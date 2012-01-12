@@ -1,5 +1,68 @@
 # TyranScript
-Script engine designed to be embedded. Aimed to be compile fast, small footprint, as few opcodes as possible, minimal dependencies and very portable. Written in C.
+Script engine designed to be embedded. Aimed to be compiled fast, have a small footprint, as few opcodes as possible, minimal dependencies and very portable. It uses reference counting to avoid costly garbage collections. Written in C.
+
+## Language
+
+### Keywords
+* if ... else
+* var
+* function
+* return
+* delete
+
+### Loop and jumps
+* for (in)
+* while
+* do ... while
+* continue
+* break
+* switch ... case ... default
+
+### Exceptions
+* try
+* catch
+* finally
+* throw
+
+### Operands
+* ","
+* "="
+* "+="
+* "-="
+* "*="
+* "%="
+* "<<="
+* ">>="
+* ">>>="
+* "&="
+* "|="
+* "^="
+* "/="
+* "||"
+* "&&"
+* "|"
+* "^"
+* "&"
+* "=="
+* "!="
+* "==="
+* "!==="
+* "<="
+* ">="
+* "instanceof"
+* "+"
+* "-"
+* "*"
+* "/"
+* "%"
+* "!"
+* "++"
+* "--"
+* "typeof"
+* "new"
+* "."
+* "[]"
+* "()"
 
 ## Opcodes
 
