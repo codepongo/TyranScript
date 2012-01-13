@@ -67,23 +67,21 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 ## Opcodes
 
 ### Stack
-* PUSH_NUMBER
-* PUSH_STRING
-* PUSH_VARIABLE
+* PUSH_NUMBER double
+* PUSH_STRING string
+* PUSH_VARIABLE variable_info* 
 * PUSH_UNDEFINED
-* PUSH_BOOLEAN
-* PUSH_FUNCTION
-* PUSH_ARGUMENTS
+* PUSH_BOOLEAN int [0 or 1]
+* PUSH_FUNCTION function*
+* PUSH_SCOPE (ARGUMENTS?)
 * PUSH_THIS
-* PUSH_TOP (DUPLICATE)
-* PUSH_TOP2 (DUPLICATE2)
-* OBJECT
-* ARRAY
-* POP
+* PUSH_TOP
+* PUSH_TOP2
+* POP int number_of_elements
 
 ### Arithmetic
-* NEGATE
-* POSITIVE
+* NEGATIVE
+* POSITIVE (convert to number)
 * NOT
 * ADD
 * SUBTRACT
@@ -93,36 +91,38 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * INCREASE
 * DECREASE
 
-### Bit operations
-* B_AND
-* B_OR
-* B_XOR
-* B_NOT
-* SHIFT
+### Bitwise operations
+* BITWISE_AND
+* BITWISE_OR
+* BITWISE_XOR
+* BITWISE_NOT
+* BITWISE_SHIFT
 
 ### Compare
-* EQUAL
-* NOT_EQUAL
-* LESS
-* GREATER
-* LESS_EQUAL
-* GREATER_EQUAL
-* STRICT_EQUAL
-* STRICT_NOT_EQUAL
+* COMPARE_EQUAL
+* COMPARE_NOT_EQUAL
+* COMPARE_LESS
+* COMPARE_GREATER
+* COMPARE_LESS_EQUAL
+* COMPARE_GREATER_EQUAL
+* COMPARE_STRICT_EQUAL
+* COMPARE_STRICT_NOT_EQUAL
 
 ### Jumps and calls
-* JUMP
-* JUMP_TRUE
-* JUMP_FALSE
-* JUMP_POP
-* CALL
-* NEW (calls constructor)
-* RETURN
+* JUMP int offset
+* JUMP_TRUE_POP int offset
+* JUMP_FALSE_POP int offset
+* JUMP_TRUE int offset
+* JUMP_FALSE int offset
+* CALL int argument_count
+* NEW (same as CALL, but creates new object as this) int argument_count
+* RETURN int pop_count
 
 ### Object manipulation
-* DELETE
-* CHANGE_THIS
-* ASSIGN
+* MAKE_OBJECT int number_of_elements
+* MAKE_ARRAY int number_of_elements
+* DELETE int number_of_elements (1=variable, 2=object member)
+* ASSIGN int number_of_elements (1=variable, 2=object member)
 * SUBSCRIPT
 * UNREFERENCE
 
@@ -131,14 +131,15 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * NEXT
 
 ### Exception
-* TRY_START
-* TRY_END
-* CATCH_START
+* TRY_BEGIN try_info* info
+* TRY_END 
+* CATCH_BEGIN string* variable_name
 * CATCH_END
-* FINALLY_START
+* FINALLY_BEGIN
 * FINALLY_END
 * THROW
 
 ### OTHER
+* LOAD_THIS
 * NOP
-* BREAK
+* DEBUG_BREAK
