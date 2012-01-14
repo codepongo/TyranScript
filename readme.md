@@ -49,7 +49,6 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * "!==="
 * "<="
 * ">="
-* "instanceof"
 * "+"
 * "-"
 * "*"
@@ -58,7 +57,6 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * "!"
 * "++"
 * "--"
-* "typeof"
 * "new"
 * "."
 * "[]"
@@ -96,7 +94,7 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * BITWISE_OR
 * BITWISE_XOR
 * BITWISE_NOT
-* BITWISE_SHIFT
+* BITWISE_SHIFT int (0=left, 1=right, 2=unsigned right)
 
 ### Compare
 * COMPARE_EQUAL
@@ -140,6 +138,6 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * THROW
 
 ### OTHER
-* LOAD_THIS
+* SET_THIS (LOAD_THIS?)
 * NOP
 * DEBUG_BREAK
