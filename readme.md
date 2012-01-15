@@ -18,12 +18,6 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * break
 * switch ... case ... default
 
-### Exceptions
-* try
-* catch
-* finally
-* throw
-
 ### Operands
 * ","
 * "="
@@ -65,19 +59,22 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 ## Opcodes
 
 ### Stack
+(10)
+
 * PUSH_NUMBER double
 * PUSH_STRING string
 * PUSH_VARIABLE variable_info* 
 * PUSH_UNDEFINED
 * PUSH_BOOLEAN int [0 or 1]
 * PUSH_FUNCTION function*
-* PUSH_SCOPE (ARGUMENTS?)
 * PUSH_THIS
 * PUSH_TOP
 * PUSH_TOP2
 * POP int number_of_elements
 
 ### Arithmetic
+(10)
+
 * NEGATIVE
 * POSITIVE (convert to number)
 * NOT
@@ -90,6 +87,8 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * DECREASE
 
 ### Bitwise operations
+(5)
+
 * BITWISE_AND
 * BITWISE_OR
 * BITWISE_XOR
@@ -97,6 +96,8 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * BITWISE_SHIFT int (0=left, 1=right, 2=unsigned right)
 
 ### Compare
+(8)
+
 * COMPARE_EQUAL
 * COMPARE_NOT_EQUAL
 * COMPARE_LESS
@@ -107,6 +108,8 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * COMPARE_STRICT_NOT_EQUAL
 
 ### Jumps and calls
+(8)
+
 * JUMP int offset
 * JUMP_TRUE_POP int offset
 * JUMP_FALSE_POP int offset
@@ -117,6 +120,8 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * RETURN int pop_count
 
 ### Object manipulation
+(6)
+
 * MAKE_OBJECT int number_of_elements
 * MAKE_ARRAY int number_of_elements
 * DELETE int number_of_elements (1=variable, 2=object member)
@@ -125,19 +130,14 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * UNREFERENCE
 
 ### Object iteration
+(2)
+
 * KEY
 * NEXT
 
-### Exception
-* TRY_BEGIN try_info* info
-* TRY_END 
-* CATCH_BEGIN string* variable_name
-* CATCH_END
-* FINALLY_BEGIN
-* FINALLY_END
-* THROW
-
 ### OTHER
+(1)
+
 * SET_THIS (LOAD_THIS?)
 * NOP
 * DEBUG_BREAK
