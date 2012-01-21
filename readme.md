@@ -111,6 +111,7 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 (8)
 
 * JUMP int offset
+* JUMP_POP jump_pop_info* (offset and pop_count)
 * JUMP_TRUE_POP int offset
 * JUMP_FALSE_POP int offset
 * JUMP_TRUE int offset
