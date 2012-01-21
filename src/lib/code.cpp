@@ -6,19 +6,19 @@
 
 
 #define OPCODES_ALLOC(code) { \
-		tyran_opcodes* r = tyran_opcodes_new(3); \
+		struct tyran_opcodes* r = tyran_opcodes_new(3); \
 		tyran_opcodes_add_code(r, (code)); \
 		return r; \
 	}
 
 #define OPCODES_ALLOC_INTEGER(code, extra) { \
-		tyran_opcodes* r = tyran_opcodes_new(3); \
+		struct tyran_opcodes* r = tyran_opcodes_new(3); \
 		tyran_opcodes_add_with_integer(r, (code), extra); \
 		return r; \
 	}
 
 #define OPCODES_ALLOC_POINTER(code, extra) { \
-		tyran_opcodes* r = tyran_opcodes_new(3); \
+		struct tyran_opcodes* r = tyran_opcodes_new(3); \
 		tyran_opcodes_add_with_pointer(r, (code), (void*)extra); \
 		return r; \
 	}
@@ -29,43 +29,51 @@ typedef struct tyran_replace_info
 	int pop_count;
 } tyran_replace_info;
 
-tyran_opcodes* tyran_opcodes_new(int size)
+struct tyran_opcodes* tyran_opcodes_new(int size)
 {
-	tyran_opcodes* ret = (tyran_opcodes*) TN_CALLOC(tyran_opcodes);
-	ret->codes = (tyran_opcode*) tyran_malloc(sizeof(tyran_opcode) * size);
+	struct tyran_opcodes* ret = (struct tyran_opcodes*) TN_CALLOC(tyran_opcodes);
+	ret->codes = (struct tyran_opcode*) tyran_malloc(sizeof(struct tyran_opcode) * size);
 	ret->code_size = size;
 	return ret;
 }
 
-tyran_opcode* tyran_opcodes_add_code(tyran_opcodes* c, tyran_opcode_id code)
+struct tyran_opcode* tyran_opcodes_add_code(struct tyran_opcodes* c, tyran_opcode_id code)
 {
 	if (c->code_size == c->code_len)
 	{
 		c->code_size = c->code_size * 2 + 1;
-		c->codes = (tyran_opcode*) realloc(c->codes, c->code_size * sizeof(tyran_opcode));
+		c->codes = (struct tyran_opcode*) realloc(c->codes, c->code_size * sizeof(struct tyran_opcode));
 	}
 	c->codes[c->code_len].opcode = code;
 	c->code_len++;
 	return &c->codes[c->code_len - 1];
 }
 
-void tyran_opcodes_add_with_pointer(tyran_opcodes* c, tyran_opcode_id opcode_id, void* param)
+void tyran_opcodes_add_with_pointer(struct tyran_opcodes* c, tyran_opcode_id opcode_id, void* param)
 {
-	tyran_opcode* code = tyran_opcodes_add_code(c, opcode_id);
+	struct tyran_opcode* code = tyran_opcodes_add_code(c, opcode_id);
 	code->dd.data = param;
 }
 
-void tyran_opcodes_add_with_integer(tyran_opcodes* c, tyran_opcode_id opcode_id, int param)
+void tyran_opcodes_add_with_integer(struct tyran_opcodes* c, tyran_opcode_id opcode_id, int param)
 {
-	tyran_opcode* code = tyran_opcodes_add_code(c, opcode_id);
+	struct tyran_opcode* code = tyran_opcodes_add_code(c, opcode_id);
 	code->dd.idata = param;
 }
 
-tyran_opcodes* tyran_opcodes_add(tyran_opcodes* a, tyran_opcodes* b)
+struct tyran_opcodes* tyran_opcodes_add(struct tyran_opcodes* a, struct tyran_opcodes* b)
 {
-	tyran_opcodes* ret = tyran_opcodes_new(a->code_len + b->code_len);
-	tyran_memcpy(ret->codes, a->codes, a->code_len * sizeof(tyran_opcode));
-	tyran_memcpy(&ret->codes[a->code_len], b->codes, b->code_len * sizeof(tyran_opcode));
+	if (!a)
+	{
+		return b;
+	}
+	if (!b)
+	{
+		return a;
+	}
+	struct tyran_opcodes* ret = tyran_opcodes_new(a->code_len + b->code_len);
+	tyran_memcpy(ret->codes, a->codes, a->code_len * sizeof(struct tyran_opcode));
+	tyran_memcpy(&ret->codes[a->code_len], b->codes, b->code_len * sizeof(struct tyran_opcode));
 
 	ret->code_size = a->code_len + b->code_len;
 	ret->code_len = ret->code_size;
@@ -80,307 +88,307 @@ tyran_opcodes* tyran_opcodes_add(tyran_opcodes* a, tyran_opcodes* b)
 	return ret;
 }
 
-tyran_opcodes* tyran_opcodes_add3(tyran_opcodes* a, tyran_opcodes* b, tyran_opcodes* c)
+struct tyran_opcodes* tyran_opcodes_add3(struct tyran_opcodes* a, struct tyran_opcodes* b, struct tyran_opcodes* c)
 {
 	return tyran_opcodes_add(tyran_opcodes_add(a, b), c);
 }
 
-tyran_opcodes* tyran_opcodes_add4(tyran_opcodes* a, tyran_opcodes* b, tyran_opcodes* c, tyran_opcodes* d)
+struct tyran_opcodes* tyran_opcodes_add4(struct tyran_opcodes* a, struct tyran_opcodes* b, struct tyran_opcodes* c, struct tyran_opcodes* d)
 {
 	return tyran_opcodes_add(tyran_opcodes_add(a, b), tyran_opcodes_add(c, d));
 }
 
 /* Stack */
-tyran_opcodes* code_push_number(double *v)
+struct tyran_opcodes* tyran_opcode_push_number(double *v)
 {
 	OPCODES_ALLOC_POINTER(TN_OP_PUSH_NUMBER, v);
 }
 
-tyran_opcodes* code_push_string(const unicode_char *str)
+struct tyran_opcodes* tyran_opcode_push_string(const unicode_char *str)
 {
 	OPCODES_ALLOC_POINTER(TN_OP_PUSH_STRING, str);
 }
 
-tyran_opcodes* code_push_variable(const unicode_char* varname)
+struct tyran_opcodes* tyran_opcode_push_variable(const unicode_char* varname)
 {
-	tyran_variable_name_info *n = (tyran_variable_name_info*) TN_CALLOC(tyran_variable_name_info);
+	struct tyran_variable_name_info *n = (struct tyran_variable_name_info*) TN_CALLOC(tyran_variable_name_info);
 	n->var.varname = varname;
 	OPCODES_ALLOC_POINTER(TN_OP_PUSH_VARIABLE, n);
 }
 
-tyran_opcodes* code_push_undefined()
+struct tyran_opcodes* tyran_opcode_push_undefined()
 {
 	OPCODES_ALLOC(TN_OP_PUSH_UNDEFINED);
 }
 
-tyran_opcodes* code_push_boolean(int v)
+struct tyran_opcodes* tyran_opcode_push_boolean(int v)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_PUSH_BOOLEAN, v);
 }
 
-tyran_opcodes* code_push_function(struct tyran_function *fun)
+struct tyran_opcodes* tyran_opcode_push_function(struct tyran_function *fun)
 {
 	OPCODES_ALLOC_POINTER(TN_OP_PUSH_FUNCTION, fun);
 }
 
-tyran_opcodes* code_push_scope()
+struct tyran_opcodes* tyran_opcode_push_scope()
 {
 	OPCODES_ALLOC(TN_OP_PUSH_SCOPE);
 }
 
-tyran_opcodes* code_push_this()
+struct tyran_opcodes* tyran_opcode_push_this()
 {
 	OPCODES_ALLOC(TN_OP_PUSH_THIS);
 }
 
-tyran_opcodes* code_push_top()
+struct tyran_opcodes* tyran_opcode_push_top()
 {
 	OPCODES_ALLOC(TN_OP_PUSH_TOP);
 }
 
-tyran_opcodes* code_push_top2()
+struct tyran_opcodes* tyran_opcode_push_top2()
 {
 	OPCODES_ALLOC(TN_OP_PUSH_TOP2);
 }
 
-tyran_opcodes* tyran_opcode_pop(int n)
+struct tyran_opcodes* tyran_opcode_pop(int n)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_POP, n);
 }
 
 
 /* Arithmetic */
-tyran_opcodes* code_negative()
+struct tyran_opcodes* tyran_opcode_negative()
 {
 	OPCODES_ALLOC(TN_OP_NEGATIVE);
 }
 
-tyran_opcodes* code_positive()
+struct tyran_opcodes* tyran_opcode_positive()
 {
 	OPCODES_ALLOC(TN_OP_POSITIVE);
 }
 
-tyran_opcodes* code_not()
+struct tyran_opcodes* tyran_opcode_not()
 {
 	OPCODES_ALLOC(TN_OP_NOT);
 }
 
-tyran_opcodes* code_add()
+struct tyran_opcodes* tyran_opcode_add()
 {
 	OPCODES_ALLOC(TN_OP_ADD);
 }
 
-tyran_opcodes* code_subtract()
+struct tyran_opcodes* tyran_opcode_subtract()
 {
 	OPCODES_ALLOC(TN_OP_SUBTRACT);
 }
 
-tyran_opcodes* code_multiply()
+struct tyran_opcodes* tyran_opcode_multiply()
 {
 	OPCODES_ALLOC(TN_OP_MULTIPLY);
 }
 
-tyran_opcodes* code_divide()
+struct tyran_opcodes* tyran_opcode_divide()
 {
 	OPCODES_ALLOC(TN_OP_DIVIDE);
 }
 
-tyran_opcodes* code_modulus()
+struct tyran_opcodes* tyran_opcode_modulus()
 {
 	OPCODES_ALLOC(TN_OP_MODULUS);
 }
 
-tyran_opcodes* code_increase(int e)
+struct tyran_opcodes* tyran_opcode_increase(int e)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_INCREASE, e);
 }
 
-tyran_opcodes* code_decrease(int e)
+struct tyran_opcodes* tyran_opcode_decrease(int e)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_DECREASE, e);
 }
 
 /* Bitwise */
-tyran_opcodes* tyran_opcode_bitwise_not()
+struct tyran_opcodes* tyran_opcode_bitwise_not()
 {
 	OPCODES_ALLOC(TN_OP_BITWISE_NOT);
 }
 
-tyran_opcodes* tyran_opcode_bitwise_and()
+struct tyran_opcodes* tyran_opcode_bitwise_and()
 {
 	OPCODES_ALLOC(TN_OP_BITWISE_AND);
 }
 
-tyran_opcodes* tyran_opcode_bitwise_or()
+struct tyran_opcodes* tyran_opcode_bitwise_or()
 {
 	OPCODES_ALLOC(TN_OP_BITWISE_OR);
 }
 
-tyran_opcodes* tyran_opcode_bitwise_xor()
+struct tyran_opcodes* tyran_opcode_bitwise_xor()
 {
 	OPCODES_ALLOC(TN_OP_BITWISE_XOR);
 }
 
-tyran_opcodes* tyran_opcode_bitwise_shift(enum tyran_shift_mode mode)
+struct tyran_opcodes* tyran_opcode_bitwise_shift(enum tyran_shift_mode mode)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_BITWISE_SHIFT, mode);
 }
 
 /* Compare */
-tyran_opcodes* tyran_opcode_compare_equal()
+struct tyran_opcodes* tyran_opcode_compare_equal()
 {
 	OPCODES_ALLOC(TN_OP_COMPARE_EQUAL);
 }
 
-tyran_opcodes* tyran_opcode_compare_not_equal()
+struct tyran_opcodes* tyran_opcode_compare_not_equal()
 {
 	OPCODES_ALLOC(TN_OP_COMPARE_NOT_EQUAL);
 }
 
-tyran_opcodes* tyran_opcode_compare_less()
+struct tyran_opcodes* tyran_opcode_compare_less()
 {
 	OPCODES_ALLOC(TN_OP_COMPARE_LESS);
 }
 
-tyran_opcodes* tyran_opcode_compare_less_equal()
+struct tyran_opcodes* tyran_opcode_compare_less_equal()
 {
 	OPCODES_ALLOC(TN_OP_COMPARE_LESS_EQUAL);
 }
 
-tyran_opcodes* tyran_opcode_compare_greater()
+struct tyran_opcodes* tyran_opcode_compare_greater()
 {
 	OPCODES_ALLOC(TN_OP_COMPARE_GREATER);
 }
 
-tyran_opcodes* tyran_opcode_compare_greater_equal()
+struct tyran_opcodes* tyran_opcode_compare_greater_equal()
 {
 	OPCODES_ALLOC(TN_OP_COMPARE_GREATER_EQUAL);
 }
 
-tyran_opcodes* tyran_opcode_compare_strict_equal()
+struct tyran_opcodes* tyran_opcode_compare_strict_equal()
 {
 	OPCODES_ALLOC(TN_OP_COMPARE_STRICT_EQUAL);
 }
 
-tyran_opcodes* tyran_opcode_compare_strict_not_equal()
+struct tyran_opcodes* tyran_opcode_compare_strict_not_equal()
 {
 	OPCODES_ALLOC(TN_OP_COMPARE_STRICT_NOT_EQUAL);
 }
 
 /* Jumps */
-tyran_opcodes* tyran_opcode_jump_false(int off)
+struct tyran_opcodes* tyran_opcode_jump_false(int off)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_JUMP_FALSE, off);
 }
 
-tyran_opcodes* tyran_opcode_jump_true(int off)
+struct tyran_opcodes* tyran_opcode_jump_true(int off)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_JUMP_TRUE, off);
 }
 
-tyran_opcodes* tyran_opcode_jump_false_pop(int off)
+struct tyran_opcodes* tyran_opcode_jump_false_pop(int off)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_JUMP_FALSE_POP, off);
 }
 
-tyran_opcodes* tyran_opcode_jump_true_pop(int off)
+struct tyran_opcodes* tyran_opcode_jump_true_pop(int off)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_JUMP_TRUE_POP, off);
 }
 
-tyran_opcodes* tyran_opcode_jump(int off)
+struct tyran_opcodes* tyran_opcode_jump(int off)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_JUMP, off);
 }
 
-tyran_jump_pop_info* tyran_opcodes_jump_pop_info_new(int offset, int pop_count)
+struct tyran_jump_pop_info* tyran_opcodes_jump_pop_info_new(int offset, int pop_count)
 {
-	tyran_jump_pop_info *r = (tyran_jump_pop_info*) malloc(sizeof(tyran_jump_pop_info));
+	struct tyran_jump_pop_info *r = (struct tyran_jump_pop_info*) malloc(sizeof(struct tyran_jump_pop_info));
 	r->offset = offset;
 	r->pop_count = pop_count;
 	return r;
 }
 
-tyran_opcodes* tyran_opcode_jump_pop(int offset, int pop_count)
+struct tyran_opcodes* tyran_opcode_jump_pop(int offset, int pop_count)
 {
 	OPCODES_ALLOC_POINTER(TN_OP_JUMP_POP, tyran_opcodes_jump_pop_info_new(offset, pop_count));
 }
 
-tyran_opcodes* tyran_opcode_call(int argc)
+struct tyran_opcodes* tyran_opcode_call(int argc)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_CALL, argc);
 }
 
-tyran_opcodes* tyran_opcode_new(int argc)
+struct tyran_opcodes* tyran_opcode_new(int argc)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_NEW, argc);
 }
 
-tyran_opcodes* tyran_opcode_return(int pop_count)
+struct tyran_opcodes* tyran_opcode_return(int pop_count)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_RETURN, pop_count);
 }
 
 /* Object */
-tyran_opcodes* tyran_opcode_assign(enum tyran_assign_mode mode)
+struct tyran_opcodes* tyran_opcode_assign(enum tyran_assign_mode mode)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_ASSIGN, mode);
 }
 
-tyran_opcodes* tyran_opcode_unreference()
+struct tyran_opcodes* tyran_opcode_unreference()
 {
 	OPCODES_ALLOC(TN_OP_UNREFERENCE);
 }
 
-tyran_opcodes* tyran_opcode_subscript(int is_right_value)
+struct tyran_opcodes* tyran_opcode_subscript(int is_right_value)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_SUBSCRIPT, is_right_value);
 }
 
 /* Object iteration */
-tyran_opcodes* tyran_opcode_key()
+struct tyran_opcodes* tyran_opcode_key()
 {
 	OPCODES_ALLOC(TN_OP_KEY);
 }
 
-tyran_opcodes* tyran_opcode_next()
+struct tyran_opcodes* tyran_opcode_next()
 {
 	OPCODES_ALLOC(TN_OP_NEXT);
 }
 
 /* Other */
-tyran_opcodes* tyran_opcode_nop()
+struct tyran_opcodes* tyran_opcode_nop()
 {
 	OPCODES_ALLOC(TN_OP_NOP);
 }
 
-tyran_opcodes* tyran_opcode_load_this(int n)
+struct tyran_opcodes* tyran_opcode_load_this(int n)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_LOAD_THIS, n);
 }
 
-tyran_opcodes* tyran_opcode_make_object(int c)
+struct tyran_opcodes* tyran_opcode_make_object(int c)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_MAKE_OBJECT, c);
 }
 
-tyran_opcodes* tyran_opcode_make_array(int c)
+struct tyran_opcodes* tyran_opcode_make_array(int c)
 {
 	OPCODES_ALLOC_INTEGER(TN_OP_MAKE_ARRAY, c);
 }
 
-tyran_opcodes* tyran_opcode_delete(int n)
+struct tyran_opcodes* tyran_opcode_delete(enum tyran_assign_mode mode)
 {
-	OPCODES_ALLOC_INTEGER(TN_OP_DELETE, n);
+	OPCODES_ALLOC_INTEGER(TN_OP_DELETE, mode);
 }
 
-void tyran_opcodes_free(tyran_opcodes* ops)
+void tyran_opcodes_free(struct tyran_opcodes* ops)
 {
 	tyran_free(ops->codes);
 	tyran_free(ops);
 }
 
-tyran_opcodes* tyran_opcodes_mark_for_resolve(enum tyran_resolve_type type)
+struct tyran_opcodes* tyran_opcodes_mark_for_resolve(enum tyran_resolve_type type)
 {
 	tyran_replace_info *ri = (tyran_replace_info*) malloc(sizeof(tyran_replace_info));
 	ri->type = type;
@@ -388,7 +396,7 @@ tyran_opcodes* tyran_opcodes_mark_for_resolve(enum tyran_resolve_type type)
 	OPCODES_ALLOC_POINTER(TN_OP_INTERNAL, ri);
 }
 
-void tyran_opcodes_resolve(tyran_opcodes* ops, int step_len, int break_only, int pop_count)
+void tyran_opcodes_resolve(struct tyran_opcodes* ops, int step_len, int break_only, int pop_count)
 {
 	int i;
 

@@ -23,7 +23,7 @@ struct tyran_opcodes* tyran_opcode_push_string(const unicode_char* str);
 struct tyran_opcodes* tyran_opcode_push_variable(const unicode_char* varname);
 struct tyran_opcodes* tyran_opcode_push_undefined();
 struct tyran_opcodes* tyran_opcode_push_boolean(int v);
-struct tyran_opcodes* tyran_opcode_push_function(const struct tyran_function* fun);
+struct tyran_opcodes* tyran_opcode_push_function(struct tyran_function* fun);
 struct tyran_opcodes* tyran_opcode_push_scope();
 struct tyran_opcodes* tyran_opcode_push_this();
 struct tyran_opcodes* tyran_opcode_push_top();
@@ -76,7 +76,7 @@ struct tyran_opcodes* tyran_opcode_unreference();
 struct tyran_opcodes* tyran_opcode_subscript(int is_right_value);
 struct tyran_opcodes* tyran_opcode_make_object(int count);
 struct tyran_opcodes* tyran_opcode_make_array(int count);
-struct tyran_opcodes* tyran_opcode_delete(int n);
+struct tyran_opcodes* tyran_opcode_delete(enum tyran_assign_mode mode);
 
 /* Object iteration */
 struct tyran_opcodes* tyran_opcode_key();
