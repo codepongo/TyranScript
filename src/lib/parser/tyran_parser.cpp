@@ -3166,7 +3166,7 @@ yyreduce:
   case 130:
 #line 804 "tyran_parser.y"
     {
-		struct tyran_opcodes *ff = tyran_opcodes_merge4((struct tyran_opcodes*)(yyvsp[(1) - (6)]), tyran_opcodes_insert_push_string((const tyran_string*)(yyvsp[(3) - (6)])), tyran_opcodes_insert_load_this(1), tyran_opcodes_insert_subscript(1));
+		struct tyran_opcodes *ff = tyran_opcodes_merge4((struct tyran_opcodes*)(yyvsp[(1) - (6)]), tyran_opcodes_insert_push_string((const tyran_string*)(yyvsp[(3) - (6)])), tyran_opcodes_insert_load_this(), tyran_opcodes_insert_subscript(1));
 		struct tyran_opcodes *expression_list = (struct tyran_opcodes*)(yyvsp[(5) - (6)]);
 		int expression_count = expression_list ? expression_list->expression_count : 0;
 		(yyval) = tyran_opcodes_merge3(ff, expression_list, tyran_opcodes_insert_call(expression_count));
@@ -3176,7 +3176,7 @@ yyreduce:
   case 131:
 #line 810 "tyran_parser.y"
     {
-		struct tyran_opcodes *ff = tyran_opcodes_merge4((struct tyran_opcodes*)(yyvsp[(1) - (7)]), (struct tyran_opcodes*)(yyvsp[(3) - (7)]), tyran_opcodes_insert_load_this(1), tyran_opcodes_insert_subscript(1));
+		struct tyran_opcodes *ff = tyran_opcodes_merge4((struct tyran_opcodes*)(yyvsp[(1) - (7)]), (struct tyran_opcodes*)(yyvsp[(3) - (7)]), tyran_opcodes_insert_load_this(), tyran_opcodes_insert_subscript(1));
 		struct tyran_opcodes *expression_list = (struct tyran_opcodes*)(yyvsp[(6) - (7)]);
 		int expression_count = expression_list ? expression_list->expression_count : 0;
 		(yyval) = tyran_opcodes_merge3(ff, expression_list, tyran_opcodes_insert_call(expression_count));
@@ -3188,7 +3188,7 @@ yyreduce:
     {
 		struct tyran_opcodes *expression_list = (struct tyran_opcodes*)(yyvsp[(5) - (6)]);
 		int expression_count = expression_list ? expression_list->expression_count : 0;
-		(yyval) = tyran_opcodes_merge4((struct tyran_opcodes*)(yyvsp[(2) - (6)]), tyran_opcodes_insert_load_this(0), expression_list, tyran_opcodes_insert_call(expression_count));
+		(yyval) = tyran_opcodes_merge3((struct tyran_opcodes*)(yyvsp[(2) - (6)]), expression_list, tyran_opcodes_insert_call(expression_count));
 	;}
     break;
 
@@ -3200,10 +3200,10 @@ yyreduce:
 		struct tyran_opcodes *pref;
 		struct tyran_opcodes *lvalue = (struct tyran_opcodes*)(yyvsp[(1) - (4)]);
 		if (lvalue->lvalue_flag == tyran_assign_object) {
-			pref = tyran_opcodes_merge3((struct tyran_opcodes*)(yyvsp[(1) - (4)]), tyran_opcodes_insert_load_this(1), tyran_opcodes_insert_subscript(1));
+			pref = tyran_opcodes_merge3((struct tyran_opcodes*)(yyvsp[(1) - (4)]), tyran_opcodes_insert_load_this(), tyran_opcodes_insert_subscript(1));
 			(yyval) = tyran_opcodes_merge3(pref, expression_list, tyran_opcodes_insert_call(expression_count));
 		} else {
-			pref = tyran_opcodes_merge((struct tyran_opcodes*)(yyvsp[(1) - (4)]), tyran_opcodes_insert_load_this(0));
+			pref = (struct tyran_opcodes*)(yyvsp[(1) - (4)]);
 			(yyval) = tyran_opcodes_merge3(pref, expression_list, tyran_opcodes_insert_call(expression_count));
 		}
 	;}

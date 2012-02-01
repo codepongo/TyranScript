@@ -341,9 +341,9 @@ struct tyran_opcodes* tyran_opcodes_insert_nop()
 	OPCODES_ALLOC(TYRAN_OPCODE_NOP);
 }
 
-struct tyran_opcodes* tyran_opcodes_insert_load_this(int n)
+struct tyran_opcodes* tyran_opcodes_insert_load_this()
 {
-	OPCODES_ALLOC_INTEGER(TYRAN_OPCODE_LOAD_THIS, n);
+	OPCODES_ALLOC(TYRAN_OPCODE_LOAD_THIS);
 }
 
 struct tyran_opcodes* tyran_opcodes_insert_make_object(int c)

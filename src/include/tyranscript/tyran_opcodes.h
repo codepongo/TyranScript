@@ -94,6 +94,6 @@ struct tyran_opcodes* tyran_opcodes_insert_next();
 
 /* Other */
 struct tyran_opcodes* tyran_opcodes_insert_nop();
-struct tyran_opcodes* tyran_opcodes_insert_load_this(int n);
+struct tyran_opcodes* tyran_opcodes_insert_load_this();
 
 #endif

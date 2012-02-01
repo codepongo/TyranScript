@@ -802,13 +802,13 @@ function_statement_block:
 
 function_call_expression:
 	expression TYRAN_TOKEN_MEMBER TYRAN_TOKEN_IDENTIFIER TYRAN_TOKEN_PARENTHESES_LEFT expression_list_optional TYRAN_TOKEN_PARENTHESES_RIGHT {
-		struct tyran_opcodes *ff = tyran_opcodes_merge4((struct tyran_opcodes*)$1, tyran_opcodes_insert_push_string((const tyran_string*)$3), tyran_opcodes_insert_load_this(1), tyran_opcodes_insert_subscript(1));
+		struct tyran_opcodes *ff = tyran_opcodes_merge4((struct tyran_opcodes*)$1, tyran_opcodes_insert_push_string((const tyran_string*)$3), tyran_opcodes_insert_load_this(), tyran_opcodes_insert_subscript(1));
 		struct tyran_opcodes *expression_list = (struct tyran_opcodes*)$5;
 		int expression_count = expression_list ? expression_list->expression_count : 0;
 		$$ = tyran_opcodes_merge3(ff, expression_list, tyran_opcodes_insert_call(expression_count));
 	}
 	| expression TYRAN_TOKEN_BRACKET_LEFT expression TYRAN_TOKEN_BRACKET_RIGHT TYRAN_TOKEN_PARENTHESES_LEFT expression_list_optional TYRAN_TOKEN_PARENTHESES_RIGHT {
-		struct tyran_opcodes *ff = tyran_opcodes_merge4((struct tyran_opcodes*)$1, (struct tyran_opcodes*)$3, tyran_opcodes_insert_load_this(1), tyran_opcodes_insert_subscript(1));
+		struct tyran_opcodes *ff = tyran_opcodes_merge4((struct tyran_opcodes*)$1, (struct tyran_opcodes*)$3, tyran_opcodes_insert_load_this(), tyran_opcodes_insert_subscript(1));
 		struct tyran_opcodes *expression_list = (struct tyran_opcodes*)$6;
 		int expression_count = expression_list ? expression_list->expression_count : 0;
 		$$ = tyran_opcodes_merge3(ff, expression_list, tyran_opcodes_insert_call(expression_count));
@@ -816,7 +816,7 @@ function_call_expression:
 	| TYRAN_TOKEN_PARENTHESES_LEFT expression TYRAN_TOKEN_PARENTHESES_RIGHT TYRAN_TOKEN_PARENTHESES_LEFT expression_list_optional TYRAN_TOKEN_PARENTHESES_RIGHT {
 		struct tyran_opcodes *expression_list = (struct tyran_opcodes*)$5;
 		int expression_count = expression_list ? expression_list->expression_count : 0;
-		$$ = tyran_opcodes_merge4((struct tyran_opcodes*)$2, tyran_opcodes_insert_load_this(0), expression_list, tyran_opcodes_insert_call(expression_count));
+		$$ = tyran_opcodes_merge3((struct tyran_opcodes*)$2, expression_list, tyran_opcodes_insert_call(expression_count));
 	}
 	| lvalue TYRAN_TOKEN_PARENTHESES_LEFT expression_list_optional TYRAN_TOKEN_PARENTHESES_RIGHT {
 		struct tyran_opcodes *expression_list = (struct tyran_opcodes*)$3;
@@ -824,10 +824,10 @@ function_call_expression:
 		struct tyran_opcodes *pref;
 		struct tyran_opcodes *lvalue = (struct tyran_opcodes*)$1;
 		if (lvalue->lvalue_flag == tyran_assign_object) {
-			pref = tyran_opcodes_merge3((struct tyran_opcodes*)$1, tyran_opcodes_insert_load_this(1), tyran_opcodes_insert_subscript(1));
+			pref = tyran_opcodes_merge3((struct tyran_opcodes*)$1, tyran_opcodes_insert_load_this(), tyran_opcodes_insert_subscript(1));
 			$$ = tyran_opcodes_merge3(pref, expression_list, tyran_opcodes_insert_call(expression_count));
 		} else {
-			pref = tyran_opcodes_merge((struct tyran_opcodes*)$1, tyran_opcodes_insert_load_this(0));
+			pref = (struct tyran_opcodes*)$1;
 			$$ = tyran_opcodes_merge3(pref, expression_list, tyran_opcodes_insert_call(expression_count));
 		}
 	}
