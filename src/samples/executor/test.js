@@ -1,7 +1,7 @@
-var start = 2 + 2 * 16;
-
-function test(a) {
-	return a * a;
+function test() {
+	for (i=0; i<10; ++i) {
+		print(i);
+	}
 }
 
-return test(start);
+test();

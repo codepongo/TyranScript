@@ -1,5 +1,11 @@
 #include <tyranscript/tyran_api.h>
 
+void expose_function(tyran_value* global, const char* name, tyran_function_callback static_function)
+{
+	tyran_value* function_object = tyran_function_object_new_callback(static_function);
+	tyran_value_object_insert_string_key(global, tyran_string_from_c_str(name), function_object);
+}
+
 int read_file(const char* filename, char* buf, int max_length)
 {
 	FILE* fp = fopen(filename, "rb");
@@ -23,12 +29,19 @@ tyran_parser_state* parse_file(const char* filename)
 	return state;
 }
 
+static int script_print(tyran_runtime* runtime, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
+{
+	tyran_print_value("", args, 1);
+	return 0;
+}
 
 tyran_value* create_context()
 {
 	tyran_value* global = tyran_value_new();
 	tyran_value_set_object(*global, tyran_object_new());
 	tyran_prototypes_init(global);
+
+	expose_function(global, "print", script_print);
 
 	return global;
 }
