@@ -1,0 +1,20 @@
+<target name="tyranscript" type="executable">
+        <!-- configurations -->
+        <configuration name="debug">
+                <define name="DEBUG" />
+        </configuration>
+
+        <configuration name="release">
+        </configuration>
+        <configuration name="adhoc">
+        </configuration>
+        <configuration name="distribution">
+        </configuration>
+
+	<compiler program="g++" flags="-Wall" />
+	<linker program="g++" flags="" />
+
+	<source directory="../../lib" recursive="true"/>
+	<header directory="../../include" />
+	<source directory='.'/>
+</target>
