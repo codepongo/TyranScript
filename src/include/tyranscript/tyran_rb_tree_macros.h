@@ -1,5 +1,5 @@
-#ifndef __MACROS_H__
-#define __MACROS_H__
+#ifndef RB__MACROS_H__
+#define RB__MACROS_H__
 
 #include <stdlib.h>
 
@@ -9,15 +9,8 @@
  * Simple macro to malloc data and check if the allocation was successfull.
  * A simple use can be char* string = alloc(char, 5); which allocates a string with 5 characters.
  */
-#define alloc(type, how_many)				\
-  (type *) __alloc(malloc(how_many * sizeof(type)));	
-
-static void* __alloc(void* x){
-  if(x)
-    return x;
-  exit(1);
-  return 0;
-}
+#define rb_alloc(type, how_many)				\
+  (type *) (void *)tyran_malloc(how_many * sizeof(type));
 
 #endif
 

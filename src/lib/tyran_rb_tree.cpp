@@ -3,11 +3,12 @@
 #include <sys/types.h>
 #include <tyranscript/tyran_rb_tree.h>
 #include <tyranscript/tyran_rb_tree_macros.h>
+#include <tyranscript/tyran_config.h>
 
 tree_node RBNIL;
 
 static tree_node* new_rbtree_node(void* node){
-  tree_node *z = alloc(tree_node, 1);
+  tree_node *z = rb_alloc(tree_node, 1);
 
   RBNIL.node = NULL;
   RBNIL.color = BLACK;
@@ -29,7 +30,7 @@ tree_root* new_simple_rbtree(){
 
 tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node),
 		    int (*compare_function_pointer)(void* keyA, void* keyB)){
-  tree_root* r = alloc(tree_root, 1);
+  tree_root* r = rb_alloc(tree_root, 1);
   r->root = &RBNIL;
   r->key = key_function_pointer;
   r->compare = compare_function_pointer;
@@ -327,7 +328,7 @@ void* rb_tree_delete(tree_root* root, void* key){
 
 tree_iterator* new_tree_iterator(tree_root* root){
   tree_node* aux = root->root;
-  tree_iterator* it = alloc(tree_iterator, 1);
+  tree_iterator* it = rb_alloc(tree_iterator, 1);
 
   while(aux->left != &RBNIL || aux->right != &RBNIL){ 
     while(aux->left != &RBNIL)
