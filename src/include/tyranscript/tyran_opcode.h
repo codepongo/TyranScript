@@ -4,25 +4,25 @@
 #include <tyranscript/tyran_opcode_ids.h>
 #include <tyranscript/tyran_string.h>
 
-struct tyran_opcode {
+typedef struct tyran_opcode {
 	tyran_opcode_id opcode;
 	union data {
 		void* pointer;
 		int integer;
 	} data;
-};
+} tyran_opcode;
 
-struct tyran_jump_pop_info {
+typedef struct tyran_jump_pop_info {
 	int offset;
 	int pop_count;
-};
+} tyran_jump_pop_info;
 
-struct tyran_variable_name_info {
+typedef struct tyran_variable_name_info {
 	struct {
 		const tyran_string* variable_name;
 		struct tyran_value* variable;
 	} data;
-};
+} tyran_variable_name_info;
 
 #endif
 

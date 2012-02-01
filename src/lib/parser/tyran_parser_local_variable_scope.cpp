@@ -4,9 +4,9 @@
 #include "tyran_parser_local_variable_scope.h"
 #include "../tyran_string_array.h"
 
-const int TYRAN_LOCAL_VARIABLE_SCOPE_MAX_DEPTH = 1024;
+#define  TYRAN_LOCAL_VARIABLE_SCOPE_MAX_DEPTH 1024
 
-static tyran_string_array* scopes[TYRAN_LOCAL_VARIABLE_SCOPE_MAX_DEPTH];
+tyran_string_array* scopes[TYRAN_LOCAL_VARIABLE_SCOPE_MAX_DEPTH];
 static int tyran_local_variable_scope_index;
 
 void tyran_parser_local_variable_scope_push()

@@ -1,6 +1,8 @@
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_config.h>
 
+#define tyran_string_max_length 512
+
 const tyran_string* tyran_string_strdup(const tyran_string* str)
 {
 	int len = TYRAN_UNICODE_STRLEN(str);
@@ -43,27 +45,25 @@ void tyran_string_free(const tyran_string* d)
 	tyran_free((void *)(((char*)d) - sizeof(tyran_string_length_type) ));
 }
 
-const int max_string_len = 512;
-
 const char *tyran_string_to_c_str(const tyran_string* str)
 {
-	static char buf[max_string_len];
+	static char buf[tyran_string_max_length];
 	int i;
 	int len = TYRAN_UNICODE_STRLEN(str);
 
-	for (i = 0; i < len && i < max_string_len; ++i) buf[i] = (char)str[i];
+	for (i = 0; i < len && i < tyran_string_max_length; ++i) buf[i] = (char)str[i];
 	buf[i] = 0;
 	return buf;
 }
 
 const tyran_string* tyran_string_from_c_str(const char* str)
 {
-	static tyran_string buf[max_string_len];
+	static tyran_string buf[tyran_string_max_length];
 	tyran_string_length_type *len = (tyran_string_length_type *)buf;
 	tyran_string* b = (tyran_string *)((char*)buf + sizeof(tyran_string_length_type));
 	tyran_string_length_type i;
 
-	for (i = 0; str[i] && i < max_string_len; ++i) {
+	for (i = 0; str[i] && i < tyran_string_max_length; ++i) {
 		b[i] = str[i];
 	}
 	*len = i;

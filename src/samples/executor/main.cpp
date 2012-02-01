@@ -33,11 +33,6 @@ tyran_value* create_context()
 	return global;
 }
 
-void execute()
-{
-
-}
-
 void execute(tyran_opcodes* opcodes)
 {
 	tyran_value return_value;

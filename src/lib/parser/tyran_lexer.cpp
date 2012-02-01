@@ -40,12 +40,12 @@ static void tyran_lexer_push_character(int c, tyran_lexer* lexer)
 
 static int tyran_lexer_get_keyword_token(const char* temp_string_buffer)
 {
-	struct tyran_lexer_keyword {
+	typedef struct tyran_lexer_keyword {
 		const char* name;
 		int token_value;
-	};
+	} tyran_lexer_keyword;
 
-	static struct tyran_lexer_keyword keywords[] = {
+	static tyran_lexer_keyword keywords[] = {
 		{ "var", TYRAN_TOKEN_LOCAL },
 		{ "new", TYRAN_TOKEN_NEW },
 		{ "delete", TYRAN_TOKEN_DELETE },
@@ -71,7 +71,7 @@ static int tyran_lexer_get_keyword_token(const char* temp_string_buffer)
 
 	size_t i;
 
-	for (i = 0; i < sizeof(keywords) / sizeof(struct tyran_lexer_keyword); ++i) {
+	for (i = 0; i < sizeof(keywords) / sizeof(tyran_lexer_keyword); ++i) {
 		if (tyran_strcmp(temp_string_buffer, keywords[i].name) == 0)
 			return keywords[i].token_value;
 	}
@@ -148,11 +148,11 @@ const tyran_string* tyran_lexer_parse_string(tyran_lexer* lexer)
 
 int tyran_lexer_parse_operand(tyran_lexer* lexer)
 {
-	struct tyran_operand_info {
+	typedef struct tyran_operand_info {
 		const char* name;
 		int len;
 		int value;
-	};
+	} tyran_operand_info;
 	
 	static tyran_operand_info operands[] = {
 		{ ">>>=", 4, TYRAN_TOKEN_UNSIGNED_SHIFT_RIGHT_ASSIGNMENT },
@@ -219,11 +219,11 @@ int tyran_lexer_parse_operand(tyran_lexer* lexer)
 		return 0;
 	}
 
-	for (i = 0; i < sizeof(operands)/sizeof(struct tyran_operand_info); ++i) {
+	for (i = 0; i < sizeof(operands)/sizeof(tyran_operand_info); ++i) {
 		if (index < operands[i].len) {
 			continue;
 		}
-		
+
 		if (tyran_strncmp(buf, operands[i].name, operands[i].len) == 0) {
 			int j;
 			for (j = index - 1; j >= operands[i].len; --j) {

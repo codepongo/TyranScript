@@ -3,7 +3,7 @@
 
 struct tyran_value;
 
-void tyran_value_convert_to_string(tyran_value* v);
-int tyran_value_to_integer(tyran_value* v);
+void tyran_value_convert_to_string(struct tyran_value* v);
+int tyran_value_to_integer(struct tyran_value* v);
 
 #endif

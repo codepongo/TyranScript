@@ -13,7 +13,7 @@ typedef struct tyran_lexer {
 	int last_token;
 } tyran_lexer;
 
-int yylex(YYSTYPE* token, YYLTYPE* lexer_position_info, tyran_parser_state* parser_state);
-void yyerror(YYLTYPE* lexer_position_info, tyran_parser_state* ps, const char* error_message);
+int yylex(YYSTYPE* token, YYLTYPE* lexer_position_info, struct tyran_parser_state* parser_state);
+void yyerror(YYLTYPE* lexer_position_info, struct tyran_parser_state* ps, const char* error_message);
 
 #endif

@@ -54,14 +54,14 @@ const char* tyran_value_to_c_string(const tyran_value* v)
 		default:
 			TYRAN_ERROR("Unknown value type");
 	}
-    
+
     return buf;
 }
 
 void tyran_print_value_helper(int tabs, const char* property, const tyran_value* v, int quote)
 {
 	int t;
-	
+
 	if (v == tyran_object_prototype || v == tyran_array_prototype || v == tyran_function_prototype) {
 		return;
 	}
@@ -116,7 +116,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 			strcpy(value, tyran_value_to_c_string(v));
 			break;
 	}
-	
+
 	TYRAN_LOG("%s %s", prefix, value);
 
 	if (v->type == TYRAN_VALUE_TYPE_OBJECT) {
@@ -126,7 +126,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 		if (len > 0) {
 			int i;
 			tyran_value* nv;
-			
+
 			TYRAN_LOG("[]");
 			char desc[256];
 			for (i = 0; i < len; ++i) {
@@ -140,14 +140,15 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 			tyran_object_iterator* target_iterator = tyran_object_iterator_new();
 			tyran_object_get_keys(v, target_iterator);
 			int flag;
-			for (int i=0; i<target_iterator->count; ++i) {
+			int i;
+			for (i=0; i<target_iterator->count; ++i) {
 				const tyran_object_key* key = target_iterator->keys[i];
 				tyran_value* sub_value = tyran_value_object_lookup(v, key, &flag);
 				if (sub_value) {
 					tyran_print_value_helper(tabs, tyran_string_to_c_str((const tyran_string*)key), sub_value, quote);
 				}
 			}
-			
+
 			tyran_value* prototype = tyran_object_get_prototype(o);
 			if (prototype) {
 				if (prototype != v) {

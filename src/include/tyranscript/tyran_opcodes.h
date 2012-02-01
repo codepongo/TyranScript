@@ -7,7 +7,7 @@
 struct tyran_function;
 struct tyran_opcode;
 
-struct tyran_opcodes {
+typedef struct tyran_opcodes {
 	struct tyran_opcode* codes;
 	int code_len;
 	int code_size;
@@ -15,7 +15,7 @@ struct tyran_opcodes {
 	int expression_count;
 	enum tyran_assign_mode lvalue_flag;
 	const tyran_string* lvalue_name;
-};
+} tyran_opcodes;
 
 /* Opcodes */
 struct tyran_opcodes* tyran_opcodes_new(int size);

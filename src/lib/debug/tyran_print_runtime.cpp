@@ -6,7 +6,7 @@
 #include <tyranscript/debug/tyran_opcodes_print.h>
 #include <tyranscript/debug/tyran_print_value.h>
 
-void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _this, const tyran_opcode* opcode, int ip)
+void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _this, const struct tyran_opcode* opcode, int ip)
 {
 	int i;
 	char stack_info[2048];

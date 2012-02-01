@@ -9,10 +9,10 @@
 
 static TYRAN_UNICODE_STRING(6) LENGTH_STRING = { 6, {'l','e','n','g','t','h'}};
 
-struct tyran_rb_tree_key_value_node {
+typedef struct tyran_rb_tree_key_value_node {
 	const tyran_object_key* key;
 	struct tyran_value* value;
-};
+} tyran_rb_tree_key_value_node;
 
 void* tyran_object_key_get(struct stree_node* node)
 {

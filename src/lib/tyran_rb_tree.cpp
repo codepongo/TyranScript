@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <tyranscript/tyran_rb_tree.h>
+#include <tyranscript/tyran_rb_tree_macros.h>
 
 tree_node RBNIL;
 
@@ -27,11 +28,11 @@ tree_root* new_simple_rbtree(){
 }
 
 tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node),
-		    int64_t (*compare_function_pointer)(void* keyA, void* keyB)){
+		    int (*compare_function_pointer)(void* keyA, void* keyB)){
   tree_root* r = alloc(tree_root, 1);
   r->root = &RBNIL;
-   r->key = key_function_pointer;
-   r->compare = compare_function_pointer;
+  r->key = key_function_pointer;
+  r->compare = compare_function_pointer;
   return r;
 }
 

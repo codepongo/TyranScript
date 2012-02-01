@@ -10,25 +10,25 @@
 
 tyran_value* tyran_array_prototype;
 
-int tyran_array_prototype_constructor(tyran_runtime *ps,  tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
+int tyran_array_prototype_constructor(struct tyran_runtime *ps, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
 {
 	return 0;
 }
 
-int tyran_array_prototype_push(tyran_runtime* ps,  tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
+int tyran_array_prototype_push(struct tyran_runtime* ps,  tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
 {
 	return 0;
 }
 
-int tyran_array_prototype_pop(tyran_runtime* ps,  tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
+int tyran_array_prototype_pop(struct tyran_runtime* ps,  tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
 {
 	return 0;
 }
 
-struct tyran_function_info {
+typedef struct tyran_function_info {
 	const char *name;
 	tyran_function_callback static_function;
-};
+} tyran_function_info;
 
 static tyran_function_info tyran_array_functions[] = {
 	{ "push", tyran_array_prototype_push },

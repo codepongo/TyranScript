@@ -13,6 +13,6 @@ const tyran_object_key* tyran_object_key_new(const tyran_string* string_key, tyr
 extern void tyran_object_key_free(const tyran_object_key* key);
 const tyran_object_key* tyran_object_key_clone(const tyran_object_key* key);
 
-extern int64_t tyran_object_key_compare(void* key_a, void* key_b);
+extern int tyran_object_key_compare(void* key_a, void* key_b);
 
 #endif

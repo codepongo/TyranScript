@@ -25,7 +25,7 @@ const tyran_object_key* tyran_object_key_clone(const tyran_object_key* ori)
 	return (const tyran_object_key*) (p + sizeof(tyran_string_length_type) + sizeof(tyran_object_key_flag_type));
 }
 
-int64_t tyran_object_key_compare(void* key_a, void* key_b)
+int tyran_object_key_compare(void* key_a, void* key_b)
 {
 	tyran_object_key* a = (tyran_object_key*)key_a;
 	tyran_object_key* b = (tyran_object_key*)key_b;

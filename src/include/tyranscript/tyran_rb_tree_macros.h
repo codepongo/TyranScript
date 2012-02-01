@@ -12,7 +12,7 @@
 #define alloc(type, how_many)				\
   (type *) __alloc(malloc(how_many * sizeof(type)));	
 
-static inline void* __alloc(void* x){
+static void* __alloc(void* x){
   if(x)
     return x;
   exit(1);
@@ -20,4 +20,4 @@ static inline void* __alloc(void* x){
 }
 
 #endif
-    
+

@@ -13,7 +13,7 @@ typedef struct tyran_scope_stack {
 tyran_scope_stack* tyran_scope_stack_new(int count);
 void tyran_scope_stack_free(tyran_scope_stack* stack);
 
-tyran_value* tyran_scope_stack_lookup(const tyran_scope_stack* scopes, const tyran_object_key* key);
-tyran_scope_stack* tyran_scope_stack_clone_and_add(const tyran_scope_stack* scopes, const tyran_value* scope_to_add);
+struct tyran_value* tyran_scope_stack_lookup(const struct tyran_scope_stack* scopes, const tyran_object_key* key);
+tyran_scope_stack* tyran_scope_stack_clone_and_add(const struct tyran_scope_stack* scopes, const struct tyran_value* scope_to_add);
 
 #endif

@@ -16,7 +16,7 @@
 #include <tyranscript/tyran_runtime_callbacks.h>
 #include "debug/tyran_print_runtime.h"
 
-// #define TYRAN_RUNTIME_VERBOSE
+/* #define TYRAN_RUNTIME_VERBOSE */
 
 static TYRAN_UNICODE_STRING(9) PROTOTYPE = { 9, { 'p','r','o','t','o','t','y','p','e' } };
 
@@ -188,7 +188,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 				TYRAN_STACK_TOP2_VARIABLE_TO_VALUE();
 				int value = tyran_value_to_integer(&TYRAN_STACK_TOP2);
 				int shift_steps = ((unsigned int) tyran_value_to_integer(&TYRAN_STACK_TOP)) & 0x1f;
-				tyran_shift_mode mode = (tyran_shift_mode)ip->data.integer;
+				enum tyran_shift_mode mode = (enum tyran_shift_mode)ip->data.integer;
 				switch (mode) {
 					case tyran_shift_left:
 						value <<= shift_steps;
@@ -288,19 +288,19 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 				int argument_count = ip->data.integer;
 				TYRAN_STACK_TOP_N_VARIABLE_TO_VALUE(argument_count + 1);
 
-				// Find the function object
+				/* Find the function object */
 				int function_object_index = sp - argument_count - 1;
 				tyran_value* function_object_to_call = &stack[function_object_index];
 				const tyran_function* static_function = function_object_to_call->data.object->data.function->static_function;
 
-				// Create a new function scope
+				/* Create a new function scope */
 				tyran_value* function_scope = tyran_value_new();
 				tyran_value_set_object(*function_scope, tyran_object_new_array((const tyran_value*)&stack[sp - argument_count], argument_count));
 				tyran_value_object_set_prototype(function_scope, tyran_object_prototype);
-				// Set the name for the arguments (not just the indexes)
+				/* Set the name for the arguments (not just the indexes) */
 				tyran_scope_set_variable_names(function_scope, static_function->argument_names);
 
-				// Fill scope with local variables
+				/* Fill scope with local variables */
 				tyran_scope_set_local_variables(function_scope, static_function);
 
 				TYRAN_STACK_POP_N(argument_count);
@@ -310,8 +310,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 				if (this_scope[function_object_index].type == TYRAN_VALUE_TYPE_OBJECT) {
 					tyran_value_copy(newthis, this_scope[function_object_index]);
 					tyran_value_release(this_scope[function_object_index]);
-				} 
-				
+				}
+
 				if (is_constructor_call) {
 					tyran_object* newobj = tyran_object_new();
 					tyran_object_set_prototype(newobj, tyran_object_prototype);
@@ -367,7 +367,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 				break;
 			}
 			case TYRAN_OPCODE_DELETE: {
-				tyran_assign_mode mode = (tyran_assign_mode) ip->data.integer;
+				enum tyran_assign_mode mode = (enum tyran_assign_mode) ip->data.integer;
 				switch (mode) {
 					case tyran_assign_variable: {
 						tyran_value* v = TYRAN_STACK_TOP.data.variable;
@@ -385,7 +385,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 				break;
 			}
 			case TYRAN_OPCODE_ASSIGN: {
-				if (((tyran_assign_mode) ip->data.integer) == tyran_assign_variable) {
+				if (((enum tyran_assign_mode) ip->data.integer) == tyran_assign_variable) {
 					TYRAN_STACK_TOP_VARIABLE_TO_VALUE();
 					tyran_value_replace(*(TYRAN_STACK_TOP2.data.variable), TYRAN_STACK_TOP);
 					tyran_value_replace(TYRAN_STACK_TOP2, TYRAN_STACK_TOP);
@@ -408,8 +408,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 				TYRAN_STACK_TOP2_VARIABLE_TO_VALUE();
 				tyran_value result;
 				tyran_value_set_undefined(result);
-				tyran_runtime_value_object_subscript(&TYRAN_STACK_TOP2, &TYRAN_STACK_TOP, &result, (tyran_subscript_mode) ip->data.integer);
-			
+				tyran_runtime_value_object_subscript(&TYRAN_STACK_TOP2, &TYRAN_STACK_TOP, &result, (enum tyran_subscript_mode) ip->data.integer);
 				tyran_value_replace(TYRAN_STACK_TOP2, result);
 				TYRAN_STACK_POP();
 				break;

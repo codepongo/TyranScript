@@ -4,6 +4,6 @@
 struct tyran_value;
 struct tyran_opcode;
 
-void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _this, const tyran_opcode* opcode, int ip);
+void tyran_print_runtime(const struct tyran_value* stack, int sp, const struct tyran_value* _this, const struct tyran_opcode* opcode, int ip);
 
 #endif

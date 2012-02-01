@@ -25,7 +25,7 @@ typedef struct tyran_function {
 	const struct tyran_string_array* local_variable_names;
 } tyran_function;
 
-tyran_function* tyran_function_new(const tyran_string_array* argument_names, const tyran_string_array* local_variable_names, const struct tyran_opcodes* opcodes);
+tyran_function* tyran_function_new(const struct tyran_string_array* argument_names, const struct tyran_string_array* local_variable_names, const struct tyran_opcodes* opcodes);
 tyran_function* tyran_function_callback_new(tyran_function_callback callback);
 
 #endif

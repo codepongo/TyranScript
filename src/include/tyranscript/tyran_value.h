@@ -123,6 +123,6 @@ void tyran_value_free(tyran_value* data);
 int tyran_value_is_true(const tyran_value* v);
 int tyran_value_length(const tyran_value* v);
 
-void tyran_value_set_program_specific(tyran_value* value, tyran_runtime* runtime, void* program_specific_context);
+void tyran_value_set_program_specific(struct tyran_value* value, struct tyran_runtime* runtime, void* program_specific_context);
 
 #endif
