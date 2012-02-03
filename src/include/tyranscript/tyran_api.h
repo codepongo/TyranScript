@@ -22,7 +22,6 @@
 /* Parser */
 #include <tyranscript/parser/tyran_parser_state.h>
 #include <tyranscript/parser/tyran_lexer.h>
-extern int yyparse(tyran_parser_state *ps);
 
 /* Debug */
 #include <tyranscript/debug/tyran_print_value.h>

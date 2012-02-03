@@ -2,6 +2,8 @@
 #include <tyranscript/parser/tyran_parser_state.h>
 #include <tyranscript/parser/tyran_lexer.h>
 
+extern int yyparse(tyran_parser_state *ps);
+
 tyran_parser_state* tyran_parser_state_new(const char *str, int length)
 {
 	tyran_parser_state* parser_state = TYRAN_CALLOC(tyran_parser_state);
@@ -13,6 +15,8 @@ tyran_parser_state* tyran_parser_state_new(const char *str, int length)
 	tyran_memcpy(lexer->buffer, str, number_of_octets);
 	lexer->buffer[length] = 0;
 	lexer->line = 1;
+
+	yyparse(parser_state);
 
 	return parser_state;
 }

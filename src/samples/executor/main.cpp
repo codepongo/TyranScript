@@ -22,7 +22,6 @@ tyran_parser_state* parse_file(const char* filename)
 	int read_octets = read_file(filename, buf, max_length);
 
 	tyran_parser_state* state = tyran_parser_state_new(buf, read_octets);
-	yyparse(state);
 	printf("Error:%d\n", state->error_count);
 	tyran_opcodes_print(state->opcodes);
 
