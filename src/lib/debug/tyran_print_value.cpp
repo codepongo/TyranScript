@@ -71,6 +71,10 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 			}
 
 			break;
+			
+		case TYRAN_VALUE_TYPE_RUNTIME_STACK:
+			tyran_snprintf(buf, max_length, "runtime_stack:%p ", (void*)v->data.runtime_stack);
+			break;
 		default:
 			TYRAN_ERROR("Unknown value type");
 	}
@@ -140,7 +144,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 		default: {
 			char buf[2048];
 			tyran_value_to_c_string(v, buf, 2048, quote);
-			strcpy(value, buf);
+			tyran_strncpy(value, buf, max_size);
 			}
 			break;
 	}
@@ -180,6 +184,10 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 			}
 
 			tabs--;
+		}
+
+		if (tyran_object_get_prototype(o)) {
+			tyran_print_value_helper(tabs + 1, "__proto__", tyran_object_get_prototype(o), quote);
 		}
 	}
 }

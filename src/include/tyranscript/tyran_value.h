@@ -6,6 +6,7 @@
 #include "tyran_number.h"
 
 struct tyran_object;
+struct tyran_runtime_stack;
 
 typedef enum {
 	TYRAN_VALUE_TYPE_UNDEFINED,
@@ -14,7 +15,8 @@ typedef enum {
 	TYRAN_VALUE_TYPE_NUMBER,
 	TYRAN_VALUE_TYPE_STRING,
 	TYRAN_VALUE_TYPE_OBJECT,
-	TYRAN_VALUE_TYPE_VARIABLE
+	TYRAN_VALUE_TYPE_VARIABLE,
+	TYRAN_VALUE_TYPE_RUNTIME_STACK
 } tyran_value_type;
 
 typedef struct tyran_value {
@@ -25,6 +27,7 @@ typedef struct tyran_value {
 		const tyran_string* str;
 		tyran_object* object;
 		struct tyran_value* variable;
+		struct tyran_runtime_stack* runtime_stack;
 	} data;
 } tyran_value;
 

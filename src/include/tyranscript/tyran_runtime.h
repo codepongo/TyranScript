@@ -11,8 +11,6 @@ typedef void (*tyran_value_delete_callback)(void* program_specific_context, tyra
 
 typedef struct tyran_runtime {
 	tyran_value stack[8192];
-	int stack_pointer;
-
 	tyran_value_delete_callback delete_callback;
 	void* program_specific_context;
 } tyran_runtime;
