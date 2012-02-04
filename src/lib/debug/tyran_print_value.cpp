@@ -12,19 +12,17 @@
 #include "../tyran_string_array.h"
 #include <tyranscript/debug/tyran_print_value.h>
 
-const char* tyran_value_to_c_string(const tyran_value* v)
+void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, int quote)
 {
-	static char buf[256];
-
 	switch (v->type) {
 		case TYRAN_VALUE_TYPE_BOOLEAN:
-			tyran_sprintf(buf, "%s ", v->data.boolean ? "true" : "false");
+			tyran_sprintf(buf, "%s", v->data.boolean ? "true" : "false");
 			break;
 		case TYRAN_VALUE_TYPE_UNDEFINED:
-			tyran_sprintf(buf, "undefined ");
+			tyran_sprintf(buf, "undefined");
 			break;
 		case TYRAN_VALUE_TYPE_NULL:
-			tyran_sprintf(buf, "null ");
+			tyran_sprintf(buf, "null");
 			break;
 		case TYRAN_VALUE_TYPE_NUMBER:
 			if (tyran_value_is_integer(v->data.number)) {
@@ -43,19 +41,39 @@ const char* tyran_value_to_c_string(const tyran_value* v)
 			}
 			break;
 		case TYRAN_VALUE_TYPE_STRING:
-			tyran_sprintf(buf, "'%s' ", tyran_string_to_c_str(v->data.str));
+			if (quote) {
+				tyran_sprintf(buf, "'%s'", tyran_string_to_c_str(v->data.str));
+			} else {
+				tyran_strcpy(buf, tyran_string_to_c_str(v->data.str));
+			}
 			break;
-		case TYRAN_VALUE_TYPE_VARIABLE:
-			tyran_sprintf(buf, "variable:%p (%p)", v->data.variable, v);
+		case TYRAN_VALUE_TYPE_VARIABLE: {
+				char referenced_value[2048];
+				tyran_value_to_c_string(v->data.variable, referenced_value, 2048, quote);
+				// %p (%p)
+				// 
+				tyran_sprintf(buf, "variable:%s", referenced_value);
+			}
 			break;
 		case TYRAN_VALUE_TYPE_OBJECT:
-			tyran_sprintf(buf, "object:%p ", v->data.object);
+			switch (v->data.object->type)
+			{
+			case TYRAN_OBJECT_TYPE_OBJECT:
+				tyran_sprintf(buf, "object:%p ", v->data.object);
+			break;
+			case TYRAN_OBJECT_TYPE_FUNCTION:
+				tyran_sprintf(buf, "function:%p ", v->data.object);
+			break;
+			case TYRAN_OBJECT_TYPE_ITERATOR:
+				tyran_sprintf(buf, "iterator:%p ", v->data.object);
+			break;
+			}
+			
 			break;
 		default:
 			TYRAN_ERROR("Unknown value type");
 	}
 
-    return buf;
 }
 
 void tyran_print_value_helper(int tabs, const char* property, const tyran_value* v, int quote)
@@ -112,8 +130,11 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 			tyran_sprintf(value, "%s (ref:%d) ", value, o->retain_count);
 			break;
 		}
-		default:
-			strcpy(value, tyran_value_to_c_string(v));
+		default: {
+			char buf[2048];
+			tyran_value_to_c_string(v, buf, 2048, quote);
+			strcpy(value, buf);
+			}
 			break;
 	}
 
@@ -121,24 +142,25 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 
 	if (v->type == TYRAN_VALUE_TYPE_OBJECT) {
 		tyran_object* o = v->data.object;
-		int len = tyran_object_length(o);
-
-		if (len > 0) {
+		if (o->prototype == tyran_array_prototype) {
+			TYRAN_LOG("[]");
+			int len = tyran_object_length(o);
 			int i;
 			tyran_value* nv;
 
-			TYRAN_LOG("[]");
-			char desc[256];
+			char desc[2048];
 			for (i = 0; i < len; ++i) {
 				nv = tyran_value_object_lookup_array(v, i, 0);
-				tyran_sprintf(desc, "#%d: ", i);
-				if (nv) tyran_print_value_helper(tabs, desc, nv, 1);
-				else TYRAN_LOG("undefined");
+				if (nv) {
+					tyran_sprintf(desc, "#%d: ", i);
+					// TYRAN_ASSERT(nv != 0, "Must be able to lookup all indexes");
+					tyran_print_value_helper(tabs, desc, nv, 1);
+				}
 			}
 		} else {
 			tabs++;
 			tyran_object_iterator* target_iterator = tyran_object_iterator_new();
-			tyran_object_get_keys(v, target_iterator);
+			tyran_object_get_keys(v->data.object, target_iterator);
 			int flag;
 			int i;
 			for (i=0; i<target_iterator->count; ++i) {
@@ -149,12 +171,6 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 				}
 			}
 
-			tyran_value* prototype = tyran_object_get_prototype(o);
-			if (prototype) {
-				if (prototype != v) {
-					tyran_print_value_helper(tabs, "__proto__", prototype, quote);
-				}
-			}
 			tabs--;
 		}
 	}

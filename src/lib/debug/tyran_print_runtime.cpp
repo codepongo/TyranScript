@@ -16,11 +16,15 @@ void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _t
 		if (i != sp - 1) {
 			tyran_strcat(stack_info, ", ");
 		}
-		tyran_strcat(stack_info, tyran_value_to_c_string(&stack[i]));
+		char some_info[2048];
+		tyran_value_to_c_string(&stack[i], some_info, 2048, 1);
+		tyran_strcat(stack_info, some_info);
 	}
 
 	tyran_strcat(stack_info, "   _this:");
-	tyran_strcat(stack_info, tyran_value_to_c_string(_this));
+	char other_info[2048];
+	tyran_value_to_c_string(_this, other_info, 2048, 1);
+	tyran_strcat(stack_info, other_info);
 
 	TYRAN_LOG("%s", stack_info);
 	tyran_opcodes_print_opcode(opcode, ip);
