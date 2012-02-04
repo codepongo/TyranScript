@@ -77,6 +77,16 @@ tyran_value* tyran_value_object_lookup_prototype(const tyran_value* target, cons
 	return tyran_object_lookup_prototype(target->data.object, key, flag);
 }
 
+void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_value* prototype)
+{
+	if (!prototype) {
+		return;
+	}
+	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only set prototype on objects");
+	TYRAN_ASSERT(prototype->type == TYRAN_VALUE_TYPE_OBJECT, "Can only set prototype to objects");
+	tyran_object_set_prototype(target->data.object, prototype);
+}
+
 tyran_value* tyran_value_object_lookup_array(const tyran_value* args, int index, int* flag)
 {
 	TYRAN_UNICODE_STRING(12) string_buffer;
@@ -102,7 +112,7 @@ void tyran_value_object_fetch_key_iterator(tyran_value* target, tyran_value* ret
 {
 	tyran_object_iterator* iterator = tyran_object_iterator_new();
 
-	tyran_object_get_keys(target, iterator);
+	tyran_object_get_keys(target->data.object, iterator);
 
 	tyran_object* r = tyran_object_new();
 	r->type = TYRAN_OBJECT_TYPE_ITERATOR;

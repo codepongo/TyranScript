@@ -9,18 +9,19 @@
 #include <tyranscript/tyran_scope.h>
 #include <tyranscript/tyran_object_iterator.h>
 #include <tyranscript/tyran_object_array.h>
+#include <tyranscript/tyran_object.h>
 
 #include "tyran_runtime_helper.h"
 #include "tyran_value_convert.h"
 #include "tyran_stack.h"
 #include <tyranscript/tyran_runtime_callbacks.h>
+
 #include "debug/tyran_print_runtime.h"
+#include <tyranscript/debug/tyran_print_value.h>
 
 /* #define TYRAN_RUNTIME_VERBOSE */
 
-static TYRAN_UNICODE_STRING(9) PROTOTYPE = { 9, { 'p','r','o','t','o','t','y','p','e' } };
-
-void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes, tyran_scope_stack* scope, tyran_value* current_scope, const tyran_value* _this, tyran_value* return_value, const tyran_runtime_callbacks* eventCallbacks)
+void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes, tyran_scope_stack* scope, tyran_value* current_scope, tyran_value* _this, tyran_value* return_value, const tyran_runtime_callbacks* eventCallbacks)
 {
 	const tyran_opcode* ip = &opcodes->codes[0];
 	tyran_opcode* end = &opcodes->codes[opcodes->code_len];
@@ -28,7 +29,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 	tyran_value* stack = runtime->stack;
 	int sp = runtime->stack_pointer;
 
-	tyran_value* this_scope = runtime->this_register;
 	
 	tyran_value_set_undefined(*return_value);
 
@@ -91,7 +91,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 				tyran_value_object_set_prototype(function_prototype, tyran_object_prototype);
 
 				tyran_value_set_object(stack[sp], object);
-				tyran_value_object_insert_string_key(&stack[sp], PROTOTYPE.string, function_prototype);
+				tyran_value_object_set_prototype(&stack[sp], function_prototype);
 				sp++;
 				break;
 			}
@@ -291,12 +291,13 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 				/* Find the function object */
 				int function_object_index = sp - argument_count - 1;
 				tyran_value* function_object_to_call = &stack[function_object_index];
+				
 				const tyran_function* static_function = function_object_to_call->data.object->data.function->static_function;
 
 				/* Create a new function scope */
 				tyran_value* function_scope = tyran_value_new();
 				tyran_value_set_object(*function_scope, tyran_object_new_array((const tyran_value*)&stack[sp - argument_count], argument_count));
-				tyran_value_object_set_prototype(function_scope, tyran_object_prototype);
+
 				/* Set the name for the arguments (not just the indexes) */
 				tyran_scope_set_variable_names(function_scope, static_function->argument_names);
 
@@ -305,23 +306,21 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 
 				TYRAN_STACK_POP_N(argument_count);
 
-				tyran_value newthis;
-				tyran_value_set_undefined(newthis);
-				if (this_scope[function_object_index].type == TYRAN_VALUE_TYPE_OBJECT) {
-					tyran_value_copy(newthis, this_scope[function_object_index]);
-					tyran_value_release(this_scope[function_object_index]);
-				}
-
 				if (is_constructor_call) {
+					tyran_value* newvalue = tyran_value_new();
 					tyran_object* newobj = tyran_object_new();
-					tyran_object_set_prototype(newobj, tyran_object_prototype);
-
-					tyran_value* function_object_prototype = tyran_value_object_lookup(function_object_to_call, (tyran_object_key*) PROTOTYPE.string, 0);
+					tyran_value* function_object_prototype = tyran_object_get_prototype(function_object_to_call->data.object);
 					if (function_object_prototype && function_object_prototype->type == TYRAN_VALUE_TYPE_OBJECT) {
 						tyran_object_set_prototype(newobj, function_object_prototype);
+					} else {
+						tyran_object_set_prototype(newobj, tyran_object_prototype);
 					}
 
-					tyran_value_replace_object(newthis, newobj);
+					tyran_print_value("new prototype", tyran_object_get_prototype(newobj), 1);
+
+					tyran_value_set_object(*newvalue, newobj);
+
+					_this = newvalue;
 				}
 
 				tyran_value return_value;
@@ -329,16 +328,14 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 
 				if (static_function->type == tyran_function_type_normal) {
 					runtime->stack_pointer = sp;
-					tyran_runtime_execute(runtime, static_function->data.opcodes, function_object_to_call->data.object->data.function->scope, function_scope, &newthis, &return_value, eventCallbacks);
+					tyran_runtime_execute(runtime, static_function->data.opcodes, function_object_to_call->data.object->data.function->scope, function_scope, _this, &return_value, eventCallbacks);
 				} else {
-					static_function->data.callback(runtime, function_object_to_call, function_scope, &newthis, &return_value, is_constructor_call);
+					static_function->data.callback(runtime, function_object_to_call, function_scope, _this, &return_value, is_constructor_call);
 				}
 
 				if (is_constructor_call) {
-					tyran_value_replace(return_value, newthis);
+					tyran_value_replace(return_value, *_this);
 				}
-
-				tyran_value_release(newthis);
 
 				tyran_value_replace(TYRAN_STACK_TOP, return_value);
 				tyran_value_free(function_scope);
@@ -439,12 +436,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 				break;
 			}
 			case TYRAN_OPCODE_LOAD_THIS: {
-				int index = sp - 2;
-				tyran_value* new_this = &this_scope[index];
-				tyran_value_replace(*new_this, TYRAN_STACK_TOP2);
-				if (tyran_value_is_variable(new_this)) {
-					tyran_value_copy(*new_this, *new_this->data.variable);
-				}
+				_this = (&TYRAN_STACK_TOP2)->data.variable;
 				break;
 			}
 		}

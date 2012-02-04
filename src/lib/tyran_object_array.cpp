@@ -24,7 +24,7 @@ struct tyran_object* tyran_object_new_array(const tyran_value* items, int count)
 	
 	tyran_object_set_length(object, count);
 	
-	object->prototype = tyran_array_prototype;
+	tyran_object_set_prototype(object, tyran_array_prototype);
 	
 	return object;
 }

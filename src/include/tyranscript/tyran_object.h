@@ -44,7 +44,7 @@ tyran_object* tyran_object_new_from_items(const struct tyran_value* items, int c
 void tyran_object_free(tyran_object* object);
 
 /* Prototype */
-#define tyran_object_set_prototype(__target, __proto) __target->prototype = __proto; 
+void tyran_object_set_prototype(tyran_object* target, tyran_value* proto);
 #define tyran_object_get_prototype(__target) __target->prototype
 
 /* Length */
@@ -61,6 +61,6 @@ void tyran_object_delete(tyran_object* object, const tyran_object_key* key);
 /* Find */
 struct tyran_value* tyran_object_lookup(const tyran_object* object, const tyran_object_key* key, int* flag);
 struct tyran_value* tyran_object_lookup_prototype(const tyran_object* o, const tyran_object_key* key, int* flag);
-void tyran_object_get_keys(const struct tyran_value* target, struct tyran_object_iterator* target_iterator);
+void tyran_object_get_keys(const struct tyran_object* target, struct tyran_object_iterator* target_iterator);
 
 #endif

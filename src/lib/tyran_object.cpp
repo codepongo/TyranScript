@@ -2,12 +2,14 @@
 #include <tyranscript/tyran_object_iterator.h>
 #include <tyranscript/tyran_function_object.h>
 #include <tyranscript/tyran_value.h>
+#include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_object_prototype.h>
 #include <tyranscript/tyran_runtime.h>
 #include "tyran_number_to_string.h"
 #include <tyranscript/tyran_object_key.h>
 
 static TYRAN_UNICODE_STRING(6) LENGTH_STRING = { 6, {'l','e','n','g','t','h'}};
+static TYRAN_UNICODE_STRING(9) PROTOTYPE = { 9, { 'p','r','o','t','o','t','y','p','e' } };
 
 typedef struct tyran_rb_tree_key_value_node {
 	const tyran_object_key* key;
@@ -100,9 +102,9 @@ void tyran_object_delete(tyran_object* object, const tyran_object_key* key)
 	rb_tree_delete(object->tree, (void*)key);
 }
 
-void tyran_object_get_keys(const tyran_value* target, tyran_object_iterator* target_iterator)
+void tyran_object_get_keys(const tyran_object* target, tyran_object_iterator* target_iterator)
 {
-	tree_root* root = target->data.object->tree;
+	tree_root* root = target->tree;
 
 	tree_iterator* iterator = new_tree_iterator(root);
 	while (tree_iterator_has_next(iterator)) {
@@ -111,9 +113,16 @@ void tyran_object_get_keys(const tyran_value* target, tyran_object_iterator* tar
 	}
 	destroy_iterator(iterator);
 
-	if (target->data.object->prototype) {
-		tyran_object_get_keys(target->data.object->prototype, target_iterator);
+	if (target->prototype) {
+		tyran_object_get_keys(target->prototype->data.object, target_iterator);
 	}
+}
+
+void tyran_object_set_prototype(tyran_object* target, tyran_value* proto)
+{
+	TYRAN_ASSERT(target->prototype == 0, "Prototype already set, this is a problem");
+	tyran_object_insert_string_key(target, PROTOTYPE.string, proto);
+	target->prototype = proto;
 }
 
 tyran_value* tyran_object_lookup_prototype(const tyran_object* o, const tyran_object_key* key, int* flag)
@@ -142,7 +151,7 @@ tyran_object* tyran_object_new_from_items(const tyran_value* items, int count)
 		tyran_value_copy(*v, items[i + 1]);
 		tyran_object_insert_key(object, ok, v);
 	}
-	object->prototype = tyran_object_prototype;
+	tyran_object_set_prototype(object, tyran_object_prototype);
 	return object;
 }
 

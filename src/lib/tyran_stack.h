@@ -7,7 +7,6 @@
 #define TYRAN_STACK_POP_N(n) { \
 	int t = n; \
 	while (t > 0) { \
-		tyran_value_release(this_scope[sp - t]); \
 		tyran_value_release(stack[sp-t]); \
 		--t; \
 	} \
@@ -15,7 +14,6 @@
 }
 
 #define TYRAN_STACK_POP() { \
-	tyran_value_release(this_scope[sp - 1]); \
 	tyran_value_release(TYRAN_STACK_TOP); \
 	--sp; \
 }
