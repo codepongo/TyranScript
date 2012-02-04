@@ -458,13 +458,11 @@ void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* 
 		}
 		ip++;
 	}
-/*
-	if (is_constructor_call) {
-		tyran_value_replace(return_value, *this_for_function);
+	
+	if (sp > 0) {
+		TYRAN_CLEANUP_AFTER_FUNCTION_RETURN;
+		ip++;
 	}
-
-
-*/
 
 	} while (sp > 0);
 
