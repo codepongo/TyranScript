@@ -22,8 +22,14 @@
 
 /* #define TYRAN_RUNTIME_VERBOSE */
 
-#define TYRAN_CLEANUP_AFTER_FUNCTION_RETURN { if (is_constructor_call) { tyran_value_copy(*return_value, _this) } tyran_value_free(function_scope); tyran_runtime_stack_pop; tyran_value_replace(TYRAN_STACK_TOP, *return_value); \
-	}
+#define TYRAN_CLEANUP_AFTER_FUNCTION_BASE { if (is_constructor_call) { tyran_value_copy(*return_value, _this) } tyran_value_free(function_scope); tyran_runtime_stack_pop;  \
+}
+
+#define TYRAN_CLEANUP_AFTER_FUNCTION_END TYRAN_CLEANUP_AFTER_FUNCTION_BASE \
+	tyran_value_release(*return_value);
+
+#define TYRAN_CLEANUP_AFTER_FUNCTION_RETURN TYRAN_CLEANUP_AFTER_FUNCTION_BASE \
+tyran_value_replace(TYRAN_STACK_TOP, *return_value); 
 
 void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* opcodes, struct tyran_scope_stack* scope, struct tyran_value* function_scope, struct tyran_value* incoming_this, struct tyran_value* return_value, const struct tyran_runtime_callbacks* event_callbacks)
 {
@@ -33,6 +39,23 @@ void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* 
 	tyran_value* stack = runtime->stack;
 	int sp = 0;
 	int is_constructor_call;
+	
+	
+	/* Save return state */
+	tyran_runtime_stack* runtime_info = tyran_runtime_stack_new();
+	tyran_value_copy(runtime_info->_this, _this);
+	runtime_info->function_scope = tyran_value_new();
+	runtime_info->scope = scope;
+	runtime_info->opcodes = opcodes;
+	runtime_info->ip = end;
+	
+	
+	tyran_value runtime_value;
+	runtime_value.type = TYRAN_VALUE_TYPE_RUNTIME_STACK;
+	runtime_value.data.runtime_stack = runtime_info;
+	stack[sp] = runtime_value;
+	sp++;	
+	
 	
 	tyran_value_set_undefined(*return_value);
 
@@ -359,6 +382,7 @@ void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* 
 			}
 			case TYRAN_OPCODE_RETURN: {
 				TYRAN_STACK_TOP_VARIABLE_TO_VALUE();
+				tyran_value_copy(*return_value, TYRAN_STACK_TOP);
 				TYRAN_STACK_POP_N(ip->data.integer);
 				TYRAN_CLEANUP_AFTER_FUNCTION_RETURN
 				break;
@@ -460,7 +484,7 @@ void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* 
 	}
 	
 	if (sp > 0) {
-		TYRAN_CLEANUP_AFTER_FUNCTION_RETURN;
+		TYRAN_CLEANUP_AFTER_FUNCTION_END;
 		ip++;
 	}
 
