@@ -3,31 +3,56 @@
 
 #define tyran_string_max_length 512
 
+
+tyran_string* tyran_string_alloc(int len)
+{
+	char* r = (char*) TYRAN_MALLOC(len * sizeof(tyran_string) + sizeof(tyran_string_length_type) );
+	tyran_string* rr = (tyran_string *)(r + sizeof(tyran_string_length_type));
+	*((tyran_string_length_type *)r) = len;
+
+	return rr;
+}
+
 const tyran_string* tyran_string_strdup(const tyran_string* str)
 {
 	int len = TYRAN_UNICODE_STRLEN(str);
-
-	tyran_string* r = (tyran_string*) TYRAN_MALLOC(len * sizeof(tyran_string) + sizeof(tyran_string_length_type) );
-	tyran_string* rr = (tyran_string *)((char*)r + sizeof(tyran_string_length_type));
-
-	*((tyran_string_length_type *)r) = len;
-
+	tyran_string* rr = tyran_string_alloc(len);
 	tyran_memcpy(rr, str, (len) * sizeof(tyran_string));
 	return rr;
 }
 
+
+
 const tyran_string* tyran_string_strdup_str(const char *str)
 {
 	int len = tyran_strlen(str);
-
-	tyran_string* r = (tyran_string*) TYRAN_MALLOC(len * sizeof(tyran_string) + sizeof(tyran_string_length_type));
-	tyran_string* rr = (tyran_string *)((char*)r + sizeof(tyran_string_length_type));
 	int i;
 
-	*((tyran_string_length_type *)r) = len;
+	tyran_string* rr = tyran_string_alloc(len);
 
-	for (i = 0; i < len; ++i) rr[i] = str[i];
+	for (i = 0; i < len; ++i) {
+		rr[i] = str[i];
+	}
 
+	return rr;
+}
+
+const tyran_string* tyran_string_substr(const tyran_string* str, int start, int len)
+{
+	int source_string_length = TYRAN_UNICODE_STRLEN(str);
+	
+	if (start < 0) {
+		start += source_string_length;
+	} else if (start >= source_string_length) {
+		return tyran_string_strdup_str("");
+	}
+
+	int characters_to_copy = source_string_length - start;
+	characters_to_copy = characters_to_copy < len ? characters_to_copy : len;
+	tyran_string* rr = tyran_string_alloc(characters_to_copy);
+
+	tyran_memcpy(rr, str + start, characters_to_copy * sizeof(tyran_string));
+	
 	return rr;
 }
 
@@ -45,7 +70,7 @@ void tyran_string_free(const tyran_string* d)
 	tyran_free((void *)(((char*)d) - sizeof(tyran_string_length_type) ));
 }
 
-const char *tyran_string_to_c_str(const tyran_string* str)
+const char* tyran_string_to_c_str(const tyran_string* str)
 {
 	static char buf[tyran_string_max_length];
 	int i;
@@ -88,10 +113,7 @@ int tyran_string_strcmp(const tyran_string* str1, const tyran_string* str2)
 const tyran_string* tyran_string_strcat(const tyran_string* str1, const tyran_string* str2)
 {
 	int len = TYRAN_UNICODE_STRLEN(str1) + TYRAN_UNICODE_STRLEN(str2);
-	tyran_string* r = (tyran_string*) TYRAN_MALLOC(len * sizeof(tyran_string) + sizeof(tyran_string_length_type) );
-	tyran_string* rr = (tyran_string *)((char*)r + sizeof(tyran_string_length_type));
-
-	*((tyran_string_length_type *)r) = len;
+	tyran_string* rr = tyran_string_alloc(len);
 
 	tyran_memcpy(rr, str1, TYRAN_UNICODE_STRLEN(str1) * sizeof(tyran_string));
 	tyran_memcpy(rr + TYRAN_UNICODE_STRLEN(str1), str2, TYRAN_UNICODE_STRLEN(str2) * sizeof(tyran_string));

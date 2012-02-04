@@ -12,10 +12,11 @@ typedef tyran_uint16 tyran_string_length_type;
 const tyran_string* tyran_string_from_c_str(const char* str);
 const tyran_string* tyran_string_strcat(const tyran_string* str1, const tyran_string* str2);
 const tyran_string* tyran_string_strdup(const tyran_string* str);
+const tyran_string* tyran_string_strdup_str(const char *str);
 void tyran_string_free(const tyran_string* d);
 
 void tyran_string_strcpy(tyran_string* to, const tyran_string* from);
-
+const tyran_string* tyran_string_substr(const tyran_string* str, int start, int len);
 const char* tyran_string_to_c_str(const tyran_string* str);
 
 int tyran_string_strcmp(const tyran_string* str1, const tyran_string* str2);
