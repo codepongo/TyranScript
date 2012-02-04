@@ -29,11 +29,10 @@ int tyran_array_prototype_push(struct tyran_runtime* ps, tyran_value* static_fun
 	tyran_value* add = tyran_value_object_lookup_array(args, 0, 0);
 	tyran_object_insert_array(_this->data.object, length, add);
 	
-	int new_length = tyran_object_length(_this->data.object);
 	return 0;
 }
 
-int tyran_array_prototype_pop(struct tyran_runtime* ps,  tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor)
+int tyran_array_prototype_pop(struct tyran_runtime* ps, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor)
 {
 	int length = tyran_object_length(_this->data.object);
 	TYRAN_ASSERT(length > 0, "You can not pop an empty array");

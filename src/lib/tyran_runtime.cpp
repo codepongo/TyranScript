@@ -316,8 +316,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, const tyran_opcodes* opcodes,
 						tyran_object_set_prototype(newobj, tyran_object_prototype);
 					}
 
-					tyran_print_value("new prototype", tyran_object_get_prototype(newobj), 1);
-
 					tyran_value_set_object(*newvalue, newobj);
 
 					_this = newvalue;

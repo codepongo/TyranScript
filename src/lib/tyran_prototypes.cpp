@@ -16,7 +16,6 @@
 	if (tyran_strcmp(name, "Object") != 0) { tyran_value_object_set_prototype(constructor_function, tyran_value_object_new()); } \
 	tyran_value_object_insert_string_key(global, tyran_string_from_c_str(name), constructor_function); \
 	tyran_ ## TYPE ## _prototype_init(tyran_object_get_prototype(constructor_function->data.object)); \
-	tyran_print_value(name, constructor_function, 1); \
 }
 
 void tyran_prototypes_init(tyran_value* global)
