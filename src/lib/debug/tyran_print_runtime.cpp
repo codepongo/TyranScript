@@ -9,22 +9,31 @@
 void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _this, const struct tyran_opcode* opcode, int ip)
 {
 	int i;
-	char stack_info[2048];
+	const int max_size = 2048;
+	char stack_info[max_size];
+	stack_info[0] = 0;
 
-	tyran_sprintf(stack_info, "STACK%d: ", sp);
+	int stack_info_length_left = max_size - 1;
+	tyran_snprintf(stack_info, max_size, "STACK%d: ", sp);
 	for (i = sp - 1; i >= 0 && i >= sp - 10; --i) {
 		if (i != sp - 1) {
-			tyran_strcat(stack_info, ", ");
+			const char* seperator = ", ";
+			tyran_strncat(stack_info, seperator, stack_info_length_left);
+			stack_info_length_left -= tyran_strlen(seperator);
 		}
-		char some_info[2048];
-		tyran_value_to_c_string(&stack[i], some_info, 2048, 1);
-		tyran_strcat(stack_info, some_info);
+		char some_info[max_size];
+		tyran_value_to_c_string(&stack[i], some_info, max_size, 1);
+		stack_info_length_left -= tyran_strlen(some_info);
+		tyran_strncat(stack_info, some_info, stack_info_length_left);
 	}
 
-	tyran_strcat(stack_info, "   _this:");
-	char other_info[2048];
-	tyran_value_to_c_string(_this, other_info, 2048, 1);
-	tyran_strcat(stack_info, other_info);
+	const char* this_seperator = "   _this:";
+	tyran_strncat(stack_info, this_seperator, stack_info_length_left);
+	stack_info_length_left -= tyran_strlen(this_seperator);
+
+	char this_info[max_size];
+	tyran_value_to_c_string(_this, this_info, max_size, 1);
+	tyran_strncat(stack_info, this_info, stack_info_length_left);
 
 	TYRAN_LOG("%s", stack_info);
 	tyran_opcodes_print_opcode(opcode, ip);

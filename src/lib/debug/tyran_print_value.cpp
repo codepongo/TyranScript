@@ -16,56 +16,57 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 {
 	switch (v->type) {
 		case TYRAN_VALUE_TYPE_BOOLEAN:
-			tyran_sprintf(buf, "%s", v->data.boolean ? "true" : "false");
+			tyran_snprintf(buf, max_length, "%s", v->data.boolean ? "true" : "false");
 			break;
 		case TYRAN_VALUE_TYPE_UNDEFINED:
-			tyran_sprintf(buf, "undefined");
+			tyran_snprintf(buf, max_length, "undefined");
 			break;
 		case TYRAN_VALUE_TYPE_NULL:
-			tyran_sprintf(buf, "null");
+			tyran_snprintf(buf, max_length, "null");
 			break;
 		case TYRAN_VALUE_TYPE_NUMBER:
 			if (tyran_value_is_integer(v->data.number)) {
-				tyran_sprintf(buf, "%d", (int)v->data.number);
+				tyran_snprintf(buf, max_length, "%d", (int)v->data.number);
 			} else if (tyran_number_is_normal(v->data.number)) {
-				tyran_sprintf(buf, "%g", v->data.number);
+				tyran_snprintf(buf, max_length, "%g", v->data.number);
 			} else if (tyran_number_is_nan(v->data.number)) {
-				tyran_sprintf(buf, "NaN");
+				tyran_snprintf(buf, max_length, "NaN");
 			} else {
 				int s = tyran_number_is_infinity(v->data.number);
 				if (s > 0) {
-					tyran_sprintf(buf, "+Infinity");
+					tyran_snprintf(buf, max_length, "+Infinity");
 				} else if (s < 0) {
-					tyran_sprintf(buf, "-Infinity");
+					tyran_snprintf(buf, max_length, "-Infinity");
 				}
 			}
 			break;
 		case TYRAN_VALUE_TYPE_STRING:
 			if (quote) {
-				tyran_sprintf(buf, "'%s'", tyran_string_to_c_str(v->data.str));
+				tyran_snprintf(buf, max_length, "'%s'", tyran_string_to_c_str(v->data.str));
 			} else {
-				tyran_strcpy(buf, tyran_string_to_c_str(v->data.str));
+				tyran_strncpy(buf, tyran_string_to_c_str(v->data.str), max_length);
 			}
 			break;
 		case TYRAN_VALUE_TYPE_VARIABLE: {
-				char referenced_value[2048];
-				tyran_value_to_c_string(v->data.variable, referenced_value, 2048, quote);
+				const int max_reference_size = 2048;
+				char referenced_value[max_reference_size];
+				tyran_value_to_c_string(v->data.variable, referenced_value, max_reference_size, quote);
 				// %p (%p)
 				// 
-				tyran_sprintf(buf, "variable:%s", referenced_value);
+				tyran_snprintf(buf, max_length, "variable:%s", referenced_value);
 			}
 			break;
 		case TYRAN_VALUE_TYPE_OBJECT:
 			switch (v->data.object->type)
 			{
 			case TYRAN_OBJECT_TYPE_OBJECT:
-				tyran_sprintf(buf, "object:%p ", v->data.object);
+				tyran_snprintf(buf, max_length, "object:%p ", v->data.object);
 			break;
 			case TYRAN_OBJECT_TYPE_FUNCTION:
-				tyran_sprintf(buf, "function:%p ", v->data.object);
+				tyran_snprintf(buf, max_length, "function:%p ", v->data.object);
 			break;
 			case TYRAN_OBJECT_TYPE_ITERATOR:
-				tyran_sprintf(buf, "iterator:%p ", v->data.object);
+				tyran_snprintf(buf, max_length, "iterator:%p ", v->data.object);
 			break;
 			}
 			
@@ -98,7 +99,9 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 		sprintf(prefix, "%s%s: (%p) ", tab_string, property, v);
 	}
 
-	char value[200];
+	const int max_size = 200;
+	char value[max_size];
+	int max_size_left = max_size;
 	switch(v->type) {
 		case TYRAN_VALUE_TYPE_OBJECT: {
 			tyran_object* o = v->data.object;
@@ -106,28 +109,32 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 				case TYRAN_OBJECT_TYPE_FUNCTION: {
 					const tyran_function* f = o->data.function->static_function;
 					if (f->type == tyran_function_type_normal) {
-						tyran_sprintf(value, "function (");
+						tyran_snprintf(value, max_size, "function (");
 						int i;
 						for (i = 0; i < f->argument_names->count; ++i) {
 							if (i != 0) {
-								tyran_strcat(value, ", ");
+								tyran_strncat(value, ", ", max_size_left);
+								max_size_left -= 2;
 							}
-							tyran_strcat(value, tyran_string_to_c_str(tyran_string_array_get(f->argument_names, i)));
+							const char* argument_name = tyran_string_to_c_str(tyran_string_array_get(f->argument_names, i));
+							tyran_strncat(value, argument_name, max_size_left);
+							max_size_left -= tyran_strlen(argument_name);
 						}
-						tyran_strcat(value, ") {");
+						tyran_strncat(value, ") {", max_size_left);
+						max_size_left -= 3;
 					} else {
-						tyran_sprintf(value, "function () { [Native code] }");
+						tyran_snprintf(value, max_size, "function () { [Native code] }");
 					}
 					break;
 				}
 				case TYRAN_OBJECT_TYPE_OBJECT:
-					tyran_sprintf(value, "object %p (program:%p)", o, o->program_specific);
+					tyran_snprintf(value, max_size, "object %p (program:%p)", o, o->program_specific);
 					break;
 				default:
 					TYRAN_ERROR("Unexpected object type");
 					break;
 			}
-			tyran_sprintf(value, "%s (ref:%d) ", value, o->retain_count);
+			tyran_snprintf(value, max_size, "%s (ref:%d) ", value, o->retain_count);
 			break;
 		}
 		default: {
@@ -148,11 +155,12 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 			int i;
 			tyran_value* nv;
 
-			char desc[2048];
+			const int max_size_description = 2048;
+			char desc[max_size_description];
 			for (i = 0; i < len; ++i) {
 				nv = tyran_value_object_lookup_array(v, i, 0);
 				if (nv) {
-					tyran_sprintf(desc, "#%d: ", i);
+					tyran_snprintf(desc, max_size_description, "#%d: ", i);
 					// TYRAN_ASSERT(nv != 0, "Must be able to lookup all indexes");
 					tyran_print_value_helper(tabs, desc, nv, 1);
 				}

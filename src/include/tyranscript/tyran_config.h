@@ -18,11 +18,11 @@ typedef unsigned short tyran_uint16;
 #define tyran_memcmp memcmp
 
 #define tyran_sscanf sscanf
-#define tyran_sprintf sprintf
-#define tyran_strcpy strcpy
+#define tyran_snprintf snprintf
+#define tyran_strncpy strncpy
+#define tyran_strncat strncat
 #define tyran_strcmp strcmp
 #define tyran_strlen strlen
-#define tyran_strcat strcat
 #define tyran_strncmp strncmp
 
 #define TYRAN_LOG(...) { printf(__VA_ARGS__); printf("\n"); fflush(stdout); }

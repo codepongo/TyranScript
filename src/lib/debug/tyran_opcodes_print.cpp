@@ -67,7 +67,8 @@ const char* tyran_opcode_names[100] = {
 
 void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip)
 {
-	char value[256];
+	const int max_size = 2048;
+	char value[max_size];
 	value[0] = 0;
 	
 	switch (opcode->opcode)
@@ -84,19 +85,19 @@ void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip)
 	case TYRAN_OPCODE_BITWISE_SHIFT:
 	case TYRAN_OPCODE_INCREASE:
 	case TYRAN_OPCODE_DECREASE:
-		tyran_sprintf(value, "%d", opcode->data.integer);
+		tyran_snprintf(value, max_size, "%d", opcode->data.integer);
 		break;
 
 	case TYRAN_OPCODE_PUSH_NUMBER:
-		tyran_sprintf(value, "%g", *((double *)opcode->data.pointer));
+		tyran_snprintf(value, max_size, "%g", *((double *)opcode->data.pointer));
 		break;
 
 	case TYRAN_OPCODE_PUSH_STRING:
-		tyran_sprintf(value, "\"%s\"", tyran_string_to_c_str((const tyran_string*) opcode->data.pointer));
+		tyran_snprintf(value, max_size, "\"%s\"", tyran_string_to_c_str((const tyran_string*) opcode->data.pointer));
 		break;
 
 	case TYRAN_OPCODE_PUSH_VARIABLE:
-		tyran_sprintf(value, "\"%s\"", tyran_string_to_c_str(((const tyran_variable_name_info *)opcode->data.pointer)->data.variable_name));
+		tyran_snprintf(value, max_size, "\"%s\"", tyran_string_to_c_str(((const tyran_variable_name_info *)opcode->data.pointer)->data.variable_name));
 		break;
 		
 	case TYRAN_OPCODE_JUMP_TRUE:
@@ -104,12 +105,12 @@ void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip)
 	case TYRAN_OPCODE_JUMP_TRUE_POP:
 	case TYRAN_OPCODE_JUMP_FALSE_POP:
 	case TYRAN_OPCODE_JUMP:
-		tyran_sprintf(value, "%d (offset:%d)", ip + opcode->data.integer, opcode->data.integer);
+		tyran_snprintf(value, max_size, "%d (offset:%d)", ip + opcode->data.integer, opcode->data.integer);
 		break;
 
 	case TYRAN_OPCODE_JUMP_POP: {
 			tyran_jump_pop_info *jp = (tyran_jump_pop_info*) opcode->data.pointer;
-			tyran_sprintf(value, "%d (offset:%d) pop:%d", ip + jp->offset, jp->offset, jp->pop_count);
+			tyran_snprintf(value, max_size, "%d (offset:%d) pop:%d", ip + jp->offset, jp->offset, jp->pop_count);
 		}
 		break;
 
