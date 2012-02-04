@@ -71,14 +71,14 @@ void tyran_object_insert_key(tyran_object* object, const tyran_object_key* key, 
 
 void tyran_object_insert_string_key(tyran_object* object, const tyran_string* key_string, tyran_value* value)
 {
-	int flag = 0;
+	tyran_object_key_flag_type flag = tyran_object_key_flag_normal;
 	const tyran_object_key* key = tyran_object_key_new(key_string, flag);
 	tyran_object_insert_key(object, key, value);
 }
 
 void tyran_object_insert_array(tyran_object* object, int index, tyran_value* value)
 {
-	int flag = 0;
+	tyran_object_key_flag_type flag = tyran_object_key_flag_normal;
 
 	TYRAN_UNICODE_STRING(12) string_buffer;
 	tyran_number_integer_to_string(index, string_buffer.string);
@@ -88,7 +88,7 @@ void tyran_object_insert_array(tyran_object* object, int index, tyran_value* val
 	tyran_object_extend_length_if_needed(object, index);
 }
 
-tyran_value* tyran_object_lookup(const tyran_object* object, const tyran_object_key* key, int* flag)
+tyran_value* tyran_object_lookup(const tyran_object* object, const tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
 	tyran_rb_tree_key_value_node* node = (tyran_rb_tree_key_value_node*) search_rbtree(*object->tree, (void*)key);
 	if (!node) {
@@ -109,7 +109,9 @@ void tyran_object_get_keys(const tyran_object* target, tyran_object_iterator* ta
 	tree_iterator* iterator = new_tree_iterator(root);
 	while (tree_iterator_has_next(iterator)) {
 		tyran_rb_tree_key_value_node* node = (tyran_rb_tree_key_value_node*) tree_iterator_next(iterator);
-		tyran_object_iterator_insert(target_iterator, node->key);
+		if (tyran_object_key_has_enumerate(node->key)) {
+			tyran_object_iterator_insert(target_iterator, node->key);
+		}
 	}
 	destroy_iterator(iterator);
 
@@ -121,11 +123,12 @@ void tyran_object_get_keys(const tyran_object* target, tyran_object_iterator* ta
 void tyran_object_set_prototype(tyran_object* target, tyran_value* proto)
 {
 	TYRAN_ASSERT(target->prototype == 0, "Prototype already set, this is a problem");
-	tyran_object_insert_string_key(target, PROTOTYPE.string, proto);
+	const tyran_object_key* key = tyran_object_key_new(PROTOTYPE.string, 0);
+	tyran_object_insert_key(target, key, proto);
 	target->prototype = proto;
 }
 
-tyran_value* tyran_object_lookup_prototype(const tyran_object* o, const tyran_object_key* key, int* flag)
+tyran_value* tyran_object_lookup_prototype(const tyran_object* o, const tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
 	tyran_value* retValue;
 	retValue = tyran_object_lookup(o, key, flag);
@@ -146,7 +149,7 @@ tyran_object* tyran_object_new_from_items(const tyran_value* items, int count)
 	int i;
 
 	for (i = 0; i < count; i += 2) {
-		ok = tyran_object_key_new(items[i].data.str, 0);
+		ok = tyran_object_key_new(items[i].data.str, tyran_object_key_flag_normal);
 		v = tyran_value_new();
 		tyran_value_copy(*v, items[i + 1]);
 		tyran_object_insert_key(object, ok, v);
@@ -157,13 +160,13 @@ tyran_object* tyran_object_new_from_items(const tyran_value* items, int count)
 
 void tyran_object_set_length(tyran_object* object, int len)
 {
-	int flag = 0;
+	tyran_object_key_flag_type flag;
 	tyran_value* r = tyran_object_lookup(object, (tyran_object_key*) LENGTH_STRING.string, &flag);
 	if (!r) {
 		tyran_value* n = tyran_value_new();
 		tyran_value_set_number(*n, len);
 
-		const tyran_object_key* nk = tyran_object_key_new(LENGTH_STRING.string, 0);
+		const tyran_object_key* nk = tyran_object_key_new(LENGTH_STRING.string, tyran_object_key_flag_normal);
 		tyran_object_insert_key(object, nk, n);
 	} else {
 		tyran_value_set_number(*r, len);
@@ -172,7 +175,7 @@ void tyran_object_set_length(tyran_object* object, int len)
 
 int tyran_object_length(const tyran_object* object)
 {
-	int flag;
+	tyran_object_key_flag_type flag;
 	tyran_value* r = tyran_object_lookup(object, (tyran_object_key*) LENGTH_STRING.string, &flag);
 	if (r && tyran_value_is_number(r)) {
 		if (tyran_value_is_integer(r->data.number)) return (int)r->data.number;

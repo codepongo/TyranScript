@@ -16,7 +16,7 @@ struct tyran_object* tyran_object_new_array(const tyran_value* items, int count)
 
 	for (i = 0; i < count; ++i) {
 		tyran_number_integer_to_string(i, number_string.string);
-		ok = tyran_object_key_new(number_string.string, 0);
+		ok = tyran_object_key_new(number_string.string, tyran_object_key_flag_normal);
 		v = tyran_value_new();
 		tyran_value_copy(*v, items[i]);
 		tyran_object_insert_key(object, ok, v);

@@ -59,8 +59,8 @@ void tyran_object_insert_array(tyran_object* object, int index, struct tyran_val
 void tyran_object_delete(tyran_object* object, const tyran_object_key* key);
 
 /* Find */
-struct tyran_value* tyran_object_lookup(const tyran_object* object, const tyran_object_key* key, int* flag);
-struct tyran_value* tyran_object_lookup_prototype(const tyran_object* o, const tyran_object_key* key, int* flag);
+struct tyran_value* tyran_object_lookup(const tyran_object* object, const tyran_object_key* key, tyran_object_key_flag_type* flag);
+struct tyran_value* tyran_object_lookup_prototype(const tyran_object* o, const tyran_object_key* key, tyran_object_key_flag_type* flag);
 void tyran_object_get_keys(const struct tyran_object* target, struct tyran_object_iterator* target_iterator);
 
 #endif

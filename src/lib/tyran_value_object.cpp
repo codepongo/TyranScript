@@ -65,13 +65,13 @@ void tyran_value_object_delete(tyran_value* target, tyran_value* key)
 	tyran_object_delete(target->data.object, (const tyran_object_key*)key->data.str);
 }
 
-tyran_value* tyran_value_object_lookup(const tyran_value* target, const tyran_object_key* key, int *flag)
+tyran_value* tyran_value_object_lookup(const tyran_value* target, const tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
 	return tyran_object_lookup(target->data.object, key, flag);
 }
 
-tyran_value* tyran_value_object_lookup_prototype(const tyran_value* target, const tyran_object_key* key, int *flag)
+tyran_value* tyran_value_object_lookup_prototype(const tyran_value* target, const tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
 	return tyran_object_lookup_prototype(target->data.object, key, flag);
@@ -87,7 +87,7 @@ void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_v
 	tyran_object_set_prototype(target->data.object, prototype);
 }
 
-tyran_value* tyran_value_object_lookup_array(const tyran_value* args, int index, int* flag)
+tyran_value* tyran_value_object_lookup_array(const tyran_value* args, int index, tyran_object_key_flag_type* flag)
 {
 	TYRAN_UNICODE_STRING(12) string_buffer;
 	tyran_number_integer_to_string(index, string_buffer.string);
@@ -98,7 +98,9 @@ int tyran_value_object_has_key(const tyran_value* target, const tyran_object_key
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Only objects has keys");
 
-	if (tyran_value_object_lookup(target, key, 0)) {
+	tyran_object_key_flag_type flag;
+
+	if (tyran_value_object_lookup(target, key, &flag)) {
 		return 1;
 	}
 

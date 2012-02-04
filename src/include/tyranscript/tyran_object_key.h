@@ -6,7 +6,14 @@
 typedef tyran_string tyran_object_key;
 typedef tyran_uint16 tyran_object_key_flag_type;
 
+const tyran_object_key_flag_type tyran_object_key_flag_enumerate = 1;
+const tyran_object_key_flag_type tyran_object_key_flag_normal = tyran_object_key_flag_enumerate;
+
+#define tyran_object_key_has_enumerate(key) (TYRAN_OBJECT_KEY_FLAG(key) & tyran_object_key_flag_enumerate)
+
 #define TYRAN_OBJECT_KEY_FLAG(ok) (*((tyran_object_key_flag_type *)(((char*)(ok)) - sizeof(tyran_string_length_type) - sizeof(tyran_object_key_flag_type))))
+#define TYRAN_OBJECT_KEY_SET_FLAG(ok, flag) TYRAN_OBJECT_KEY_FLAG(ok) = flag;
+
 #define TYRAN_OBJECT_KEY(_len) struct{ TYRAN_UNICODE_STRING(_len) str; }
 
 const tyran_object_key* tyran_object_key_new(const tyran_string* string_key, tyran_object_key_flag_type flag);

@@ -19,9 +19,9 @@ void tyran_value_object_delete(struct tyran_value* object, struct tyran_value* k
 
 /* Query */
 void tyran_value_object_fetch_key_iterator(struct tyran_value* object, struct tyran_value* return_value);
-struct tyran_value* tyran_value_object_lookup(const struct tyran_value* object, const tyran_object_key* key, int* flag);
-struct tyran_value* tyran_value_object_lookup_prototype(const struct tyran_value* object, const tyran_object_key* key, int* flag);
-struct tyran_value* tyran_value_object_lookup_array(const struct tyran_value* object, int index, int* flag);
+struct tyran_value* tyran_value_object_lookup(const struct tyran_value* object, const tyran_object_key* key, tyran_object_key_flag_type* flag);
+struct tyran_value* tyran_value_object_lookup_prototype(const struct tyran_value* object, const tyran_object_key* key, tyran_object_key_flag_type* flag);
+struct tyran_value* tyran_value_object_lookup_array(const struct tyran_value* object, int index, tyran_object_key_flag_type* flag);
 int tyran_value_object_has_key(const struct tyran_value* object, const tyran_object_key* key);
 
 #endif

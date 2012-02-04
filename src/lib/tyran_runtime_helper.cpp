@@ -31,7 +31,7 @@ void tyran_runtime_value_object_subscript(tyran_value* target, tyran_value* key,
 
 	tyran_value_convert_to_string(key);
 
-	int flag;
+	tyran_object_key_flag_type flag;
 	tyran_value* r = tyran_value_object_lookup((const tyran_value*)target, (const tyran_object_key*) key->data.str, &flag);
 	if (!r) {
 		if (target->data.object->prototype) {
@@ -41,7 +41,7 @@ void tyran_runtime_value_object_subscript(tyran_value* target, tyran_value* key,
 			tyran_value* value = tyran_value_new();
 			tyran_value_copy(*value, *existing_value);
 
-			const tyran_object_key* nk = tyran_object_key_new(key->data.str, 0);
+			const tyran_object_key* nk = tyran_object_key_new(key->data.str, tyran_object_key_flag_normal);
 			tyran_value_object_insert_key(target, nk, value);
 			tyran_value_replace_variable(*existing_value, value);
 		}

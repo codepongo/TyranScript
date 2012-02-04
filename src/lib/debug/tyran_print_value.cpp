@@ -161,7 +161,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 			tabs++;
 			tyran_object_iterator* target_iterator = tyran_object_iterator_new();
 			tyran_object_get_keys(v->data.object, target_iterator);
-			int flag;
+			tyran_object_key_flag_type flag;
 			int i;
 			for (i=0; i<target_iterator->count; ++i) {
 				const tyran_object_key* key = target_iterator->keys[i];

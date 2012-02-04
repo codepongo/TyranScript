@@ -1,12 +1,13 @@
 #include <tyranscript/tyran_object_key.h>
 #include <tyranscript/tyran_config.h>
 
+
 const tyran_object_key* tyran_object_key_new(const tyran_string* strkey, tyran_object_key_flag_type flag)
 {
 	void *p = TYRAN_MALLOC(TYRAN_UNICODE_STRLEN(strkey)* sizeof(tyran_string) + sizeof(tyran_string_length_type) + sizeof(tyran_object_key_flag_type));
 	tyran_object_key* ok = (tyran_object_key*) (((char*)p) + sizeof(tyran_string_length_type) + sizeof(tyran_object_key_flag_type));
 	tyran_string_strcpy((tyran_string *)ok, strkey);
-	TYRAN_OBJECT_KEY_FLAG(ok) = flag;
+	TYRAN_OBJECT_KEY_SET_FLAG(ok, flag);
 
 	return ok;
 }
