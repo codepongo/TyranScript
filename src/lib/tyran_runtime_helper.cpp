@@ -27,7 +27,7 @@ void tyran_runtime_logical_less(tyran_value v1, tyran_value v2, tyran_value* res
 
 void tyran_runtime_value_object_subscript(tyran_value* target, tyran_value* key, tyran_value* existing_value, enum tyran_subscript_mode mode)
 {
-	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript objects");
+	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "tyran_runtime_value_object_subscript");
 
 	tyran_value_convert_to_string(key);
 

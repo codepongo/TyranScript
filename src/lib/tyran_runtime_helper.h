@@ -6,8 +6,8 @@
 
 #define tyran_runtime_arithmetic(operand) { \
 	TYRAN_STACK_TOP2_VARIABLE_TO_VALUE(); \
-	TYRAN_ASSERT(tyran_value_is_number(&TYRAN_STACK_TOP), "Must be numbers for bitwise operations"); \
-	TYRAN_ASSERT(tyran_value_is_number(&TYRAN_STACK_TOP2), "Must be numbers for bitwise operations"); \
+	TYRAN_ASSERT(tyran_value_is_number(&TYRAN_STACK_TOP), "Must be numbers for arithmetic operations"); \
+	TYRAN_ASSERT(tyran_value_is_number(&TYRAN_STACK_TOP2), "Must be numbers for arithmetic operations"); \
 	TYRAN_STACK_TOP2.data.number = TYRAN_STACK_TOP2.data.number operand TYRAN_STACK_TOP.data.number; \
 	TYRAN_STACK_POP(); \
 }
