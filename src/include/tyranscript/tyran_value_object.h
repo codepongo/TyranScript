@@ -8,7 +8,7 @@ struct tyran_value;
 
 /* Create and Destroy */
 struct tyran_value* tyran_value_object_new();
-#define tyran_value_object_set_prototype(__target, __proto) __target->data.object->prototype = __proto; 
+void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_value* prototype);
 
 /* Insert and Delete */
 void tyran_value_object_insert_key(struct tyran_value* object, const tyran_object_key* key, struct tyran_value* value);
