@@ -30,7 +30,10 @@ tyran_parser_state* parse_file(const char* filename)
 
 static int script_print(tyran_runtime* runtime, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
 {
-	tyran_print_value("", args, 1);
+	tyran_value* str = tyran_value_object_lookup_array(args, 0, 0);
+	char buf[2048];
+	tyran_value_to_c_string(str, buf, 2048, 0);
+	TYRAN_LOG_NO_LF("%s", buf);
 	return 0;
 }
 
@@ -63,7 +66,7 @@ void execute(tyran_opcodes* opcodes)
 
 	tyran_runtime_free(runtime);
 
-	tyran_print_value("result", &return_value, 1);
+	tyran_print_value("\nresult", &return_value, 1);
 }
 
 int main(int argc, char* argv[])
