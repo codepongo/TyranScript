@@ -6,8 +6,8 @@
 typedef tyran_string tyran_object_key;
 typedef tyran_uint16 tyran_object_key_flag_type;
 
-const tyran_object_key_flag_type tyran_object_key_flag_enumerate = 1;
-const tyran_object_key_flag_type tyran_object_key_flag_normal = tyran_object_key_flag_enumerate;
+static const tyran_object_key_flag_type tyran_object_key_flag_enumerate = 1;
+static const tyran_object_key_flag_type tyran_object_key_flag_normal = 1;
 
 #define tyran_object_key_has_enumerate(key) (TYRAN_OBJECT_KEY_FLAG(key) & tyran_object_key_flag_enumerate)
 

@@ -44,7 +44,7 @@ tyran_object* tyran_object_new_from_items(const struct tyran_value* items, int c
 void tyran_object_free(tyran_object* object);
 
 /* Prototype */
-void tyran_object_set_prototype(tyran_object* target, tyran_value* proto);
+void tyran_object_set_prototype(tyran_object* target, struct tyran_value* proto);
 #define tyran_object_get_prototype(__target) __target->prototype
 
 /* Length */

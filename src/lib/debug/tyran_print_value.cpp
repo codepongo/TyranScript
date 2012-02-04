@@ -60,16 +60,16 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 			switch (v->data.object->type)
 			{
 			case TYRAN_OBJECT_TYPE_OBJECT:
-				tyran_snprintf(buf, max_length, "object:%p ", v->data.object);
+				tyran_snprintf(buf, max_length, "object:%p ", (void*) v->data.object);
 			break;
 			case TYRAN_OBJECT_TYPE_FUNCTION:
-				tyran_snprintf(buf, max_length, "function:%p ", v->data.object);
+				tyran_snprintf(buf, max_length, "function:%p ", (void*) v->data.object);
 			break;
 			case TYRAN_OBJECT_TYPE_ITERATOR:
-				tyran_snprintf(buf, max_length, "iterator:%p ", v->data.object);
+				tyran_snprintf(buf, max_length, "iterator:%p ", (void*)v->data.object);
 			break;
 			}
-			
+
 			break;
 		default:
 			TYRAN_ERROR("Unknown value type");
@@ -96,7 +96,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 	char prefix[100];
 	prefix[0] = 0;
 	if (property != 0) {
-		sprintf(prefix, "%s%s: (%p) ", tab_string, property, v);
+		sprintf(prefix, "%s%s: (%p) ", tab_string, property, (void*)v);
 	}
 
 	const int max_size = 200;
@@ -128,7 +128,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 					break;
 				}
 				case TYRAN_OBJECT_TYPE_OBJECT:
-					tyran_snprintf(value, max_size, "object %p (program:%p)", o, o->program_specific);
+					tyran_snprintf(value, max_size, "object %p (program:%p)", (void*)o, (void*)o->program_specific);
 					break;
 				default:
 					TYRAN_ERROR("Unexpected object type");

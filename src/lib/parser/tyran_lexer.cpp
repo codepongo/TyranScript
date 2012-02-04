@@ -346,7 +346,7 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, int c, tyran_string* number_str
 
 	double* number_pointer = TYRAN_MALLOC_TYPE(double, 1);
 	if (hex_number_detected) {
-		int temp_value;
+		unsigned int temp_value;
 		tyran_sscanf(tyran_string_to_c_str(number_string), "%X", &temp_value);
 		*number_pointer = temp_value;
 
