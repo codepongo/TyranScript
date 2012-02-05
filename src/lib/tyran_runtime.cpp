@@ -22,47 +22,43 @@
 
 /* #define TYRAN_RUNTIME_VERBOSE */
 
-#define TYRAN_CLEANUP_AFTER_FUNCTION_BASE { if (is_constructor_call) { tyran_value_copy(*return_value, _this) } tyran_value_free(function_scope); tyran_runtime_stack_pop;  \
+#define TYRAN_CLEANUP_AFTER_FUNCTION_BASE { if (is_constructor_call) { tyran_value_copy(*return_value, *_this) } tyran_value_free(function_scope); tyran_runtime_stack_pop;  \
 }
 
 #define TYRAN_CLEANUP_AFTER_FUNCTION_END TYRAN_CLEANUP_AFTER_FUNCTION_BASE \
-	tyran_value_release(*return_value);
+	if (sp > 0) { \
+		tyran_value_replace(TYRAN_STACK_TOP, *return_value); \
+	}
 
-#define TYRAN_CLEANUP_AFTER_FUNCTION_RETURN TYRAN_CLEANUP_AFTER_FUNCTION_BASE \
-tyran_value_replace(TYRAN_STACK_TOP, *return_value); 
+#define TYRAN_CLEANUP_AFTER_FUNCTION_RETURN TYRAN_CLEANUP_AFTER_FUNCTION_END
 
-void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* opcodes, struct tyran_scope_stack* scope, struct tyran_value* function_scope, struct tyran_value* incoming_this, struct tyran_value* return_value, const struct tyran_runtime_callbacks* event_callbacks)
+void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_value, const struct tyran_runtime_callbacks* event_callbacks)
 {
-	const tyran_opcode* ip = &opcodes->codes[0];
-	tyran_opcode* end = &opcodes->codes[opcodes->code_len];
-	struct tyran_value _this = *incoming_this;
+	int is_constructor_call = 0;
+	const tyran_opcode* ip;
+	const tyran_opcode* end;
+	struct tyran_value _this_value;
+	struct tyran_value* _this = &_this_value;
+	tyran_value* function_scope;
+	tyran_scope_stack* scope;
+	const tyran_opcodes* opcodes;
+
 	tyran_value* stack = runtime->stack;
-	int sp = 0;
-	int is_constructor_call;
+	int sp = runtime->stack_pointer;
+	
+	tyran_value_set_undefined(_this_value);
 	
 	
-	/* Save return state */
-	tyran_runtime_stack* runtime_info = tyran_runtime_stack_new();
-	tyran_value_copy(runtime_info->_this, _this);
-	runtime_info->function_scope = tyran_value_new();
-	runtime_info->scope = scope;
-	runtime_info->opcodes = opcodes;
-	runtime_info->ip = end;
-	
-	
-	tyran_value runtime_value;
-	runtime_value.type = TYRAN_VALUE_TYPE_RUNTIME_STACK;
-	runtime_value.data.runtime_stack = runtime_info;
-	stack[sp] = runtime_value;
-	sp++;	
-	
+	tyran_runtime_stack_pop;
+	runtime->stack[sp].data.runtime_stack->ip = end;
+	sp++;
 	
 	tyran_value_set_undefined(*return_value);
 
 	do {
 	while(ip < end) {
 #ifdef TYRAN_RUNTIME_VERBOSE
-		tyran_print_runtime(stack, sp, &_this, ip, ip - opcodes->codes);
+		tyran_print_runtime(stack, sp, _this, ip, ip - opcodes->codes);
 #endif
 		switch(ip->opcode) {
 			case TYRAN_OPCODE_MAX_ID:
@@ -93,7 +89,6 @@ void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* 
 						tyran_value* undefined = tyran_value_new();
 						tyran_value_set_undefined(*undefined);
 						value = tyran_value_object_insert_key_and_flag(function_scope, key, undefined, tyran_object_key_flag_normal);
-					} else {
 					}
 				}
 				tyran_value_set_variable(stack[sp], value);
@@ -128,7 +123,7 @@ void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* 
 				sp++;
 				break;
 			case TYRAN_OPCODE_PUSH_THIS:
-				tyran_value_copy(stack[sp], _this);
+				tyran_value_copy(stack[sp], *_this);
 				sp++;
 				break;
 			case TYRAN_OPCODE_PUSH_TOP:
@@ -318,7 +313,7 @@ void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* 
 
 				/* Save return state */
 				tyran_runtime_stack* runtime_info = tyran_runtime_stack_new();
-				tyran_value_copy(runtime_info->_this, _this);
+				tyran_value_copy(runtime_info->_this, *_this);
 				runtime_info->function_scope = function_scope;
 				runtime_info->scope = scope;
 				runtime_info->opcodes = opcodes;
@@ -362,7 +357,7 @@ void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* 
 
 					tyran_value_set_object(*newvalue, newobj);
 
-					_this = *newvalue;
+					*_this = *newvalue;
 				}
 
 				tyran_value_set_undefined(*return_value);
@@ -370,7 +365,7 @@ void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* 
 
 
 				if (static_function->type == tyran_function_type_callback) {
- 					static_function->data.callback(runtime, function_object_to_call, function_scope, &_this, return_value, is_constructor_call);
+ 					static_function->data.callback(runtime, function_object_to_call, function_scope, _this, return_value, is_constructor_call);
 					TYRAN_CLEANUP_AFTER_FUNCTION_RETURN
 				} else {
 					opcodes = static_function->data.opcodes;
@@ -476,7 +471,7 @@ void tyran_runtime_execute(tyran_runtime* runtime,  const struct tyran_opcodes* 
 				break;
 			}
 			case TYRAN_OPCODE_LOAD_THIS: {
-				_this = *(&TYRAN_STACK_TOP2)->data.variable;
+				_this = (&TYRAN_STACK_TOP2)->data.variable;
 				break;
 			}
 		}

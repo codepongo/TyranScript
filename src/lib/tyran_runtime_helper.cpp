@@ -2,6 +2,9 @@
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_runtime.h>
 
+#include <tyranscript/tyran_runtime_stack.h>
+#include <tyranscript/tyran_opcodes.h>
+#include <tyranscript/tyran_opcode.h>
 #include "tyran_runtime_helper.h"
 #include "tyran_value_convert.h"
 
@@ -14,6 +17,23 @@ tyran_runtime* tyran_runtime_new()
 void tyran_runtime_free(tyran_runtime* rt)
 {
 	tyran_free(rt);
+}
+
+void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opcodes, struct tyran_scope_stack* scope, struct tyran_value* function_scope, struct tyran_value* _this)
+{
+	/* Save return state */
+	tyran_runtime_stack* runtime_info = tyran_runtime_stack_new();
+	tyran_value_copy(runtime_info->_this, *_this);
+	runtime_info->function_scope = function_scope;
+	runtime_info->scope = scope;
+	runtime_info->opcodes = opcodes;
+	runtime_info->ip = opcodes->codes;
+
+	tyran_value runtime_value;
+	runtime_value.type = TYRAN_VALUE_TYPE_RUNTIME_STACK;
+	runtime_value.data.runtime_stack = runtime_info;
+	rt->stack[rt->stack_pointer] = runtime_value;
+	rt->stack_pointer++;
 }
 
 void tyran_runtime_logical_less(tyran_value v1, tyran_value v2, tyran_value* res)

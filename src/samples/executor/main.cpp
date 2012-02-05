@@ -60,7 +60,8 @@ void execute(tyran_opcodes* opcodes)
 
 	tyran_scope_stack* global_scope_stack = tyran_scope_stack_clone_and_add(0, global);
 
-	tyran_runtime_execute(runtime, opcodes, global_scope_stack, global, global, &return_value, callbacks);
+	tyran_runtime_push_call(runtime, opcodes, global_scope_stack, global, global);
+	tyran_runtime_execute(runtime, &return_value, callbacks);
 
 	tyran_free(callbacks);
 
