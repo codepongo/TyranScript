@@ -17,7 +17,7 @@ void tyran_string_free(const tyran_string* d);
 
 void tyran_string_strcpy(tyran_string* to, const tyran_string* from);
 const tyran_string* tyran_string_substr(const tyran_string* str, int start, int len);
-const char* tyran_string_to_c_str(const tyran_string* str);
+void tyran_string_to_c_str(char* buf, int max_size, const tyran_string* str);
 
 int tyran_string_strcmp(const tyran_string* str1, const tyran_string* str2);
 

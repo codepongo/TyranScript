@@ -70,6 +70,10 @@ void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip)
 	const int max_size = 2048;
 	char value[max_size];
 	value[0] = 0;
+
+	const int temp_buffer_size = 512;
+	char temp_buffer[temp_buffer_size];
+
 	
 	switch (opcode->opcode)
 	{
@@ -93,11 +97,13 @@ void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip)
 		break;
 
 	case TYRAN_OPCODE_PUSH_STRING:
-		tyran_snprintf(value, max_size, "\"%s\"", tyran_string_to_c_str((const tyran_string*) opcode->data.pointer));
+		tyran_string_to_c_str(temp_buffer, temp_buffer_size, (const tyran_string*) opcode->data.pointer);
+		tyran_snprintf(value, max_size, "\"%s\"", temp_buffer);
 		break;
 
 	case TYRAN_OPCODE_PUSH_VARIABLE:
-		tyran_snprintf(value, max_size, "\"%s\"", tyran_string_to_c_str(((const tyran_variable_name_info *)opcode->data.pointer)->data.variable_name));
+		tyran_string_to_c_str(temp_buffer, temp_buffer_size, ((const tyran_variable_name_info *)opcode->data.pointer)->data.variable_name);
+		tyran_snprintf(value, max_size, "\"%s\"", temp_buffer);
 		break;
 		
 	case TYRAN_OPCODE_JUMP_TRUE:

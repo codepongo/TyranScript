@@ -10,7 +10,7 @@
 
 tyran_value* tyran_array_prototype;
 
-int tyran_array_prototype_constructor(struct tyran_runtime *ps, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor)
+int tyran_array_prototype_constructor(struct tyran_runtime*, tyran_value*, tyran_value*, tyran_value* , tyran_value* return_value, int is_constructor)
 {
 	if (is_constructor) {
 		return 0;
@@ -23,7 +23,7 @@ int tyran_array_prototype_constructor(struct tyran_runtime *ps, tyran_value* sta
 	return 0;
 }
 
-int tyran_array_prototype_push(struct tyran_runtime* ps, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
+int tyran_array_prototype_push(struct tyran_runtime*, tyran_value*, tyran_value* args, tyran_value* _this, tyran_value*, int)
 {
 	int length = tyran_object_length(_this->data.object);
 	tyran_value* add = tyran_value_object_lookup_array(args, 0, 0);
@@ -32,7 +32,7 @@ int tyran_array_prototype_push(struct tyran_runtime* ps, tyran_value* static_fun
 	return 0;
 }
 
-int tyran_array_prototype_pop(struct tyran_runtime* ps, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor)
+int tyran_array_prototype_pop(struct tyran_runtime*, tyran_value*, tyran_value*, tyran_value* _this, tyran_value* return_value, int)
 {
 	int length = tyran_object_length(_this->data.object);
 	TYRAN_ASSERT(length > 0, "You can not pop an empty array");

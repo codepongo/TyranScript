@@ -10,7 +10,7 @@ void tyran_object_prototype_init(tyran_value* constructor_prototype)
 	tyran_object_prototype = constructor_prototype;
 }
 
-int tyran_object_prototype_constructor(struct tyran_runtime *ps, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
+int tyran_object_prototype_constructor(struct tyran_runtime*, tyran_value*, tyran_value*, tyran_value*, tyran_value*, int)
 {
 	return 0;
 }

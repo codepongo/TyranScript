@@ -7,17 +7,17 @@
 
 tyran_value* tyran_function_prototype;
 
-int tyran_function_prototype_constructor(tyran_runtime *ps, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int asc)
+int tyran_function_prototype_constructor(tyran_runtime*, tyran_value*, tyran_value*, tyran_value*, tyran_value*, int)
 {
 	return 0;
 }
 
-static int tyran_function_prototype_call(tyran_runtime *ps,  tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int asc)
+static int tyran_function_prototype_call(tyran_runtime*,  tyran_value*, tyran_value*, tyran_value*, tyran_value*, int)
 {
 	return 0;
 }
 
-static int tyran_function_prototype_apply(tyran_runtime *ps,  tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int asc)
+static int tyran_function_prototype_apply(tyran_runtime*,  tyran_value*, tyran_value*, tyran_value*, tyran_value*, int)
 {
 	return 0;
 }

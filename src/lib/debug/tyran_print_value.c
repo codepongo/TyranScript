@@ -14,6 +14,8 @@
 
 void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, int quote)
 {
+	const int temp_buffer_size = 512;
+	char temp_buffer[temp_buffer_size];
 	switch (v->type) {
 		case TYRAN_VALUE_TYPE_BOOLEAN:
 			tyran_snprintf(buf, max_length, "%s", v->data.boolean ? "true" : "false");
@@ -41,10 +43,11 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 			}
 			break;
 		case TYRAN_VALUE_TYPE_STRING:
+			tyran_string_to_c_str(temp_buffer, temp_buffer_size, v->data.str);
 			if (quote) {
-				tyran_snprintf(buf, max_length, "'%s'", tyran_string_to_c_str(v->data.str));
+				tyran_snprintf(buf, max_length, "'%s'", temp_buffer);
 			} else {
-				tyran_strncpy(buf, tyran_string_to_c_str(v->data.str), max_length);
+				tyran_strncpy(buf, temp_buffer, temp_buffer_size);
 			}
 			break;
 		case TYRAN_VALUE_TYPE_VARIABLE: {
@@ -100,11 +103,15 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 	char prefix[100];
 	prefix[0] = 0;
 	if (property != 0) {
-		sprintf(prefix, "%s%s: (%p) ", tab_string, property, (void*)v);
+		tyran_snprintf(prefix, "%s%s: (%p) ", tab_string, property, (void*)v);
 	}
 
 	const int max_size = 200;
 	char value[max_size];
+
+	const int temp_buffer_size = 512;
+	char temp_buffer[temp_buffer_size];
+
 	int max_size_left = max_size;
 	switch(v->type) {
 		case TYRAN_VALUE_TYPE_OBJECT: {
@@ -120,7 +127,8 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 								tyran_strncat(value, ", ", max_size_left);
 								max_size_left -= 2;
 							}
-							const char* argument_name = tyran_string_to_c_str(tyran_string_array_get(f->argument_names, i));
+							tyran_string_to_c_str(temp_buffer, temp_buffer_size, tyran_string_array_get(f->argument_names, i));
+							const char* argument_name = temp_buffer;
 							tyran_strncat(value, argument_name, max_size_left);
 							max_size_left -= tyran_strlen(argument_name);
 						}
@@ -179,7 +187,8 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 				const tyran_object_key* key = target_iterator->keys[i];
 				tyran_value* sub_value = tyran_value_object_lookup(v, key, &flag);
 				if (sub_value) {
-					tyran_print_value_helper(tabs, tyran_string_to_c_str((const tyran_string*)key), sub_value, quote);
+					tyran_string_to_c_str(temp_buffer, temp_buffer_size, (const tyran_string*)key);
+					tyran_print_value_helper(tabs, temp_buffer, sub_value, quote);
 				}
 			}
 

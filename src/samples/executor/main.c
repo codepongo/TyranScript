@@ -8,8 +8,11 @@ void expose_function(tyran_value* global, const char* name, tyran_function_callb
 
 int read_file(const char* filename, char* buf, int max_length)
 {
-	FILE* fp = fopen(filename, "rb");
-	int read = fread(buf, 1, max_length, fp);
+	FILE* fp;
+	int read;
+	tyran_fopen(&fp, filename, "rb");
+	read = tyran_fread(buf, 1, max_length, fp);
+	tyran_fclose(fp);
 	buf[read] = 0;
 	return read;
 }
@@ -28,7 +31,7 @@ tyran_parser_state* parse_file(const char* filename)
 	return state;
 }
 
-static int script_print(tyran_runtime* runtime, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
+static int script_print(tyran_runtime*, tyran_value*, tyran_value* args, tyran_value*, tyran_value*, int)
 {
 	tyran_value* str = tyran_value_object_lookup_array(args, 0, 0);
 	char buf[2048];

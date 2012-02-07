@@ -88,7 +88,7 @@ void tyran_object_insert_array(tyran_object* object, int index, tyran_value* val
 	tyran_object_extend_length_if_needed(object, index);
 }
 
-tyran_value* tyran_object_lookup(const tyran_object* object, const tyran_object_key* key, tyran_object_key_flag_type* flag)
+tyran_value* tyran_object_lookup(const tyran_object* object, const tyran_object_key* key, tyran_object_key_flag_type*)
 {
 	tyran_rb_tree_key_value_node* node = (tyran_rb_tree_key_value_node*) search_rbtree(*object->tree, (void*)key);
 	if (!node) {

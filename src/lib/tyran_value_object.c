@@ -36,6 +36,7 @@ void tyran_value_object_insert_array(tyran_value* target, int key, tyran_value* 
 tyran_value* tyran_value_object_insert_key_and_flag(tyran_value* target, tyran_value* key, const tyran_value* value, tyran_object_key_flag_type flag)
 {
 	const tyran_object_key* ok = 0;
+	tyran_value* v;
 
 	int arrayindex = -1;
 
@@ -46,7 +47,7 @@ tyran_value* tyran_value_object_insert_key_and_flag(tyran_value* target, tyran_v
 	tyran_value_convert_to_string(key);
 	ok = tyran_object_key_new(key->data.str, flag);
 
-	tyran_value* v = tyran_value_new();
+	 v = tyran_value_new();
 	tyran_value_copy(*v, *value);
 	tyran_value_object_insert_key(target, ok, v);
 	if (arrayindex >= 0) {
@@ -96,9 +97,9 @@ tyran_value* tyran_value_object_lookup_array(const tyran_value* args, int index,
 
 int tyran_value_object_has_key(const tyran_value* target, const tyran_object_key* key)
 {
+	tyran_object_key_flag_type flag;
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Only objects has keys");
 
-	tyran_object_key_flag_type flag;
 
 	if (tyran_value_object_lookup(target, key, &flag)) {
 		return 1;
@@ -113,10 +114,11 @@ int tyran_value_object_has_key(const tyran_value* target, const tyran_object_key
 void tyran_value_object_fetch_key_iterator(tyran_value* target, tyran_value* return_value)
 {
 	tyran_object_iterator* iterator = tyran_object_iterator_new();
+	tyran_object* r;
 
 	tyran_object_get_keys(target->data.object, iterator);
 
-	tyran_object* r = tyran_object_new();
+	 r = tyran_object_new();
 	r->type = TYRAN_OBJECT_TYPE_ITERATOR;
 	r->data.iterator = iterator;
 

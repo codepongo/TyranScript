@@ -5,6 +5,9 @@
 #include <memory.h>
 #include <stdio.h>
 
+#include <string.h>
+#include <math.h>
+
 typedef unsigned short tyran_uint16;
 
 #define tyran_malloc malloc
@@ -17,13 +20,27 @@ typedef unsigned short tyran_uint16;
 #define tyran_memcpy memcpy
 #define tyran_memcmp memcmp
 
-#define tyran_sscanf sscanf
-#define tyran_snprintf snprintf
-#define tyran_strncpy strncpy
-#define tyran_strncat strncat
+#if defined WIN32
+	#define tyran_sscanf sscanf_s
+	#define tyran_snprintf sprintf_s
+	#define tyran_strncpy(a, b, c) strncpy_s(a, 1, b, c)
+	#define tyran_fopen fopen_s
+	#define tyran_fread fread
+	#define tyran_fclose fclose
+	#define tyran_strncat strncat_s
+#else
+	#define tyran_sscanf sscanf
+	#define tyran_snprintf snprintf
+	#define tyran_strncpy strncpy_s
+	#define tyran_strncat strncat
+#endif
 #define tyran_strcmp strcmp
 #define tyran_strlen strlen
 #define tyran_strncmp strncmp
+
+#define tyran_fmod fmod
+
+
 
 #define TYRAN_LOG(...) { printf(__VA_ARGS__); printf("\n"); fflush(stdout); }
 #define TYRAN_LOG_NO_LF(...) { printf(__VA_ARGS__); }
