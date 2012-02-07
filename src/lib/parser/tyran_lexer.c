@@ -13,9 +13,9 @@ void yyerror(YYLTYPE* lexer_position_info, tyran_parser_state* ps, const char *m
 	ps->error_count++;
 }
 
-static int tyran_lexer_pop_character(tyran_lexer* lexer)
+static char tyran_lexer_pop_character(tyran_lexer* lexer)
 {
-	int c = 0;
+	char c = 0;
 
 	c = lexer->buffer[lexer->index];
 	if (c != 0) {
@@ -31,7 +31,7 @@ static int tyran_lexer_pop_character(tyran_lexer* lexer)
 	return c;
 }
 
-static void tyran_lexer_push_character(int c, tyran_lexer* lexer)
+static void tyran_lexer_push_character(char c, tyran_lexer* lexer)
 {
 	TYRAN_ASSERT(c != 0, "Must be a real character");
 	lexer->index--;
@@ -95,8 +95,8 @@ int tyran_lexer_is_alpha_numeric(int c)
 
 const tyran_string* tyran_lexer_parse_string(tyran_lexer* lexer)
 {
-	int c = tyran_lexer_pop_character(lexer);
-	int endchar = c;
+	char c = tyran_lexer_pop_character(lexer);
+	char endchar = c;
 
 	#define max_string_length 4096
 	TYRAN_UNICODE_STRING(max_string_length) string_buffer;
@@ -111,7 +111,7 @@ const tyran_string* tyran_lexer_parse_string(tyran_lexer* lexer)
 			return 0;
 		}
 		if (c == '\\') {
-			int n = tyran_lexer_pop_character(lexer);
+			char n = tyran_lexer_pop_character(lexer);
 			switch(n) {
 				case 'b':
 					buf[index++] = '\b';
@@ -142,7 +142,7 @@ const tyran_string* tyran_lexer_parse_string(tyran_lexer* lexer)
 		}
 	}
 	buf[index] = 0;
-	string_buffer.len = index;
+	string_buffer.len = (tyran_string_length_type) index;
 	return tyran_string_strdup(buf);
 }
 
@@ -209,7 +209,7 @@ int tyran_lexer_parse_operand(tyran_lexer* lexer)
 	char buf[4];
 	size_t i;
 	for (index = 0; index < 4; ++index) {
-		int c = tyran_lexer_pop_character(lexer);
+		char c = tyran_lexer_pop_character(lexer);
 		if (c == 0 || c == '\n') {
 			break;
 		}
@@ -243,8 +243,9 @@ int tyran_lexer_parse_operand(tyran_lexer* lexer)
 
 static void tyran_lexer_skip_comment(tyran_lexer *lexer)
 {
-	int c;
-	while((c = tyran_lexer_pop_character(lexer))) {
+	char c;
+	do {
+		c = tyran_lexer_pop_character(lexer);
 		if (c == '*') {
 			c = tyran_lexer_pop_character(lexer);
 			if (c == '/') {
@@ -252,14 +253,14 @@ static void tyran_lexer_skip_comment(tyran_lexer *lexer)
 			}
 			tyran_lexer_push_character(c, lexer);
 		}
-	}
+	} while (c);
 	TYRAN_SOFT_ERROR("Unexpected end of file");
 }
 
 
-static int tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
+static char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
 {
-	int c;
+	char c;
 	
 	while ((c = tyran_lexer_pop_character(lexer)) == ' ' || c == '\t' || c == '\n' || c == '\r')
 		;
@@ -279,7 +280,7 @@ void tyran_lexer_set_end(YYLTYPE* lexer_position_info, const tyran_lexer* lexer)
 	lexer_position_info->last_column = lexer->column;
 }
 
-int tyran_lexer_parse_identifier(tyran_lexer* lexer, int c, tyran_string* temp_string_buffer)
+int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, tyran_string* temp_string_buffer)
 {
 	int string_index = 0;
 	tyran_lexer_push_character(c, lexer);
@@ -296,11 +297,13 @@ int tyran_lexer_parse_identifier(tyran_lexer* lexer, int c, tyran_string* temp_s
 	return string_index;
 }
 
-int tyran_lexer_parse_identifier_or_keyword(tyran_lexer* lexer, int c, tyran_string* temp_string_buffer, tyran_string_length_type* string_length, YYLTYPE* lexer_position_info, YYSTYPE* token)
+int tyran_lexer_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_string* temp_string_buffer, tyran_string_length_type* string_length, YYLTYPE* lexer_position_info, YYSTYPE* token)
 {
 	int identifier_length = tyran_lexer_parse_identifier(lexer, c, temp_string_buffer);
-	*string_length = identifier_length;
-	int r = tyran_lexer_get_keyword_token(tyran_string_to_c_str(temp_string_buffer));
+	*string_length = (tyran_string_length_type) identifier_length;
+	char temp_buffer[512];
+	tyran_string_to_c_str(temp_buffer, 512, temp_string_buffer);
+	int r = tyran_lexer_get_keyword_token(temp_buffer);
 	if (r) {
 		return r;
 	}
@@ -309,25 +312,25 @@ int tyran_lexer_parse_identifier_or_keyword(tyran_lexer* lexer, int c, tyran_str
 	return TYRAN_TOKEN_IDENTIFIER;
 }
 
-int tyran_lexer_parse_number(tyran_lexer* lexer, int c, tyran_string* number_string, tyran_string_length_type* string_length, YYLTYPE* lexer_position_info, YYSTYPE* token)
+int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_string* number_string, tyran_string_length_type* string_length, YYLTYPE* lexer_position_info, YYSTYPE* token)
 {
 	int decimal_point_detected = 0;
 	int hex_number_detected = 0;
 	int string_index = 0;
 
-	number_string[string_index++] = c;
+	number_string[string_index++] = (int) c;
 
 	while (string_index < 128) {
 		c = tyran_lexer_pop_character(lexer);
 		if (tyran_lexer_is_digit(c)) {
-			number_string[string_index++] = c;
+			number_string[string_index++] = (int) c;
 		} else if (c == '.') {
 			if (decimal_point_detected || hex_number_detected) {
 				TYRAN_SOFT_ERROR("Number format error");
 				return 0;
 			}
 			decimal_point_detected = 1;
-			number_string[string_index++] = c;
+			number_string[string_index++] = (int) c;
 		} else if ((c == 'x' || c == 'X') && string_index == 1 && string_index) {
 			if (decimal_point_detected || hex_number_detected) {
 				TYRAN_SOFT_ERROR("Number format error");
@@ -342,16 +345,20 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, int c, tyran_string* number_str
 	tyran_lexer_set_end(lexer_position_info, lexer);
 
 	number_string[string_index] = 0;
-	*string_length = string_index;
+	*string_length = (tyran_string_length_type) string_index;
 
 	double* number_pointer = TYRAN_MALLOC_TYPE(double, 1);
 	if (hex_number_detected) {
 		unsigned int temp_value;
-		tyran_sscanf(tyran_string_to_c_str(number_string), "%X", &temp_value);
+		char temp_buffer[512];
+		tyran_string_to_c_str(temp_buffer, 512, number_string);
+		tyran_sscanf(temp_buffer, "%X", &temp_value);
 		*number_pointer = temp_value;
 
 	} else {
-		tyran_sscanf(tyran_string_to_c_str(number_string), "%lf", number_pointer);
+		char temp_buffer[512];
+		tyran_string_to_c_str(temp_buffer, 512, number_string);
+		tyran_sscanf(temp_buffer, "%lf", number_pointer);
 	}
 
 	*token = number_pointer;
@@ -360,7 +367,7 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, int c, tyran_string* number_str
 
 int tyran_lexer_parse_comment(tyran_lexer* lexer)
 {
-	int d = tyran_lexer_pop_character(lexer);
+	char d = tyran_lexer_pop_character(lexer);
 	if (d == '/') {
 		while ((d = tyran_lexer_pop_character(lexer)) != '\r' && d != '\n' && d != 0)
 			;
@@ -374,7 +381,7 @@ int tyran_lexer_parse_comment(tyran_lexer* lexer)
 	return 0;
 }
 
-int tyran_lexer_parse_whole_string(tyran_lexer* lexer, int c, YYLTYPE* lexer_position_info, YYSTYPE* token)
+int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, YYLTYPE* lexer_position_info, YYSTYPE* token)
 {
 	tyran_lexer_push_character(c, lexer);
 	*token = (void *) tyran_lexer_parse_string(lexer);
@@ -389,7 +396,7 @@ static int tyran_lexer_next_token(YYSTYPE* token, YYLTYPE* lexer_position_info, 
 
 	tyran_lexer_set_begin(lexer_position_info, lexer);
 
-	int c = tyran_lexer_next_character_skip_whitespace(lexer);
+	char c = tyran_lexer_next_character_skip_whitespace(lexer);
 	if (!c) {
 		return 0;
 	}

@@ -10,20 +10,22 @@
 
 struct tyran_value* tyran_string_prototype;
 
-int tyran_string_prototype_constructor(tyran_runtime *ps, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* ret, int is_constructor)
+int tyran_string_prototype_constructor(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* d, int is_constructor)
 {
+	tyran_value* str;
+
 	if (!is_constructor) {
 		return 0;
 	}
 
-	tyran_value* str = tyran_value_object_lookup_array(args, 0, 0);
+	 str = tyran_value_object_lookup_array(args, 0, 0);
 	tyran_object_set_length(_this->data.object, TYRAN_UNICODE_STRLEN(str->data.str));
 	tyran_value_object_insert_string_key(_this, tyran_string_from_c_str("str"), str);
 
 	return 0;
 }
 
-int tyran_string_prototype_char_at(tyran_runtime *ps, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor)
+int tyran_string_prototype_char_at(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor)
 {
 	tyran_value* value = tyran_value_object_lookup(_this, tyran_string_from_c_str("str"), 0);
 	TYRAN_ASSERT(value != 0, "Couldn't find str member");
@@ -39,12 +41,12 @@ int tyran_string_prototype_char_at(tyran_runtime *ps, tyran_value* static_functi
 	return 0;
 }
 
-int tyran_string_prototype_from_char_code(tyran_runtime *ps, tyran_value* static_function, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor)
+int tyran_string_prototype_from_char_code(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* d, tyran_value* return_value, int is_constructor)
 {
 	char buf[100];
 
 	tyran_value* char_code = tyran_value_object_lookup_array(args, 0, 0);
-	buf[0] = tyran_value_to_integer(char_code);
+	buf[0] = (char) tyran_value_to_integer(char_code);
 	buf[1] = 0;
 
 	const tyran_string* duplicate = tyran_string_strdup_str(buf);

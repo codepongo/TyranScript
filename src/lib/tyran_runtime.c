@@ -178,7 +178,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				break;
 			case TYRAN_OPCODE_MODULUS: {
 				TYRAN_STACK_TOP2_VARIABLE_TO_VALUE();
-				TYRAN_STACK_TOP2.data.number = fmod(TYRAN_STACK_TOP2.data.number, TYRAN_STACK_TOP.data.number);
+				TYRAN_STACK_TOP2.data.number = tyran_fmod(TYRAN_STACK_TOP2.data.number, TYRAN_STACK_TOP.data.number);
 				TYRAN_STACK_POP();
 				break;
 			}

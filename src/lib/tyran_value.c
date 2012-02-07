@@ -58,5 +58,4 @@ int tyran_value_is_true(const tyran_value* value)
 			TYRAN_ERROR("Can not convert value to true");
 			break;
 	}
-	return 0;
 }

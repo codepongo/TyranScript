@@ -1,14 +1,12 @@
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_config.h>
 
-#define tyran_string_max_length 512
-
 
 tyran_string* tyran_string_alloc(int len)
 {
 	char* r = (char*) TYRAN_MALLOC(len * sizeof(tyran_string) + sizeof(tyran_string_length_type) );
 	tyran_string* rr = (tyran_string *)(r + sizeof(tyran_string_length_type));
-	*((tyran_string_length_type *)r) = len;
+	*((tyran_string_length_type *)r) = (tyran_string_length_type) len;
 
 	return rr;
 }
@@ -62,7 +60,7 @@ void tyran_string_strcpy(tyran_string* to, const tyran_string* from)
 	int i;
 	for (i = 0; i < len; ++i) to[i] = from[i];
 
-	TYRAN_UNICODE_STRLEN(to) = len;
+	TYRAN_UNICODE_STRLEN(to) = (tyran_string_length_type) len;
 }
 
 void tyran_string_free(const tyran_string* d)
@@ -70,20 +68,19 @@ void tyran_string_free(const tyran_string* d)
 	tyran_free((void *)(((char*)d) - sizeof(tyran_string_length_type) ));
 }
 
-const char* tyran_string_to_c_str(const tyran_string* str)
+void tyran_string_to_c_str(char* buf, int tyran_string_max_length, const tyran_string* str)
 {
-	static char buf[tyran_string_max_length];
 	int i;
 	int len = TYRAN_UNICODE_STRLEN(str);
 
-	for (i = 0; i < len && i < tyran_string_max_length; ++i) buf[i] = (char)str[i];
+	for (i = 0; i < len && i < tyran_string_max_length - 1; ++i) buf[i] = (char)str[i];
 	buf[i] = 0;
-	return buf;
 }
 
 const tyran_string* tyran_string_from_c_str(const char* str)
 {
-	static tyran_string buf[tyran_string_max_length];
+	const int tyran_string_max_length = 512;
+	tyran_string buf[tyran_string_max_length];
 	tyran_string_length_type *len = (tyran_string_length_type *)buf;
 	tyran_string* b = (tyran_string *)((char*)buf + sizeof(tyran_string_length_type));
 	tyran_string_length_type i;
@@ -105,7 +102,10 @@ int tyran_string_strcmp(const tyran_string* str1, const tyran_string* str2)
 	if (len1 != len2) return len1 - len2;
 
 	for (i = 0; i < len1; ++i) {
-		if ((r = str1[i] - str2[i])) return r;
+		r = str1[i] - str2[i];
+		if (r) {
+			return r;
+		}
 	}
 	return 0;
 }
