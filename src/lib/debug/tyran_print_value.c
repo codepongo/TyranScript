@@ -14,7 +14,7 @@
 
 void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, int quote)
 {
-	const int temp_buffer_size = 512;
+	const static int temp_buffer_size = 512;
 	char temp_buffer[temp_buffer_size];
 	switch (v->type) {
 		case TYRAN_VALUE_TYPE_BOOLEAN:
@@ -103,7 +103,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 	char prefix[100];
 	prefix[0] = 0;
 	if (property != 0) {
-		tyran_snprintf(prefix, "%s%s: (%p) ", tab_string, property, (void*)v);
+		tyran_snprintf(prefix, 100, "%s%s: (%p) ", tab_string, property, (void*)v);
 	}
 
 	const int max_size = 200;

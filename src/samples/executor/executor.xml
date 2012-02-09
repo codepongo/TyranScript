@@ -11,8 +11,6 @@
         <configuration name="distribution">
         </configuration>
 
-	<compiler program="g++" flags="-Wall" />
-	<linker program="g++" flags="" />
 
 	<source directory="../../lib" recursive="true"/>
 	<header directory="../../include" />

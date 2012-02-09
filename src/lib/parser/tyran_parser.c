@@ -58,8 +58,6 @@
 /* Using locations.  */
 #define YYLSP_NEEDED 1
 
-#pragma warning( disable : 4127 4065 4244 4100 4702 )
-
 /* Tokens.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE

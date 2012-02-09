@@ -379,7 +379,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				TYRAN_STACK_TOP_VARIABLE_TO_VALUE();
 				tyran_value_copy(*return_value, TYRAN_STACK_TOP);
 				TYRAN_STACK_POP_N(ip->data.integer);
-				TYRAN_CLEANUP_AFTER_FUNCTION_RETURN
+				ip = end;
 				break;
 			}
 			case TYRAN_OPCODE_MAKE_OBJECT: {
