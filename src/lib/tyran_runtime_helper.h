@@ -27,19 +27,4 @@ void tyran_runtime_logical_less(tyran_value v1, tyran_value v2, tyran_value* res
 void tyran_runtime_value_object_subscript(tyran_value* target, tyran_value* key, tyran_value* existing_value, enum tyran_subscript_mode mode);
 
 
-#define tyran_runtime_stack_pop { \
-	TYRAN_ASSERT(sp > 0, "Stack pointer has popped too much"); \
-	sp--; \
-	tyran_value* runtime_stack_value = &stack[sp]; \
-	TYRAN_ASSERT(runtime_stack_value->type == TYRAN_VALUE_TYPE_RUNTIME_STACK, "Not a callstack info. Stack is mismatched."); \
-	tyran_runtime_stack* runtime_info = runtime_stack_value->data.runtime_stack; \
-	tyran_value_copy(*_this, runtime_info->_this); \
-	function_scope = runtime_info->function_scope; \
-	scope = runtime_info->scope; \
-	opcodes = runtime_info->opcodes; \
-	end = &opcodes->codes[opcodes->code_len]; \
-	ip = runtime_info->ip; \
-}
-
-
 #endif

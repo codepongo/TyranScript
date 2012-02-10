@@ -10,7 +10,7 @@ struct tyran_scope_stack;
 typedef struct tyran_runtime_stack {
 	const struct tyran_opcodes* opcodes;
 	struct tyran_scope_stack* scope;
-	tyran_value* function_scope;
+	tyran_value function_scope;
 	tyran_value _this;
 	const struct tyran_opcode* ip;
 } tyran_runtime_stack;
