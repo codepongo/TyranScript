@@ -177,7 +177,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 					tyran_print_value_helper(tabs, desc, nv, 1);
 				}
 			}
-		} else {
+		} /*else*/ {
 			tabs++;
 			tyran_object_iterator* target_iterator = tyran_object_iterator_new();
 			tyran_object_get_keys(v->data.object, target_iterator);
