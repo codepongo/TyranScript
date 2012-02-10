@@ -14,7 +14,7 @@ void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _t
 	stack_info[0] = 0;
 
 	int stack_info_length_left = max_size - 1;
-	tyran_snprintf(stack_info, max_size, "STACK%d: ", sp);
+	tyran_snprintf(stack_info, max_size, "STACK%d: ", sp - 1);
 	for (i = sp - 1; i >= 0 && i >= sp - 10; --i) {
 		if (i != sp - 1) {
 			const char* seperator = ", ";
