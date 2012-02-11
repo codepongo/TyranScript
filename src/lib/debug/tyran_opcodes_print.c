@@ -65,7 +65,7 @@ const char* tyran_opcode_names[100] = {
 	"LOAD_THIS"
 };
 
-void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip)
+void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip, int highlight)
 {
 	const int max_size = 2048;
 	char value[max_size];
@@ -124,15 +124,15 @@ void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip)
 		break;
 	}
 	
-	TYRAN_LOG("%d: %s %s", ip, (tyran_opcode_names[opcode->opcode]), value);
+	TYRAN_LOG("%c%d: %s %s", highlight ? '>' : ' ', ip, (tyran_opcode_names[opcode->opcode]), value);
 	
 	if (opcode->opcode == TYRAN_OPCODE_PUSH_FUNCTION) {
 		const tyran_function* function = (const tyran_function*) opcode->data.pointer;
-		tyran_opcodes_print(function->data.opcodes);
+		tyran_opcodes_print(function->data.opcodes, 0);
 	}
 }
 
-void tyran_opcodes_print(const struct tyran_opcodes* ops)
+void tyran_opcodes_print(const struct tyran_opcodes* ops, const struct tyran_opcode* ip)
 {
 	int i = 0;
 	tyran_opcode* tyran_opcodes = ops->codes;
@@ -141,6 +141,6 @@ void tyran_opcodes_print(const struct tyran_opcodes* ops)
 	TYRAN_LOG("opcode octets:%d", octet_length);
 
 	for (i = 0; i < octet_length; ++i) {
-		tyran_opcodes_print_opcode(&tyran_opcodes[i], i);
+		tyran_opcodes_print_opcode(&tyran_opcodes[i], i, ip == &tyran_opcodes[i]);
 	}
 }

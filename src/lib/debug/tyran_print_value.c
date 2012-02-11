@@ -88,7 +88,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 {
 	int t;
 
-	if (v == tyran_object_prototype || v == tyran_array_prototype || v == tyran_function_prototype) {
+	if (v == tyran_object_prototype) {
 		return;
 	}
 
@@ -170,7 +170,8 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 			const int max_size_description = 2048;
 			char desc[max_size_description];
 			for (i = 0; i < len; ++i) {
-				nv = tyran_value_object_lookup_array(v, i, 0);
+				tyran_object_key_flag_type flag;
+				nv = tyran_value_object_lookup_array(v, i, &flag);
 				if (nv) {
 					tyran_snprintf(desc, max_size_description, "#%d: ", i);
 					// TYRAN_ASSERT(nv != 0, "Must be able to lookup all indexes");

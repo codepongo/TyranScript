@@ -8,6 +8,9 @@
 #include "tyran_runtime_helper.h"
 #include "tyran_value_convert.h"
 
+#include <tyranscript/debug/tyran_print_value.h>
+#include <tyranscript/debug/tyran_opcodes_print.h>
+
 tyran_runtime* tyran_runtime_new()
 {
 	tyran_runtime* rt = TYRAN_CALLOC(tyran_runtime);
@@ -28,6 +31,7 @@ void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opco
 	runtime_info->scope = scope;
 	runtime_info->opcodes = opcodes;
 	runtime_info->ip = opcodes->codes - 1;
+	tyran_opcodes_print(opcodes, runtime_info->ip);
 
 	tyran_value runtime_value;
 	runtime_value.type = TYRAN_VALUE_TYPE_RUNTIME_STACK;

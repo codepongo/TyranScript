@@ -3,7 +3,10 @@
 #include <tyranscript/tyran_runtime.h>
 #include <tyranscript/tyran_function_object.h>
 #include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_object_array.h>
 #include <tyranscript/tyran_value_object.h>
+#include <tyranscript/tyran_scope.h>
+#include <tyranscript/debug/tyran_print_value.h>
 
 tyran_value* tyran_function_prototype;
 
@@ -17,13 +20,32 @@ static int tyran_function_prototype_call(tyran_runtime* runtime,  tyran_value* a
 	return 0;
 }
 
-static int tyran_function_prototype_apply(tyran_runtime* runtime,  tyran_value* a, tyran_value* b, tyran_value* c, tyran_value* d, int is_constructor)
+int tyran_function_prototype_apply(tyran_runtime* runtime, tyran_value* function_object_value, tyran_value* function_scope, tyran_value* _this, tyran_value* return_value, int is_constructor)
 {
-	return 0;
+	tyran_object_key_flag_type flag;
+	
+	tyran_value* this_to_use = tyran_value_object_lookup_array(function_scope, 0, &flag);
+	tyran_value* arguments_to_use = tyran_value_object_lookup_array(function_scope, 1, &flag);
+	
+	const tyran_function* function_to_call = _this->data.object->data.function->static_function;
+	
+	tyran_function_object* function_object = _this->data.object->data.function;
+	
+
+	/* Set the name for the arguments (not just the indexes) */
+	tyran_scope_set_variable_names(arguments_to_use, function_to_call->argument_names);
+
+	/* Fill scope with local variables */
+	tyran_scope_set_local_variables(arguments_to_use, function_to_call);
+
+	tyran_runtime_push_call(runtime, function_to_call->data.opcodes, function_object->scope, arguments_to_use, this_to_use);
+	
+	return -1;
 }
 
 void tyran_function_prototype_init(tyran_value* constructor_protoype)
 {
+	tyran_function_prototype = constructor_protoype;
 	tyran_value* function_call = tyran_function_object_new_callback(tyran_function_prototype_call);
 	tyran_value_object_insert_string_key(constructor_protoype, tyran_string_from_c_str("call"), function_call);
 	tyran_value_object_set_prototype(function_call, tyran_function_prototype);

@@ -36,5 +36,5 @@ void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _t
 	tyran_strncat(stack_info, this_info, stack_info_length_left);
 
 	TYRAN_LOG("%s", stack_info);
-	tyran_opcodes_print_opcode(opcode, ip);
+	tyran_opcodes_print_opcode(opcode, ip, 1);
 }

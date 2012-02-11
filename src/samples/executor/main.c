@@ -28,14 +28,15 @@ tyran_parser_state* parse_file(const char* filename)
 	if (state->error_count) {
 		printf("Error:%d\n", state->error_count);
 	}
-	tyran_opcodes_print(state->opcodes);
+	tyran_opcodes_print(state->opcodes, 0);
 
 	return state;
 }
 
 static int script_print(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* c, tyran_value* d, int is_constructor)
 {
-	tyran_value* str = tyran_value_object_lookup_array(args, 0, 0);
+	tyran_object_key_flag_type flag;
+	tyran_value* str = tyran_value_object_lookup_array(args, 0, &flag);
 	char buf[2048];
 	tyran_value_to_c_string(str, buf, 2048, 0);
 	TYRAN_LOG_NO_LF("%s", buf);

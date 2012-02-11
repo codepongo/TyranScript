@@ -5,6 +5,9 @@
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_function.h>
 
+#include <tyranscript/tyran_function_prototype.h>
+#include <tyranscript/tyran_value_object.h>
+
 tyran_function_object* tyran_function_object_new(const tyran_function* function)
 {
 	tyran_function_object* object = TYRAN_CALLOC(tyran_function_object);

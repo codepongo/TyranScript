@@ -50,8 +50,9 @@ tyran_value* tyran_scope_stack_lookup(const tyran_scope_stack* stack, const tyra
 	int i;
 	tyran_value* found_value;
 	
+	tyran_object_key_flag_type flag;
 	for (i = stack->scope_count - 1; i >= 0; --i) {
-		found_value = tyran_value_object_lookup(stack->scopes[i], key, 0);
+		found_value = tyran_value_object_lookup(stack->scopes[i], key, &flag);
 		if (found_value) {
 			return found_value;
 		}

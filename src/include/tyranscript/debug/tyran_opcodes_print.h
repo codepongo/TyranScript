@@ -4,7 +4,7 @@
 struct tyran_opcode;
 struct tyran_opcodes;
 
-void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip);
-void tyran_opcodes_print(const struct tyran_opcodes* ops);
+void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip, int highlight);
+void tyran_opcodes_print(const struct tyran_opcodes* ops, const struct tyran_opcode* ip);
 
 #endif

@@ -94,6 +94,7 @@ tyran_value* tyran_object_lookup(const tyran_object* object, const tyran_object_
 	if (!node) {
 		return 0;
 	}
+	*flag = TYRAN_OBJECT_KEY_FLAG(node->key);
 	return node->value;
 }
 

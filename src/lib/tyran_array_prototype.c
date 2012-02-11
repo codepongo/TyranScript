@@ -26,7 +26,8 @@ int tyran_array_prototype_constructor(struct tyran_runtime* runtime, tyran_value
 int tyran_array_prototype_push(struct tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* c, int isconstructor)
 {
 	int length = tyran_object_length(_this->data.object);
-	tyran_value* add = tyran_value_object_lookup_array(args, 0, 0);
+	tyran_object_key_flag_type flag;
+	tyran_value* add = tyran_value_object_lookup_array(args, 0, &flag);
 	tyran_object_insert_array(_this->data.object, length, add);
 	
 	return 0;
@@ -35,11 +36,12 @@ int tyran_array_prototype_push(struct tyran_runtime* r, tyran_value* a, tyran_va
 int tyran_array_prototype_pop(struct tyran_runtime* r, tyran_value* a, tyran_value* b, tyran_value* _this, tyran_value* return_value, int isconstructor)
 {
 	int length = tyran_object_length(_this->data.object);
+	tyran_object_key_flag_type flag;
 	TYRAN_ASSERT(length > 0, "You can not pop an empty array");
 	
 	length--;
 
-	tyran_value_copy(*return_value, *tyran_value_object_lookup_array(_this, length, 0));
+	tyran_value_copy(*return_value, *tyran_value_object_lookup_array(_this, length, &flag));
 	tyran_object_set_length(_this->data.object, length);
 	return 0;
 }
