@@ -322,7 +322,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				int argument_count = ip->data.integer;
 				int should_set_this = (ip->opcode == TYRAN_OPCODE_CALL_SET_THIS) ? 1 : 0;
 				int items_to_pop = argument_count + should_set_this;
-				int items_to_convert = argument_count + 1;
+				int items_to_convert = argument_count + 1 + should_set_this;
 				
 				TYRAN_STACK_TOP_N_VARIABLE_TO_VALUE(items_to_convert);
 
