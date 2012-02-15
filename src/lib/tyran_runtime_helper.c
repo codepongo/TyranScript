@@ -31,7 +31,6 @@ void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opco
 	runtime_info->scope = scope;
 	runtime_info->opcodes = opcodes;
 	runtime_info->ip = opcodes->codes - 1;
-	tyran_opcodes_print(opcodes, runtime_info->ip);
 
 	tyran_value runtime_value;
 	runtime_value.type = TYRAN_VALUE_TYPE_RUNTIME_STACK;
