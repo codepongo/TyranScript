@@ -1,5 +1,5 @@
 # TyranScript
-Script engine designed to be embedded. Aimed to be compiled fast, have a small footprint, as few opcodes as possible, minimal dependencies and very portable. It uses reference counting to avoid costly garbage collections. Written in C.
+TyranScript is a tiny, embeddable scripting language written in C. Aimed to compile fast, have a small footprint, as few opcodes as possible, minimal dependencies and very portable. It uses reference counting to avoid costly garbage collections.
 
 ## Language
 
@@ -19,47 +19,11 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * switch ... case ... default
 
 ### Operands
-* ","
-* "="
-* "+="
-* "-="
-* "*="
-* "%="
-* "<<="
-* ">>="
-* ">>>="
-* "&="
-* "|="
-* "^="
-* "/="
-* "||"
-* "&&"
-* "|"
-* "^"
-* "&"
-* "=="
-* "!="
-* "==="
-* "!==="
-* "<="
-* ">="
-* "+"
-* "-"
-* "*"
-* "/"
-* "%"
-* "!"
-* "++"
-* "--"
-* "new"
-* "."
-* "[]"
-* "()"
+* , = += -= *= %= <<= >>= >>>= &= |= ^= /= || && | ^ & == != === !=== <= >= + - * / % ! ++ -- new . [] ()
 
 ## Opcodes
 
 ### Stack
-(10)
 
 * PUSH_NUMBER double
 * PUSH_STRING string
@@ -70,10 +34,10 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * PUSH_THIS
 * PUSH_TOP
 * PUSH_TOP2
+* TOC_DUP
 * POP int number_of_elements
 
 ### Arithmetic
-(9)
 
 * NEGATIVE
 * NOT
@@ -86,7 +50,6 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * DECREASE
 
 ### Bitwise operations
-(5)
 
 * BITWISE_AND
 * BITWISE_OR
@@ -95,7 +58,6 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * BITWISE_SHIFT int (0=left, 1=right, 2=unsigned right)
 
 ### Compare
-(6)
 
 * COMPARE_EQUAL
 * COMPARE_NOT_EQUAL
@@ -105,7 +67,6 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * COMPARE_GREATER_EQUAL
 
 ### Jumps and calls
-(8)
 
 * JUMP int offset
 * JUMP_POP jump_pop_info* (offset and pop_count)
@@ -118,7 +79,6 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * RETURN int pop_count
 
 ### Object manipulation
-(6)
 
 * MAKE_OBJECT int number_of_elements
 * MAKE_ARRAY int number_of_elements
@@ -128,30 +88,29 @@ Script engine designed to be embedded. Aimed to be compiled fast, have a small f
 * UNREFERENCE
 
 ### Object iteration
-(2)
 
 * KEY
 * NEXT
 
-### OTHER
-(1)
+### Other
 
-* SET_THIS (LOAD_THIS?)
 * NOP
-* DEBUG_BREAK
 
 
 ## Licenses
 
-* Fast number to string conversion using stringencoders:
+#### stringencoders
+Fast number to string conversion using stringencoders:
 
-Copyright &copy; 2007, Nick Galbreath -- nickg [at] modp [dot] com
+Copyright (c) 2007, Nick Galbreath -- nickg [at] modp [dot] com
+
   * All rights reserved.
-  * http://code.google.com/p/stringencoders/
+  * [stringencoders](http://code.google.com/p/stringencoders/)
   * Released under the MIT license.
 
+#### Generic-Red-Black-Tree
  
-* Red Black Tree implementation by Frederico Gonçalves (https://github.com/fgoncalves/Generic-Red-Black-Tree)
+Red Black Tree implementation by Frederico Gonçalves [Generic-Red-Black-Tree](https://github.com/fgoncalves/Generic-Red-Black-Tree)
 
 Copyright (c) 2012 Frederico Gonçalves
 
