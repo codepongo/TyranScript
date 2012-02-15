@@ -1,7 +1,6 @@
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_config.h>
 
-
 tyran_string* tyran_string_alloc(int len)
 {
 	char* r = (char*) TYRAN_MALLOC(len * sizeof(tyran_string) + sizeof(tyran_string_length_type) );
@@ -18,8 +17,6 @@ const tyran_string* tyran_string_strdup(const tyran_string* str)
 	tyran_memcpy(rr, str, (len) * sizeof(tyran_string));
 	return rr;
 }
-
-
 
 const tyran_string* tyran_string_strdup_str(const char *str)
 {
@@ -79,8 +76,8 @@ void tyran_string_to_c_str(char* buf, int tyran_string_max_length, const tyran_s
 
 const tyran_string* tyran_string_from_c_str(const char* str)
 {
-	const int tyran_string_max_length = 512;
-	tyran_string buf[tyran_string_max_length];
+	#define tyran_string_max_length 512
+	static tyran_string buf[tyran_string_max_length];
 	tyran_string_length_type *len = (tyran_string_length_type *)buf;
 	tyran_string* b = (tyran_string *)((char*)buf + sizeof(tyran_string_length_type));
 	tyran_string_length_type i;
@@ -99,7 +96,10 @@ int tyran_string_strcmp(const tyran_string* str1, const tyran_string* str2)
 	int len2 = TYRAN_UNICODE_STRLEN(str2);
 
 	int i, r;
-	if (len1 != len2) return len1 - len2;
+	
+	if (len1 != len2) {
+		return len1 - len2;
+	}
 
 	for (i = 0; i < len1; ++i) {
 		r = str1[i] - str2[i];
