@@ -21,7 +21,7 @@ struct tyran_runtime_callbacks;
 tyran_runtime* tyran_runtime_new();
 void tyran_runtime_free(tyran_runtime* rt);
 void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_value, const struct tyran_runtime_callbacks* callbacks);
-void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opcodes, struct tyran_scope_stack* scope, struct tyran_value* function_scope, struct tyran_value* _this);
+void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opcodes, struct tyran_scope_stack* scope, struct tyran_value* function_scope, const struct tyran_value* _this);
 
 
 #endif

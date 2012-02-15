@@ -146,6 +146,11 @@ struct tyran_opcodes* tyran_opcodes_insert_push_top()
 	OPCODES_ALLOC(TYRAN_OPCODE_PUSH_TOP);
 }
 
+struct tyran_opcodes* tyran_opcodes_insert_toc_dup()
+{
+	OPCODES_ALLOC(TYRAN_OPCODE_TOC_DUP);
+}
+
 struct tyran_opcodes* tyran_opcodes_insert_push_top2()
 {
 	OPCODES_ALLOC(TYRAN_OPCODE_PUSH_TOP2);
@@ -293,6 +298,11 @@ struct tyran_jump_pop_info* tyran_opcodes_insert_jump_pop_info_new(int offset, i
 	return r;
 }
 
+struct tyran_opcodes* tyran_opcodes_insert_call_set_this(int argc)
+{
+	OPCODES_ALLOC_INTEGER(TYRAN_OPCODE_CALL_SET_THIS, argc);
+}
+
 struct tyran_opcodes* tyran_opcodes_insert_call(int argc)
 {
 	OPCODES_ALLOC_INTEGER(TYRAN_OPCODE_CALL, argc);
@@ -339,11 +349,6 @@ struct tyran_opcodes* tyran_opcodes_insert_next()
 struct tyran_opcodes* tyran_opcodes_insert_nop()
 {
 	OPCODES_ALLOC(TYRAN_OPCODE_NOP);
-}
-
-struct tyran_opcodes* tyran_opcodes_insert_load_this()
-{
-	OPCODES_ALLOC(TYRAN_OPCODE_LOAD_THIS);
 }
 
 struct tyran_opcodes* tyran_opcodes_insert_make_object(int c)

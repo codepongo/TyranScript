@@ -22,7 +22,7 @@ void tyran_runtime_free(tyran_runtime* rt)
 	tyran_free(rt);
 }
 
-void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opcodes, struct tyran_scope_stack* scope, struct tyran_value* function_scope, struct tyran_value* _this)
+void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opcodes, struct tyran_scope_stack* scope, struct tyran_value* function_scope, const struct tyran_value* _this)
 {
 	/* Save return state */
 	tyran_runtime_stack* runtime_info = tyran_runtime_stack_new();

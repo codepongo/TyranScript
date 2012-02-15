@@ -5,6 +5,7 @@
 #include <tyranscript/tyran_function.h>
 #include <tyranscript/debug/tyran_opcodes_print.h>
 
+
 const char* tyran_opcode_names[100] = {
 	"NOP",
 	"PUSH_NUMBER",
@@ -16,6 +17,7 @@ const char* tyran_opcode_names[100] = {
 	"PUSH_SCOPE",
 	"PUSH_THIS",
 	"PUSH_TOP",
+	"TOC_DUP",
 	"PUSH_TOP2",
 	"POP",
 
@@ -49,6 +51,7 @@ const char* tyran_opcode_names[100] = {
 	"JUMP_TRUE_POP",
 	"JUMP_FALSE_POP",
 	"CALL",
+	"CALL_SET_THIS",
 	"NEW",
 	"RETURN",
 
@@ -61,8 +64,6 @@ const char* tyran_opcode_names[100] = {
 
 	"KEY",
 	"NEXT",
-
-	"LOAD_THIS"
 };
 
 void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip, int highlight)
@@ -78,6 +79,7 @@ void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip, int h
 	switch (opcode->opcode)
 	{
 	case TYRAN_OPCODE_PUSH_BOOLEAN:
+	case TYRAN_OPCODE_CALL_SET_THIS:
 	case TYRAN_OPCODE_CALL:
 	case TYRAN_OPCODE_POP:
 	case TYRAN_OPCODE_ASSIGN:

@@ -38,6 +38,7 @@ struct tyran_opcodes* tyran_opcodes_insert_push_function(const struct tyran_func
 struct tyran_opcodes* tyran_opcodes_insert_push_scope();
 struct tyran_opcodes* tyran_opcodes_insert_push_this();
 struct tyran_opcodes* tyran_opcodes_insert_push_top();
+struct tyran_opcodes* tyran_opcodes_insert_toc_dup();
 struct tyran_opcodes* tyran_opcodes_insert_push_top2();
 struct tyran_opcodes* tyran_opcodes_insert_pop(int count);
 
@@ -76,6 +77,7 @@ struct tyran_opcodes* tyran_opcodes_insert_jump_false(int offset);
 struct tyran_opcodes* tyran_opcodes_insert_jump_true(int offset);
 struct tyran_opcodes* tyran_opcodes_insert_jump(int offset);
 
+struct tyran_opcodes* tyran_opcodes_insert_call_set_this(int argument_count);
 struct tyran_opcodes* tyran_opcodes_insert_call(int argument_count);
 struct tyran_opcodes* tyran_opcodes_insert_new_call(int argument_count);
 struct tyran_opcodes* tyran_opcodes_insert_return(int pop_count);
@@ -94,6 +96,5 @@ struct tyran_opcodes* tyran_opcodes_insert_next();
 
 /* Other */
 struct tyran_opcodes* tyran_opcodes_insert_nop();
-struct tyran_opcodes* tyran_opcodes_insert_load_this();
 
 #endif
