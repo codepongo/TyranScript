@@ -281,7 +281,7 @@ static void __rb_tree_delete_fixup(tree_root* root, tree_node* x) {
 
 void* rb_tree_delete(tree_root* root, void* key) {
 	tree_node *y, *z, *x, *hold_node_to_delete;
-	uint y_original_color;
+	tyran_rb_tree_color y_original_color;
 	void* node_to_return;
 
 	hold_node_to_delete = y = z = __search_rbtree_node(*root, key);
