@@ -47,7 +47,7 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 			if (quote) {
 				tyran_snprintf(buf, max_length, "'%s'", temp_buffer);
 			} else {
-				tyran_strncpy(buf, temp_buffer, temp_buffer_size);
+				tyran_strncpy(buf, max_length, temp_buffer, temp_buffer_size);
 			}
 			break;
 		case TYRAN_VALUE_TYPE_VARIABLE: {
@@ -152,7 +152,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 		default: {
 			char buf[2048];
 			tyran_value_to_c_string(v, buf, 2048, quote);
-			tyran_strncpy(value, buf, max_size);
+			tyran_strncpy(value, max_size, buf, 2048);
 			}
 			break;
 	}

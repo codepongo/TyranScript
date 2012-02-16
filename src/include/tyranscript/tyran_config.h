@@ -21,9 +21,11 @@ typedef unsigned short tyran_uint16;
 #define tyran_memcmp memcmp
 
 #if defined WIN32
+	#pragma warning( disable : 4100 )
+
 	#define tyran_sscanf sscanf_s
 	#define tyran_snprintf sprintf_s
-	#define tyran_strncpy(a, b, c) strncpy_s(a, 1, b, c)
+	#define tyran_strncpy(dest, dest_size, source, source_size) strncpy_s(dest, dest_size, source, source_size)
 	#define tyran_fopen fopen_s
 	#define tyran_fread fread
 	#define tyran_fclose fclose
@@ -31,7 +33,7 @@ typedef unsigned short tyran_uint16;
 #else
 	#define tyran_sscanf sscanf
 	#define tyran_snprintf snprintf
-	#define tyran_strncpy strncpy
+	#define tyran_strncpy(dest, dest_size, source, source_size) strncpy(dest, source, dest_size)
 	#define tyran_strncat strncat
 	#define tyran_fopen(F, N, M) *F = fopen(N, M)
 	#define tyran_fread fread
