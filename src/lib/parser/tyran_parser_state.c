@@ -11,7 +11,7 @@ tyran_parser_state* tyran_parser_state_new(const char *str, int length)
 	parser_state->lexer = lexer;
 	
 	int number_of_octets = sizeof(char) * length;
-	lexer->buffer = TYRAN_MALLOC_TYPE(char, length);
+	lexer->buffer = TYRAN_MALLOC_TYPE(char, length + 1);
 	tyran_memcpy(lexer->buffer, str, number_of_octets);
 	lexer->buffer[length] = 0;
 	lexer->line = 1;
