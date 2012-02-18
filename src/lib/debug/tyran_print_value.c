@@ -14,7 +14,7 @@
 
 void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, int quote)
 {
-	const static int temp_buffer_size = 512;
+	static const int temp_buffer_size = 512;
 	char temp_buffer[temp_buffer_size];
 	switch (v->type) {
 		case TYRAN_VALUE_TYPE_BOOLEAN:

@@ -104,7 +104,7 @@ static struct tyran_opcodes* tyran_operator_assign(struct tyran_opcodes* lvalue,
 	return ret;
 }
 
-static struct  tyran_opcodes* make_forin(struct tyran_opcodes* lvalue, struct tyran_opcodes* expression, struct tyran_opcodes* statements, const tyran_string* label)
+static struct  tyran_opcodes* make_forin(struct tyran_opcodes* lvalue, struct tyran_opcodes* expression, struct tyran_opcodes* statements)
 {
 	struct tyran_opcodes* init = tyran_opcodes_merge(expression, tyran_opcodes_insert_key());
 	struct tyran_opcodes* condition = tyran_opcodes_merge3(lvalue, tyran_opcodes_insert_next(), tyran_opcodes_insert_jump_false_pop(statements->code_len + 2));
@@ -613,7 +613,7 @@ for_statement:
 			lvalue = fv->lvalue;
 		}
 		
-		struct tyran_opcodes* ret = make_forin(lvalue, (struct tyran_opcodes*)$5, (struct tyran_opcodes*)$7, 0);
+		struct tyran_opcodes* ret = make_forin(lvalue, (struct tyran_opcodes*)$5, (struct tyran_opcodes*)$7);
 		if (fv->variable_name && fv->local) {
 			tyran_parser_local_variable_scope_add(fv->variable_name);
 			tyran_opcodes_free(fv->local);
