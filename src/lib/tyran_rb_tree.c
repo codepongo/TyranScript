@@ -5,16 +5,10 @@
 #include <tyranscript/tyran_rb_tree_macros.h>
 #include <tyranscript/tyran_config.h>
 
-tree_node RBNIL;
+static tree_node RBNIL;
 
 static tree_node* new_rbtree_node(void* node) {
 	tree_node *z = tyran_rb_tree_alloc(tree_node, 1);
-
-	RBNIL.node = NULL;
-	RBNIL.color = tyran_rb_tree_color_black;
-	RBNIL.parent = &RBNIL;
-	RBNIL.left = &RBNIL;
-	RBNIL.right = &RBNIL;
 
 	z->node = node;
 	z->parent = &RBNIL;
@@ -29,6 +23,12 @@ tree_root* new_simple_rbtree() {
 }
 
 tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), int (*compare_function_pointer)(void* keyA, void* keyB)) {
+	RBNIL.node = NULL;
+	RBNIL.color = tyran_rb_tree_color_black;
+	RBNIL.parent = &RBNIL;
+	RBNIL.left = &RBNIL;
+	RBNIL.right = &RBNIL;
+	
 	tree_root* r = tyran_rb_tree_alloc(tree_root, 1);
 	r->root = &RBNIL;
 	r->key = key_function_pointer;

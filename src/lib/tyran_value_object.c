@@ -8,11 +8,17 @@
 #include <tyranscript/tyran_object_key.h>
 #include "tyran_number_to_string.h"
 
-tyran_value* tyran_value_object_new()
+tyran_value* tyran_value_object_new(const struct tyran_runtime* runtime)
 {
 	tyran_value* value = tyran_value_new();
-	tyran_value_set_object(*value, tyran_object_new());
+	tyran_value_set_object(*value, tyran_object_new(runtime));
 	return value;
+}
+
+void tyran_value_object_insert_c_string_key(tyran_value* target, const char* key, tyran_value* value)
+{
+	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only insert keys on objects");
+	tyran_object_insert_c_string_key(target->data.object, key, value);
 }
 
 void tyran_value_object_insert_key(tyran_value* target, const tyran_object_key* key, tyran_value* value)
@@ -111,14 +117,14 @@ int tyran_value_object_has_key(const tyran_value* target, const tyran_object_key
 	return tyran_value_object_has_key(target->data.object->prototype, key);
 }
 
-void tyran_value_object_fetch_key_iterator(tyran_value* target, tyran_value* return_value)
+void tyran_value_object_fetch_key_iterator(const struct tyran_runtime* runtime, tyran_value* target, tyran_value* return_value)
 {
 	tyran_object_iterator* iterator = tyran_object_iterator_new();
 	tyran_object* r;
 
 	tyran_object_get_keys(target->data.object, iterator);
 
-	 r = tyran_object_new();
+	r = tyran_object_new(runtime);
 	r->type = TYRAN_OBJECT_TYPE_ITERATOR;
 	r->data.iterator = iterator;
 

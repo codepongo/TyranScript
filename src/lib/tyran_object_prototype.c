@@ -5,7 +5,7 @@
 tyran_value* tyran_object_prototype;
 struct tyran_runtime;
 
-void tyran_object_prototype_init(tyran_value* constructor_prototype)
+void tyran_object_prototype_init(const struct tyran_runtime* runtime, tyran_value* constructor_prototype)
 {
 	tyran_object_prototype = constructor_prototype;
 }

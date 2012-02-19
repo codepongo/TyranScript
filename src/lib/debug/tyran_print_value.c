@@ -63,13 +63,13 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 			switch (v->data.object->type)
 			{
 			case TYRAN_OBJECT_TYPE_OBJECT:
-				tyran_snprintf(buf, max_length, "object:%p ", (void*) v->data.object);
+				tyran_snprintf(buf, max_length, "object:%p (%d)", (void*) v->data.object, v->data.object->retain_count);
 			break;
 			case TYRAN_OBJECT_TYPE_FUNCTION:
-				tyran_snprintf(buf, max_length, "function:%p ", (void*) v->data.object);
+				tyran_snprintf(buf, max_length, "function:%p (%d)", (void*) v->data.object, v->data.object->retain_count);
 			break;
 			case TYRAN_OBJECT_TYPE_ITERATOR:
-				tyran_snprintf(buf, max_length, "iterator:%p ", (void*)v->data.object);
+				tyran_snprintf(buf, max_length, "iterator:%p (%d)", (void*)v->data.object, v->data.object->retain_count);
 			break;
 			}
 

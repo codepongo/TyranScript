@@ -33,9 +33,12 @@ typedef struct tyran_value {
 
 #define tyran_value_release(v) { \
 	if ((v).type == TYRAN_VALUE_TYPE_STRING) tyran_string_free((v).data.str); \
-	else if ((v).type == TYRAN_VALUE_TYPE_OBJECT) TYRAN_OBJECT_RELEASE((v).data.object); \
+	else if ((v).type == TYRAN_VALUE_TYPE_OBJECT) TYRAN_OBJECT_RELEASE((v).data.object) \
+	else if ((v).type == TYRAN_VALUE_TYPE_VARIABLE && (v).data.variable->type==TYRAN_VALUE_TYPE_OBJECT) TYRAN_OBJECT_RELEASE((v).data.variable->data.object) \
 	(v).type = TYRAN_VALUE_TYPE_UNDEFINED; \
+	(v).data.object = 0; \
 }
+
 
 #define tyran_value_copy(to, from) { \
 	(to) = (from); \
@@ -46,7 +49,7 @@ typedef struct tyran_value {
 #define tyran_value_set_object(v, o) { \
 	(v).type = TYRAN_VALUE_TYPE_OBJECT; \
 	(v).data.object = (o); \
-	TYRAN_OBJECT_RETAIN((v).data.object); \
+	TYRAN_OBJECT_RETAIN(o); \
 }
 
 #define tyran_value_set_number(v, n) { \
@@ -126,6 +129,6 @@ void tyran_value_free(tyran_value* data);
 int tyran_value_is_true(const tyran_value* v);
 int tyran_value_length(const tyran_value* v);
 
-void tyran_value_set_program_specific(struct tyran_value* value, struct tyran_runtime* runtime, void* program_specific_context);
+void tyran_value_set_program_specific(struct tyran_value* value, void* program_specific_context);
 
 #endif

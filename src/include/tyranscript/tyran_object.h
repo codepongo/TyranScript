@@ -32,15 +32,15 @@ typedef struct tyran_object {
 
 	tree_root* tree;
 
-	struct tyran_runtime* created_in_runtime;
+	const struct tyran_runtime* created_in_runtime;
 	void* program_specific;
 
 	int flags;
 } tyran_object;
 
 /* Create and destroy */
-tyran_object* tyran_object_new();
-tyran_object* tyran_object_new_from_items(const struct tyran_value* items, int count);
+tyran_object* tyran_object_new(const struct tyran_runtime* runtime);
+tyran_object* tyran_object_new_from_items(const struct tyran_runtime* runtime, const struct tyran_value* items, int count);
 void tyran_object_free(tyran_object* object);
 
 /* Prototype */
@@ -54,6 +54,7 @@ int tyran_object_length(const tyran_object* object);
 
 /* Insert and Delete */
 void tyran_object_insert_key(tyran_object* object, const tyran_object_key* key, struct tyran_value* value);
+void tyran_object_insert_c_string_key(tyran_object* object, const char* key, struct tyran_value* value);
 void tyran_object_insert_string_key(tyran_object* object, const tyran_string* key, struct tyran_value* value);
 void tyran_object_insert_array(tyran_object* object, int index, struct tyran_value* value);
 void tyran_object_delete(tyran_object* object, const tyran_object_key* key);

@@ -3,7 +3,7 @@
 #include <tyranscript/tyran_opcode.h>
 #include <tyranscript/tyran_config.h>
 #include <tyranscript/tyran_function.h>
-#include <tyranscript/debug/tyran_opcodes_print.h>
+#include <tyranscript/debug/tyran_print_opcodes.h>
 
 
 const char* tyran_opcode_names[100] = {
@@ -66,7 +66,7 @@ const char* tyran_opcode_names[100] = {
 	"NEXT",
 };
 
-void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip, int highlight)
+void tyran_print_opcode(const struct tyran_opcode* opcode, int ip, int highlight)
 {
 	const int max_size = 2048;
 	char value[max_size];
@@ -130,11 +130,11 @@ void tyran_opcodes_print_opcode(const struct tyran_opcode* opcode, int ip, int h
 	
 	if (opcode->opcode == TYRAN_OPCODE_PUSH_FUNCTION) {
 		const tyran_function* function = (const tyran_function*) opcode->data.pointer;
-		tyran_opcodes_print(function->data.opcodes, 0);
+		tyran_print_opcodes(function->data.opcodes, 0);
 	}
 }
 
-void tyran_opcodes_print(const struct tyran_opcodes* ops, const struct tyran_opcode* ip)
+void tyran_print_opcodes(const struct tyran_opcodes* ops, const struct tyran_opcode* ip)
 {
 	int i = 0;
 	tyran_opcode* tyran_opcodes = ops->codes;
@@ -143,6 +143,6 @@ void tyran_opcodes_print(const struct tyran_opcodes* ops, const struct tyran_opc
 	TYRAN_LOG("opcode octets:%d", octet_length);
 
 	for (i = 0; i < octet_length; ++i) {
-		tyran_opcodes_print_opcode(&tyran_opcodes[i], i, ip == &tyran_opcodes[i]);
+		tyran_print_opcode(&tyran_opcodes[i], i, ip == &tyran_opcodes[i]);
 	}
 }

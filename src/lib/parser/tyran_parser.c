@@ -3166,7 +3166,7 @@ yyreduce:
   case 130:
 #line 804 "tyran_parser.y"
     {
-		struct tyran_opcodes *ff = tyran_opcodes_merge4((struct tyran_opcodes*)(yyvsp[(1) - (6)]), tyran_opcodes_insert_toc_dup(), tyran_opcodes_insert_push_string((const tyran_string*)(yyvsp[(3) - (6)])), tyran_opcodes_insert_subscript(1));
+		struct tyran_opcodes *ff = tyran_opcodes_merge4((struct tyran_opcodes*)(yyvsp[(1) - (6)]), tyran_opcodes_insert_push_string((const tyran_string*)(yyvsp[(3) - (6)])), tyran_opcodes_insert_toc_dup(), tyran_opcodes_insert_subscript(1));
 		struct tyran_opcodes *expression_list = (struct tyran_opcodes*)(yyvsp[(5) - (6)]);
 		int expression_count = expression_list ? expression_list->expression_count : 0;
 		(yyval) = tyran_opcodes_merge3(ff, expression_list, tyran_opcodes_insert_call_set_this(expression_count));

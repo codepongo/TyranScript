@@ -9,7 +9,7 @@
 #include "tyran_value_convert.h"
 
 #include <tyranscript/debug/tyran_print_value.h>
-#include <tyranscript/debug/tyran_opcodes_print.h>
+#include <tyranscript/debug/tyran_print_opcodes.h>
 
 tyran_runtime* tyran_runtime_new()
 {

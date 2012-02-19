@@ -28,14 +28,14 @@ tyran_function_object* tyran_function_object_new_callback_helper(tyran_function_
 	return tyran_function_object_new(func);
 }
 
-tyran_value* tyran_function_object_new_callback(tyran_function_callback callback)
+tyran_value* tyran_function_object_new_callback(const struct tyran_runtime* runtime, tyran_function_callback callback)
 {
-	tyran_object* object = tyran_object_new();
-
+	tyran_object* object = tyran_object_new(runtime);
 	tyran_object_set_function(object, tyran_function_object_new_callback_helper(callback));
 
 	tyran_value* value = tyran_value_new();
 	tyran_value_set_object(*value, object);
+	
 
 	return value;
 }

@@ -6,13 +6,13 @@
 
 #include "tyran_number_to_string.h"
 
-struct tyran_object* tyran_object_new_array(const tyran_value* items, int count)
+struct tyran_object* tyran_object_new_array(const struct tyran_runtime* runtime, const tyran_value* items, int count)
 {
 	TYRAN_UNICODE_STRING(12) number_string;
 	int i;
 	const tyran_object_key* ok;
 	tyran_value* v;
-	tyran_object* object = tyran_object_new();
+	tyran_object* object = tyran_object_new(runtime);
 
 	for (i = 0; i < count; ++i) {
 		tyran_number_integer_to_string(i, number_string.string);

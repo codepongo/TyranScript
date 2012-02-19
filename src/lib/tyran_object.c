@@ -7,6 +7,7 @@
 #include <tyranscript/tyran_runtime.h>
 #include "tyran_number_to_string.h"
 #include <tyranscript/tyran_object_key.h>
+#include <tyranscript/tyran_context.h>
 
 static TYRAN_UNICODE_STRING(6) LENGTH_STRING = { 6, {'l','e','n','g','t','h'}};
 static TYRAN_UNICODE_STRING(9) PROTOTYPE = { 9, { 'p','r','o','t','o','t','y','p','e' } };
@@ -16,24 +17,46 @@ typedef struct tyran_rb_tree_key_value_node {
 	struct tyran_value* value;
 } tyran_rb_tree_key_value_node;
 
+
+void tyran_object_retain(struct tyran_object* o)
+{
+	o->retain_count++;
+	tyran_value value;
+	value.type = TYRAN_VALUE_TYPE_OBJECT;
+	value.data.object = o;
+	// tyran_print_value("Retain", &value, 1);
+}
+
+void tyran_object_release(struct tyran_object *o)
+{
+	o->retain_count--;
+	tyran_value value;
+	value.type = TYRAN_VALUE_TYPE_OBJECT;
+	value.data.object = o;
+	// tyran_print_value("Released", &value, 1);
+	if (o->retain_count == 0) {
+		tyran_object_free(o);
+	}
+}
+
 void* tyran_object_key_get(struct stree_node* node)
 {
 	return (void*) ((tyran_rb_tree_key_value_node*)(node->node))->key;
 }
 
-tyran_object* tyran_object_new()
+tyran_object* tyran_object_new(const struct tyran_runtime* runtime)
 {
 	tyran_object* object = TYRAN_CALLOC(tyran_object);
 	object->tree = new_rbtree(tyran_object_key_get, tyran_object_key_compare);
+	object->created_in_runtime = runtime;
 	return object;
 }
 
 void tyran_object_free(tyran_object* object)
 {
-	if (object->created_in_runtime) {
-		tyran_runtime* runtime = object->created_in_runtime;
-		runtime->delete_callback(runtime, object);
-	}
+	const tyran_runtime* runtime = object->created_in_runtime;
+	runtime->delete_callback(runtime, object);
+	object->retain_count = -9999;
 
 	switch (object->type) {
 		case TYRAN_OBJECT_TYPE_ITERATOR:
@@ -46,6 +69,7 @@ void tyran_object_free(tyran_object* object)
 			break;
 	}
 	destroy_rbtree(object->tree);
+	object->tree = 0;
 	tyran_free(object);
 }
 
@@ -67,6 +91,12 @@ void tyran_object_insert_key(tyran_object* object, const tyran_object_key* key, 
 	node->key = key;
 	node->value = value;
 	rb_tree_insert(object->tree, node);
+}
+
+void tyran_object_insert_c_string_key(tyran_object* object, const char* key_string, tyran_value* value)
+{
+	const tyran_string* s = tyran_string_from_c_str(key_string);
+	tyran_object_insert_string_key(object, s, value);
 }
 
 void tyran_object_insert_string_key(tyran_object* object, const tyran_string* key_string, tyran_value* value)
@@ -123,8 +153,9 @@ void tyran_object_get_keys(const tyran_object* target, tyran_object_iterator* ta
 
 void tyran_object_set_prototype(tyran_object* target, tyran_value* proto)
 {
-	TYRAN_ASSERT(target->prototype == 0, "Prototype already set, this is a problem");
+	// TYRAN_ASSERT(target->prototype == 0, "Prototype already set, this is a problem");
 	const tyran_object_key* key = tyran_object_key_new(PROTOTYPE.string, 0);
+	TYRAN_OBJECT_RETAIN(proto->data.object);
 	tyran_object_insert_key(target, key, proto);
 	target->prototype = proto;
 }
@@ -142,9 +173,9 @@ tyran_value* tyran_object_lookup_prototype(const tyran_object* o, const tyran_ob
 	return retValue;
 }
 
-tyran_object* tyran_object_new_from_items(const tyran_value* items, int count)
+tyran_object* tyran_object_new_from_items(const struct tyran_runtime* runtime, const tyran_value* items, int count)
 {
-	tyran_object* object = tyran_object_new();
+	tyran_object* object = tyran_object_new(runtime);
 	const tyran_object_key* ok;
 	tyran_value* v;
 	int i;

@@ -18,8 +18,10 @@ void tyran_scope_set_variable_names(tyran_value* scope, const tyran_string_array
 		if (!argkey) {
 			break;
 		}
+
 		tyran_object_key_flag_type flag;
 		tyran_value* v = tyran_value_object_lookup_array(scope, i, &flag);
+		
 		if (v) {
 			const tyran_object_key* strkey = tyran_object_key_new(argkey, tyran_object_key_flag_normal);
 			tyran_value_object_insert_key(scope, strkey, v);

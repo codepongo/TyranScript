@@ -16,7 +16,7 @@ int tyran_array_prototype_constructor(struct tyran_runtime* runtime, tyran_value
 		return 0;
 	}
 
-	tyran_object* o = tyran_object_new();
+	tyran_object* o = tyran_object_new(runtime);
 	tyran_object_set_length(o, 0);
 	tyran_value_set_object(*return_value, o);
 
@@ -56,12 +56,12 @@ static tyran_function_info tyran_array_functions[] = {
 	{ "pop", tyran_array_prototype_pop }
 };
 
-void tyran_array_prototype_init(tyran_value* constructor_prototype)
+void tyran_array_prototype_init(const struct tyran_runtime* runtime, tyran_value* constructor_prototype)
 {
 	tyran_array_prototype = constructor_prototype;
 	size_t i;
 	for (i = 0; i < sizeof(tyran_array_functions) / sizeof(struct tyran_function_info); ++i) {
-		tyran_value* n = tyran_function_object_new_callback(tyran_array_functions[i].static_function);
+		tyran_value* n = tyran_function_object_new_callback(runtime, tyran_array_functions[i].static_function);
 		tyran_value_object_set_prototype(n, tyran_function_prototype);
 		tyran_value_object_insert_string_key(constructor_prototype, tyran_string_from_c_str(tyran_array_functions[i].name), n);
 	}

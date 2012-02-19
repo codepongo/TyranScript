@@ -5,6 +5,7 @@
 
 struct tyran_scope_stack;
 struct tyran_value;
+struct tyran_runtime;
 
 typedef struct tyran_function_object {
 	const struct tyran_function* static_function;
@@ -12,7 +13,7 @@ typedef struct tyran_function_object {
 } tyran_function_object;
 
 tyran_function_object* tyran_function_object_new(const tyran_function* function);
-struct tyran_value* tyran_function_object_new_callback(tyran_function_callback callback);
+struct tyran_value* tyran_function_object_new_callback(const struct tyran_runtime* runtime, tyran_function_callback callback);
 void tyran_function_object_free(tyran_function_object* function_object);
 
 #endif

@@ -57,15 +57,15 @@ int tyran_string_prototype_from_char_code(tyran_runtime* r, tyran_value* a, tyra
 	return 0;
 }
 
-void tyran_string_prototype_init(tyran_value* constructor_prototype)
+void tyran_string_prototype_init(const struct tyran_runtime* runtime, tyran_value* constructor_prototype)
 {
 	tyran_string_prototype = constructor_prototype;
 	
-	tyran_value* function_call = tyran_function_object_new_callback(tyran_string_prototype_char_at);
+	tyran_value* function_call = tyran_function_object_new_callback(runtime, tyran_string_prototype_char_at);
 	tyran_value_object_insert_string_key(constructor_prototype, tyran_string_from_c_str("charAt"), function_call);
 	tyran_value_object_set_prototype(function_call, tyran_function_prototype);
 
-	tyran_value* from_char_code = tyran_function_object_new_callback(tyran_string_prototype_from_char_code);
+	tyran_value* from_char_code = tyran_function_object_new_callback(runtime, tyran_string_prototype_from_char_code);
 	tyran_value_object_insert_string_key(constructor_prototype, tyran_string_from_c_str("fromCharCode"), from_char_code);
 	tyran_value_object_set_prototype(from_char_code, tyran_function_prototype);
 }

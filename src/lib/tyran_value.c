@@ -4,10 +4,9 @@
 extern tyran_value* tyran_object_prototype;
 extern tyran_value* tyran_array_prototype;
 
-void tyran_value_set_program_specific(tyran_value* value, struct tyran_runtime* runtime, void* program_specific_context)
+void tyran_value_set_program_specific(tyran_value* value, void* program_specific_context)
 {
 	value->data.object->program_specific = program_specific_context;
-	value->data.object->created_in_runtime = runtime;
 }
 
 tyran_value* tyran_value_new()

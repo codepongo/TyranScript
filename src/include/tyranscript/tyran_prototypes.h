@@ -2,8 +2,9 @@
 #define _TYRAN_PROTOTYPES_H
 
 struct tyran_value;
+struct tyran_runtime;
 
-void tyran_prototypes_init(struct tyran_value* global);
+void tyran_prototypes_init(const struct tyran_runtime* runtime, struct tyran_value* global);
 
 #endif
 

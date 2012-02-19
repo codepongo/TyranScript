@@ -49,7 +49,7 @@ typedef unsigned short tyran_uint16;
 
 
 #define TYRAN_LOG(...) { printf(__VA_ARGS__); printf("\n"); fflush(stdout); }
-#define TYRAN_LOG_NO_LF(...) { printf(__VA_ARGS__); }
+#define TYRAN_LOG_NO_LF(...) { printf(__VA_ARGS__); fflush(stdout); }
 #define TYRAN_SOFT_ERROR(...) TYRAN_LOG(__VA_ARGS__);
 #define TYRAN_BREAK abort()
 #define TYRAN_ERROR(...) TYRAN_LOG(__VA_ARGS__); TYRAN_BREAK;

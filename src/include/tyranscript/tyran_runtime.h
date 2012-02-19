@@ -7,7 +7,7 @@ struct tyran_opcodes;
 struct tyran_scope_stack;
 struct tyran_runtime;
 
-typedef void (*tyran_value_delete_callback)(void* program_specific_context, tyran_object* program_specific);
+typedef void (*tyran_value_delete_callback)(const struct tyran_runtime* program_specific_context, tyran_object* program_specific);
 
 typedef struct tyran_runtime {
 	tyran_value stack[8192];

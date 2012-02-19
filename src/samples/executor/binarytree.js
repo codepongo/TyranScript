@@ -40,7 +40,7 @@ var maxDepth = max(minDepth + 2, n);
 var stretchDepth = maxDepth + 1;
 
 var check = bottomUpTree(0,stretchDepth).itemCheck();
-print("stretch tree of depth " + stretchDepth + "\t check: " + check);
+print("stretch tree of depth " + stretchDepth + "\t check: " + check + "\n");
 
 var longLivedTree = bottomUpTree(0,maxDepth);
 for (var depth=minDepth; depth<=maxDepth; depth+=2){
@@ -51,9 +51,9 @@ for (var depth=minDepth; depth<=maxDepth; depth+=2){
       check += bottomUpTree(i,depth).itemCheck();
       check += bottomUpTree(-i,depth).itemCheck();
    }
-   print(iterations*2 + "\t trees of depth " + depth + "\t check: " + check);
+   print(iterations*2 + "\t trees of depth " + depth + "\t check: " + check + "\n");
 }
 
 print("long lived tree of depth " + maxDepth + "\t check: " 
-   + longLivedTree.itemCheck());
+   + longLivedTree.itemCheck() + "\n");
 

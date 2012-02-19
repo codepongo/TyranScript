@@ -43,7 +43,9 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 		TYRAN_ASSERT(runtime_stack_value->type == TYRAN_VALUE_TYPE_RUNTIME_STACK, "Not a callstack info. Stack is mismatched.");
 		tyran_runtime_stack* runtime_info = runtime_stack_value->data.runtime_stack;
 		tyran_value_replace(_this, runtime_info->_this);
-		tyran_value_copy(function_scope, runtime_info->function_scope);
+		tyran_value_release(runtime_info->_this);
+		tyran_value_replace(function_scope, runtime_info->function_scope);
+		tyran_value_release(runtime_info->function_scope);
 		scope = runtime_info->scope;
 		opcodes = runtime_info->opcodes;
 		end = &opcodes->codes[opcodes->code_len];
@@ -60,6 +62,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	while(ip < end) {
 #ifdef TYRAN_RUNTIME_VERBOSE
 		tyran_print_runtime(stack, sp, &_this, ip, ip - opcodes->codes);
+		// tyran_print_value("SCOPE", &function_scope, 1);
 #endif
 		switch(ip->opcode) {
 			case TYRAN_OPCODE_MAX_ID:
@@ -109,13 +112,13 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				tyran_function_object* fo = tyran_function_object_new((const tyran_function *)ip->data.pointer);
 				fo->scope = tyran_scope_stack_clone_and_add(scope, &function_scope);
 
-				tyran_object* object = tyran_object_new();
+				tyran_object* object = tyran_object_new(runtime);
 				tyran_object_set_function(object, fo);
 
-				tyran_value* function_object_prototype_value = tyran_value_object_new();
+				tyran_value* function_object_prototype_value = tyran_value_object_new(runtime);
 				tyran_value_object_set_prototype(function_object_prototype_value, tyran_function_prototype);
 
-				tyran_value* function_object_value = tyran_value_object_new();
+				tyran_value* function_object_value = tyran_value_object_new(runtime);
 				tyran_value_set_object(*function_object_value, object);
 				tyran_value_object_set_prototype(function_object_value, function_object_prototype_value);
 				
@@ -345,7 +348,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 
 				/* Create a new function scope */
 				tyran_value new_function_scope;
-				tyran_value_set_object(new_function_scope, tyran_object_new_array((const tyran_value*)&stack[sp - argument_count], argument_count));
+				tyran_value_set_object(new_function_scope, tyran_object_new_array(runtime, (const tyran_value*)&stack[sp - argument_count], argument_count));
 
 				/* Set the name for the arguments (not just the indexes) */
 				tyran_scope_set_variable_names(&new_function_scope, static_function->argument_names);
@@ -362,7 +365,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 
 				if (is_constructor_call) {
 					tyran_value* newvalue = tyran_value_new();
-					tyran_object* newobj = tyran_object_new();
+					tyran_object* newobj = tyran_object_new(runtime);
 					tyran_value* function_object_prototype = tyran_object_get_prototype(function_object_to_call.data.object);
 					if (function_object_prototype && function_object_prototype->type == TYRAN_VALUE_TYPE_OBJECT) {
 						tyran_object_set_prototype(newobj, function_object_prototype);
@@ -417,7 +420,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			case TYRAN_OPCODE_MAKE_OBJECT: {
 				int value_count = ip->data.integer * 2;		
 				TYRAN_STACK_TOP_N_VARIABLE_TO_VALUE(value_count);
-				tyran_object* object = tyran_object_new_from_items(&stack[sp - value_count], value_count);
+				tyran_object* object = tyran_object_new_from_items(runtime, &stack[sp - value_count], value_count);
 				TYRAN_STACK_POP_N(value_count- 1);
 				tyran_value_replace_object(TYRAN_STACK_TOP, object);
 				break;
@@ -425,7 +428,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			case TYRAN_OPCODE_MAKE_ARRAY: {
 				int itemcount = ip->data.integer;
 				TYRAN_STACK_TOP_N_VARIABLE_TO_VALUE(itemcount);
-				tyran_object* object = tyran_object_new_array(&stack[sp - itemcount], itemcount);
+				tyran_object* object = tyran_object_new_array(runtime, &stack[sp - itemcount], itemcount);
 				TYRAN_STACK_POP_N(itemcount - 1);
 				tyran_value_replace_object(TYRAN_STACK_TOP, object);
 				break;
@@ -452,7 +455,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				if (((enum tyran_assign_mode) ip->data.integer) == tyran_assign_variable) {
 					TYRAN_STACK_TOP_VARIABLE_TO_VALUE();
 					tyran_value_replace(*(TYRAN_STACK_TOP2.data.variable), TYRAN_STACK_TOP);
-					tyran_value_replace(TYRAN_STACK_TOP2, TYRAN_STACK_TOP);
+
+					tyran_value_copy(TYRAN_STACK_TOP2, TYRAN_STACK_TOP);
 					TYRAN_STACK_POP();
 				} else {
 					TYRAN_STACK_TOP_N_VARIABLE_TO_VALUE(3);
@@ -472,6 +476,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				TYRAN_STACK_TOP2_VARIABLE_TO_VALUE();
 				tyran_value result;
 				tyran_value_set_undefined(result);
+				
 				tyran_runtime_value_object_subscript(&TYRAN_STACK_TOP2, &TYRAN_STACK_TOP, &result, (enum tyran_subscript_mode) ip->data.integer);
 				tyran_value_replace(TYRAN_STACK_TOP2, result);
 				TYRAN_STACK_POP();
@@ -480,7 +485,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			case TYRAN_OPCODE_KEY: {
 				TYRAN_STACK_TOP_VARIABLE_TO_VALUE();
 				tyran_value result;
-				tyran_value_object_fetch_key_iterator(&TYRAN_STACK_TOP, &result);
+				tyran_value_object_fetch_key_iterator(runtime, &TYRAN_STACK_TOP, &result);
 				stack[sp] = result;
 				sp++;
 				break;

@@ -2,9 +2,23 @@
 
 #include <tyranscript/tyran_config.h>
 #include <tyranscript/tyran_value.h>
+#include <tyranscript/tyran_scope_stack.h>
 
-#include <tyranscript/debug/tyran_opcodes_print.h>
+#include <tyranscript/debug/tyran_print_opcodes.h>
 #include <tyranscript/debug/tyran_print_value.h>
+
+void tyran_print_scope_stack(const tyran_scope_stack* stack)
+{
+	int i;
+	const int max_size = 512;
+	char description[max_size];
+	for (i = 0; i < stack->scope_count; ++i)
+	{
+		tyran_value* v = stack->scopes[i];
+		tyran_snprintf(description, max_size, "scope-stack:%d", i);
+		tyran_print_value(description, v, 1);
+	}
+}
 
 void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _this, const struct tyran_opcode* opcode, int ip)
 {
@@ -36,5 +50,5 @@ void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _t
 	tyran_strncat(stack_info, this_info, stack_info_length_left);
 
 	TYRAN_LOG("%s", stack_info);
-	tyran_opcodes_print_opcode(opcode, ip, 1);
+	tyran_print_opcode(opcode, ip, 1);
 }
