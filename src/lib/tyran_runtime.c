@@ -36,6 +36,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	int sp = runtime->stack_pointer;
 	int replace_with_return_value = 1;
 
+	tyran_value_set_undefined(function_scope);
 	tyran_value_set_undefined(_this);
 	do {
 		sp--;
