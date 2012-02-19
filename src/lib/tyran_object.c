@@ -7,7 +7,6 @@
 #include <tyranscript/tyran_runtime.h>
 #include "tyran_number_to_string.h"
 #include <tyranscript/tyran_object_key.h>
-#include <tyranscript/tyran_context.h>
 
 static TYRAN_UNICODE_STRING(6) LENGTH_STRING = { 6, {'l','e','n','g','t','h'}};
 static TYRAN_UNICODE_STRING(9) PROTOTYPE = { 9, { 'p','r','o','t','o','t','y','p','e' } };
