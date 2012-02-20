@@ -19,7 +19,7 @@ TyranScript is a tiny, embeddable scripting language written in C. Aimed to comp
 * switch ... case ... default
 
 ### Operands
-* , = += -= *= %= <<= >>= >>>= &= |= ^= /= || && | ^ & == != === !=== <= >= + - * / % ! ++ -- new . [] ()
+* , = += -= *= %= <<= >>= >>>= &= |= ^= /= || && | ^ & == != === !=== <= >= + - * / % ! ++ -- new . \[ \] \( \)
 
 ## Opcodes
 
@@ -27,15 +27,18 @@ TyranScript is a tiny, embeddable scripting language written in C. Aimed to comp
 
 * PUSH_NUMBER double
 * PUSH_STRING string
-* PUSH_VARIABLE variable_info* 
 * PUSH_UNDEFINED
-* PUSH_BOOLEAN int [0 or 1]
-* PUSH_FUNCTION function*
+* PUSH_BOOLEAN (int bool) [0 or 1]
+* PUSH_FUNCTION (function*)
 * PUSH_THIS
 * PUSH_TOP
 * PUSH_TOP2
+* PUSH_LOCAL (int index)
+* PUSH_ARGUMENT (int index)
 * TOC_DUP
-* POP int number_of_elements
+* POP_LOCAL (int index)
+* POP_ARGUMENT (int index)
+* POP (int number_of_elements)
 
 ### Arithmetic
 
@@ -55,7 +58,7 @@ TyranScript is a tiny, embeddable scripting language written in C. Aimed to comp
 * BITWISE_OR
 * BITWISE_XOR
 * BITWISE_NOT
-* BITWISE_SHIFT int (0=left, 1=right, 2=unsigned right)
+* BITWISE_SHIFT (int mode) [0=left, 1=right, 2=unsigned right]
 
 ### Compare
 
@@ -68,23 +71,23 @@ TyranScript is a tiny, embeddable scripting language written in C. Aimed to comp
 
 ### Jumps and calls
 
-* JUMP int offset
+* JUMP (int offset)
 * JUMP_POP jump_pop_info* (offset and pop_count)
-* JUMP_TRUE_POP int offset
-* JUMP_FALSE_POP int offset
-* JUMP_TRUE int offset
-* JUMP_FALSE int offset
-* CALL int argument_count
-* NEW (same as CALL, but creates new object as this) int argument_count
-* RETURN int pop_count
+* JUMP_TRUE_POP (int offset)
+* JUMP_FALSE_POP (int offset)
+* JUMP_TRUE (int offset)
+* JUMP_FALSE (int offset)
+* CALL (int argument_count)
+* NEW (int argument_count) [same as CALL, but creates new object as this]
+* RETURN (int pop_count)
 
 ### Object manipulation
 
-* MAKE_OBJECT int number_of_elements
-* MAKE_ARRAY int number_of_elements
-* DELETE int number_of_elements (1=variable, 2=object member)
-* ASSIGN int number_of_elements (1=variable, 2=object member)
-* SUBSCRIPT
+* MAKE_OBJECT (int number_of_elements) [int32 member_id, value, ...]
+* MAKE_ARRAY (int number_of_elements) [value, ...]
+* DELETE (int member_id)
+* ASSIGN (int32 member_id)
+* SUBSCRIPT (int32 member_id)
 * UNREFERENCE
 
 ### Object iteration
