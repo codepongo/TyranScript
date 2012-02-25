@@ -19,6 +19,8 @@ typedef struct tyran_rb_tree_key_value_node {
 
 void tyran_object_retain(struct tyran_object* o)
 {
+	TYRAN_ASSERT(o->retain_count >= 0, "Retain count is bad:%d", o->retain_count);
+	TYRAN_ASSERT(o->tree != 0, "object tree is null");
 	o->retain_count++;
 	tyran_value value;
 	value.type = TYRAN_VALUE_TYPE_OBJECT;
@@ -28,6 +30,8 @@ void tyran_object_retain(struct tyran_object* o)
 
 void tyran_object_release(struct tyran_object *o)
 {
+	TYRAN_ASSERT(o->retain_count > 0, "Retain count is bad:%d", o->retain_count);
+	TYRAN_ASSERT(o->tree != 0, "object tree is null");
 	o->retain_count--;
 	tyran_value value;
 	value.type = TYRAN_VALUE_TYPE_OBJECT;
@@ -55,7 +59,6 @@ void tyran_object_free(tyran_object* object)
 {
 	const tyran_runtime* runtime = object->created_in_runtime;
 	runtime->delete_callback(runtime, object);
-	object->retain_count = -9999;
 
 	switch (object->type) {
 		case TYRAN_OBJECT_TYPE_ITERATOR:
@@ -68,7 +71,10 @@ void tyran_object_free(tyran_object* object)
 			break;
 	}
 	destroy_rbtree(object->tree);
-	object->tree = 0;
+
+	tyran_memset_type(object, 0);
+	object->retain_count = -9999;
+
 	tyran_free(object);
 }
 

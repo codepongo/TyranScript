@@ -121,6 +121,11 @@ struct tyran_opcodes* tyran_opcodes_insert_push_undefined()
 	OPCODES_ALLOC(TYRAN_OPCODE_PUSH_UNDEFINED);
 }
 
+struct tyran_opcodes* tyran_opcodes_insert_push_null()
+{
+	OPCODES_ALLOC(TYRAN_OPCODE_PUSH_NULL);
+}
+
 struct tyran_opcodes* tyran_opcodes_insert_push_boolean(int v)
 {
 	OPCODES_ALLOC_INTEGER(TYRAN_OPCODE_PUSH_BOOLEAN, v);

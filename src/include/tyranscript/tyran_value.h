@@ -71,6 +71,11 @@ typedef struct tyran_value {
 	(v).type = TYRAN_VALUE_TYPE_UNDEFINED; \
 }
 
+#define tyran_value_set_null(v) { \
+	(v).type = TYRAN_VALUE_TYPE_NULL; \
+}
+
+
 #define tyran_value_set_variable(v, var) { \
 	(v).type = TYRAN_VALUE_TYPE_VARIABLE; \
 	(v).data.variable = var; \

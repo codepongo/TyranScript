@@ -105,6 +105,10 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				tyran_value_set_undefined(stack[sp]);
 				sp++;
 				break;
+			case TYRAN_OPCODE_PUSH_NULL:
+				tyran_value_set_null(stack[sp]);
+				sp++;
+				break;
 			case TYRAN_OPCODE_PUSH_BOOLEAN:
 				tyran_value_set_boolean(stack[sp], ip->data.integer);
 				sp++;

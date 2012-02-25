@@ -50,6 +50,7 @@ static int tyran_lexer_get_keyword_token(const char* temp_string_buffer)
 		{ "new", TYRAN_TOKEN_NEW },
 		{ "delete", TYRAN_TOKEN_DELETE },
 		{ "undefined", TYRAN_TOKEN_UNDEFINED },
+		{ "null", TYRAN_TOKEN_NULL },
 		{ "true", TYRAN_TOKEN_TRUE },
 		{ "false", TYRAN_TOKEN_FALSE },
 		{ "this", TYRAN_TOKEN_THIS },

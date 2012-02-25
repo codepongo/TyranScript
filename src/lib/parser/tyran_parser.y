@@ -158,6 +158,7 @@ static struct  tyran_opcodes* make_forin(struct tyran_opcodes* lvalue, struct ty
 %token TYRAN_TOKEN_TRUE
 %token TYRAN_TOKEN_FALSE
 %token TYRAN_TOKEN_THIS
+%token TYRAN_TOKEN_NULL
 
 %token TYRAN_TOKEN_BRACKET_RIGHT
 %token TYRAN_TOKEN_PARENTHESES_RIGHT
@@ -494,6 +495,9 @@ value:
 	}
 	| TYRAN_TOKEN_FALSE {
 		$$ = tyran_opcodes_insert_push_boolean(0);
+	}
+	| TYRAN_TOKEN_NULL {
+		$$ = tyran_opcodes_insert_push_null();
 	}
 ;
 

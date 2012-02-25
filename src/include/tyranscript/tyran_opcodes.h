@@ -33,6 +33,7 @@ struct tyran_opcodes* tyran_opcodes_insert_push_number(const double *v);
 struct tyran_opcodes* tyran_opcodes_insert_push_string(const tyran_string* str);
 struct tyran_opcodes* tyran_opcodes_insert_push_variable(const tyran_string* variable_name);
 struct tyran_opcodes* tyran_opcodes_insert_push_undefined();
+struct tyran_opcodes* tyran_opcodes_insert_push_null();
 struct tyran_opcodes* tyran_opcodes_insert_push_boolean(int v);
 struct tyran_opcodes* tyran_opcodes_insert_push_function(const struct tyran_function* func);
 struct tyran_opcodes* tyran_opcodes_insert_push_scope();

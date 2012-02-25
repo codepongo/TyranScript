@@ -12,6 +12,7 @@ const char* tyran_opcode_names[100] = {
 	"PUSH_STRING",
 	"PUSH_VARIABLE",
 	"PUSH_UNDEFINED",
+	"PUSH_NULL",
 	"PUSH_BOOLEAN",
 	"PUSH_FUNCTION",
 	"PUSH_SCOPE",

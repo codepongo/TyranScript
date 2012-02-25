@@ -24,7 +24,4 @@ void tyran_prototypes_init(const struct tyran_runtime* runtime, tyran_value* glo
 	TYRAN_INITIALIZE_PROTOTYPE(runtime, function, "Function");
 	TYRAN_INITIALIZE_PROTOTYPE(runtime, array, "Array");
 	TYRAN_INITIALIZE_PROTOTYPE(runtime, string, "String");
-	
-	tyran_value* null = tyran_value_object_new(runtime);
-	tyran_value_object_insert_c_string_key(global, "null", null);
 }

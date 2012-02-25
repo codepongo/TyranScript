@@ -19,6 +19,8 @@ typedef unsigned short tyran_uint16;
 #define TYRAN_MALLOC(count) tyran_malloc(count);
 #define tyran_memcpy memcpy
 #define tyran_memcmp memcmp
+#define tyran_memset_type(T, V) memset(T, V, sizeof(*T))
+
 
 #if defined WIN32
 	#pragma warning( disable : 4100 )
@@ -53,6 +55,6 @@ typedef unsigned short tyran_uint16;
 #define TYRAN_SOFT_ERROR(...) TYRAN_LOG(__VA_ARGS__);
 #define TYRAN_BREAK abort()
 #define TYRAN_ERROR(...) TYRAN_LOG(__VA_ARGS__); TYRAN_BREAK;
-#define TYRAN_ASSERT(expression, description) if (!(expression)) { TYRAN_LOG(description); TYRAN_BREAK; }
+#define TYRAN_ASSERT(expression, ...) if (!(expression)) { TYRAN_LOG(__VA_ARGS__); TYRAN_BREAK; }
 
 #endif
