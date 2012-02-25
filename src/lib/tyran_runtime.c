@@ -401,6 +401,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 					if (action == 0) {
 						TYRAN_STACK_POP();
 						tyran_value_replace(TYRAN_STACK_TOP, *return_value);
+						tyran_value_replace(_this, runtime_info->_this);
 					} else {
 						ip = end;
 						replace_with_return_value = 0;
