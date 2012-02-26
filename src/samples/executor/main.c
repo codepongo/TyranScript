@@ -59,10 +59,6 @@ tyran_value* create_context(const struct tyran_runtime* runtime)
 
 void object_deleted(const struct tyran_runtime* runtime, tyran_object* program_specific)
 {
-	tyran_value value;
-	value.type = TYRAN_VALUE_TYPE_OBJECT;
-	value.data.object = program_specific;
-	// tyran_print_value("DELETED", &value, 1);
 }
 
 void execute(tyran_opcodes* opcodes, const char* numeric)
@@ -77,8 +73,6 @@ void execute(tyran_opcodes* opcodes, const char* numeric)
 	tyran_value* global = create_context(runtime);
 
 	tyran_scope_stack* global_scope_stack = tyran_scope_stack_clone_and_add(0, global);
-
-	
 
 	tyran_value* arguments = tyran_value_object_new(runtime);
 	tyran_value argument;
