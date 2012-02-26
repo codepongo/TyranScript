@@ -22,10 +22,6 @@ void tyran_object_retain(struct tyran_object* o)
 	TYRAN_ASSERT(o->retain_count >= 0, "Retain count is bad:%d", o->retain_count);
 	TYRAN_ASSERT(o->tree != 0, "object tree is null");
 	o->retain_count++;
-	tyran_value value;
-	value.type = TYRAN_VALUE_TYPE_OBJECT;
-	value.data.object = o;
-	// tyran_print_value("Retain", &value, 1);
 }
 
 void tyran_object_release(struct tyran_object *o)
@@ -33,10 +29,6 @@ void tyran_object_release(struct tyran_object *o)
 	TYRAN_ASSERT(o->retain_count > 0, "Retain count is bad:%d", o->retain_count);
 	TYRAN_ASSERT(o->tree != 0, "object tree is null");
 	o->retain_count--;
-	tyran_value value;
-	value.type = TYRAN_VALUE_TYPE_OBJECT;
-	value.data.object = o;
-	// tyran_print_value("Released", &value, 1);
 	if (o->retain_count == 0) {
 		tyran_object_free(o);
 	}
