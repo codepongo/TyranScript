@@ -1,104 +1,53 @@
 # TyranScript
 TyranScript is a tiny, embeddable scripting language written in C. Aimed to compile fast, have a small footprint, as few opcodes as possible, minimal dependencies and very portable. It uses reference counting to avoid costly garbage collections.
 
-## Language
-
-### Keywords
-* if ... else
-* var
-* function
-* return
-* delete
-
-### Loop and jumps
-* for (in)
-* while
-* do ... while
-* continue
-* break
-* switch ... case ... default
-
-### Operands
-* , = += -= *= %= <<= >>= >>>= &= |= ^= /= || && | ^ & == != === !=== <= >= + - * / % ! ++ -- new . \[ \] \( \)
-
 ## Opcodes
+All opcodes are coded within a 32-bit instruction.
 
-### Stack
+* 6 bits. Opcode index.
+* 8 bits. Parameter A.
+* 9 bits. Parameter X. 1 bit = Register / Constant.
+* 9 bits. Parameter Y. 1 bit = Register / Constant.
+* BR = (X << 8 + Y) - 32768.
 
-* PUSH_NUMBER double
-* PUSH_STRING string
-* PUSH_UNDEFINED
-* PUSH_BOOLEAN (int bool) [0 or 1]
-* PUSH_FUNCTION (function*)
-* PUSH_THIS
-* PUSH_TOP
-* PUSH_TOP2
-* PUSH_LOCAL (int index)
-* PUSH_ARGUMENT (int index)
-* TOC_DUP
-* POP_LOCAL (int index)
-* POP_ARGUMENT (int index)
-* POP (int number_of_elements)
+### Variables
+* R(). Registers, up to 256 values.
+* C(). Constants, up to 256 values.
+* RC(v). Register or Constant, depending on the high bit of v.
+* S(). Stack.
+* PC. Program Counter.
 
-### Arithmetic
+### Register (4)
+* **LD A X**. Load register. R(A) = R(X).
+* **LDC A X**. Load constant. R(A) = C(X).
+* **LDB A X**. Load boolean. R(A) = (BOOL)X.
+* **LDN A X.** Load NULL. R(A..A+X) = NULL.
 
-* NEGATIVE
-* NOT
-* ADD
-* SUBTRACT
-* MULTIPLY
-* DIVIDE
-* MODULUS
-* INCREASE
-* DECREASE
+### Arithmetic (8)
+* **ADD A X Y**. Add. R(A) = RC(X) + RC(Y).    
+* **DIV A X Y**. Divide. R(A) = RC(X) / RC(Y).
+* **MOD A X Y**. Modulus. R(A) = RC(X) % RC(Y).
+* **MUL A X Y**. Multiply. R(A) = RC(X) * RC(Y).
+* **NEG A X**. Negate. R(A) = -RC(X).
+* **NOT A X**. Logical Not. R(A) = !RC(X).
+* **POW A X Y**. Exponentiation. R(A) = RC(X) ^ RC(Y).
+* **SUB A X Y**. Subtract. R(A) = RC(X) - RC(Y).
 
-### Bitwise operations
+### Jumps and calls (8)
+* **JB A X**. Jump boolean. if !(RC(X) != A) then PC++.
+* **JBLD A X Y**. Jump boolean and load. if RC(X) != (BOOL)Y then R(A) = RC(X) else PC++.
+* **JEQ A X Y**. Jump Equal. if (RC(X) == RC(Y)) != (BOOL)A then PC++.
+* **JLT A X Y**. Jump less than. if (RC(X) < RC(Y)) != (BOOL)A then PC++.
+* **JLE A X Y**. Jump less. if (RC(X) <= RC(Y)) != (BOOL)A then PC++.
+* **JMP BR** . Jump. PC += BR.
+* **RET A X**. Return from call. returns R(A .. A + X - 2).
+* **CALL A X Y**. Call a function. R(A) holds the function object. R(A+1) = SELF, R(A+2..A+X) are the arguments. Return values are stored in R(A+1..). Y=1: ignore return values, Y=2 Constructor.
 
-* BITWISE_AND
-* BITWISE_OR
-* BITWISE_XOR
-* BITWISE_NOT
-* BITWISE_SHIFT (int mode) [0=left, 1=right, 2=unsigned right]
-
-### Compare
-
-* COMPARE_EQUAL
-* COMPARE_NOT_EQUAL
-* COMPARE_LESS
-* COMPARE_GREATER
-* COMPARE_LESS_EQUAL
-* COMPARE_GREATER_EQUAL
-
-### Jumps and calls
-
-* JUMP (int offset)
-* JUMP_POP jump_pop_info* (offset and pop_count)
-* JUMP_TRUE_POP (int offset)
-* JUMP_FALSE_POP (int offset)
-* JUMP_TRUE (int offset)
-* JUMP_FALSE (int offset)
-* CALL (int argument_count)
-* NEW (int argument_count) [same as CALL, but creates new object as this]
-* RETURN (int pop_count)
-
-### Object manipulation
-
-* MAKE_OBJECT (int number_of_elements) [int32 member_id, value, ...]
-* MAKE_ARRAY (int number_of_elements) [value, ...]
-* DELETE (int member_id)
-* ASSIGN (int32 member_id)
-* SUBSCRIPT (int32 member_id)
-* UNREFERENCE
-
-### Object iteration
-
-* KEY
-* NEXT
-
-### Other
-
-* NOP
-
+### Object (4)
+* **SET A X Y**. R(A)[ R(X) ] = R(Y).
+* **GET A X Y**. R(A) = R(X)[ R(Y) ].
+* **KEY A**. Creates an iterator for object R(A).
+* **NEXT A**. Next key for iterator R(A).
 
 ## Licenses
 
