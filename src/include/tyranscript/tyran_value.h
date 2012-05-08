@@ -22,12 +22,10 @@ typedef enum {
 typedef struct tyran_value {
 	tyran_value_type type;
 	union {
-		int boolean;
-		double number;
+		uint32 boolean;
+		float number;
 		const tyran_string* str;
 		tyran_object* object;
-		struct tyran_value* variable;
-		struct tyran_runtime_stack* runtime_stack;
 	} data;
 } tyran_value;
 
