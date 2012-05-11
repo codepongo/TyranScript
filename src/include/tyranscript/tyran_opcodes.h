@@ -5,10 +5,10 @@
 #include <tyranscript/tyran_string.h>
 
 struct tyran_function;
-struct tyran_opcode;
+typedef u32t tyran_opcode;
 
 typedef struct tyran_opcodes {
-	struct tyran_opcode* codes;
+	const tyran_opcode* codes;
 	int code_len;
 	int code_size;
 

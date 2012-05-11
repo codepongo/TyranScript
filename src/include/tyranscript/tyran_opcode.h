@@ -4,14 +4,6 @@
 #include <tyranscript/tyran_opcode_ids.h>
 #include <tyranscript/tyran_string.h>
 
-typedef struct tyran_opcode {
-	tyran_opcode_id opcode;
-	union data {
-		void* pointer;
-		int integer;
-	} data;
-} tyran_opcode;
-
 typedef struct tyran_jump_pop_info {
 	int offset;
 	int pop_count;

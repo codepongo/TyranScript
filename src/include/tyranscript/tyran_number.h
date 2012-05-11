@@ -3,6 +3,7 @@
 
 #define MAXEXP	2047
 
+typedef unsigned char u8t;
 typedef unsigned short u16t;
 typedef unsigned int u32t;
 

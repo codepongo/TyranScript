@@ -1,3 +1,6 @@
+#define TYRAN_REGISTER_A \
+	a = instruction;
+	
 #define TYRAN_REGISTER_A_X \
 	i = instruction; \
 	a = i; \
@@ -54,16 +57,25 @@
 	pc = sp->pc;
 
 #define TYRAN_ADD_REF(v) \
-	if ((v).type == TYRAN_TYPE_OBJECT) { \
-		((v)).object.ref_cnt++; \
+	if ((v).type == TYRAN_VALUE_TYPE_OBJECT) { \
+		((v)).data.object->retain_count++; \
 	}
 
-#define TYRAN_DEC_REF(memory_pool, v) \
-	if (--(v).object.ref_cnt == 0) { \
-		object_pool_free(memory_pool, (v).object); \
+#define TYRAN_DEC_REF(memory_pool, o) \
+	if (--o->retain_count == 0) { \
+		tyran_object_pool_free(memory_pool, o); \
 	}
 
-#define TYRAN_DEC_REF_RANGE(memory_pool, v, n) { \
-	for (int __i=0; __i < n; ++__i) { \
-		TYRAN_DEC_REF(memory_pool, v[i]); \
+#define TYRAN_DEC_REF_RANGE(memory_pool, values, n) { \
+	int __i; \
+	tyran_value* v = (values); \
+	for (__i=0; __i < n; ++__i) { \
+		TYRAN_DEC_REF(memory_pool, v[i].data.object); \
 	}
+
+#define TYRAN_CONTEXT_PUSH
+
+#define TYRAN_CONTEXT_POP
+
+#define TYRAN_CALC_HASH(a) 
+

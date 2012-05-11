@@ -2,9 +2,9 @@
 #define _TYRAN_RUNTIME_STACK_H
 
 #include <tyranscript/tyran_value.h>
+#include <tyranscript/tyran_opcodes.h>
 
 struct tyran_opcodes;
-struct tyran_opcode;
 struct tyran_scope_stack;
 
 typedef struct tyran_runtime_stack {
@@ -12,7 +12,7 @@ typedef struct tyran_runtime_stack {
 	struct tyran_scope_stack* scope;
 	tyran_value function_scope;
 	tyran_value _this;
-	const struct tyran_opcode* ip;
+	const tyran_opcode* ip;
 } tyran_runtime_stack;
 
 tyran_runtime_stack* tyran_runtime_stack_new();
