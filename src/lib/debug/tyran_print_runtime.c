@@ -20,7 +20,7 @@ void tyran_print_scope_stack(const tyran_scope_stack* stack)
 	}
 }
 
-void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _this, const struct tyran_opcode* opcode, int ip)
+void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _this, const tyran_opcode* opcode, int ip)
 {
 	int i;
 	const int max_size = 2048;

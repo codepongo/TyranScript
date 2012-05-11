@@ -31,13 +31,6 @@ int tyran_function_prototype_apply(tyran_runtime* runtime, tyran_value* function
 	
 	tyran_function_object* function_object = _this->data.object->data.function;
 	
-
-	/* Set the name for the arguments (not just the indexes) */
-	tyran_scope_set_variable_names(arguments_to_use, function_to_call->argument_names);
-
-	/* Fill scope with local variables */
-	tyran_scope_set_local_variables(arguments_to_use, function_to_call);
-
 	tyran_runtime_push_call(runtime, function_to_call->data.opcodes, function_object->scope, arguments_to_use, this_to_use);
 	
 	return -1;

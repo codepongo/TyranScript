@@ -10,7 +10,5 @@ typedef struct tyran_parser_state {
 	int error_count;
 } tyran_parser_state;
 
-tyran_parser_state* tyran_parser_state_new(const char* str, int octets);
-void tyran_parser_state_free(tyran_parser_state* state);
 
 #endif

@@ -3,9 +3,6 @@
 
 #define MAXEXP	2047
 
-typedef unsigned char u8t;
-typedef unsigned short u16t;
-typedef unsigned int u32t;
 
 #define EXP(a) ((((u16t *)(&a))[3] & 0x7ff0) >> 4)
 #define FRAZERO(a) (((u32t *)(&a))[0] == 0 && (((u32t *)(&a))[1] & 0x0fffff) == 0)

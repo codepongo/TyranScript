@@ -15,8 +15,6 @@ typedef enum {
 	TYRAN_VALUE_TYPE_NUMBER,
 	TYRAN_VALUE_TYPE_STRING,
 	TYRAN_VALUE_TYPE_OBJECT,
-	TYRAN_VALUE_TYPE_VARIABLE,
-	TYRAN_VALUE_TYPE_RUNTIME_STACK
 } tyran_value_type;
 
 typedef struct tyran_value {
@@ -33,7 +31,6 @@ typedef struct tyran_value {
 #define tyran_value_release(v) { \
 	if ((v).type == TYRAN_VALUE_TYPE_STRING) tyran_string_free((v).data.str); \
 	else if ((v).type == TYRAN_VALUE_TYPE_OBJECT) TYRAN_OBJECT_RELEASE((v).data.object) \
-	else if ((v).type == TYRAN_VALUE_TYPE_VARIABLE && (v).data.variable->type==TYRAN_VALUE_TYPE_OBJECT) TYRAN_OBJECT_RELEASE((v).data.variable->data.object) \
 	(v).type = TYRAN_VALUE_TYPE_UNDEFINED; \
 	(v).data.object = 0; \
 }

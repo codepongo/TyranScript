@@ -8,6 +8,10 @@
 #include <string.h>
 #include <math.h>
 
+typedef unsigned char u8t;
+typedef unsigned short u16t;
+typedef unsigned int u32t;
+
 typedef unsigned short tyran_uint16;
 
 #define tyran_malloc malloc

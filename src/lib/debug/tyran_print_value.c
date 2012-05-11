@@ -50,15 +50,6 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 				tyran_strncpy(buf, max_length, temp_buffer, temp_buffer_size);
 			}
 			break;
-		case TYRAN_VALUE_TYPE_VARIABLE: {
-				const int max_reference_size = 2048;
-				char referenced_value[max_reference_size];
-				tyran_value_to_c_string(v->data.variable, referenced_value, max_reference_size, quote);
-				// %p (%p)
-				// 
-				tyran_snprintf(buf, max_length, "variable:%s", referenced_value);
-			}
-			break;
 		case TYRAN_VALUE_TYPE_OBJECT:
 			switch (v->data.object->type)
 			{
@@ -73,10 +64,6 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 			break;
 			}
 
-			break;
-			
-		case TYRAN_VALUE_TYPE_RUNTIME_STACK:
-			tyran_snprintf(buf, max_length, "runtime_stack:%p ", (void*)v->data.runtime_stack);
 			break;
 		default:
 			TYRAN_ERROR("Unknown value type");
@@ -121,17 +108,6 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 					const tyran_function* f = o->data.function->static_function;
 					if (f->type == tyran_function_type_normal) {
 						tyran_snprintf(value, max_size, "function (");
-						int i;
-						for (i = 0; i < f->argument_names->count; ++i) {
-							if (i != 0) {
-								tyran_strncat(value, ", ", max_size_left);
-								max_size_left -= 2;
-							}
-							tyran_string_to_c_str(temp_buffer, temp_buffer_size, tyran_string_array_get(f->argument_names, i));
-							const char* argument_name = temp_buffer;
-							tyran_strncat(value, argument_name, max_size_left);
-							max_size_left -= tyran_strlen(argument_name);
-						}
 						tyran_strncat(value, ") {", max_size_left);
 						max_size_left -= 3;
 					} else {
