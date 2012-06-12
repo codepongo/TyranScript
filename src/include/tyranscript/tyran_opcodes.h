@@ -6,6 +6,7 @@
 
 struct tyran_function;
 typedef u32t tyran_opcode;
+typedef u8t tyran_reg_index;
 
 typedef struct tyran_opcodes {
 	const tyran_opcode* codes;
@@ -21,81 +22,41 @@ typedef struct tyran_opcodes {
 struct tyran_opcodes* tyran_opcodes_new(int size);
 void tyran_opcodes_free(struct tyran_opcodes* codes);
 
-struct tyran_opcodes* tyran_opcodes_merge(struct tyran_opcodes* a, struct tyran_opcodes* b);
-struct tyran_opcodes* tyran_opcodes_merge3(struct tyran_opcodes* a, struct tyran_opcodes* b, struct tyran_opcodes* c);
-struct tyran_opcodes* tyran_opcodes_merge4(struct tyran_opcodes* a, struct tyran_opcodes* b, struct tyran_opcodes* c, struct tyran_opcodes* d);
-
-struct tyran_opcodes* tyran_opcodes_insert_mark_for_resolve(enum tyran_resolve_type type);
-void tyran_opcodes_resolve(struct tyran_opcodes* codes, int step_len, int break_only, int pop_count);
-
-/* Stack */
-struct tyran_opcodes* tyran_opcodes_insert_push_number(const double *v);
-struct tyran_opcodes* tyran_opcodes_insert_push_string(const tyran_string* str);
-struct tyran_opcodes* tyran_opcodes_insert_push_variable(const tyran_string* variable_name);
-struct tyran_opcodes* tyran_opcodes_insert_push_undefined();
-struct tyran_opcodes* tyran_opcodes_insert_push_null();
-struct tyran_opcodes* tyran_opcodes_insert_push_boolean(int v);
-struct tyran_opcodes* tyran_opcodes_insert_push_function(const struct tyran_function* func);
-struct tyran_opcodes* tyran_opcodes_insert_push_scope();
-struct tyran_opcodes* tyran_opcodes_insert_push_this();
-struct tyran_opcodes* tyran_opcodes_insert_push_top();
-struct tyran_opcodes* tyran_opcodes_insert_toc_dup();
-struct tyran_opcodes* tyran_opcodes_insert_push_top2();
-struct tyran_opcodes* tyran_opcodes_insert_pop(int count);
+/* Load values */
+void tyran_opcodes_op_ld(tyran_reg_index a, tyran_reg_index x);
+void tyran_opcodes_op_ldc_string(tyran_reg_index a, tyran_string* str);
+void tyran_opcodes_op_ldc_number(tyran_reg_index a, tyran_number v);
+void tyran_opcodes_op_ldc_boolean(tyran_reg_index a, int boolean);
+void tyran_opcodes_op_ldc_null(tyran_reg_index a);
+void tyran_opcodes_op_ldb(tyran_reg_index a, int boolean);
+void tyran_opcodes_op_ldn(tyran_reg_index);
 
 /* Arithmetic */
-struct tyran_opcodes* tyran_opcodes_insert_negate();
-struct tyran_opcodes* tyran_opcodes_insert_not();
-struct tyran_opcodes* tyran_opcodes_insert_add();
-struct tyran_opcodes* tyran_opcodes_insert_subtract();
-struct tyran_opcodes* tyran_opcodes_insert_multiply();
-struct tyran_opcodes* tyran_opcodes_insert_divide();
-struct tyran_opcodes* tyran_opcodes_insert_modulus();
-struct tyran_opcodes* tyran_opcodes_insert_increase(int amount);
-struct tyran_opcodes* tyran_opcodes_insert_decrease(int amount);
+void tyran_opcodes_op_add(tyran_reg_index a, tyran_reg_index x, int x_constant, tyran_reg_index y, int y_constant);
+void tyran_opcodes_op_div(tyran_reg_index a, tyran_reg_index x, int x_constant, tyran_reg_index y, int y_constant);
+void tyran_opcodes_op_mod(tyran_reg_index a, tyran_reg_index x, int x_constant, tyran_reg_index y, int y_constant);
+void tyran_opcodes_op_mul(tyran_reg_index a, tyran_reg_index x, int x_constant, tyran_reg_index y, int y_constant);
+void tyran_opcodes_op_neg(tyran_reg_index a, tyran_reg_index x, int x_constant, tyran_reg_index y, int y_constant);
+void tyran_opcodes_op_not(tyran_reg_index a, tyran_reg_index x, int x_constant);
+void tyran_opcodes_op_pow(tyran_reg_index a, tyran_reg_index x, int x_constant, tyran_reg_index y, int y_constant);
+void tyran_opcodes_op_sub(tyran_reg_index a, tyran_reg_index x, int x_constant, tyran_reg_index y, int y_constant);
 
-/* Bitwise */
-struct tyran_opcodes* tyran_opcodes_insert_bitwise_not();
-struct tyran_opcodes* tyran_opcodes_insert_bitwise_and();
-struct tyran_opcodes* tyran_opcodes_insert_bitwise_or();
-struct tyran_opcodes* tyran_opcodes_insert_bitwise_xor();
-struct tyran_opcodes* tyran_opcodes_insert_bitwise_shift(enum tyran_shift_mode shift_type);
+/* Branch */
+void tyran_opcodes_op_jb(tyran_reg_index y, int boolean);
+void tyran_opcodes_op_jbld(tyran_reg_index a, tyran_reg_index y, int boolean);
+void tyran_opcodes_op_jeq(tyran_reg_index x, int x_constant, tyran_reg_index y, int y_constant, int boolean, int pc);
+void tyran_opcodes_op_jlt(tyran_reg_index x, int x_constant, tyran_reg_index y, int y_constant, int boolean, int pc);
+void tyran_opcodes_op_jle(tyran_reg_index x, int x_constant, tyran_reg_index y, int y_constant, int boolean, int pc);
+void tyran_opcodes_op_jmp(int pc);
 
-/* Compare */
-struct tyran_opcodes* tyran_opcodes_insert_compare_equal();
-struct tyran_opcodes* tyran_opcodes_insert_compare_not_equal();
-struct tyran_opcodes* tyran_opcodes_insert_compare_less();
-struct tyran_opcodes* tyran_opcodes_insert_compare_less_equal();
-struct tyran_opcodes* tyran_opcodes_insert_compare_greater();
-struct tyran_opcodes* tyran_opcodes_insert_compare_greater_equal();
-struct tyran_opcodes* tyran_opcodes_insert_compare_strict_equal();
-struct tyran_opcodes* tyran_opcodes_insert_compare_strict_not_equal();
-
-/* Jumps */
-struct tyran_opcodes* tyran_opcodes_insert_jump_false_pop(int offset);
-struct tyran_opcodes* tyran_opcodes_insert_jump_true_pop(int offset);
-struct tyran_opcodes* tyran_opcodes_insert_jump_false(int offset);
-struct tyran_opcodes* tyran_opcodes_insert_jump_true(int offset);
-struct tyran_opcodes* tyran_opcodes_insert_jump(int offset);
-
-struct tyran_opcodes* tyran_opcodes_insert_call_set_this(int argument_count);
-struct tyran_opcodes* tyran_opcodes_insert_call(int argument_count);
-struct tyran_opcodes* tyran_opcodes_insert_new_call(int argument_count);
-struct tyran_opcodes* tyran_opcodes_insert_return(int pop_count);
+/* Call stack */
+void tyran_opcodes_op_ret();
+void tyran_opcdoes_op_call();
 
 /* Object */
-struct tyran_opcodes* tyran_opcodes_insert_assign(enum tyran_assign_mode mode);
-struct tyran_opcodes* tyran_opcodes_insert_unreference();
-struct tyran_opcodes* tyran_opcodes_insert_subscript(int is_right_value);
-struct tyran_opcodes* tyran_opcodes_insert_make_object(int count);
-struct tyran_opcodes* tyran_opcodes_insert_make_array(int count);
-struct tyran_opcodes* tyran_opcodes_insert_delete(enum tyran_assign_mode mode);
+void tyran_opcodes_op_new();
+void tyran_opcodes_op_set();
+void tyran_opcodes_op_get();
 
-/* Object iteration */
-struct tyran_opcodes* tyran_opcodes_insert_key();
-struct tyran_opcodes* tyran_opcodes_insert_next();
-
-/* Other */
-struct tyran_opcodes* tyran_opcodes_insert_nop();
 
 #endif
