@@ -43,12 +43,18 @@ All opcodes are coded within a 32-bit instruction.
 * **RET A X**. Return from call. returns R(A .. A + X - 2).
 * **CALL A X Y**. Call a function. R(A) holds the function object. R(A+1) = SELF, R(A+2..A+X) are the arguments. Return values are stored in R(A+1..). Y=1: ignore return values, Y=2 Constructor, Y=3 tailcall.
 
+### Function
+* **FUNC A**. Create a function. R(A)=new function.
+
+
 ### Object (5)
 * **SET A X Y**. R(A)[ R(X) ] = R(Y).
 * **GET A X Y**. R(A) = R(X)[ R(Y) ].
 * **LEN A X**. R(A) = length( R(X) ).
 * **KEY A X**. R(A) = new iterator for object R(X).
 * **NEXT A X**. R(A) = next key for iterator R(X).
+
+
 
 ## Licenses
 
