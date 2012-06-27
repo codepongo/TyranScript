@@ -3,6 +3,7 @@
 
 #define MAXEXP	2047
 
+typedef float tyran_number;
 
 #define EXP(a) ((((u16t *)(&a))[3] & 0x7ff0) >> 4)
 #define FRAZERO(a) (((u32t *)(&a))[0] == 0 && (((u32t *)(&a))[1] & 0x0fffff) == 0)

@@ -3,7 +3,8 @@
 
 #include "tyran_object_key.h"
 #include "tyran_object.h"
-#include "tyran_number.h"
+
+#include <tyranscript/tyran_number.h>
 
 struct tyran_object;
 struct tyran_runtime_stack;
@@ -21,7 +22,7 @@ typedef struct tyran_value {
 	tyran_value_type type;
 	union {
 		u32t boolean;
-		float number;
+		tyran_number number;
 		const tyran_string* str;
 		tyran_object* object;
 		u32t data;

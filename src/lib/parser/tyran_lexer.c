@@ -7,7 +7,7 @@
 
 const int TYRAN_TOKEN_COMMENT = -1;
 
-void yyerror(YYLTYPE* lexer_position_info, tyran_parser_state* ps, const char *msg)
+void yyerror(tyran_lexer_position_info* lexer_position_info, tyran_parser_state* ps, const char *msg)
 {
 	TYRAN_SOFT_ERROR("%d[%d-%d]:%s", lexer_position_info->first_line, lexer_position_info->first_column, lexer_position_info->last_column, msg);
 	ps->error_count++;
@@ -269,13 +269,13 @@ static char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
 	return c;
 }
 
-void tyran_lexer_set_begin(YYLTYPE* lexer_position_info, const tyran_lexer* lexer)	
+void tyran_lexer_set_begin(tyran_lexer_position_info* lexer_position_info, const tyran_lexer* lexer)	
 {
 	lexer_position_info->first_line = lexer->line;
 	lexer_position_info->first_column = lexer->column;
 }
 
-void tyran_lexer_set_end(YYLTYPE* lexer_position_info, const tyran_lexer* lexer)
+void tyran_lexer_set_end(tyran_lexer_position_info* lexer_position_info, const tyran_lexer* lexer)
 {
 	lexer_position_info->last_line = lexer->line;
 	lexer_position_info->last_column = lexer->column;
@@ -298,7 +298,7 @@ int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, tyran_string* temp_
 	return string_index;
 }
 
-int tyran_lexer_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_string* temp_string_buffer, tyran_string_length_type* string_length, YYLTYPE* lexer_position_info, YYSTYPE* token)
+int tyran_lexer_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_string* temp_string_buffer, tyran_string_length_type* string_length, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
 {
 	int identifier_length = tyran_lexer_parse_identifier(lexer, c, temp_string_buffer);
 	*string_length = (tyran_string_length_type) identifier_length;
@@ -313,7 +313,7 @@ int tyran_lexer_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_st
 	return TYRAN_TOKEN_IDENTIFIER;
 }
 
-int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_string* number_string, tyran_string_length_type* string_length, YYLTYPE* lexer_position_info, YYSTYPE* token)
+int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_string* number_string, tyran_string_length_type* string_length, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
 {
 	int decimal_point_detected = 0;
 	int hex_number_detected = 0;
@@ -370,7 +370,7 @@ int tyran_lexer_parse_comment(tyran_lexer* lexer)
 {
 	char d = tyran_lexer_pop_character(lexer);
 	if (d == '/') {
-		while ((d = tyran_lexer_pop_character(lexer)) != '\r' && d != '\n' && d != 0)
+		while ((d = tyran_lexer_pop_character(lexer)) != '\n' && d != '\n' && d != 0)
 			;
 		return TYRAN_TOKEN_COMMENT;
 	} else if (d == '*') {
@@ -382,7 +382,7 @@ int tyran_lexer_parse_comment(tyran_lexer* lexer)
 	return 0;
 }
 
-int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, YYLTYPE* lexer_position_info, YYSTYPE* token)
+int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
 {
 	tyran_lexer_push_character(c, lexer);
 	*token = (void *) tyran_lexer_parse_string(lexer);
@@ -390,7 +390,7 @@ int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, YYLTYPE* lexer_po
 	return TYRAN_TOKEN_STRING;
 }
 
-static int tyran_lexer_next_token(YYSTYPE* token, YYLTYPE* lexer_position_info, tyran_lexer* lexer)
+static int tyran_lexer_next_token(tyran_lexer_token_data* token, tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
 	TYRAN_UNICODE_STRING(1024) string_buffer;
 	tyran_string* temp_string_buffer = string_buffer.string;
@@ -423,7 +423,7 @@ static int tyran_lexer_next_token(YYSTYPE* token, YYLTYPE* lexer_position_info, 
 	return r;
 }
 
-int yylex(YYSTYPE* token, YYLTYPE* lexer_position_info, tyran_parser_state* parser_state)
+int yylex(tyran_lexer_token_data* token, tyran_lexer_position_info* lexer_position_info, tyran_parser_state* parser_state)
 {
 	int ret;
 	do {

@@ -1,5 +1,5 @@
 #include <tyranscript/tyran_value.h>
-#include "tyran_number.h"
+#include <tyranscript/tyran_number.h>
 
 extern tyran_value* tyran_object_prototype;
 extern tyran_value* tyran_array_prototype;

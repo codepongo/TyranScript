@@ -74,17 +74,17 @@
 #define TYRAN_TOKEN_BRACKET_LEFT 331
 #define TYRAN_TOKEN_MEMBER 332
 #define function_precedence 333
-#define YYSTYPE void *
+#define tyran_lexer_token_data void *
 
-#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
-typedef struct YYLTYPE
+#if ! defined tyran_lexer_position_info && ! defined YYLTYPE_IS_DECLARED
+typedef struct tyran_lexer_position_info
 {
   int first_line;
   int first_column;
   int last_line;
   int last_column;
-} YYLTYPE;
-# define yyltype YYLTYPE /* obsolescent; will be withdrawn */
+} tyran_lexer_position_info;
+# define yyltype tyran_lexer_position_info /* obsolescent; will be withdrawn */
 # define YYLTYPE_IS_DECLARED 1
 # define YYLTYPE_IS_TRIVIAL 1
 #endif
