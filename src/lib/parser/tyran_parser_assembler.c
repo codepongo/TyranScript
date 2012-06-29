@@ -14,7 +14,7 @@ void tyran_parse_assembler(tyran_lexer* lexer, char c)
 }
 
 enum {
-	TYRAN_TOKEN_ASSEMBLER_LD,
+	TYRAN_TOKEN_ASSEMBLER_LD = 1,
 	TYRAN_TOKEN_ASSEMBLER_LDA,
 	TYRAN_TOKEN_ASSEMBLER_LDB,
 	TYRAN_TOKEN_ASSEMBLER_LDC,
@@ -43,6 +43,7 @@ enum {
 
 static int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffer)
 {
+	TYRAN_LOG("checking for match for assembler keyword");
 	typedef struct tyran_lexer_keyword {
 		const char* name;
 		int token_value;
@@ -78,6 +79,7 @@ static int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffe
 
 	for (i = 0; i < sizeof(keywords) / sizeof(tyran_lexer_keyword); ++i) {
 		if (tyran_strcmp(temp_string_buffer, keywords[i].name) == 0)
+			TYRAN_LOG("Found match:%d (%s)", keywords[i].token_value, temp_string_buffer);
 			return keywords[i].token_value;
 	}
 	return 0;
@@ -85,6 +87,7 @@ static int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffe
 
 int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_string* temp_string_buffer, tyran_string_length_type* string_length, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
 {
+	TYRAN_LOG("parse identifier");
 	int identifier_length = tyran_lexer_parse_identifier(lexer, c, temp_string_buffer);
 	*string_length = (tyran_string_length_type) identifier_length;
 	char temp_buffer[512];
@@ -101,6 +104,7 @@ int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c
 
 static int tyran_lexer_assembler_next_token(tyran_lexer_token_data* token, tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
+	TYRAN_LOG("Parse next token");
 	TYRAN_UNICODE_STRING(1024) string_buffer;
 	tyran_string* temp_string_buffer = string_buffer.string;
 
@@ -133,6 +137,7 @@ static int tyran_lexer_assembler_next_token(tyran_lexer_token_data* token, tyran
 
 void parse_r_rc(tyran_parser_state* state, tyran_reg_index* a, tyran_reg_or_constant_index* c)
 {
+	TYRAN_LOG("parse_r_rc()");
 }
 
 void parse_r_rc_rc(tyran_parser_state* state, tyran_reg_index* a, tyran_reg_or_constant_index* x, tyran_reg_or_constant_index* y)
@@ -164,6 +169,7 @@ void parse_r_s(tyran_parser_state* state, tyran_reg_index* a, int* b)
 
 int tyran_lexer_assembler_parse(tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
 {
+	TYRAN_LOG("parse assembler");
 	tyran_lexer_token_data data;
 
 	int token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);

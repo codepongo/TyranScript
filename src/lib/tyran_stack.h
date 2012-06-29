@@ -14,7 +14,7 @@
 }
 
 #define TYRAN_STACK_POP() { \
-	tyran_value_release(TYRAN_STACK_TOP); \
+	// tyran_value_release(TYRAN_STACK_TOP); \
 	--sp; \
 }
 

@@ -1,4 +1,5 @@
 #include <tyranscript/tyran_api.h>
+#include <tyranscript/parser/tyran_parser_assembler.h>
 
 void expose_function(const struct tyran_runtime* runtime, tyran_value* global, const char* name, tyran_function_callback static_function)
 {
@@ -19,12 +20,16 @@ int read_file(const char* filename, char* buf, int max_length)
 
 tyran_parser_state* parse_file(const char* filename)
 {
+	TYRAN_LOG("Parse file '%s'", filename);
 	const int max_length = 8192;
 	char buf[max_length];
 
 	int read_octets = read_file(filename, buf, max_length);
-
+	TYRAN_LOG("Read %d octets", read_octets);
 	tyran_parser_state* state = tyran_parser_state_new(buf, read_octets);
+
+	tyran_lexer_position_info position;
+	tyran_lexer_assembler_parse(&position, state);
 	if (state->error_count) {
 		printf("Error:%d\n", state->error_count);
 	}
@@ -83,9 +88,9 @@ void execute(tyran_opcodes* opcodes, const char* numeric)
 	tyran_runtime_push_call(runtime, opcodes, global_scope_stack, arguments, global);
 	tyran_runtime_execute(runtime, &return_value, callbacks);
 
-	tyran_value_release(*global);
+	// tyran_value_release(*global);
 
-	tyran_free(callbacks);
+	// tyran_free(callbacks);
 
 	tyran_runtime_free(runtime);
 
@@ -101,6 +106,7 @@ int main(int argc, char* argv[])
 
 	tyran_parser_state* state = parse_file(argv[1]);
 	if (state->opcodes) {
+		tyran_print_opcodes(state->opcodes, 0);
 		execute(state->opcodes, argc >= 3 ? argv[2] : "0");
 	}
 	tyran_parser_state_free(state);

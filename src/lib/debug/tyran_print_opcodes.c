@@ -11,6 +11,7 @@ const char* tyran_opcode_names[100] = {
 
 void tyran_print_opcode(const tyran_opcode* opcode, int ip, int highlight)
 {
+	TYRAN_LOG("%d opcode:%d", ip, *opcode);
 }
 
 void tyran_print_opcodes(const struct tyran_opcodes* ops, const tyran_opcode* ip)

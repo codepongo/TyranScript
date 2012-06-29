@@ -12,7 +12,7 @@ typedef struct tyran_runtime_stack {
 	struct tyran_scope_stack* scope;
 	tyran_value function_scope;
 	tyran_value _this;
-	const tyran_opcode* ip;
+	const tyran_opcode* pc;
 } tyran_runtime_stack;
 
 tyran_runtime_stack* tyran_runtime_stack_new();

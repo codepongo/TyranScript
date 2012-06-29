@@ -11,13 +11,9 @@ typedef u8t tyran_reg_index;
 typedef u16t tyran_reg_or_constant_index;
 
 typedef struct tyran_opcodes {
-	const tyran_opcode* codes;
+	tyran_opcode* codes;
 	int code_len;
 	int code_size;
-
-	int expression_count;
-	enum tyran_assign_mode lvalue_flag;
-	const tyran_string* lvalue_name;
 } tyran_opcodes;
 
 /* Opcodes */

@@ -14,6 +14,7 @@
 tyran_runtime* tyran_runtime_new()
 {
 	tyran_runtime* rt = TYRAN_CALLOC(tyran_runtime);
+	rt->stack = TYRAN_MALLOC_TYPE(tyran_runtime_stack, 128);
 	return rt;
 }
 
@@ -26,11 +27,11 @@ void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opco
 {
 	/* Save return state */
 	tyran_runtime_stack* runtime_info = tyran_runtime_stack_new();
-	tyran_value_copy(runtime_info->_this, *_this);
-	tyran_value_copy(runtime_info->function_scope, *function_scope);
+	// tyran_value_copy(runtime_info->_this, *_this);
+	// tyran_value_copy(runtime_info->function_scope, *function_scope);
 	runtime_info->scope = scope;
 	runtime_info->opcodes = opcodes;
-	runtime_info->ip = opcodes->codes;
+	runtime_info->pc = opcodes->codes;
 
 	rt->stack[rt->stack_pointer] = *runtime_info;
 	rt->stack_pointer++;

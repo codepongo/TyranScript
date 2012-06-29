@@ -31,7 +31,7 @@ static char tyran_lexer_pop_character(tyran_lexer* lexer)
 	return c;
 }
 
-static void tyran_lexer_push_character(char c, tyran_lexer* lexer)
+void tyran_lexer_push_character(char c, tyran_lexer* lexer)
 {
 	TYRAN_ASSERT(c != 0, "Must be a real character");
 	lexer->index--;
@@ -259,7 +259,7 @@ static void tyran_lexer_skip_comment(tyran_lexer *lexer)
 }
 
 
-static char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
+char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
 {
 	char c;
 	

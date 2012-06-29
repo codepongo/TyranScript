@@ -7,6 +7,7 @@
 #include "tyranscript/tyran_function.h"
 #include "tyranscript/tyran_function_object.h"
 #include "tyranscript/tyran_opcodes.h"
+#include "tyranscript/tyran_runtime_stack.h"
 
 typedef struct tyran_context
 {
@@ -29,14 +30,23 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	tyran_value rcx;
 	tyran_value rcy;
 
+	tyran_value_set_undefined(*return_value);
+
+	// TYRAN_STACK_POP;
+	runtime->stack_pointer--;
+
+	tyran_runtime_stack* stack = &runtime->stack[runtime->stack_pointer];
+
+
 	// Context
-	const u32t* pc = 0;
-	tyran_value* r;
+	const u32t* pc = stack->pc;
+	tyran_value registers[128];
+
+	tyran_value* r = registers;
 	tyran_value* c;
 
 	tyran_context* sp;
 
-	TYRAN_STACK_POP;
 
 	u32t i;
 	int test;
@@ -46,9 +56,10 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 
 	switch (opcode) {
 		case TYRAN_OPCODE_LD:
-			TYRAN_REGISTER_A_X;
-			r[a] = r[x];
-			TYRAN_ADD_REF(r[a]);
+			TYRAN_LOG("LD opcode");
+			// TYRAN_REGISTER_A_X;
+			// r[a] = r[x];
+			// TYRAN_ADD_REF(r[a]);
 			break;
 		case TYRAN_OPCODE_LDC:
 			TYRAN_REGISTER_A_X;
