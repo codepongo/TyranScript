@@ -19,7 +19,8 @@ typedef struct tyran_context
 
 void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_value, const struct tyran_runtime_callbacks* event_callbacks)
 {
-	TYRAN_LOG("* EXECUTE");
+	TYRAN_LOG(" ");
+	TYRAN_LOG("*** EXECUTE");
 	// Parameters
 	u8t a;
 	u8t x;
@@ -42,7 +43,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 
 	// Context
 	const u32t* pc = stack->pc;
-	tyran_value registers[128];
+	tyran_value* registers = TYRAN_MALLOC_TYPE(tyran_value, 128);
 
 	tyran_value* r = registers;
 	tyran_value* c = stack->constants->values;
@@ -56,7 +57,9 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	while (1)
 	{
 		long pc_value = pc - stack->pc;
+		TYRAN_LOG("r1:%f r2:%f r3:%f r4:%f", r[1].data.number, r[2].data.number, r[3].data.number, r[4].data.number);
 		tyran_print_opcode(pc, pc_value, 1);
+		TYRAN_LOG(" ");
 		if (pc_value > 10) {
 			return;
 		}
@@ -82,7 +85,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_LDN:
 			TYRAN_REGISTER_A_X;
-			TYRAN_DEC_REF_RANGE(&runtime->object_pool, &r[a], x);
+			// TYRAN_DEC_REF_RANGE(&runtime->object_pool, &r[a], x);
 			tyran_memset_type_n(&r[a], 0, x);
 			break;
 		case TYRAN_OPCODE_ADD:
@@ -172,13 +175,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			return;
 			TYRAN_CONTEXT_POP;
 			break;
-		case TYRAN_OPCODE_NEW:
-			TYRAN_REGISTER_A_X;
-			r[a].data.object = tyran_object_pool_alloc(&runtime->object_pool); 
-			r[a].type = TYRAN_VALUE_TYPE_OBJECT;
-			if (x) {
-				break;
-			}
 		case TYRAN_OPCODE_CALL:
 			TYRAN_CONTEXT_PUSH;
 			TYRAN_REGISTER_A_X;
@@ -187,6 +183,14 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				r = &r[a];
 				pc = function->data.opcodes->codes;
 				c = function->constants;
+			}
+			break;
+		case TYRAN_OPCODE_NEW:
+			TYRAN_REGISTER_A_X;
+			r[a].data.object = tyran_object_pool_alloc(&runtime->object_pool); 
+			r[a].type = TYRAN_VALUE_TYPE_OBJECT;
+			if (x) {
+				break;
 			}
 			break;
 /*
@@ -207,5 +211,4 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		}
 	}
-}
 }

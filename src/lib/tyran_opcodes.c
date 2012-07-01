@@ -40,12 +40,10 @@ void tyran_opcodes_add_code_a_c(tyran_opcodes* codes, int code, tyran_reg_index 
 	tyran_opcodes_add_code(codes, code, a, c, 0);
 }
 
-
 void tyran_opcodes_add_code_a_x(tyran_opcodes* codes, int code, tyran_reg_index a, tyran_reg_index x)
 {
 	tyran_opcodes_add_code(codes, code, a, (tyran_reg_or_constant_index)x, (tyran_reg_or_constant_index)0);
 }
-
 
 void tyran_opcodes_add_code_a_x_y(tyran_opcodes* codes, int code, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y)
 {
@@ -63,7 +61,7 @@ void tyran_opcodes_op_ldc(tyran_opcodes* codes, tyran_reg_index a, tyran_constan
 	tyran_opcodes_add_code_a_c(codes, TYRAN_OPCODE_LDC, a, c);
 }
 
-void tyran_opcodes_op_ldb(tyran_opcodes* codes, tyran_reg_index a, int boolean)
+void tyran_opcodes_op_ldb(tyran_opcodes* codes, tyran_reg_index a, tyran_boolean boolean)
 {
 	tyran_opcodes_add_code_a_x(codes, TYRAN_OPCODE_LDB, a, (tyran_reg_or_constant_index) boolean);
 }
@@ -115,29 +113,29 @@ void tyran_opcodes_op_sub(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_
 }
 
 /* Branch */
-void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_index y, int boolean)
+void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_index a, tyran_boolean boolean)
 {
-
+	tyran_opcodes_add_code_a_x(codes, TYRAN_OPCODE_JB, a, boolean);
 }
 
-void tyran_opcodes_op_jbld(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index y, int boolean)
+void tyran_opcodes_op_jbld(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_boolean boolean)
 {
-
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_JBLD, a, x, boolean);
 }
 
-void tyran_opcodes_op_jeq(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean)
+void tyran_opcodes_op_jeq(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, tyran_boolean boolean)
 {
-
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_JEQ, boolean, x, y);
 }
 
-void tyran_opcodes_op_jlt(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean)
+void tyran_opcodes_op_jlt(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, tyran_boolean boolean)
 {
-
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_JLT, boolean, x, y);
 }
 
-void tyran_opcodes_op_jle(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean)
+void tyran_opcodes_op_jle(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, tyran_boolean boolean)
 {
-
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_JLE, boolean, x, y);
 }
 
 void tyran_opcodes_op_jmp(tyran_opcodes* codes, int pc)
