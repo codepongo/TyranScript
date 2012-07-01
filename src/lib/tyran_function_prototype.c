@@ -31,7 +31,7 @@ int tyran_function_prototype_apply(tyran_runtime* runtime, tyran_value* function
 	
 	tyran_function_object* function_object = _this->data.object->data.function;
 	
-	tyran_runtime_push_call(runtime, function_to_call->data.opcodes, function_object->scope, arguments_to_use, this_to_use);
+	tyran_runtime_push_call(runtime, function_to_call->data.opcodes, 0, function_object->scope, arguments_to_use, this_to_use);
 	
 	return -1;
 }

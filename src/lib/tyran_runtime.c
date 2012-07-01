@@ -8,6 +8,7 @@
 #include "tyranscript/tyran_function_object.h"
 #include "tyranscript/tyran_opcodes.h"
 #include "tyranscript/tyran_runtime_stack.h"
+#include <tyranscript/debug/tyran_print_opcodes.h>
 
 typedef struct tyran_context
 {
@@ -18,6 +19,7 @@ typedef struct tyran_context
 
 void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_value, const struct tyran_runtime_callbacks* event_callbacks)
 {
+	TYRAN_LOG("* EXECUTE");
 	// Parameters
 	u8t a;
 	u8t x;
@@ -43,23 +45,30 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	tyran_value registers[128];
 
 	tyran_value* r = registers;
-	tyran_value* c;
+	tyran_value* c = stack->constants->values;
 
 	tyran_context* sp;
 
 
 	u32t i;
 	int test;
+
+	while (1)
+	{
+		long pc_value = pc - stack->pc;
+		tyran_print_opcode(pc, pc_value, 1);
+		if (pc_value > 10) {
+			return;
+		}
 	u32t instruction = *pc++;
 	u32t opcode = instruction & 0x3f;
 	instruction >>= 6;
 
 	switch (opcode) {
 		case TYRAN_OPCODE_LD:
-			TYRAN_LOG("LD opcode");
-			// TYRAN_REGISTER_A_X;
-			// r[a] = r[x];
-			// TYRAN_ADD_REF(r[a]);
+			TYRAN_REGISTER_A_X;
+			TYRAN_SET_REGISTER(a, x);
+			TYRAN_ADD_REF(r[a]);
 			break;
 		case TYRAN_OPCODE_LDC:
 			TYRAN_REGISTER_A_X;
@@ -160,6 +169,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			pc += br;
 			break;
 		case TYRAN_OPCODE_RET:
+			return;
 			TYRAN_CONTEXT_POP;
 			break;
 		case TYRAN_OPCODE_NEW:
@@ -197,4 +207,5 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		}
 	}
+}
 }

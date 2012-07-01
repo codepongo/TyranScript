@@ -66,7 +66,7 @@ void object_deleted(const struct tyran_runtime* runtime, tyran_object* program_s
 {
 }
 
-void execute(tyran_opcodes* opcodes, const char* numeric)
+void execute(tyran_opcodes* opcodes, struct tyran_constants* constants, const char* numeric)
 {
 	tyran_value return_value;
 
@@ -85,7 +85,7 @@ void execute(tyran_opcodes* opcodes, const char* numeric)
 	tyran_value_object_insert_array(arguments, 0, &argument);
 	tyran_value_set_object(*global, tyran_object_new(runtime));
 
-	tyran_runtime_push_call(runtime, opcodes, global_scope_stack, arguments, global);
+	tyran_runtime_push_call(runtime, opcodes, constants, global_scope_stack, arguments, global);
 	tyran_runtime_execute(runtime, &return_value, callbacks);
 
 	// tyran_value_release(*global);
@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
 	tyran_parser_state* state = parse_file(argv[1]);
 	if (state->opcodes) {
 		tyran_print_opcodes(state->opcodes, 0);
-		execute(state->opcodes, argc >= 3 ? argv[2] : "0");
+		execute(state->opcodes, state->constants, argc >= 3 ? argv[2] : "0");
 	}
 	tyran_parser_state_free(state);
 

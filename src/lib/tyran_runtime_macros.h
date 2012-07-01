@@ -56,6 +56,10 @@
 	c = sp->c; \
 	pc = sp->pc;
 
+#define TYRAN_SET_REGISTER(a, x) \
+	r[a] = r[x];
+
+
 #define TYRAN_ADD_REF(v) \
 	if ((v).type == TYRAN_VALUE_TYPE_OBJECT) { \
 		((v)).data.object->retain_count++; \

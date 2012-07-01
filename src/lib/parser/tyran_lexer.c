@@ -4,6 +4,7 @@
 #include <tyranscript/parser/tyran_parser_state.h>
 
 #include <tyranscript/tyran_config.h>
+#include <tyranscript/tyran_number.h>
 
 const int TYRAN_TOKEN_COMMENT = -1;
 
@@ -294,6 +295,9 @@ int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, tyran_string* temp_
 	}
 	tyran_lexer_push_character(c, lexer);
 	temp_string_buffer[string_index] = 0;
+
+	char buf[512];
+	tyran_string_to_c_str(buf, 512, temp_string_buffer);
 	
 	return string_index;
 }
@@ -348,7 +352,7 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_string* number_st
 	number_string[string_index] = 0;
 	*string_length = (tyran_string_length_type) string_index;
 
-	double* number_pointer = TYRAN_MALLOC_TYPE(double, 1);
+	tyran_number* number_pointer = TYRAN_MALLOC_TYPE(tyran_number, 1);
 	if (hex_number_detected) {
 		unsigned int temp_value;
 		char temp_buffer[512];
@@ -359,7 +363,7 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_string* number_st
 	} else {
 		char temp_buffer[512];
 		tyran_string_to_c_str(temp_buffer, 512, number_string);
-		tyran_sscanf(temp_buffer, "%lf", number_pointer);
+		tyran_sscanf(temp_buffer, "%f", number_pointer);
 	}
 
 	*token = number_pointer;
@@ -386,6 +390,7 @@ int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, tyran_lexer_posit
 {
 	tyran_lexer_push_character(c, lexer);
 	*token = (void *) tyran_lexer_parse_string(lexer);
+
 	tyran_lexer_set_end(lexer_position_info, lexer);
 	return TYRAN_TOKEN_STRING;
 }

@@ -6,12 +6,40 @@
 #include <tyranscript/debug/tyran_print_opcodes.h>
 
 
-const char* tyran_opcode_names[100] = {
+const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
+	"NOP",
+	"LD",
+	"LDC",
+	"LDB",
+	"LDN",
+	"ADD",
+	"DIV",
+	"MOD",
+	"MUL",
+	"NEG",
+	"NOT",
+	"POW",
+	"SUB",
+	"JB",
+	"JBLD",
+	"JEQ",
+	"JLT",
+	"JLE",
+	"JMP",
+	"RET",
+	"CALL",
+	"NEW",
+	"SET",
+	"GET",
+	"DEBUG"
 };
 
 void tyran_print_opcode(const tyran_opcode* opcode, int ip, int highlight)
 {
-	TYRAN_LOG("%d opcode:%d", ip, *opcode);
+	tyran_opcode code = *opcode;
+	int instruction = code & 0x3f;
+	
+	TYRAN_LOG("%d %s", ip, tyran_opcode_names[instruction]);
 }
 
 void tyran_print_opcodes(const struct tyran_opcodes* ops, const tyran_opcode* ip)

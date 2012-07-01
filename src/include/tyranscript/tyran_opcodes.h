@@ -9,6 +9,7 @@ struct tyran_function;
 typedef u32t tyran_opcode;
 typedef u8t tyran_reg_index;
 typedef u16t tyran_reg_or_constant_index;
+typedef u16t tyran_constant_index;
 
 typedef struct tyran_opcodes {
 	tyran_opcode* codes;
@@ -22,10 +23,7 @@ void tyran_opcodes_free(struct tyran_opcodes* codes);
 
 /* Load values */
 void tyran_opcodes_op_ld(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index x);
-void tyran_opcodes_op_ldc_string(tyran_opcodes* codes, tyran_reg_index a, tyran_string* str);
-void tyran_opcodes_op_ldc_number(tyran_opcodes* codes, tyran_reg_index a, tyran_number v);
-void tyran_opcodes_op_ldc_boolean(tyran_opcodes* codes, tyran_reg_index a, int boolean);
-void tyran_opcodes_op_ldc_null(tyran_opcodes* codes, tyran_reg_index a);
+void tyran_opcodes_op_ldc(tyran_opcodes* codes, tyran_reg_index a, tyran_constant_index c);
 void tyran_opcodes_op_ldb(tyran_opcodes* codes, tyran_reg_index a, int boolean);
 void tyran_opcodes_op_ldn(tyran_opcodes* codes, tyran_reg_index, int count);
 
