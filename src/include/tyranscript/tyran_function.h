@@ -5,6 +5,7 @@ struct tyran_runtime;
 struct tyran_value;
 struct tyran_opcodes;
 struct tyran_string_array;
+struct tyran_constants;
 
 typedef int (*tyran_function_callback)(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call);
 
@@ -21,10 +22,10 @@ typedef struct tyran_function {
 		tyran_function_callback callback;
 	} data;
 
-	struct tyran_value* constants;
+	const struct tyran_constants* constants;
 } tyran_function;
 
-tyran_function* tyran_function_new(const struct tyran_opcodes* opcodes);
+tyran_function* tyran_function_new(const struct tyran_opcodes* opcodes, const struct tyran_constants* constants);
 tyran_function* tyran_function_callback_new(tyran_function_callback callback);
 
 #endif

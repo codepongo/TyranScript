@@ -59,6 +59,15 @@ void print_r_rc_rc(tyran_opcode code, char* buf, int size)
 	tyran_snprintf(buf, size, "@%d @%d @%d", a, x, y);
 }
 
+void print_r_r_rc(tyran_opcode code, char* buf, int size)
+{
+	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
+	tyran_reg_index r = TYRAN_OPCODE_ARG_X(code);
+	tyran_reg_or_constant_index y = TYRAN_OPCODE_ARG_Y(code);
+
+	tyran_snprintf(buf, size, "@%d @%d @%d", a, r, y);
+}
+
 void print_r_rc(tyran_opcode code, char* buf, int size)
 {
 	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
@@ -124,6 +133,15 @@ void print_r_s(tyran_opcode code, char* buf, int size)
 	tyran_snprintf(buf, size, "@%d %d", a, s);
 }
 
+void print_r_s_s(tyran_opcode code, char* buf, int size)
+{
+	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
+	int s = TYRAN_OPCODE_ARG_X(code);
+	int s2 = TYRAN_OPCODE_ARG_Y(code);
+
+	tyran_snprintf(buf, size, "@%d %d %d", a, s, s2);
+}
+
 void tyran_print_arguments(tyran_opcode code, int ip, char* buf, int size)
 {
 	int instruction = TYRAN_OPCODE_INSTRUCTION(code);
@@ -165,10 +183,16 @@ void tyran_print_arguments(tyran_opcode code, int ip, char* buf, int size)
 			print_br(code, ip, buf, size);
 			break;
 		case TYRAN_OPCODE_RET:
+			buf[0] = 0;
+			break;
 		case TYRAN_OPCODE_CALL:
+			print_r_s_s(code, buf, size);
+			break;
 		case TYRAN_OPCODE_NEW:
 		case TYRAN_OPCODE_SET:
 		case TYRAN_OPCODE_GET:
+			print_r_r_rc(code, buf, size);
+			break;
 		case TYRAN_OPCODE_DEBUG:
 			buf[0] = 0;
 			break;

@@ -149,9 +149,9 @@ void tyran_opcodes_op_ret(tyran_opcodes* codes)
 	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_RET, 0, 0, 0);
 }
 
-void tyran_opcdoes_op_call(tyran_opcodes* codes)
+void tyran_opcodes_op_call(tyran_opcodes* codes, tyran_reg_index a, int s, int s2)
 {
-
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_CALL, a, s, s2);
 }
 
 /* Object */
@@ -165,7 +165,7 @@ void tyran_opcodes_op_set(tyran_opcodes* codes)
 
 }
 
-void tyran_opcodes_op_get(tyran_opcodes* codes)
+void tyran_opcodes_op_get(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index r, tyran_reg_or_constant_index y)
 {
-
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_GET, a, r, y);
 }

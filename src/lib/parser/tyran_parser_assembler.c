@@ -7,6 +7,10 @@
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_opcodes.h>
 #include <tyranscript/tyran_constants.h>
+#include <tyranscript/tyran_function.h>
+
+#include <tyranscript/debug/tyran_print_opcodes.h>
+#include <tyranscript/debug/tyran_print_constants.h>
 
 void tyran_parse_assembler(tyran_lexer* lexer, char c)
 {
@@ -44,6 +48,7 @@ enum {
 	TYRAN_TOKEN_ASSEMBLER_SET,
 	TYRAN_TOKEN_ASSEMBLER_GET,
 	TYRAN_TOKEN_ASSEMBLER_NEW,
+	TYRAN_TOKEN_ASSEMBLER_FUNC,
 	TYRAN_TOKEN_ASSEMBLER_COLON,
 } tyran_assembler_token;
 
@@ -79,6 +84,7 @@ static int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffe
 		{ "set", TYRAN_TOKEN_ASSEMBLER_SET },
 		{ "get", TYRAN_TOKEN_ASSEMBLER_GET },
 		{ "new", TYRAN_TOKEN_ASSEMBLER_NEW },
+		{ "func", TYRAN_TOKEN_ASSEMBLER_FUNC }
 	};
 
 	size_t i;
@@ -139,6 +145,11 @@ static int tyran_lexer_assembler_next_token(tyran_lexer_token_data token, tyran_
 	if (c==':') {
 		return TYRAN_TOKEN_COLON;
 	}
+
+	if (c=='.') {
+		return TYRAN_TOKEN_MEMBER;
+	}
+
 	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
 		return tyran_lexer_assembler_parse_identifier_or_keyword(lexer, c, temp_string_buffer, &string_buffer.len, lexer_position_info, token);
 	} else if (tyran_lexer_is_digit(c) || c == '-') {
@@ -180,11 +191,6 @@ void add_label_reference(tyran_parser_state* state, tyran_string* name)
 }
 
 
-tyran_reg_or_constant_index add_constant_number(tyran_parser_state* state, tyran_number v)
-{
-	return 1;
-}
-
 void parse_r_index(tyran_parser_state* state, tyran_reg_index* a)
 {
 	tyran_number* number;
@@ -211,20 +217,45 @@ void parse_s(tyran_parser_state* state, int* s)
 	}
 }
 
+tyran_reg_or_constant_index parse_constant(tyran_parser_state* parser_state, tyran_lexer_position_info* lexer_position, int allow_register)
+{
+	tyran_lexer_token_data data;
+
+	int token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
+	switch (token) {
+		case TYRAN_TOKEN_NUMBER:
+			return tyran_constants_add_number(parser_state->constants, *(tyran_number*)data);
+			break;
+		case TYRAN_TOKEN_STRING:
+			return tyran_constants_add_string(parser_state->constants, (tyran_string*)data);
+			break;
+		case TYRAN_TOKEN_TRUE:
+		case TYRAN_TOKEN_FALSE:
+			return tyran_constants_add_boolean(parser_state->constants, *(tyran_boolean*)data);
+			break;
+		case TYRAN_TOKEN_REGISTER:
+			if (!allow_register) {
+				error();
+				return -1;
+			}
+			tyran_reg_index a;
+			parse_r_index(parser_state, &a);
+			return a;
+			break;
+		default:
+			error();
+			return -1;
+	}
+
+}
+
+
 void parse_rc(tyran_parser_state* state, tyran_reg_or_constant_index* a)
 {
 	tyran_number* number;
 	tyran_lexer_position_info position;
 
-	int token = tyran_lexer_assembler_next_token(&number, &position, state->lexer);
-	switch (token) {
-		case TYRAN_TOKEN_NUMBER:
-			*a = add_constant_number(state, *number);
-			break;
-		case TYRAN_TOKEN_REGISTER:
-			parse_r_index(state, (tyran_reg_index*)a);
-			break;
-	}
+	*a = parse_constant(state, &position, 1);
 }
 
 void parse_r(tyran_parser_state* state, tyran_reg_index* a)
@@ -277,6 +308,12 @@ void parse_r_rc_rc(tyran_parser_state* state, tyran_reg_index* a, tyran_reg_or_c
 	parse_rc(state, y);
 }
 
+void parse_r_r_rc(tyran_parser_state* state, tyran_reg_index* a, tyran_reg_index* x, tyran_reg_or_constant_index* y)
+{
+	parse_r(state, a);
+	parse_r(state, x);
+	parse_rc(state, y);
+}
 
 void parse_r_b(tyran_parser_state* state, tyran_reg_index* a, tyran_boolean* b)
 {
@@ -308,6 +345,14 @@ void parse_r_s(tyran_parser_state* state, tyran_reg_index* a, int* s)
 {
 	parse_r(state, a);
 	parse_s(state, s);
+}
+
+void parse_r_s_s(tyran_parser_state* state, tyran_reg_index* a, int* s, int* s2)
+{
+	parse_r(state, a);
+	parse_s(state, s);
+	parse_s(state, s2);
+	TYRAN_LOG("s:%d s2:%d", *s, *s2);
 }
 
 void change_opcode_branch(tyran_opcode* code, int position)
@@ -344,24 +389,62 @@ void fixup_label_references(tyran_parser_state* state)
 }
 
 
+void tyran_lexer_assembler_end_of_function(tyran_parser_state* parser_state)
+{
+	TYRAN_LOG("*** End of function!");
+
+	fixup_label_references(parser_state);
+	tyran_print_constants(parser_state->constants);
+	tyran_print_opcodes(parser_state->opcodes, 0);
+
+
+	tyran_function* func = tyran_function_new(parser_state->opcodes, parser_state->constants);
+	tyran_parser_state_reset(parser_state);
+
+}
+
 int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
 {
 	tyran_lexer_token_data data;
 	int token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
 	if (token == 0) {
 		TYRAN_LOG("END OF FILE!");
+		if (parser_state->inside_function) {
+			tyran_lexer_assembler_end_of_function(parser_state);
+		}
 		return 0;
 	}
 
 
 	tyran_reg_index a;
+	tyran_reg_index r;
 	int b;
 	int s;
+	int s2;
 	tyran_reg_or_constant_index x, y;
 	tyran_opcodes* opcodes = parser_state->opcodes;
 	tyran_constant_index c;
 
 	switch (token) {
+		case TYRAN_TOKEN_MEMBER:
+			token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
+			if (token == TYRAN_TOKEN_ASSEMBLER_FUNC) {
+				if (parser_state->inside_function) {
+					tyran_lexer_assembler_end_of_function(parser_state);
+				}
+				token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
+				if (token != TYRAN_TOKEN_IDENTIFIER) {
+					error();
+					return -1;
+				}
+				{
+					char buf[512];
+					tyran_string_to_c_str(buf, 512, (tyran_string*)data);
+					TYRAN_LOG("function '%s'", buf);
+				}
+				parser_state->inside_function = 1;
+			}
+			break;
 		case TYRAN_TOKEN_IDENTIFIER:
 			token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
 			if (token == TYRAN_TOKEN_COLON) {
@@ -377,22 +460,7 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_LDC:
 			parse_r(parser_state, &a);
-			token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
-			switch (token) {
-				case TYRAN_TOKEN_NUMBER:
-					c = tyran_constants_add_number(parser_state->constants, *(tyran_number*)data);
-					break;
-				case TYRAN_TOKEN_STRING:
-					c = tyran_constants_add_string(parser_state->constants, (tyran_string*)data);
-					break;
-				case TYRAN_TOKEN_TRUE:
-				case TYRAN_TOKEN_FALSE:
-					c = tyran_constants_add_boolean(parser_state->constants, *(tyran_boolean*)data);
-					break;
-				default:
-					error();
-					return -1;
-			}
+			int c = parse_constant(parser_state, lexer_position, 0);
 			tyran_opcodes_op_ldc(opcodes, a, c);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_LDB:
@@ -462,6 +530,14 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 		case TYRAN_TOKEN_ASSEMBLER_RET:
 			tyran_opcodes_op_ret(opcodes);
 			break;
+		case TYRAN_TOKEN_ASSEMBLER_GET:
+			parse_r_r_rc(parser_state, &a, &r, &y);
+			tyran_opcodes_op_get(opcodes, a, r, y);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_CALL:
+			parse_r_s_s(parser_state, &r, &s, &s2);
+			tyran_opcodes_op_call(opcodes, r, s, s2);
+			break;
 	}
 
 	return token;
@@ -473,8 +549,6 @@ int tyran_lexer_assembler_parse(tyran_lexer_position_info* lexer_position, tyran
 	do {
 		token = tyran_lexer_assembler_parse_one(lexer_position, parser_state);
 	} while (token != 0);
-	
-	fixup_label_references(parser_state);
 	
 	return 0;
 }

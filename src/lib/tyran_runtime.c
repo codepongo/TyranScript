@@ -46,7 +46,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	tyran_value* registers = TYRAN_MALLOC_TYPE(tyran_value, 128);
 
 	tyran_value* r = registers;
-	tyran_value* c = stack->constants->values;
+	const tyran_value* c = stack->constants->values;
 
 	tyran_context* sp;
 
@@ -182,7 +182,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				const tyran_function* function = r[a].data.object->data.function->static_function;
 				r = &r[a];
 				pc = function->data.opcodes->codes;
-				c = function->constants;
+				c = function->constants->values;
 			}
 			break;
 		case TYRAN_OPCODE_NEW:

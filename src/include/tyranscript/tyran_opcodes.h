@@ -48,12 +48,12 @@ void tyran_opcodes_op_jmp(tyran_opcodes* codes, int pc);
 
 /* Call stack */
 void tyran_opcodes_op_ret(tyran_opcodes* codes);
-void tyran_opcdoes_op_call(tyran_opcodes* codes);
+void tyran_opcodes_op_call(tyran_opcodes* codes, tyran_reg_index, int s, int s2);
 
 /* Object */
 void tyran_opcodes_op_new(tyran_opcodes* codes);
 void tyran_opcodes_op_set(tyran_opcodes* codes);
-void tyran_opcodes_op_get(tyran_opcodes* codes);
+void tyran_opcodes_op_get(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index r, tyran_reg_or_constant_index y);
 
 
 #endif
