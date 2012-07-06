@@ -114,6 +114,7 @@ typedef struct tyran_value {
 }
 
 #define tyran_value_is_same_type(a, b) ((a)->type == (b)->type)
+#define tyran_value_is_same(a, b) (tyran_value_is_same_type(a, b) && (((a)->type == TYRAN_VALUE_TYPE_STRING && tyran_string_strcmp((a)->data.str, (b)->data.str) == 0) || ((a)->data.data == (b)->data.data) )) 
 #define tyran_value_is_undefined(pv) ((pv)->type == TYRAN_VALUE_TYPE_UNDEFINED)
 #define tyran_value_is_null(pv) ((pv)->type == TYRAN_VALUE_TYPE_NULL)
 #define tyran_value_is_integer(n) (tyran_number_is_normal(n) && (double)((int)(n)) == (n))

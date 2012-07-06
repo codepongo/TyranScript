@@ -1,5 +1,5 @@
 #include <tyranscript/tyran_constants.h>
-
+#include <tyranscript/tyran_value.h>
 tyran_constants* tyran_constants_new(int size)
 {
 	tyran_constants* constants = TYRAN_CALLOC(tyran_constants);
@@ -13,23 +13,37 @@ void tyran_constants_free(tyran_constants* constants)
 	tyran_free(constants);
 }
 
+tyran_constant_index tyran_constants_reserve_index(struct tyran_constants* constants, tyran_value* v)
+{
+	for (int i=0; i<constants->size; ++i)
+	{
+		if (tyran_value_is_same(&constants->values[i], v)) {
+			return i | TYRAN_OPCODE_CONSTANT_BIT;
+		}
+	}
+
+	tyran_constant_index new_index = constants->size++;
+	tyran_value_copy(constants->values[new_index], *v);
+	return new_index | TYRAN_OPCODE_CONSTANT_BIT;
+}
+
 tyran_constant_index tyran_constants_add_number(tyran_constants* constants, tyran_number v)
 {
-	tyran_value_set_number(constants->values[constants->size], v);
-	tyran_constant_index new_index = constants->size++;
-	return new_index;
+	tyran_value value;
+	tyran_value_set_number(value, v);
+	return tyran_constants_reserve_index(constants, &value);
 }
 
 tyran_constant_index tyran_constants_add_string(tyran_constants* constants, tyran_string* v)
 {
-	tyran_value_set_string(constants->values[constants->size], v);
-	tyran_constant_index new_index = constants->size++;
-	return new_index;
+	tyran_value value;
+	tyran_value_set_string(value, v);
+	return tyran_constants_reserve_index(constants, &value);
 }
 
 tyran_constant_index tyran_constants_add_boolean(tyran_constants* constants, tyran_boolean v)
 {
-	tyran_value_set_boolean(constants->values[constants->size], v);
-	tyran_constant_index new_index = constants->size++;
-	return new_index;
+	tyran_value value;
+	tyran_value_set_boolean(value, v);
+	return tyran_constants_reserve_index(constants, &value);
 }

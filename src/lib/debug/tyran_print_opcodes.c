@@ -3,6 +3,7 @@
 #include <tyranscript/tyran_opcode.h>
 #include <tyranscript/tyran_config.h>
 #include <tyranscript/tyran_function.h>
+#include <tyranscript/tyran_constants.h>
 #include <tyranscript/debug/tyran_print_opcodes.h>
 
 const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
@@ -50,99 +51,116 @@ const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
 	((code >> 6) & 0xffff) - 0x8000;
 
 
-void print_r_rc_rc(tyran_opcode code, char* buf, int size)
+void print_s(int v, char* buf, int size)
 {
-	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
-	tyran_reg_or_constant_index x = TYRAN_OPCODE_ARG_X(code);
-	tyran_reg_or_constant_index y = TYRAN_OPCODE_ARG_Y(code);
+	const int tmp_size = 512;
+	char tmp[tmp_size];
 
-	tyran_snprintf(buf, size, "@%d @%d @%d", a, x, y);
+	tyran_snprintf(tmp, tmp_size, " %d", v);
+	tyran_strncat(buf, tmp, size);
 }
 
-void print_r_r_rc(tyran_opcode code, char* buf, int size)
+void print_b(tyran_boolean b, char* buf, int size)
 {
-	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
-	tyran_reg_index r = TYRAN_OPCODE_ARG_X(code);
-	tyran_reg_or_constant_index y = TYRAN_OPCODE_ARG_Y(code);
-
-	tyran_snprintf(buf, size, "@%d @%d @%d", a, r, y);
+	strncat(buf, b ? " true" : " false", size);
 }
 
-void print_r_rc(tyran_opcode code, char* buf, int size)
+void print_r(tyran_reg_index index, char* buf, int size)
 {
-	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
-	tyran_reg_or_constant_index x = TYRAN_OPCODE_ARG_X(code);
+	const int tmp_size = 512;
+	char tmp[tmp_size];
 
-	tyran_snprintf(buf, size, "@%d @%d", a, x);
+	tyran_snprintf(tmp, tmp_size, " @%d", index);
+	tyran_strncat(buf, tmp, size);
 }
 
-void print_r_c(tyran_opcode code, char* buf, int size)
+void print_rc(tyran_reg_or_constant_index index, const tyran_constants* constants, char* buf, int size)
 {
-	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
-	tyran_constant_index x = TYRAN_OPCODE_ARG_X(code);
+	if (index & TYRAN_OPCODE_CONSTANT_BIT) {
+		const int tmp_size = 512;
+		char tmp[tmp_size];
+		char value_buf[tmp_size];
+		int constant_index = index & TYRAN_OPCODE_REGISTER_MASK;
+		tyran_value_to_c_string(&constants->values[constant_index], value_buf, tmp_size, 1);
+		tyran_snprintf(tmp, tmp_size, " %s (#%d)", value_buf, constant_index);
+		tyran_strncat(buf, tmp, size);
+	} else {
+		print_r(index, buf, size);
+	}
+}
 
-	tyran_snprintf(buf, size, "@%d #%d", a, x);
+void print_r_rc_rc(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
+{
+	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
+	print_rc(TYRAN_OPCODE_ARG_X(code), constants, buf, size);
+	print_rc(TYRAN_OPCODE_ARG_Y(code), constants, buf, size);
+}
+
+void print_r_r_rc(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
+{
+	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
+	print_r(TYRAN_OPCODE_ARG_X(code), buf, size);
+	print_rc(TYRAN_OPCODE_ARG_Y(code), constants, buf, size);
+}
+
+void print_r_rc(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
+{
+	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
+	print_rc(TYRAN_OPCODE_ARG_X(code), constants, buf, size);
+}
+
+void print_r_c(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
+{
+	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
+	print_rc(TYRAN_OPCODE_ARG_X(code), constants, buf, size);
 }
 
 void print_r_b(tyran_opcode code, char* buf, int size)
 {
-	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
-	tyran_boolean b = TYRAN_OPCODE_ARG_X(code);
-
-	tyran_snprintf(buf, size, "@%d %s", a, b ? "true" : "false");
+	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
+	print_b(TYRAN_OPCODE_ARG_X(code), buf, size);
 }
 
-void print_rc_b(tyran_opcode code, char* buf, int size)
+void print_rc_b(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
 {
-	tyran_reg_or_constant_index a = TYRAN_OPCODE_ARG_X(code);
-	tyran_boolean b = TYRAN_OPCODE_ARG_A(code);
-
-	tyran_snprintf(buf, size, "@%d %s", a, b ? "true" : "false");
+	print_rc(TYRAN_OPCODE_ARG_X(code), constants, buf, size);
+	print_b(TYRAN_OPCODE_ARG_A(code), buf, size);
 }
 
-void print_r_rc_b(tyran_opcode code, char* buf, int size)
+void print_r_rc_b(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
 {
-	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
-	tyran_reg_or_constant_index y = TYRAN_OPCODE_ARG_Y(code);
-	tyran_boolean b = TYRAN_OPCODE_ARG_Y(code);
-
-	tyran_snprintf(buf, size, "@%d = @%d %s", a, y, b ? "true" : "false");
+	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
+	print_rc(TYRAN_OPCODE_ARG_Y(code), constants, buf, size);
+	print_b(TYRAN_OPCODE_ARG_Y(code), buf, size);
 }
 
-void print_b_rc_rc(tyran_opcode code, char* buf, int size)
+void print_b_rc_rc(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
 {
-	tyran_boolean b = TYRAN_OPCODE_ARG_A(code);
-	tyran_reg_or_constant_index x = TYRAN_OPCODE_ARG_X(code);
-	tyran_reg_or_constant_index y = TYRAN_OPCODE_ARG_Y(code);
-
-	tyran_snprintf(buf, size, "@%d @%d %s", x, y, b ? "true" : "false");
+	print_b(TYRAN_OPCODE_ARG_A(code), buf, size);
+	print_rc(TYRAN_OPCODE_ARG_X(code), constants, buf, size);
+	print_rc(TYRAN_OPCODE_ARG_Y(code), constants, buf, size);
 }
 
 void print_br(tyran_opcode code, int pc, char* buf, int size)
 {
 	int br = TYRAN_OPCODE_ARG_BR(code);
-	tyran_snprintf(buf, size, "%d (%d)", (pc + br + 1), br);
+	tyran_snprintf(buf, size, " %d (%d)", (pc + br + 1), br);
 }
-
 
 void print_r_s(tyran_opcode code, char* buf, int size)
 {
-	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
-	int s = TYRAN_OPCODE_ARG_X(code);
-
-	tyran_snprintf(buf, size, "@%d %d", a, s);
+	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
+	print_s(TYRAN_OPCODE_ARG_X(code), buf, size);
 }
 
 void print_r_s_s(tyran_opcode code, char* buf, int size)
 {
-	tyran_reg_index a = TYRAN_OPCODE_ARG_A(code);
-	int s = TYRAN_OPCODE_ARG_X(code);
-	int s2 = TYRAN_OPCODE_ARG_Y(code);
-
-	tyran_snprintf(buf, size, "@%d %d %d", a, s, s2);
+	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
+	print_s(TYRAN_OPCODE_ARG_X(code), buf, size);
+	print_s(TYRAN_OPCODE_ARG_Y(code), buf, size);
 }
 
-void tyran_print_arguments(tyran_opcode code, int ip, char* buf, int size)
+void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* constants, char* buf, int size)
 {
 	int instruction = TYRAN_OPCODE_INSTRUCTION(code);
 	switch (instruction)
@@ -153,14 +171,14 @@ void tyran_print_arguments(tyran_opcode code, int ip, char* buf, int size)
 		case TYRAN_OPCODE_MUL:
 		case TYRAN_OPCODE_POW:
 		case TYRAN_OPCODE_SUB:
-			print_r_rc_rc(code, buf, size);
+			print_r_rc_rc(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_NEG:
 		case TYRAN_OPCODE_NOT:
-			print_r_rc(code, buf, size);
+			print_r_rc(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_LDC:
-			print_r_c(code, buf, size);
+			print_r_c(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_LDB:
 			print_r_b(code, buf, size);
@@ -171,19 +189,18 @@ void tyran_print_arguments(tyran_opcode code, int ip, char* buf, int size)
 		case TYRAN_OPCODE_JEQ:
 		case TYRAN_OPCODE_JLT:
 		case TYRAN_OPCODE_JLE:
-			print_b_rc_rc(code, buf, size);
+			print_b_rc_rc(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_JB:
-			print_rc_b(code, buf, size);
+			print_rc_b(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_JBLD:
-			print_r_rc_b(code, buf, size);
+			print_r_rc_b(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_JMP:
 			print_br(code, ip, buf, size);
 			break;
 		case TYRAN_OPCODE_RET:
-			buf[0] = 0;
 			break;
 		case TYRAN_OPCODE_CALL:
 			print_r_s_s(code, buf, size);
@@ -191,26 +208,26 @@ void tyran_print_arguments(tyran_opcode code, int ip, char* buf, int size)
 		case TYRAN_OPCODE_NEW:
 		case TYRAN_OPCODE_SET:
 		case TYRAN_OPCODE_GET:
-			print_r_r_rc(code, buf, size);
+			print_r_r_rc(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_DEBUG:
-			buf[0] = 0;
 			break;
 	}
 }
 
-void tyran_print_opcode(const tyran_opcode* opcode, int ip, int highlight)
+void tyran_print_opcode(const tyran_opcode* opcode, const tyran_constants* constants, int ip, int highlight)
 {
 	tyran_opcode code = *opcode;
 	int instruction = TYRAN_OPCODE_INSTRUCTION(code);
 
 	char args[512];
-	tyran_print_arguments(code, ip, args, 512);
+	args[0] = 0;
+	tyran_print_arguments(code, ip, constants, args, 512);
 	
-	TYRAN_LOG("%d %s %s", ip, tyran_opcode_names[instruction], args);
+	TYRAN_LOG("%d %s%s", ip, tyran_opcode_names[instruction], args);
 }
 
-void tyran_print_opcodes(const struct tyran_opcodes* ops, const tyran_opcode* ip)
+void tyran_print_opcodes(const struct tyran_opcodes* ops, const tyran_opcode* ip, const tyran_constants* constants)
 {
 	int i = 0;
 	const tyran_opcode* tyran_opcodes = ops->codes;
@@ -219,6 +236,6 @@ void tyran_print_opcodes(const struct tyran_opcodes* ops, const tyran_opcode* ip
 	TYRAN_LOG("opcode octets:%d", octet_length);
 
 	for (i = 0; i < octet_length; ++i) {
-		tyran_print_opcode(&tyran_opcodes[i], i, ip == &tyran_opcodes[i]);
+		tyran_print_opcode(&tyran_opcodes[i], constants, i, ip == &tyran_opcodes[i]);
 	}
 }

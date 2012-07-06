@@ -58,7 +58,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	{
 		long pc_value = pc - stack->pc;
 		TYRAN_LOG("r1:%f r2:%f r3:%f r4:%f", r[1].data.number, r[2].data.number, r[3].data.number, r[4].data.number);
-		tyran_print_opcode(pc, pc_value, 1);
+		tyran_print_opcode(pc, stack->constants, pc_value, 1);
 		TYRAN_LOG(" ");
 		if (pc_value > 10) {
 			return;

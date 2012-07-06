@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
 
 	tyran_parser_state* state = parse_file(argv[1]);
 	if (state->opcodes) {
-		tyran_print_opcodes(state->opcodes, 0);
+		tyran_print_opcodes(state->opcodes, 0, state->constants);
 		execute(state->opcodes, state->constants, argc >= 3 ? argv[2] : "0");
 	}
 	tyran_parser_state_free(state);
