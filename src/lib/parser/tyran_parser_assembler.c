@@ -8,6 +8,8 @@
 #include <tyranscript/tyran_opcodes.h>
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/tyran_function.h>
+#include <tyranscript/tyran_function_object.h>
+#include <tyranscript/tyran_value_object.h>
 
 #include <tyranscript/debug/tyran_print_opcodes.h>
 #include <tyranscript/debug/tyran_print_constants.h>
@@ -91,7 +93,6 @@ static int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffe
 
 	for (i = 0; i < sizeof(keywords) / sizeof(tyran_lexer_keyword); ++i) {
 		if (tyran_strcmp(temp_string_buffer, keywords[i].name) == 0) {
-			TYRAN_LOG("Found match:%d (%s) (%s)", keywords[i].token_value, temp_string_buffer, keywords[i].name);
 			return keywords[i].token_value;
 		}
 	}
@@ -352,7 +353,6 @@ void parse_r_s_s(tyran_parser_state* state, tyran_reg_index* a, int* s, int* s2)
 	parse_r(state, a);
 	parse_s(state, s);
 	parse_s(state, s2);
-	TYRAN_LOG("s:%d s2:%d", *s, *s2);
 }
 
 void change_opcode_branch(tyran_opcode* code, int position)
@@ -401,6 +401,14 @@ void tyran_lexer_assembler_end_of_function(tyran_parser_state* parser_state)
 	tyran_function* func = tyran_function_new(parser_state->opcodes, parser_state->constants);
 	tyran_parser_state_reset(parser_state);
 
+	tyran_function_object* func_obj = tyran_function_object_new(func);
+	tyran_value* func_value_obj = tyran_value_new();
+
+	tyran_object* obj = tyran_object_new(parser_state->runtime);
+	tyran_object_set_function(obj, func_obj);
+
+	tyran_value_set_object(*func_value_obj, obj);
+	tyran_value_object_insert_c_string_key(&parser_state->context, parser_state->function_name, func_value_obj);
 }
 
 int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
@@ -438,9 +446,8 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 					return -1;
 				}
 				{
-					char buf[512];
-					tyran_string_to_c_str(buf, 512, (tyran_string*)data);
-					TYRAN_LOG("function '%s'", buf);
+					tyran_string_to_c_str(parser_state->function_name, 512, (tyran_string*)data);
+					TYRAN_LOG("function '%s'", parser_state->function_name);
 				}
 				parser_state->inside_function = 1;
 			}
@@ -527,8 +534,16 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 			parse_identifier(parser_state);
 			tyran_opcodes_op_jmp(opcodes, 0);
 			break;
+		case TYRAN_TOKEN_ASSEMBLER_NEW:
+			parse_r(parser_state, &a);
+			tyran_opcodes_op_new(opcodes, a);
+			break;
 		case TYRAN_TOKEN_ASSEMBLER_RET:
 			tyran_opcodes_op_ret(opcodes);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_SET:
+			parse_r_rc_rc(parser_state, &a, &x, &y);
+			tyran_opcodes_op_set(opcodes, a, x, y);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_GET:
 			parse_r_r_rc(parser_state, &a, &r, &y);

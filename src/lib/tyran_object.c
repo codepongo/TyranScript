@@ -13,7 +13,7 @@ static TYRAN_UNICODE_STRING(9) PROTOTYPE = { 9, { 'p','r','o','t','o','t','y','p
 
 typedef struct tyran_rb_tree_key_value_node {
 	const tyran_object_key* key;
-	struct tyran_value* value;
+	struct tyran_value value;
 } tyran_rb_tree_key_value_node;
 
 
@@ -86,7 +86,7 @@ void tyran_object_insert_key(tyran_object* object, const tyran_object_key* key, 
 {
 	tyran_rb_tree_key_value_node* node = TYRAN_MALLOC_TYPE(tyran_rb_tree_key_value_node, 1);
 	node->key = key;
-	node->value = value;
+	tyran_value_copy(node->value, *value);
 	rb_tree_insert(object->tree, node);
 }
 
@@ -122,7 +122,7 @@ tyran_value* tyran_object_lookup(const tyran_object* object, const tyran_object_
 		return 0;
 	}
 	*flag = TYRAN_OBJECT_KEY_FLAG(node->key);
-	return node->value;
+	return &node->value;
 }
 
 void tyran_object_delete(tyran_object* object, const tyran_object_key* key)

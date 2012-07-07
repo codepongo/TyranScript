@@ -9,12 +9,15 @@ struct tyran_opcodes;
 struct tyran_scope_stack;
 
 typedef struct tyran_runtime_stack {
-	const struct tyran_opcodes* opcodes;
-	// struct tyran_scope_stack* scope;
-	tyran_value function_scope;
-	tyran_value _this;
+	const tyran_opcodes* opcodes;
 	const tyran_opcode* pc;
+
 	const tyran_constants* constants;
+	const tyran_value* c;
+
+	tyran_value* r;
+
+	tyran_value _this;
 } tyran_runtime_stack;
 
 tyran_runtime_stack* tyran_runtime_stack_new();

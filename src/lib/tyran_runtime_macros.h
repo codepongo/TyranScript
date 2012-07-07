@@ -78,9 +78,5 @@
 		TYRAN_DEC_REF(memory_pool, v[i].data.object); \
 	}
 
-#define TYRAN_CONTEXT_PUSH
-
-#define TYRAN_CONTEXT_POP
-
 #define TYRAN_CALC_HASH(a) 
 
