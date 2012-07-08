@@ -75,7 +75,7 @@ void execute_function(tyran_runtime* runtime, tyran_value* _this, const char* fu
 	TYRAN_ASSERT(tyran_value_is_function(value), "Must be function!");
 	
 	const tyran_function* func = value->data.object->data.function->static_function;
-	tyran_print_opcodes(func->data.opcodes, 0, func->constants);
+	// tyran_print_opcodes(func->data.opcodes, 0, func->constants);
 	execute(runtime, func->data.opcodes, func->constants, _this);
 }
 

@@ -51,7 +51,7 @@ void tyran_opcodes_op_jle(tyran_opcodes* codes, tyran_reg_or_constant_index x, t
 void tyran_opcodes_op_jmp(tyran_opcodes* codes, int pc);
 
 /* Call stack */
-void tyran_opcodes_op_ret(tyran_opcodes* codes);
+void tyran_opcodes_op_ret(tyran_opcodes* codes, tyran_reg_index, int s);
 void tyran_opcodes_op_call(tyran_opcodes* codes, tyran_reg_index, int s, int s2);
 
 /* Object */

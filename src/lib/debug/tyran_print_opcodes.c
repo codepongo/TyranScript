@@ -204,6 +204,7 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 			print_br(code, ip, buf, size);
 			break;
 		case TYRAN_OPCODE_RET:
+			print_r_s(code, buf, size);
 			break;
 		case TYRAN_OPCODE_CALL:
 			print_r_s_s(code, buf, size);

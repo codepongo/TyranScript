@@ -11,6 +11,14 @@
 #include "tyranscript/tyran_value_object.h"
 #include <tyranscript/debug/tyran_print_opcodes.h>
 
+void tyran_register_copy(tyran_value* target, tyran_value* source, int count)
+{
+	for (int i=0; i<count; ++i)
+	{
+		tyran_value_copy(target[i], source[i]);
+	}
+}
+
 void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_value, const struct tyran_runtime_callbacks* event_callbacks)
 {
 	TYRAN_LOG(" ");
@@ -181,9 +189,12 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			pc += br;
 			break;
 		case TYRAN_OPCODE_RET:
+			TYRAN_REGISTER_A_X;
 			if (sp == base_sp) {
 				return;
 			}
+			tyran_value* from = &r[a];
+			tyran_register_copy(sp->return_register, from, x);
 			TYRAN_STACK_POP;
 			break;
 		case TYRAN_OPCODE_CALL:
@@ -196,7 +207,9 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				pc = sp->opcodes->codes;
 				sp->constants = function->constants;
 				c = sp->constants->values;
-				r = &r[a] + 1;
+				tyran_value* target_register = &r[a];
+				r = target_register + 1;
+				sp->return_register = target_register;
 			}
 			break;
 		case TYRAN_OPCODE_NEW:

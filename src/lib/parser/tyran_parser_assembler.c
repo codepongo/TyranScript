@@ -539,7 +539,8 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 			tyran_opcodes_op_new(opcodes, a);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_RET:
-			tyran_opcodes_op_ret(opcodes);
+			parse_r_s(parser_state, &a, &s);
+			tyran_opcodes_op_ret(opcodes, a, s);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_SET:
 			parse_r_rc_rc(parser_state, &a, &x, &y);

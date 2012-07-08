@@ -144,9 +144,9 @@ void tyran_opcodes_op_jmp(tyran_opcodes* codes, int pc)
 }
 
 /* Call stack */
-void tyran_opcodes_op_ret(tyran_opcodes* codes)
+void tyran_opcodes_op_ret(tyran_opcodes* codes, tyran_reg_index a, int s)
 {
-	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_RET, 0, 0, 0);
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_RET, a, s, 0);
 }
 
 void tyran_opcodes_op_call(tyran_opcodes* codes, tyran_reg_index a, int s, int s2)

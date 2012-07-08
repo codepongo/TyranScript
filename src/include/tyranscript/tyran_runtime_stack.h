@@ -17,6 +17,8 @@ typedef struct tyran_runtime_stack {
 
 	tyran_value* r;
 
+	tyran_value* return_register;
+
 	tyran_value _this;
 } tyran_runtime_stack;
 
