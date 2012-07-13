@@ -20,7 +20,7 @@ void tyran_parse_assembler(tyran_lexer* lexer, char c)
 	tyran_string* temp_string_buffer = string_buffer.string;
 
 	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
-		int length = tyran_lexer_parse_identifier(lexer, c, temp_string_buffer);
+		tyran_lexer_parse_identifier(lexer, c, temp_string_buffer);
 	}
 }
 
@@ -253,7 +253,6 @@ tyran_reg_or_constant_index parse_constant(tyran_parser_state* parser_state, tyr
 
 void parse_rc(tyran_parser_state* state, tyran_reg_or_constant_index* a)
 {
-	tyran_number* number;
 	tyran_lexer_position_info position;
 
 	*a = parse_constant(state, &position, 1);
@@ -261,7 +260,6 @@ void parse_rc(tyran_parser_state* state, tyran_reg_or_constant_index* a)
 
 void parse_r(tyran_parser_state* state, tyran_reg_index* a)
 {
-	tyran_number* number;
 	tyran_lexer_position_info position;
 
 	int token = tyran_lexer_assembler_next_token((tyran_lexer_token_data*)0, &position, state->lexer);
@@ -285,7 +283,6 @@ void parse_identifier(tyran_parser_state* state)
 
 void parse_b(tyran_parser_state* state, tyran_boolean* b)
 {
-	tyran_number* number;
 	tyran_lexer_position_info position;
 
 	int token = tyran_lexer_assembler_next_token((tyran_lexer_token_data*)0, &position, state->lexer);
@@ -363,7 +360,8 @@ void change_opcode_branch(tyran_opcode* code, int position)
 
 tyran_label* get_label(tyran_label* labels, int count, const tyran_string* name)
 {
-	for (int i=0; i<count; ++i)
+	int i;
+	for (i=0; i<count; ++i)
 	{
 		if (tyran_string_strcmp(labels[i].name, name) == 0) {
 			return &labels[i];
@@ -375,7 +373,8 @@ tyran_label* get_label(tyran_label* labels, int count, const tyran_string* name)
 
 void fixup_label_references(tyran_parser_state* state)
 {
-	for (int i=0; i<state->label_reference_count;++i)
+	int i;
+	for (i=0; i<state->label_reference_count;++i)
 	{
 		tyran_label_reference* ref = &state->label_references[i];
 		tyran_label* label = get_label(state->labels, state->label_count, ref->name);
@@ -431,7 +430,6 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 	int s2;
 	tyran_reg_or_constant_index x, y;
 	tyran_opcodes* opcodes = parser_state->opcodes;
-	tyran_constant_index c;
 
 	switch (token) {
 		case TYRAN_TOKEN_MEMBER:

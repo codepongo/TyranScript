@@ -15,7 +15,8 @@ void tyran_constants_free(tyran_constants* constants)
 
 tyran_constant_index tyran_constants_reserve_index(struct tyran_constants* constants, tyran_value* v)
 {
-	for (int i=0; i<constants->size; ++i)
+	int i;
+	for (i=0; i<constants->size; ++i)
 	{
 		if (tyran_value_is_same(&constants->values[i], v)) {
 			return i | TYRAN_OPCODE_CONSTANT_BIT;

@@ -13,7 +13,8 @@
 
 void tyran_register_copy(tyran_value* target, tyran_value* source, int count)
 {
-	for (int i=0; i<count; ++i)
+	int i;
+	for (i=0; i<count; ++i)
 	{
 		tyran_value_copy(target[i], source[i]);
 	}
@@ -63,8 +64,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 		char result[512];
 
 		result[0] = 0;
-
-		for (int reg_index=0; reg_index < 4; reg_index++)
+		int reg_index;
+		for (reg_index=0; reg_index < 4; reg_index++)
 		{
 			if (reg_index != 0) {
 				tyran_strncat(result, ", ", 512);

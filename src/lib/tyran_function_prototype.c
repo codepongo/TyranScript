@@ -25,11 +25,9 @@ int tyran_function_prototype_apply(tyran_runtime* runtime, tyran_value* function
 	tyran_object_key_flag_type flag;
 	
 	tyran_value* this_to_use = tyran_value_object_lookup_array(function_scope, 0, &flag);
-	tyran_value* arguments_to_use = tyran_value_object_lookup_array(function_scope, 1, &flag);
 	
 	const tyran_function* function_to_call = _this->data.object->data.function->static_function;
 	
-	tyran_function_object* function_object = _this->data.object->data.function;
 	
 	tyran_runtime_push_call(runtime, function_to_call->data.opcodes, 0, this_to_use);
 	
