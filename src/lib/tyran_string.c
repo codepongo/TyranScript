@@ -3,19 +3,19 @@
 
 tyran_string* tyran_string_alloc(int len)
 {
-	char* r = (char*) TYRAN_MALLOC(len * sizeof(tyran_string) + sizeof(tyran_string_length_type) );
-	tyran_string* rr = (tyran_string *)(r + sizeof(tyran_string_length_type));
-	*((tyran_string_length_type *)r) = (tyran_string_length_type) len;
-
-	return rr;
+	tyran_string* str = TYRAN_MALLOC_TYPE(tyran_string, 1);
+	str->buf = TYRAN_MALLOC_TYPE(tyran_string_char, len);
+	str->len = len;
+	
+	return str;
 }
 
 const tyran_string* tyran_string_strdup(const tyran_string* str)
 {
 	int len = str->len;
-	tyran_string* rr = tyran_string_alloc(len);
-	tyran_memcpy(rr, str, (len) * sizeof(tyran_string));
-	return rr;
+	tyran_string* duplicate = tyran_string_alloc(len);
+	tyran_memcpy(duplicate->buf, str->buf, len * sizeof(tyran_string_char));
+	return duplicate;
 }
 
 const tyran_string* tyran_string_strdup_str(const char *str)
@@ -46,7 +46,7 @@ const tyran_string* tyran_string_substr(const tyran_string* str, int start, int 
 	characters_to_copy = characters_to_copy < len ? characters_to_copy : len;
 	tyran_string* rr = tyran_string_alloc(characters_to_copy);
 
-	tyran_memcpy(rr, str + start, characters_to_copy * sizeof(tyran_string));
+	tyran_memcpy(rr->buf, str->buf + start, characters_to_copy * sizeof(tyran_string_char));
 	
 	return rr;
 }
@@ -54,15 +54,13 @@ const tyran_string* tyran_string_substr(const tyran_string* str, int start, int 
 void tyran_string_strcpy(tyran_string* to, const tyran_string* from)
 {
 	int len = from->len;
-	int i;
-	for (i = 0; i < len; ++i) to[i] = from[i];
-
-	to->len = (tyran_string_length_type) len;
+	tyran_memcpy(to->buf, from->buf, len * sizeof(tyran_string_char));
+	to->len = len;
 }
 
 void tyran_string_free(const tyran_string* d)
 {
-	tyran_free((void *)(((char*)d) - sizeof(tyran_string_length_type) ));
+	tyran_free((void*)d);
 }
 
 void tyran_string_to_c_str(char* buf, int tyran_string_max_length, const tyran_string* str)
@@ -77,17 +75,15 @@ void tyran_string_to_c_str(char* buf, int tyran_string_max_length, const tyran_s
 const tyran_string* tyran_string_from_c_str(const char* str)
 {
 	#define tyran_string_max_length 512
-	static tyran_string buf[tyran_string_max_length];
-	tyran_string_length_type *len = (tyran_string_length_type *)buf;
-	tyran_string* b = (tyran_string *)((char*)buf + sizeof(tyran_string_length_type));
+	tyran_string* target = tyran_string_alloc(tyran_string_max_length);
 	tyran_string_length_type i;
 
 	for (i = 0; str[i] && i < tyran_string_max_length; ++i) {
-		b->buf[i] = str[i];
+		target->buf[i] = str[i];
 	}
-	*len = i;
+	target->len = i;
 
-	return b;
+	return target;
 }
 
 int tyran_string_strcmp(const tyran_string* str1, const tyran_string* str2)
@@ -115,7 +111,7 @@ const tyran_string* tyran_string_strcat(const tyran_string* str1, const tyran_st
 	int len = str1->len + str2->len;
 	tyran_string* rr = tyran_string_alloc(len);
 
-	tyran_memcpy(rr, str1, str1->len * sizeof(tyran_string));
-	tyran_memcpy(rr + str1->len, str2, str2->len * sizeof(tyran_string));
+	tyran_memcpy(rr->buf, str1->buf, str1->len * sizeof(tyran_string_char));
+	tyran_memcpy(rr->buf + str1->len, str2->buf, str2->len * sizeof(tyran_string_char));
 	return rr;
 }

@@ -165,7 +165,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 				const tyran_object_key* key = target_iterator->keys[i];
 				tyran_value* sub_value = tyran_value_object_lookup(v, key, &flag);
 				if (sub_value) {
-					tyran_string_to_c_str(temp_buffer, temp_buffer_size, (const tyran_string*)key);
+					tyran_string_to_c_str(temp_buffer, temp_buffer_size, key->str);
 					tyran_print_value_helper(tabs, temp_buffer, sub_value, quote);
 				}
 			}

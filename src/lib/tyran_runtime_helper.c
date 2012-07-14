@@ -13,11 +13,16 @@
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_object_macros.h>
+#include <tyranscript/tyran_object_key.h>
 
 tyran_runtime* tyran_runtime_new()
 {
 	tyran_runtime* rt = TYRAN_CALLOC(tyran_runtime);
 	rt->stack = TYRAN_MALLOC_TYPE(tyran_runtime_stack, 128);
+	
+	rt->length_key = tyran_object_key_new(tyran_string_from_c_str("length"), tyran_object_key_flag_normal);
+	rt->prototype_key = tyran_object_key_new(tyran_string_from_c_str("prototype"), tyran_object_key_flag_normal);
+	
 	return rt;
 }
 

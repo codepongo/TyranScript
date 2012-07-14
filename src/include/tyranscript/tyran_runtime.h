@@ -18,6 +18,10 @@ typedef struct tyran_runtime {
 	int stack_pointer;
 	void* program_specific_context;
 	struct tyran_object_pool* object_pool;
+	
+	const struct tyran_object_key* length_key;
+	const struct tyran_object_key* prototype_key;
+	
 } tyran_runtime;
 
 struct tyran_runtime_callbacks;

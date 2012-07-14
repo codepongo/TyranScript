@@ -5,9 +5,11 @@
 
 typedef tyran_uint16 tyran_string_length_type;
 
+typedef tyran_uint16 tyran_string_char;
+
 typedef struct tyran_string {
 	tyran_string_length_type len;
-	tyran_uint16* buf;
+	tyran_string_char* buf;
 } tyran_string;
 
 tyran_string* tyran_string_alloc(int max_size);

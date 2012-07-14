@@ -11,8 +11,6 @@
 #include <tyranscript/tyran_rb_tree.h>
 #include <tyranscript/tyran_number.h>
 
-static const tyran_string *LENGTH_STRING = 0; //tyran_string_from_c_str("length");
-static const tyran_string* PROTOTYPE = 0; // tyran_string_from_c_str("prototype");
 
 typedef struct tyran_rb_tree_key_value_node {
 	const struct tyran_object_key* key;
@@ -154,9 +152,8 @@ void tyran_object_get_keys(const struct tyran_object* target, tyran_object_itera
 void tyran_object_set_prototype(struct tyran_object* target, struct tyran_value* proto)
 {
 	// TYRAN_ASSERT(target->prototype == 0, "Prototype already set, this is a problem");
-	const struct tyran_object_key* key = tyran_object_key_new(PROTOTYPE, 0);
 	TYRAN_OBJECT_RETAIN(proto->data.object);
-	tyran_object_insert_key(target, key, proto);
+	tyran_object_insert_key(target, target->created_in_runtime->prototype_key, proto);
 	target->prototype = proto;
 }
 
@@ -193,13 +190,12 @@ tyran_object* tyran_object_new_from_items(const struct tyran_runtime* runtime, c
 void tyran_object_set_length(struct tyran_object* object, int len)
 {
 	tyran_object_key_flag_type flag;
-	tyran_value* r = tyran_object_lookup(object, (struct tyran_object_key*) LENGTH_STRING, &flag);
+	tyran_value* r = tyran_object_lookup(object, object->created_in_runtime->length_key, &flag);
 	if (!r) {
 		tyran_value* n = tyran_value_new();
 		tyran_value_set_number(*n, len);
 
-		const struct tyran_object_key* nk = tyran_object_key_new(LENGTH_STRING, tyran_object_key_flag_normal);
-		tyran_object_insert_key(object, nk, n);
+		tyran_object_insert_key(object, object->created_in_runtime->length_key, n);
 	} else {
 		tyran_value_set_number(*r, len);
 	}
@@ -208,7 +204,7 @@ void tyran_object_set_length(struct tyran_object* object, int len)
 int tyran_object_length(const struct tyran_object* object)
 {
 	tyran_object_key_flag_type flag;
-	tyran_value* r = tyran_object_lookup(object, (struct tyran_object_key*) LENGTH_STRING, &flag);
+	tyran_value* r = tyran_object_lookup(object, object->created_in_runtime->length_key, &flag);
 	if (r && tyran_value_is_number(r)) {
 		if (tyran_value_is_integer(r->data.number)) return (int)r->data.number;
 	}

@@ -398,7 +398,6 @@ void tyran_lexer_assembler_end_of_function(tyran_parser_state* parser_state)
 	tyran_print_constants(parser_state->constants);
 	tyran_print_opcodes(parser_state->opcodes, 0, parser_state->constants);
 
-
 	tyran_function* func = tyran_function_new(parser_state->opcodes, parser_state->constants);
 	tyran_parser_state_reset(parser_state);
 
