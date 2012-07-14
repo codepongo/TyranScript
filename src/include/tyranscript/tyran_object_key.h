@@ -1,24 +1,25 @@
 #ifndef _TYRAN_OBJECT_KEY_H
 #define _TYRAN_OBJECT_KEY_H
 
-#include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_config.h>
 
-typedef tyran_string tyran_object_key;
+struct tyran_string;
+
 typedef tyran_uint16 tyran_object_key_flag_type;
+
+typedef struct tyran_object_key {
+	struct tyran_string* str;
+	tyran_object_key_flag_type flag;
+} tyran_object_key;
 
 static const tyran_object_key_flag_type tyran_object_key_flag_enumerate = 1;
 static const tyran_object_key_flag_type tyran_object_key_flag_normal = 1;
 
-#define tyran_object_key_has_enumerate(key) (TYRAN_OBJECT_KEY_FLAG(key) & tyran_object_key_flag_enumerate)
+#define tyran_object_key_has_enumerate(key) (key->flag & tyran_object_key_flag_enumerate)
 
-#define TYRAN_OBJECT_KEY_FLAG(ok) (*((tyran_object_key_flag_type *)(((char*)(ok)) - sizeof(tyran_string_length_type) - sizeof(tyran_object_key_flag_type))))
-#define TYRAN_OBJECT_KEY_SET_FLAG(ok, flag) TYRAN_OBJECT_KEY_FLAG(ok) = flag;
-
-#define TYRAN_OBJECT_KEY(_len) struct{ TYRAN_UNICODE_STRING(_len) str; }
-
-const tyran_object_key* tyran_object_key_new(const tyran_string* string_key, tyran_object_key_flag_type flag);
-extern void tyran_object_key_free(const tyran_object_key* key);
-const tyran_object_key* tyran_object_key_clone(const tyran_object_key* key);
+const struct tyran_object_key* tyran_object_key_new(const struct tyran_string* string_key, tyran_object_key_flag_type flag);
+extern void tyran_object_key_free(const struct tyran_object_key* key);
+const struct tyran_object_key* tyran_object_key_clone(const struct tyran_object_key* key);
 
 extern int tyran_object_key_compare(void* key_a, void* key_b);
 

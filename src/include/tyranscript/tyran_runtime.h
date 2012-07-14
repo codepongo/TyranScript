@@ -1,22 +1,23 @@
 #ifndef _TYRAN_RUNTIME_H
 #define _TYRAN_RUNTIME_H
 
-#include "tyran_value.h"
-#include "tyran_object_pool.h"
 struct tyran_opcodes;
 struct tyran_scope_stack;
 struct tyran_runtime;
 struct tyran_runtime_stack;
 struct tyran_constants;
+struct tyran_value;
+struct tyran_object;
+struct tyran_object_pool;
 
-typedef void (*tyran_value_delete_callback)(const struct tyran_runtime* program_specific_context, tyran_object* program_specific);
+typedef void (*tyran_value_delete_callback)(const struct tyran_runtime* program_specific_context, struct tyran_object* program_specific);
 
 typedef struct tyran_runtime {
 	struct tyran_runtime_stack* stack;
 	tyran_value_delete_callback delete_callback;
 	int stack_pointer;
 	void* program_specific_context;
-	tyran_object_pool object_pool;
+	struct tyran_object_pool* object_pool;
 } tyran_runtime;
 
 struct tyran_runtime_callbacks;

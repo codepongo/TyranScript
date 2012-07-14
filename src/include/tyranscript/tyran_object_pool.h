@@ -3,7 +3,7 @@
 
 struct tyran_object;
 
-typedef struct {
+typedef struct tyran_object_pool {
 	void* p;
 } tyran_object_pool;
 

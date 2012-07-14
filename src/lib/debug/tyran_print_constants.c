@@ -1,4 +1,6 @@
 #include <tyranscript/tyran_constants.h>
+#include <tyranscript/debug/tyran_print_value.h>
+#include <tyranscript/tyran_value.h>
 
 void tyran_print_constants(tyran_constants* constants)
 {

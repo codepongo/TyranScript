@@ -1,5 +1,6 @@
 #include <tyranscript/parser/tyran_parser_state.h>
 #include <tyranscript/tyran_value.h>
+#include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_function.h>
 #include <tyranscript/tyran_function_object.h>
 
@@ -7,6 +8,8 @@
 #include <tyranscript/tyran_function_prototype.h>
 
 #include <tyranscript/tyran_value_object.h>
+#include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_object_macros.h>
 
 tyran_value* tyran_array_prototype;
 

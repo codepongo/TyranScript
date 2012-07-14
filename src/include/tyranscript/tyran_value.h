@@ -1,11 +1,9 @@
 #ifndef _TYRAN_VALUE_H
 #define _TYRAN_VALUE_H
 
-#include "tyran_object_key.h"
-#include "tyran_object.h"
+#include <tyranscript/tyran_config.h>
 
-#include <tyranscript/tyran_number.h>
-
+struct tyran_string;
 struct tyran_object;
 struct tyran_runtime_stack;
 
@@ -23,8 +21,8 @@ typedef struct tyran_value {
 	union {
 		u32t boolean;
 		tyran_number number;
-		const tyran_string* str;
-		tyran_object* object;
+		const struct tyran_string* str;
+		struct tyran_object* object;
 		u32t data;
 	} data;
 } tyran_value;

@@ -11,6 +11,8 @@
 typedef unsigned char u8t;
 typedef unsigned short u16t;
 typedef unsigned int u32t;
+typedef float tyran_number;
+typedef int tyran_boolean;
 
 typedef unsigned short tyran_uint16;
 
@@ -47,16 +49,20 @@ typedef unsigned short tyran_uint16;
 	#define tyran_fclose fclose
 	#define tyran_strncat strncat
 #endif
+
 #define tyran_strcmp strcmp
 #define tyran_strlen strlen
 #define tyran_strncmp strncmp
+#define tyran_printf printf
+#define tyran_fflush fflush
+
 
 #define tyran_fmod fmod
 #define tyran_pow pow
 
 
-#define TYRAN_LOG(...) { printf(__VA_ARGS__); printf("\n"); fflush(stdout); }
-#define TYRAN_LOG_NO_LF(...) { printf(__VA_ARGS__); fflush(stdout); }
+#define TYRAN_LOG(...) { tyran_printf(__VA_ARGS__); tyran_printf("\n"); tyran_fflush(stdout); }
+#define TYRAN_LOG_NO_LF(...) { tyran_printf(__VA_ARGS__); tyran_fflush(stdout); }
 #define TYRAN_SOFT_ERROR(...) TYRAN_LOG(__VA_ARGS__);
 #define TYRAN_BREAK abort()
 #define TYRAN_ERROR(...) TYRAN_LOG(__VA_ARGS__); TYRAN_BREAK;

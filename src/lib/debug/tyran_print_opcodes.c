@@ -5,6 +5,8 @@
 #include <tyranscript/tyran_function.h>
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/debug/tyran_print_opcodes.h>
+#include <tyranscript/debug/tyran_print_value.h>
+#include <tyranscript/tyran_value.h>
 
 const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
 	"NOP",

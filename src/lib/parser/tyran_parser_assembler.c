@@ -9,6 +9,8 @@
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/tyran_function.h>
 #include <tyranscript/tyran_function_object.h>
+#include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_value_object.h>
 
 #include <tyranscript/debug/tyran_print_opcodes.h>
@@ -16,8 +18,8 @@
 
 void tyran_parse_assembler(tyran_lexer* lexer, char c)
 {
-	TYRAN_UNICODE_STRING(1024) string_buffer;
-	tyran_string* temp_string_buffer = string_buffer.string;
+	tyran_string* string_buffer = tyran_string_alloc(1024);
+	tyran_string* temp_string_buffer = string_buffer;
 
 	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
 		tyran_lexer_parse_identifier(lexer, c, temp_string_buffer);
@@ -129,8 +131,8 @@ int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c
 
 static int tyran_lexer_assembler_next_token(tyran_lexer_token_data token, tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
-	TYRAN_UNICODE_STRING(1024) string_buffer;
-	tyran_string* temp_string_buffer = string_buffer.string;
+	tyran_string* string_buffer = tyran_string_alloc(1024);
+	tyran_string* temp_string_buffer = string_buffer;
 
 	tyran_lexer_set_begin(lexer_position_info, lexer);
 
@@ -152,9 +154,9 @@ static int tyran_lexer_assembler_next_token(tyran_lexer_token_data token, tyran_
 	}
 
 	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
-		return tyran_lexer_assembler_parse_identifier_or_keyword(lexer, c, temp_string_buffer, &string_buffer.len, lexer_position_info, token);
+		return tyran_lexer_assembler_parse_identifier_or_keyword(lexer, c, temp_string_buffer, &string_buffer->len, lexer_position_info, token);
 	} else if (tyran_lexer_is_digit(c) || c == '-') {
-		return tyran_lexer_parse_number(lexer, c, temp_string_buffer, &string_buffer.len, lexer_position_info, token);
+		return tyran_lexer_parse_number(lexer, c, temp_string_buffer, &string_buffer->len, lexer_position_info, token);
 	} else if (c == '"' || c == '\'') {
 		return tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, token);
 	} else if (c == '/') {

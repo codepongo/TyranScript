@@ -1,14 +1,14 @@
 #ifndef _TYRAN_OBJECT_H
 #define _TYRAN_OBJECT_H
 
-#include "tyran_string.h"
-#include "tyran_object_key.h"
-#include "tyran_object_macros.h"
-#include "tyran_rb_tree.h"
+#include <tyranscript/tyran_object_key.h>
 
+struct tyran_value;
+struct tyran_function_object;
 struct tyran_object_iterator;
 struct tyran_function_object;
 struct tyran_runtime;
+struct tree_root;
 
 typedef enum {
 	TYRAN_OBJECT_TYPE_OBJECT,
@@ -22,15 +22,15 @@ typedef struct tyran_object {
 	tyran_object_type type;
 	union {
 		int value;
-		double number;
-		tyran_string* str;
+		tyran_number number;
+		struct tyran_string* str;
 		struct tyran_function_object* function;
 		struct tyran_object_iterator* iterator;
 	} data;
 
 	int retain_count;
 
-	tree_root* tree;
+	struct tree_root* tree;
 
 	const struct tyran_runtime* created_in_runtime;
 	void* program_specific;
@@ -53,15 +53,15 @@ void tyran_object_set_length(tyran_object* object, int len);
 int tyran_object_length(const tyran_object* object);
 
 /* Insert and Delete */
-void tyran_object_insert_key(tyran_object* object, const tyran_object_key* key, struct tyran_value* value);
-void tyran_object_insert_c_string_key(tyran_object* object, const char* key, struct tyran_value* value);
-void tyran_object_insert_string_key(tyran_object* object, const tyran_string* key, struct tyran_value* value);
-void tyran_object_insert_array(tyran_object* object, int index, struct tyran_value* value);
-void tyran_object_delete(tyran_object* object, const tyran_object_key* key);
+void tyran_object_insert_key(struct tyran_object* object, const struct tyran_object_key* key, struct tyran_value* value);
+void tyran_object_insert_c_string_key(struct tyran_object* object, const char* key, struct tyran_value* value);
+void tyran_object_insert_string_key(struct tyran_object* object, const struct tyran_string* key, struct tyran_value* value);
+void tyran_object_insert_array(struct tyran_object* object, int index, struct tyran_value* value);
+void tyran_object_delete(struct tyran_object* object, const struct tyran_object_key* key);
 
 /* Find */
-struct tyran_value* tyran_object_lookup(const tyran_object* object, const tyran_object_key* key, tyran_object_key_flag_type* flag);
-struct tyran_value* tyran_object_lookup_prototype(const tyran_object* o, const tyran_object_key* key, tyran_object_key_flag_type* flag);
+struct tyran_value* tyran_object_lookup(const struct tyran_object* object, const struct tyran_object_key* key, tyran_object_key_flag_type* flag);
+struct tyran_value* tyran_object_lookup_prototype(const struct tyran_object* o, const struct tyran_object_key* key, tyran_object_key_flag_type* flag);
 void tyran_object_get_keys(const struct tyran_object* target, struct tyran_object_iterator* target_iterator);
 
 #endif

@@ -20,8 +20,8 @@
 
 void tyran_prototypes_init(const struct tyran_runtime* runtime, tyran_value* global)
 {
-	TYRAN_INITIALIZE_PROTOTYPE(runtime, object, "Object");
-	TYRAN_INITIALIZE_PROTOTYPE(runtime, function, "Function");
-	TYRAN_INITIALIZE_PROTOTYPE(runtime, array, "Array");
-	TYRAN_INITIALIZE_PROTOTYPE(runtime, string, "String");
+	// TYRAN_INITIALIZE_PROTOTYPE(runtime, object, "Object");
+	// TYRAN_INITIALIZE_PROTOTYPE(runtime, function, "Function");
+	// TYRAN_INITIALIZE_PROTOTYPE(runtime, array, "Array");
+	// TYRAN_INITIALIZE_PROTOTYPE(runtime, string, "String");
 }

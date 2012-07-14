@@ -2,6 +2,8 @@
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_config.h>
+#include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_object_macros.h>
 
 tyran_scope_stack* tyran_scope_stack_new(int cnt)
 {
@@ -45,7 +47,7 @@ tyran_scope_stack* tyran_scope_stack_clone_and_add(const tyran_scope_stack* stac
 	return r;
 }
 
-tyran_value* tyran_scope_stack_lookup(const tyran_scope_stack* stack, const tyran_object_key* key)
+tyran_value* tyran_scope_stack_lookup(const tyran_scope_stack* stack, const struct tyran_object_key* key)
 {
 	int i;
 	tyran_value* found_value;

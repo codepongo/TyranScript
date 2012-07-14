@@ -1,5 +1,8 @@
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_number.h>
+#include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_object_macros.h>
+#include <tyranscript/tyran_string.h>
 
 extern tyran_value* tyran_object_prototype;
 extern tyran_value* tyran_array_prototype;
@@ -50,7 +53,7 @@ int tyran_value_is_true(const tyran_value* value)
 				return 0;
 			return 1;
 		case TYRAN_VALUE_TYPE_STRING:
-			return TYRAN_UNICODE_STRLEN(value->data.str) ? 1 : 0;
+			return value->data.str->len ? 1 : 0;
 		case TYRAN_VALUE_TYPE_OBJECT:
 			return 1;
 		default:

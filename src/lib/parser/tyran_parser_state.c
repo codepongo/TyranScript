@@ -10,6 +10,8 @@
 #include <tyranscript/tyran_opcodes.h>
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/tyran_runtime.h>
+#include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_object_macros.h>
 
 #include <tyranscript/debug/tyran_print_value.h>
 

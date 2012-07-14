@@ -3,7 +3,10 @@
 #include <tyranscript/tyran_runtime.h>
 #include <tyranscript/tyran_function_object.h>
 #include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_object_macros.h>
+#include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_value_object.h>
+#include <tyranscript/tyran_string.h>
 #include "tyran_value_convert.h"
 
 #include <tyranscript/debug/tyran_print_value.h>
@@ -20,7 +23,7 @@ int tyran_string_prototype_constructor(tyran_runtime* r, tyran_value* a, tyran_v
 
 	tyran_object_key_flag_type flag;
 	 str = tyran_value_object_lookup_array(args, 0, &flag);
-	tyran_object_set_length(_this->data.object, TYRAN_UNICODE_STRLEN(str->data.str));
+	tyran_object_set_length(_this->data.object, str->data.str->len);
 	tyran_value_object_insert_string_key(_this, tyran_string_from_c_str("str"), str);
 
 	return 0;
@@ -29,7 +32,7 @@ int tyran_string_prototype_constructor(tyran_runtime* r, tyran_value* a, tyran_v
 int tyran_string_prototype_char_at(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor)
 {
 	tyran_object_key_flag_type flag;
-	tyran_value* value = tyran_value_object_lookup(_this, tyran_string_from_c_str("str"), &flag);
+	tyran_value* value = tyran_value_object_lookup_string(_this, tyran_string_from_c_str("str"), &flag);
 	TYRAN_ASSERT(value != 0, "Couldn't find str member");
 	
 	tyran_value* start = tyran_value_object_lookup_array(args, 0, &flag);

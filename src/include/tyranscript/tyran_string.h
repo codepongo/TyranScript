@@ -3,11 +3,14 @@
 
 #include <tyranscript/tyran_config.h>
 
-#define TYRAN_UNICODE_STRING(_len) struct{ tyran_string_length_type len; tyran_string string[(_len)]; }
-#define TYRAN_UNICODE_STRLEN(str) (*((tyran_string_length_type *)(((char*)(str)) - sizeof(tyran_string_length_type))))
-
-typedef tyran_uint16 tyran_string;
 typedef tyran_uint16 tyran_string_length_type;
+
+typedef struct tyran_string {
+	tyran_string_length_type len;
+	tyran_uint16* buf;
+} tyran_string;
+
+tyran_string* tyran_string_alloc(int max_size);
 
 const tyran_string* tyran_string_from_c_str(const char* str);
 const tyran_string* tyran_string_strcat(const tyran_string* str1, const tyran_string* str2);

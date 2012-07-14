@@ -71,7 +71,7 @@ void execute_function(tyran_runtime* runtime, tyran_value* _this, const char* fu
 	TYRAN_LOG(" ");
 	TYRAN_LOG("Execute function '%s'", func_name);
 	tyran_object_key_flag_type flag;
-	tyran_value* value = tyran_value_object_lookup(_this, tyran_string_from_c_str(func_name), &flag);
+	tyran_value* value = tyran_value_object_lookup_string(_this, tyran_string_from_c_str(func_name), &flag);
 	TYRAN_ASSERT(tyran_value_is_function(value), "Must be function!");
 	
 	const tyran_function* func = value->data.object->data.function->static_function;

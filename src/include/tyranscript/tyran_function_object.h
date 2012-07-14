@@ -1,8 +1,9 @@
 #ifndef _TYRAN_FUNCTION_OBJECT_H
 #define _TYRAN_FUNCTION_OBJECT_H
 
-#include "tyran_function.h"
+#include <tyranscript/tyran_function_callback.h>
 
+struct tyran_function;
 struct tyran_scope_stack;
 struct tyran_value;
 struct tyran_runtime;
@@ -12,7 +13,7 @@ typedef struct tyran_function_object {
 	struct tyran_scope_stack* scope;
 } tyran_function_object;
 
-tyran_function_object* tyran_function_object_new(const tyran_function* function);
+tyran_function_object* tyran_function_object_new(const struct tyran_function* function);
 struct tyran_value* tyran_function_object_new_callback(const struct tyran_runtime* runtime, tyran_function_callback callback);
 void tyran_function_object_free(tyran_function_object* function_object);
 

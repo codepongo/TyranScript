@@ -1,5 +1,7 @@
 #include <tyranscript/tyran_object_array.h>
 #include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_object_macros.h>
+#include <tyranscript/tyran_object_key.h>
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_array_prototype.h>
@@ -8,15 +10,15 @@
 
 struct tyran_object* tyran_object_new_array(const struct tyran_runtime* runtime, const tyran_value* items, int count)
 {
-	TYRAN_UNICODE_STRING(12) number_string;
+	tyran_string* number_string = tyran_string_alloc(12);
 	int i;
-	const tyran_object_key* ok;
+	const struct tyran_object_key* ok;
 	tyran_value* v;
 	tyran_object* object = tyran_object_new(runtime);
 
 	for (i = 0; i < count; ++i) {
-		tyran_number_integer_to_string(i, number_string.string);
-		ok = tyran_object_key_new(number_string.string, tyran_object_key_flag_normal);
+		tyran_number_integer_to_string(i, number_string);
+		ok = tyran_object_key_new(number_string, tyran_object_key_flag_normal);
 		v = tyran_value_new();
 		tyran_value_copy(*v, items[i]);
 		tyran_object_insert_key(object, ok, v);

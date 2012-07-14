@@ -12,7 +12,7 @@ tyran_string* tyran_string_alloc(int len)
 
 const tyran_string* tyran_string_strdup(const tyran_string* str)
 {
-	int len = TYRAN_UNICODE_STRLEN(str);
+	int len = str->len;
 	tyran_string* rr = tyran_string_alloc(len);
 	tyran_memcpy(rr, str, (len) * sizeof(tyran_string));
 	return rr;
@@ -26,7 +26,7 @@ const tyran_string* tyran_string_strdup_str(const char *str)
 	tyran_string* rr = tyran_string_alloc(len);
 
 	for (i = 0; i < len; ++i) {
-		rr[i] = str[i];
+		rr->buf[i] = str[i];
 	}
 
 	return rr;
@@ -34,7 +34,7 @@ const tyran_string* tyran_string_strdup_str(const char *str)
 
 const tyran_string* tyran_string_substr(const tyran_string* str, int start, int len)
 {
-	int source_string_length = TYRAN_UNICODE_STRLEN(str);
+	int source_string_length = str->len;
 	
 	if (start < 0) {
 		start += source_string_length;
@@ -53,11 +53,11 @@ const tyran_string* tyran_string_substr(const tyran_string* str, int start, int 
 
 void tyran_string_strcpy(tyran_string* to, const tyran_string* from)
 {
-	int len = TYRAN_UNICODE_STRLEN(from);
+	int len = from->len;
 	int i;
 	for (i = 0; i < len; ++i) to[i] = from[i];
 
-	TYRAN_UNICODE_STRLEN(to) = (tyran_string_length_type) len;
+	to->len = (tyran_string_length_type) len;
 }
 
 void tyran_string_free(const tyran_string* d)
@@ -68,9 +68,9 @@ void tyran_string_free(const tyran_string* d)
 void tyran_string_to_c_str(char* buf, int tyran_string_max_length, const tyran_string* str)
 {
 	int i;
-	int len = TYRAN_UNICODE_STRLEN(str);
+	int len = str->len;
 
-	for (i = 0; i < len && i < tyran_string_max_length - 1; ++i) buf[i] = (char)str[i];
+	for (i = 0; i < len && i < tyran_string_max_length - 1; ++i) buf[i] = (char)str->buf[i];
 	buf[i] = 0;
 }
 
@@ -83,7 +83,7 @@ const tyran_string* tyran_string_from_c_str(const char* str)
 	tyran_string_length_type i;
 
 	for (i = 0; str[i] && i < tyran_string_max_length; ++i) {
-		b[i] = str[i];
+		b->buf[i] = str[i];
 	}
 	*len = i;
 
@@ -92,8 +92,8 @@ const tyran_string* tyran_string_from_c_str(const char* str)
 
 int tyran_string_strcmp(const tyran_string* str1, const tyran_string* str2)
 {
-	int len1 = TYRAN_UNICODE_STRLEN(str1);
-	int len2 = TYRAN_UNICODE_STRLEN(str2);
+	int len1 = str1->len;
+	int len2 = str2->len;
 
 	int i, r;
 	
@@ -102,7 +102,7 @@ int tyran_string_strcmp(const tyran_string* str1, const tyran_string* str2)
 	}
 
 	for (i = 0; i < len1; ++i) {
-		r = str1[i] - str2[i];
+		r = str1->buf[i] - str2->buf[i];
 		if (r) {
 			return r;
 		}
@@ -112,10 +112,10 @@ int tyran_string_strcmp(const tyran_string* str1, const tyran_string* str2)
 
 const tyran_string* tyran_string_strcat(const tyran_string* str1, const tyran_string* str2)
 {
-	int len = TYRAN_UNICODE_STRLEN(str1) + TYRAN_UNICODE_STRLEN(str2);
+	int len = str1->len + str2->len;
 	tyran_string* rr = tyran_string_alloc(len);
 
-	tyran_memcpy(rr, str1, TYRAN_UNICODE_STRLEN(str1) * sizeof(tyran_string));
-	tyran_memcpy(rr + TYRAN_UNICODE_STRLEN(str1), str2, TYRAN_UNICODE_STRLEN(str2) * sizeof(tyran_string));
+	tyran_memcpy(rr, str1, str1->len * sizeof(tyran_string));
+	tyran_memcpy(rr + str1->len, str2, str2->len * sizeof(tyran_string));
 	return rr;
 }

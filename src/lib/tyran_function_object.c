@@ -2,6 +2,7 @@
 #include <tyranscript/tyran_config.h>
 #include <tyranscript/tyran_scope_stack.h>
 #include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_function.h>
 

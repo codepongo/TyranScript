@@ -1,13 +1,13 @@
 #ifndef _TYRAN_FUNCTION_H
 #define _TYRAN_FUNCTION_H
 
+#include <tyranscript/tyran_function_callback.h>
+
 struct tyran_runtime;
 struct tyran_value;
 struct tyran_opcodes;
 struct tyran_string_array;
 struct tyran_constants;
-
-typedef int (*tyran_function_callback)(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call);
 
 typedef enum {
 	tyran_function_type_normal,

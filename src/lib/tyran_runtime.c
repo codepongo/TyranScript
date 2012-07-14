@@ -7,9 +7,14 @@
 #include "tyranscript/tyran_function.h"
 #include "tyranscript/tyran_function_object.h"
 #include "tyranscript/tyran_opcodes.h"
+#include "tyranscript/tyran_value.h"
 #include "tyranscript/tyran_runtime_stack.h"
 #include "tyranscript/tyran_value_object.h"
 #include <tyranscript/debug/tyran_print_opcodes.h>
+#include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_object_macros.h>
+#include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_constants.h>
 
 void tyran_register_copy(tyran_value* target, tyran_value* source, int count)
 {
@@ -47,7 +52,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	// Context
 	const tyran_opcode* pc = sp->pc;
 	tyran_value* registers = TYRAN_MALLOC_TYPE(tyran_value, 128);
-	registers[0] = sp->_this;
+	tyran_value_copy(registers[0], *sp->_this);
 
 	tyran_value* r = registers;
 	const tyran_value* c = sp->c;
@@ -215,13 +220,13 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_NEW:
 			TYRAN_REGISTER_A;
-			tyran_value_set_object(r[a], tyran_object_pool_alloc(&runtime->object_pool));
+			tyran_value_set_object(r[a], tyran_object_pool_alloc(runtime->object_pool));
 			break;
 		case TYRAN_OPCODE_GET:
 			TYRAN_REGISTER_A_RCX_RCY;
 			TYRAN_ASSERT(tyran_value_is_string(&rcy), "Must use string to lookup. for now");
 			tyran_object_key_flag_type flag = tyran_object_key_flag_normal;
-			const tyran_object_key* key = tyran_object_key_new(rcy.data.str, flag);
+			const struct tyran_object_key* key = tyran_object_key_new(rcy.data.str, flag);
 			TYRAN_ASSERT(tyran_value_is_object(&rcx), "Must lookup object");
 			tyran_value* v = tyran_value_object_lookup(&rcx, key, &flag);
 			tyran_value_copy(r[a], *v);

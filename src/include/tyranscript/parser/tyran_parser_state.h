@@ -26,7 +26,6 @@ typedef struct tyran_parser_state {
 
 	char function_name[512];
 
-
 	int error_count;
 } tyran_parser_state;
 

@@ -2,13 +2,16 @@
 #include <tyranscript/tyran_object_prototype.h>
 #include <tyranscript/tyran_runtime.h>
 #include <tyranscript/tyran_function_object.h>
+#include <tyranscript/tyran_function.h>
 #include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_value.h>
+#include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_object_array.h>
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_scope.h>
 #include <tyranscript/debug/tyran_print_value.h>
 
-tyran_value* tyran_function_prototype;
+struct tyran_value* tyran_function_prototype;
 
 int tyran_function_prototype_constructor(tyran_runtime* runtime, tyran_value* a, tyran_value* b, tyran_value* c, tyran_value* d, int is_constructor)
 {

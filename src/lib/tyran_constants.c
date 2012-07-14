@@ -1,5 +1,8 @@
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/tyran_value.h>
+#include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_object_macros.h>
+
 tyran_constants* tyran_constants_new(int size)
 {
 	tyran_constants* constants = TYRAN_CALLOC(tyran_constants);
@@ -35,7 +38,7 @@ tyran_constant_index tyran_constants_add_number(tyran_constants* constants, tyra
 	return tyran_constants_reserve_index(constants, &value);
 }
 
-tyran_constant_index tyran_constants_add_string(tyran_constants* constants, tyran_string* v)
+tyran_constant_index tyran_constants_add_string(tyran_constants* constants, struct tyran_string* v)
 {
 	tyran_value value;
 	tyran_value_set_string(value, v);

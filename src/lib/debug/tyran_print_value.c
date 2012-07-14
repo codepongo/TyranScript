@@ -8,6 +8,7 @@
 #include <tyranscript/tyran_object_iterator.h>
 #include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_value_object.h>
+#include <tyranscript/tyran_number.h>
 
 #include "../tyran_string_array.h"
 #include <tyranscript/debug/tyran_print_value.h>

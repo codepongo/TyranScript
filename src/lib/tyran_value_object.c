@@ -3,6 +3,10 @@
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_object_key.h>
+#include <tyranscript/tyran_object_macros.h>
+#include <tyranscript/tyran_number.h>
+#include <tyranscript/tyran_string.h>
 
 #include "tyran_value_convert.h"
 #include <tyranscript/tyran_object_key.h>
@@ -21,7 +25,7 @@ void tyran_value_object_insert_c_string_key(tyran_value* target, const char* key
 	tyran_object_insert_c_string_key(target->data.object, key, value);
 }
 
-void tyran_value_object_insert_key(tyran_value* target, const tyran_object_key* key, tyran_value* value)
+void tyran_value_object_insert_key(tyran_value* target, const struct tyran_object_key* key, tyran_value* value)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only insert keys on objects");
 	tyran_object_insert_key(target->data.object, key, value);
@@ -41,7 +45,7 @@ void tyran_value_object_insert_array(tyran_value* target, int key, tyran_value* 
 
 tyran_value* tyran_value_object_insert_key_and_flag(tyran_value* target, tyran_value* key, const tyran_value* value, tyran_object_key_flag_type flag)
 {
-	const tyran_object_key* ok = 0;
+	const struct tyran_object_key* ok = 0;
 	tyran_value* v;
 
 	int arrayindex = -1;
@@ -69,16 +73,22 @@ void tyran_value_object_delete(tyran_value* target, tyran_value* key)
 
 	tyran_value_convert_to_string(key);
 
-	tyran_object_delete(target->data.object, (const tyran_object_key*)key->data.str);
+	tyran_object_delete(target->data.object, (const struct tyran_object_key*)key->data.str);
 }
 
-tyran_value* tyran_value_object_lookup(const tyran_value* target, const tyran_object_key* key, tyran_object_key_flag_type* flag)
+tyran_value* tyran_value_object_lookup(const tyran_value* target, const struct tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
 	return tyran_object_lookup(target->data.object, key, flag);
 }
 
-tyran_value* tyran_value_object_lookup_prototype(const tyran_value* target, const tyran_object_key* key, tyran_object_key_flag_type* flag)
+tyran_value* tyran_value_object_lookup_string(const tyran_value* target, const struct tyran_string* keyString, tyran_object_key_flag_type* flag)
+{
+	const struct tyran_object_key* key = tyran_object_key_new(keyString, tyran_object_key_flag_normal);
+	return tyran_value_object_lookup(target, key, flag);
+}
+
+tyran_value* tyran_value_object_lookup_prototype(const tyran_value* target, const struct tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
 	return tyran_object_lookup_prototype(target->data.object, key, flag);
@@ -96,12 +106,12 @@ void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_v
 
 tyran_value* tyran_value_object_lookup_array(const tyran_value* args, int index, tyran_object_key_flag_type* flag)
 {
-	TYRAN_UNICODE_STRING(12) string_buffer;
-	tyran_number_integer_to_string(index, string_buffer.string);
-	return tyran_object_lookup(args->data.object, string_buffer.string, flag);
+	tyran_string* string_buffer = tyran_string_alloc(12);
+	tyran_number_integer_to_string(index, string_buffer);
+	return tyran_value_object_lookup_string(args, string_buffer, flag);
 }
 
-int tyran_value_object_has_key(const tyran_value* target, const tyran_object_key* key)
+int tyran_value_object_has_key(const tyran_value* target, const struct tyran_object_key* key)
 {
 	tyran_object_key_flag_type flag;
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Only objects has keys");

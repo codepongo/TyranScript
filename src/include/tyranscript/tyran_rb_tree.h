@@ -1,8 +1,6 @@
 #ifndef _TYRAN_RB_TREE_H
 #define _TYRAN_RB_TREE_H
 
-#include "tyran_rb_tree_macros.h"
-
 typedef enum tyran_rb_tree_color {
 	tyran_rb_tree_color_red = 1,
 	tyran_rb_tree_color_black
@@ -18,7 +16,7 @@ typedef struct stree_node {
   struct stree_node* right;
 } tree_node;
 
-typedef struct sroot {
+typedef struct tree_root {
   struct stree_node* root;
   void* (*key)(struct stree_node* node);
   int (*compare)(void* keyA, void* keyB);
