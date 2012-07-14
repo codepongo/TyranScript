@@ -511,11 +511,11 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_JB:
 			parse_b_rc(parser_state, &b, &x);
-			tyran_opcodes_op_jb(opcodes, a, b);
+			tyran_opcodes_op_jb(opcodes, b, x);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_JBLD:
 			parse_r_b_rc(parser_state, &a, &b, &y);
-			tyran_opcodes_op_jbld(opcodes, x, y, b);
+			tyran_opcodes_op_jbld(opcodes, a, b, y);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_JEQ:
 			parse_b_rc_rc(parser_state, &b, &x, &y);
