@@ -8,7 +8,7 @@ struct tyran_string;
 typedef tyran_uint16 tyran_object_key_flag_type;
 
 typedef struct tyran_object_key {
-	struct tyran_string* str;
+	const struct tyran_string* str;
 	tyran_object_key_flag_type flag;
 } tyran_object_key;
 

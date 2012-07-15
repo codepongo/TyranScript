@@ -16,15 +16,6 @@
 #include <tyranscript/debug/tyran_print_opcodes.h>
 #include <tyranscript/debug/tyran_print_constants.h>
 
-void tyran_parse_assembler(tyran_lexer* lexer, char c)
-{
-	tyran_string* string_buffer = tyran_string_alloc(1024);
-	tyran_string* temp_string_buffer = string_buffer;
-
-	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
-		tyran_lexer_parse_identifier(lexer, c, temp_string_buffer);
-	}
-}
 
 enum {
 	TYRN_TOKEN_NOTHING,
@@ -101,29 +92,28 @@ static int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffe
 	return 0;
 }
 
-int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_string* temp_string_buffer, tyran_string_length_type* string_length, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
+int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
 {
-	int identifier_length = tyran_lexer_parse_identifier(lexer, c, temp_string_buffer);
-	*string_length = (tyran_string_length_type) identifier_length;
-	char temp_buffer[512];
-	tyran_string_to_c_str(temp_buffer, 512, temp_string_buffer);
-	int r = tyran_lexer_assembler_get_keyword_token(temp_buffer);
+	char buf[512];
+	int len = 512;
+
+	tyran_lexer_parse_identifier(lexer, c, buf, &len);
+	int r = tyran_lexer_assembler_get_keyword_token(buf);
 	if (r) {
 		return r;
 	}
 
-	int len = tyran_strlen(temp_buffer);
 	if (len == 0) {
 		return 0;
 	}
 
-	if (tyran_strcmp(temp_buffer, "true") == 0) {
+	if (tyran_strcmp(buf, "true") == 0) {
 		return TYRAN_TOKEN_TRUE;
-	} else if (tyran_strcmp(temp_buffer, "false") == 0) {
+	} else if (tyran_strcmp(buf, "false") == 0) {
 		return TYRAN_TOKEN_FALSE;
 	}
 
-	*token = (void*) tyran_string_strdup(temp_string_buffer);
+	*token = (void*) tyran_string_from_c_str(buf);
 	tyran_lexer_set_end(lexer_position_info, lexer);
 	return TYRAN_TOKEN_IDENTIFIER;
 }
@@ -131,9 +121,6 @@ int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c
 
 static int tyran_lexer_assembler_next_token(tyran_lexer_token_data token, tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
-	tyran_string* string_buffer = tyran_string_alloc(1024);
-	tyran_string* temp_string_buffer = string_buffer;
-
 	tyran_lexer_set_begin(lexer_position_info, lexer);
 
 	char c = tyran_lexer_next_character_skip_whitespace(lexer);
@@ -154,9 +141,9 @@ static int tyran_lexer_assembler_next_token(tyran_lexer_token_data token, tyran_
 	}
 
 	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
-		return tyran_lexer_assembler_parse_identifier_or_keyword(lexer, c, temp_string_buffer, &string_buffer->len, lexer_position_info, token);
+		return tyran_lexer_assembler_parse_identifier_or_keyword(lexer, c, lexer_position_info, token);
 	} else if (tyran_lexer_is_digit(c) || c == '-') {
-		return tyran_lexer_parse_number(lexer, c, temp_string_buffer, &string_buffer->len, lexer_position_info, token);
+		return tyran_lexer_parse_number(lexer, c, lexer_position_info, token);
 	} else if (c == '"' || c == '\'') {
 		return tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, token);
 	} else if (c == '/') {

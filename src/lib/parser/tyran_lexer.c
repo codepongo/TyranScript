@@ -104,10 +104,9 @@ const tyran_string* tyran_lexer_parse_string(tyran_lexer* lexer)
 	char endchar = c;
 
 	#define max_string_length 4096
-	tyran_string* string_buffer = tyran_string_alloc(max_string_length);
+	tyran_string_char buf[max_string_length];
 
 	int index = 0;
-	tyran_uint16* buf = string_buffer->buf;
 
 	while (index < max_string_length) {
 		c = tyran_lexer_pop_character(lexer);
@@ -146,9 +145,8 @@ const tyran_string* tyran_lexer_parse_string(tyran_lexer* lexer)
 			break;
 		}
 	}
-	buf[index] = 0;
-	string_buffer->len = (tyran_string_length_type) index;
-	return tyran_string_strdup(string_buffer);
+
+	return tyran_string_from_characters(buf, index);;
 }
 
 int tyran_lexer_parse_operand(tyran_lexer* lexer)
@@ -285,60 +283,64 @@ void tyran_lexer_set_end(tyran_lexer_position_info* lexer_position_info, const t
 	lexer_position_info->last_column = lexer->column;
 }
 
-int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, tyran_string* temp_string_buffer)
+int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max_length)
 {
 	int string_index = 0;
+
 	tyran_lexer_push_character(c, lexer);
 	while (string_index < 1020) {
 		c = tyran_lexer_pop_character(lexer);
 		if (!tyran_lexer_is_alpha_numeric(c) && c != '_' && c != '$') {
 			break;
 		}
-		temp_string_buffer->buf[string_index++] = c;
+		buf[string_index++] = c;
 	}
 	tyran_lexer_push_character(c, lexer);
-	temp_string_buffer->buf[string_index] = 0;
 
-	char buf[512];
-	tyran_string_to_c_str(buf, 512, temp_string_buffer);
+	buf[string_index] = 0;
+	*max_length = string_index;
 	
-	return string_index;
+	return 0;
 }
 
-int tyran_lexer_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_string* temp_string_buffer, tyran_string_length_type* string_length, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
+int tyran_lexer_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
 {
-	int identifier_length = tyran_lexer_parse_identifier(lexer, c, temp_string_buffer);
-	*string_length = (tyran_string_length_type) identifier_length;
-	char temp_buffer[512];
-	tyran_string_to_c_str(temp_buffer, 512, temp_string_buffer);
-	int r = tyran_lexer_get_keyword_token(temp_buffer);
+	char buf[1024];
+	int length = 1024;
+
+	tyran_lexer_parse_identifier(lexer, c, buf, &length);
+	buf[length] = 0;
+
+	int r = tyran_lexer_get_keyword_token(buf);
 	if (r) {
 		return r;
 	}
-	*token = (void*) tyran_string_strdup(temp_string_buffer);
+	*token = 0; //(void*) tyran_string_strdup(temp_string_buffer);
 	tyran_lexer_set_end(lexer_position_info, lexer);
 	return TYRAN_TOKEN_IDENTIFIER;
 }
 
-int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_string* number_string, tyran_string_length_type* string_length, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
+int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
 {
 	int decimal_point_detected = 0;
 	int hex_number_detected = 0;
 	int string_index = 0;
 
-	number_string->buf[string_index++] = (int) c;
+	char buf[1024];
+
+	buf[string_index++] = (int) c;
 
 	while (string_index < 128) {
 		c = tyran_lexer_pop_character(lexer);
 		if (tyran_lexer_is_digit(c)) {
-			number_string->buf[string_index++] = (int) c;
+			buf[string_index++] = (int) c;
 		} else if (c == '.') {
 			if (decimal_point_detected || hex_number_detected) {
 				TYRAN_SOFT_ERROR("Number format error");
 				return 0;
 			}
 			decimal_point_detected = 1;
-			number_string->buf[string_index++] = (int) c;
+			buf[string_index++] = (int) c;
 		} else if ((c == 'x' || c == 'X') && string_index == 1 && string_index) {
 			if (decimal_point_detected || hex_number_detected) {
 				TYRAN_SOFT_ERROR("Number format error");
@@ -352,21 +354,16 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_string* number_st
 	}
 	tyran_lexer_set_end(lexer_position_info, lexer);
 
-	number_string->buf[string_index] = 0;
-	*string_length = (tyran_string_length_type) string_index;
+	buf[string_index] = 0;
 
 	tyran_number* number_pointer = TYRAN_MALLOC_TYPE(tyran_number, 1);
 	if (hex_number_detected) {
 		unsigned int temp_value;
-		char temp_buffer[512];
-		tyran_string_to_c_str(temp_buffer, 512, number_string);
-		tyran_sscanf(temp_buffer, "%X", &temp_value);
+		tyran_sscanf(buf, "%X", &temp_value);
 		*number_pointer = temp_value;
 
 	} else {
-		char temp_buffer[512];
-		tyran_string_to_c_str(temp_buffer, 512, number_string);
-		tyran_sscanf(temp_buffer, "%f", number_pointer);
+		tyran_sscanf(buf, "%f", number_pointer);
 	}
 
 	*token = number_pointer;
@@ -400,9 +397,6 @@ int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, tyran_lexer_posit
 
 static int tyran_lexer_next_token(tyran_lexer_token_data* token, tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
-	tyran_string* string_buffer = tyran_string_alloc(1024);
-	tyran_string* temp_string_buffer = string_buffer;
-
 	tyran_lexer_set_begin(lexer_position_info, lexer);
 
 	char c = tyran_lexer_next_character_skip_whitespace(lexer);
@@ -411,9 +405,9 @@ static int tyran_lexer_next_token(tyran_lexer_token_data* token, tyran_lexer_pos
 	}
 
 	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
-		return tyran_lexer_parse_identifier_or_keyword(lexer, c, temp_string_buffer, &string_buffer->len, lexer_position_info, token);
+		return tyran_lexer_parse_identifier_or_keyword(lexer, c, lexer_position_info, token);
 	} else if (tyran_lexer_is_digit(c)) {
-		return tyran_lexer_parse_number(lexer, c, temp_string_buffer, &string_buffer->len, lexer_position_info, token);
+		return tyran_lexer_parse_number(lexer, c, lexer_position_info, token);
 	} else if (c == '"' || c == '\'') {
 		return tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, token);
 	} else if (c == '/') {

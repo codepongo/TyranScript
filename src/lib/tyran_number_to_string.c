@@ -42,14 +42,13 @@ void modp_itoa10(int32_t value, char* str)
 	strreverse(str,wstr-1);
 }
 
-void tyran_number_integer_to_string(int value, tyran_string* str)
+void tyran_number_integer_to_string(int value, const tyran_string** str)
 {
 	char string_buffer[100];
 	
 	modp_itoa10(value, string_buffer);
 
-	const tyran_string* value_as_string = tyran_string_from_c_str(string_buffer);
-	tyran_string_strcpy(str, value_as_string);
+    *str = tyran_string_from_c_str(string_buffer);
 }
 
 
@@ -164,12 +163,11 @@ void tyran_modp_dtoa2(double value, char* str, int prec)
     strreverse(str, wstr-1);
 }
 
-void tyran_number_to_string(double value, tyran_string* str, int prec)
+void tyran_number_to_string(double value, const tyran_string** str, int prec)
 {
 	char string_buffer[100];
 
 	tyran_modp_dtoa2(value, string_buffer, prec);
 
-	const tyran_string* value_as_string = tyran_string_from_c_str(string_buffer);
-	tyran_string_strcpy(str, value_as_string);
+	*str = tyran_string_from_c_str(string_buffer);
 }

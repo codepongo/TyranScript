@@ -106,8 +106,8 @@ void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_v
 
 tyran_value* tyran_value_object_lookup_array(const tyran_value* args, int index, tyran_object_key_flag_type* flag)
 {
-	tyran_string* string_buffer = tyran_string_alloc(12);
-	tyran_number_integer_to_string(index, string_buffer);
+	const tyran_string* string_buffer;
+	tyran_number_integer_to_string(index, &string_buffer);
 	return tyran_value_object_lookup_string(args, string_buffer, flag);
 }
 

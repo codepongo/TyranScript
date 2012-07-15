@@ -1,12 +1,11 @@
-#include <tyranscript/tyran_function_object.h>
 #include <tyranscript/tyran_config.h>
-#include <tyranscript/tyran_scope_stack.h>
+#include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_object_macros.h>
-#include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_function.h>
-
 #include <tyranscript/tyran_function_prototype.h>
+#include <tyranscript/tyran_function_object.h>
+#include <tyranscript/tyran_scope_stack.h>
 #include <tyranscript/tyran_value_object.h>
 
 tyran_function_object* tyran_function_object_new(const tyran_function* function)
