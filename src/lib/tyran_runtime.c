@@ -25,6 +25,13 @@ void tyran_register_copy(tyran_value* target, tyran_value* source, int count)
 	}
 }
 
+#define TYRAN_RUNTIME_DO_JMP \
+	instruction = *pc++; \
+	instruction >>= 6; \
+	TYRAN_REGISTER_BR; \
+	pc += br;
+
+
 void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_value, const struct tyran_runtime_callbacks* event_callbacks)
 {
 	TYRAN_LOG(" ");
@@ -63,8 +70,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 
 	while (1)
 	{
+#ifdef TYRAN_RUNTIME_DEBUG
 		long pc_value = pc - sp->opcodes->codes;
-
 		char tmp[512];
 		char result[512];
 
@@ -84,9 +91,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 		TYRAN_LOG("%s", result);
 
 		tyran_print_opcode(pc, sp->constants, pc_value, 1);
-		if (pc_value > 10) {
-			return;
-		}
+#endif
 	u32t instruction = *pc++;
 	u32t opcode = instruction & 0x3f;
 	instruction >>= 6;
@@ -166,6 +171,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			}
 			if (test != a) {
 				pc++;
+			} else {
+				TYRAN_RUNTIME_DO_JMP;
 			}
 			break;
 		case TYRAN_OPCODE_JLT:
@@ -177,6 +184,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			}
 			if (test != a) {
 				pc++;
+			} else {
+				TYRAN_RUNTIME_DO_JMP;
 			}
 			break;
 		case TYRAN_OPCODE_JLE:
@@ -188,6 +197,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			}
 			if (test != a) {
 				pc++;
+			} else {
+				TYRAN_RUNTIME_DO_JMP;
 			}
 			break;
 		case TYRAN_OPCODE_JMP:
