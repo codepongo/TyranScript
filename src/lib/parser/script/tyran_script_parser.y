@@ -76,34 +76,32 @@ expression:
 	| switch
 	| class
 
-
 block: 
 	INDENT OUTDENT {block_create}
-	| INDENT body OUTDENT {$2}
+	| INDENT body OUTDENT {$$ = $2;}
 
 identifier: 
-	IDENTIFIER {literal_create_identifier($1);}
+	IDENTIFIER {$$ = literal_create_identifier($1);}
 
 alpha_numeric: 
-	NUMBER {literal_create_number($1);}
-	| STRING {literal_create_string($1);}
+	NUMBER {$$ = literal_create_number($1);}
+	| STRING {$$ = literal_create_string($1);}
 
 literal: 
 	alpha_numeric
-	| UNDEFINED {undefined_create();}
-	| NULL {null_create();}
-	| BOOL {bool_create($1);}
+	| UNDEFINED {$$ = undefined_create();}
+	| NULL {$$ = null_create();}
+	| BOOL {$$ = bool_create($1);}
 
 assignment: 
-	assignable '=' expression {new Assign $1, $3}
-	| assignable '=' TERMINATOR expression {new Assign $1, $4}
-	| assignable '=' INDENT expression OUTDENT {new Assign $1, $4}
+	assignable '=' expression {$$ = tyran_parser_assignment($1, $3);}
+	| assignable '=' TERMINATOR expression {$$ = tyran_parser_assignment($1, $4);}
+	| assignable '=' INDENT expression OUTDENT {$$ = tyran_parser_assignment($1, $4);}
 
 object_assignment:
 	object_assignable {new value $1}
-	| object_assignable ':' expression {new Assign new value($1), $3, object}
-	| object_assignable ':'
-		 INDENT expression OUTDENT {new Assign new value($1), $4, object}
+	| object_assignable ':' expression {$$ = tyran_parser_assignment(tyran_parser_value($1), $3, "object");}
+	| object_assignable ':' INDENT expression OUTDENT {$$ = tyran_parser_assignment(tyran_parser_value($1), $4, "object");}
 	| comment
 
 object_assignable: 
@@ -112,19 +110,19 @@ object_assignable:
 	| self_member
 
 return: 
-	RETURN expression {Return $2}
-	| RETURN {new Return}
+	RETURN expression {$$ = tyran_parser_return($2);}
+	| RETURN {$$ = tyran_parser_return(0);}
 
 comment: 
-	COMMENT {new Comment $1}
+	COMMENT {$$ = tyran_parser_comment($1);}
 
 code: 
-	PARAM_START parameter_list PARAM_END function_glyph block {new Code $2, $5, $4}
-	| function_glyph block {new Code, $2, $1}
+	PARAM_START parameter_list PARAM_END function_glyph block {$$ = tyran_parser_code($2, $5, $4);}
+	| function_glyph block {$$ = tyran_parser_code(0, $2, $1);}
 
 function_glyph: 
-	"->" {func}
-	| "=>" {boundfunc}
+	"->" {}
+	| "=>" {}
 
 optional_comma: 
 	','
@@ -132,14 +130,14 @@ optional_comma:
 parameter_list: 
 	','
 	| parameter {$1}
-	| parameter_list ',' parameter {$1.concat $3}
-	| parameter_list optional_comma TERMINATOR parameter {$1.concat $4}
-	| parameter_list optional_comma INDENT parameter_list optional_comma OUTDENT {$1.concat $4}
+	| parameter_list ',' parameter {$$ = tyran_parser_concat($1, $3);}
+	| parameter_list optional_comma TERMINATOR parameter {$$ = tyran_parser_concat($1, $4);}
+	| parameter_list optional_comma INDENT parameter_list optional_comma OUTDENT {$$ = tyran_parser_concat($1, $4);}
 
 parameter: 
-	parameter_variable {new parameter $1}
-	| parameter_variable "..." {new parameter $1, null, on}
-	| parameter_variable '=' expression {new parameter $1, $3}
+	parameter_variable {$$ = tyran_parser_parameter($1, 0, 0);}
+	| parameter_variable "..." {$$ = tyran_parser_parameter($1, 0, 1);}
+	| parameter_variable '=' expression {$$ = tyran_parser_parameter($1, $3, 0);}
 
 parameter_variable:
 	identifier
@@ -148,32 +146,32 @@ parameter_variable:
 	| object
 
 splat: 
-	expression "..." {new splat $1}
+	expression "..." {tyran_parser_splat($1)}
 
 basic_assignable: 
-	identifier  {new value $1}
+	identifier  {$$ = tyran_parser_value($1);}
 	| value accessor {$1.add $2}
-	| invocation accessor {new value $1.concat $2}
+	| invocation accessor { $$ = tyran_parser_concat(tyran_parser_value($1), $2); }
 	| self_member
 
 
 assignable: 
 	basic_assignable
-	| array {new value $1}
-	| object {new value $1}
+	| array { $$ = tyran_parser_value($1); }
+	| object { $$ = tyran_parser_value($1); }
 
 value: 
 	assignable
-	| literal {new value $1}
-	| parenthetical {new value $1}
-	| range {new value $1}
+	| literal { $$ = tyran_parser_value($1); }
+	| parenthetical { $$ = tyran_parser_value($1); }
+	| range { $$ = tyran_parser_value($1); }
 	| self {}
 
 accessor:
-	'.'  identifier {new Access $2}
-	| "?." identifier {new Access $2, soak}
-	| "::" identifier {Access $2}
-	| "::" {new Access new literal prototype}
+	'.'  identifier { $$ = tyran_parser_accessor($2); }
+	| "?." identifier { $$ = tyran_parser_accessor($2); }
+	| "::" identifier { $$ = tyran_parser_accessor(tyran_parser_accessor()); }
+	| "::" { $$ = tyran_parser_accessor(tyran_parser_value('prototype')); }
 	| index {}
 
 index: 
@@ -181,35 +179,30 @@ index:
 	| INDEX_SOAK index {extend $2, soak : yes}
 
 index_value: 
-	expression {new index $1}
-	| slice {new slice $1}
+	expression { $$ = tyran_parser_index($1); }
+	| slice { $$ = tyran_parser_slice($1); }
 
 object: 
-	'{' assign_list optional_comma '}' {new Obj $2, $1.generated}
+	'{' assign_list '}' { $$ = tyran_parser_object($2); }
 
 assign_list:
 	',' {}
 	| object_assignment {$1}
-	| assign_list ',' object_assignment {$1.concat $3}
-	| assign_list optional_comma TERMINATOR object_assignment {$1.concat $4}
-	| assign_list optional_comma INDENT assign_list optional_comma OUTDENT {$1.concat $4}
+	| assign_list ',' object_assignment { $$ = tyran_parser_concat($1, $3); }
+	| assign_list optional_comma TERMINATOR object_assignment { $$ = tyran_parser_concat($1, $4); }
+	| assign_list optional_comma INDENT assign_list optional_comma OUTDENT { $$ = tyran_parser_concat($1, $4); }
 
 class: 
-	CLASS {new class}
-	| CLASS block {new class null, null, $2}
-	| CLASS EXTENDS expression {new class null, $3}
-	| CLASS EXTENDS expression block {new class null, $3, $4}
-	| CLASS basic_assignable {new class $2}
-	| CLASS basic_assignable block {new class $2, null, $3}
-	| CLASS basic_assignable EXTENDS expression {class $2, $4}
-	| CLASS basic_assignable EXTENDS expression block { class $2, $4, $5}
+	CLASS basic_assignable { $$ = tyran_parser_class(0, 0, 0); }
+	| CLASS basic_assignable block { $$ = tyran_parser_class($2, null, $3); }
+	| CLASS basic_assignable EXTENDS expression { $$ = tyran_parser_class($2, $4, 0); }
+	| CLASS basic_assignable EXTENDS expression block { $$ = tyran_parser_class($2, $4, $5); }
 
 invocation: 
-	value IDENTIFIER arguments {new Call $1, $3, $2}
+	value IDENTIFIER arguments { $$ = tyran_parser_call($1, $3, $2); }
 	| invocation IDENTIFIER arguments {new Call $1, $3, $2}
 	| SUPER {new Call super, new splat new literal arguments}
 	| SUPER arguments {new Call super, $2}
-
 
 arguments: 
 	CALL_START CALL_END
@@ -217,7 +210,6 @@ arguments:
 
 self: 
 	'@' {new value new literal this}
-
 
 self_member: 
 	'@' identifier {new value new literal(this), new Access($2)], this}
