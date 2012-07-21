@@ -10,7 +10,6 @@
 %token CLASS
 %token ELSE
 %token LOOP
-%token COMPOUND ASSIGN
 %token SHIFT
 %token BOOL
 %token INDENT
@@ -42,7 +41,26 @@
 %token UNTIL
 %token OWN
 %token STATEMENT
-%token COMPOUND_ASSIGN
+%token COMPOUND_ASSIGNMENT
+
+%left '.' "?." "::"
+%left CALL_START CALL_END
+%nonassoc "++" "--"
+%left '?'
+%right UNARY
+%left MATH
+%left '+' '-'
+%left SHIFT
+%left RELATION
+%left COMPARE
+%left LOGIC
+%nonassoc INDENT OUTDENT
+%right '=' ':' COMPOUND_ASSIGNMENT RETURN EXTENDS
+%right FORIN FOROF BY WHEN
+%right IF ELSE FOR WHILE UNTIL LOOP SUPER CLASS
+%right POST_IF
+
+
 
 %%
 
@@ -51,7 +69,7 @@ root:
 	| block TERMINATOR
 
 body:
-	line {block_wrap $1}
+	line {$$ = $1;}
 	| body TERMINATOR line {$1.push $3}
 	| body TERMINATOR
 
@@ -165,13 +183,11 @@ value:
 	| literal { $$ = tyran_parser_value($1); }
 	| parenthetical { $$ = tyran_parser_value($1); }
 	| range { $$ = tyran_parser_value($1); }
-	| self {}
 
 accessor:
 	'.'  identifier { $$ = tyran_parser_accessor($2); }
 	| "?." identifier { $$ = tyran_parser_accessor($2); }
 	| "::" identifier { $$ = tyran_parser_accessor(tyran_parser_accessor()); }
-	| "::" { $$ = tyran_parser_accessor(tyran_parser_value('prototype')); }
 	| index {}
 
 index: 
@@ -212,7 +228,7 @@ self:
 	'@' {new value new literal this}
 
 self_member: 
-	'@' identifier {new value new literal(this), new Access($2)], this}
+	self identifier {new value new literal(this), new Access($2)], this}
 
 array: 
 	'[' ']' {new Arr}
@@ -339,7 +355,7 @@ operation:
 	| expression COMPARE  expression {new Op $2, $1, $3}
 	| expression LOGIC    expression {new Op $2, $1, $3}
 	| expression RELATION expression {if $2.charAt(0) is !new Op($2.., $1, $3).invert() else new Op $2, $1, $3}
-	| basic_assignable COMPOUND_ASSIGN expression {new Assign $1, $3, $2}
-	| basic_assignable COMPOUND_ASSIGN INDENT expression OUTDENT {new Assign $1, $4, $2}
+	| basic_assignable COMPOUND_ASSIGNMENT expression {new Assign $1, $3, $2}
+	| basic_assignable COMPOUND_ASSIGNMENT INDENT expression OUTDENT {new Assign $1, $4, $2}
 	| basic_assignable EXTENDS expression {new Extends $1, $3}
 %%
