@@ -60,7 +60,7 @@
 %right IF ELSE FOR WHILE UNTIL LOOP SUPER CLASS
 %right POST_IF
 
-
+%expect 9
 
 %%
 
@@ -69,9 +69,7 @@ root:
 	| block TERMINATOR
 
 body:
-	line {$$ = $1;}
-	| body TERMINATOR line {$1.push $3}
-	| body TERMINATOR
+	line { $$ = $1; }
 
 line: 
 	expression
@@ -80,7 +78,7 @@ line:
 statement: 
 	return
 	| comment
-	| STATEMENT {new literal $1}
+	| STATEMENT { $$ = tyran_parser_literal($1); }
 
 expression: 
 	value
@@ -95,8 +93,8 @@ expression:
 	| class
 
 block: 
-	INDENT OUTDENT {block_create}
-	| INDENT body OUTDENT {$$ = $2;}
+	INDENT OUTDENT { $$ = tyran_parser_block(0); }
+	| INDENT body OUTDENT { $$ = tyran_parser_block($2); }
 
 identifier: 
 	IDENTIFIER {$$ = literal_create_identifier($1);}
@@ -117,7 +115,7 @@ assignment:
 	| assignable '=' INDENT expression OUTDENT {$$ = tyran_parser_assignment($1, $4);}
 
 object_assignment:
-	object_assignable {new value $1}
+	object_assignable {}
 	| object_assignable ':' expression {$$ = tyran_parser_assignment(tyran_parser_value($1), $3, "object");}
 	| object_assignable ':' INDENT expression OUTDENT {$$ = tyran_parser_assignment(tyran_parser_value($1), $4, "object");}
 	| comment
@@ -147,7 +145,7 @@ optional_comma:
 
 parameter_list: 
 	','
-	| parameter {$1}
+	| parameter { $$ = $1; }
 	| parameter_list ',' parameter {$$ = tyran_parser_concat($1, $3);}
 	| parameter_list optional_comma TERMINATOR parameter {$$ = tyran_parser_concat($1, $4);}
 	| parameter_list optional_comma INDENT parameter_list optional_comma OUTDENT {$$ = tyran_parser_concat($1, $4);}
@@ -164,11 +162,11 @@ parameter_variable:
 	| object
 
 splat: 
-	expression "..." {tyran_parser_splat($1)}
+	expression "..." { $$ = tyran_parser_splat($1); }
 
 basic_assignable: 
 	identifier  {$$ = tyran_parser_value($1);}
-	| value accessor {$1.add $2}
+	| value accessor { $$ = tyran_parser_accessor($1, $2); }
 	| invocation accessor { $$ = tyran_parser_concat(tyran_parser_value($1), $2); }
 	| self_member
 
@@ -191,8 +189,8 @@ accessor:
 	| index {}
 
 index: 
-	INDEX_START index_value INDEX_END {$2}
-	| INDEX_SOAK index {extend $2, soak : yes}
+	INDEX_START index_value INDEX_END { $$ = $2; }
+	| INDEX_SOAK index { tyran_parser_index_soakt($2); }
 
 index_value: 
 	expression { $$ = tyran_parser_index($1); }
@@ -203,56 +201,56 @@ object:
 
 assign_list:
 	',' {}
-	| object_assignment {$1}
+	| object_assignment { $$ = $1; }
 	| assign_list ',' object_assignment { $$ = tyran_parser_concat($1, $3); }
 	| assign_list optional_comma TERMINATOR object_assignment { $$ = tyran_parser_concat($1, $4); }
 	| assign_list optional_comma INDENT assign_list optional_comma OUTDENT { $$ = tyran_parser_concat($1, $4); }
 
 class: 
 	CLASS basic_assignable { $$ = tyran_parser_class(0, 0, 0); }
-	| CLASS basic_assignable block { $$ = tyran_parser_class($2, null, $3); }
+	| CLASS basic_assignable block { $$ = tyran_parser_class($2, 0, $3); }
 	| CLASS basic_assignable EXTENDS expression { $$ = tyran_parser_class($2, $4, 0); }
 	| CLASS basic_assignable EXTENDS expression block { $$ = tyran_parser_class($2, $4, $5); }
 
 invocation: 
 	value IDENTIFIER arguments { $$ = tyran_parser_call($1, $3, $2); }
-	| invocation IDENTIFIER arguments {new Call $1, $3, $2}
-	| SUPER {new Call super, new splat new literal arguments}
-	| SUPER arguments {new Call super, $2}
+	| invocation IDENTIFIER arguments { $$ = tyran_parser_call($1, $3, $2); }
+	| SUPER { $$ = tyran_parser_call(); }
+	| SUPER arguments { $$ = tyran_parser_call_super($2); }
 
 arguments: 
 	CALL_START CALL_END
-	| CALL_START argument_list optional_comma CALL_END {$2}
+	| CALL_START argument_list CALL_END { $$ = tyran_parser_arguments($2); }
 
 self: 
-	'@' {new value new literal this}
+	'@' { $$ = tyran_parser_self(); }
 
 self_member: 
-	self identifier {new value new literal(this), new Access($2)], this}
+	self identifier { tyran_parser_self_identifier($2); }
 
 array: 
-	'[' ']' {new Arr}
-	| '[' argument_list optional_comma ']' {new Arr $2}
+	'[' ']' { $$ = tyran_parser_array(0); }
+	| '[' argument_list ']' { $$ = tyran_parser_array($2); }
 
 range_dots: 
-	".." {inclusive}
-	| "..." {exclusive}
+	".." {}
+	| "..." {}
 
 range: 
-	'[' expression range_dots expression ']' {new range $1, $3, $2}
+	'[' expression range_dots expression ']' { $$ = tyran_parser_range($1, $3, $2); }
 
 slice: 
-	expression range_dots expression {new range $1, $3, $2}
-	| expression range_dots {new range $1, null, $2}
-	| range_dots expression {new range null, $2, $1}
-	| range_dots {new range null, null, $1}
+	expression range_dots expression { $$ = tyran_parser_range($1, $3, $2); }
+	| expression range_dots {$$ = tyran_parser_range($1, 0, $2); }
+	| range_dots expression {$$ = tyran_parser_range($0, $2, $1); }
+	| range_dots { $$ = tyran_parser_range(0, 0, $1); }
 
 argument_list: 
-	argument {$1}
-	| argument_list ',' argument {$1.concat $3}
-	| argument_list optional_comma TERMINATOR argument {$1.concat $4}
-	| INDENT argument_list optional_comma OUTDENT {$2}
-	| argument_list optional_comma INDENT argument_list optional_comma OUTDENT {$1.concat $4}
+	argument { $$ = $1; }
+	| argument_list ',' argument { $$ = tyran_parser_concat($1, $3); }
+	| argument_list TERMINATOR argument { $$ = tyran_parser_concat($1, $3); }
+	| INDENT argument_list OUTDENT { $$ = $2; }
+	| argument_list INDENT argument_list OUTDENT { $$ = tyran_parser_concat($1, $4); }
 
 argument: 
 	expression
@@ -260,102 +258,91 @@ argument:
 
 basic_arguments: 
 	expression
-	| basic_arguments ',' expression {concat $1, $3}
+	| basic_arguments ',' expression { $$ = tyran_parser_concat($1, $3); }
 
 parenthetical: 
-	'(' body ')' {new Parens $2}
-	| '(' INDENT body OUTDENT ')' {new Parens $3}
+	'(' body ')' { $$ = tyran_parser_parens($2); }
+	| '(' INDENT body OUTDENT ')' { $$ = tyran_parser_parens($3); }
 
 while_condition: 
-	WHILE expression {new While $2}
-	| WHILE expression WHEN expression {new While $2, guard: $4}
-	| UNTIL expression {new While $2, invert: true}
-	| UNTIL expression WHEN expression {new While $2, invert: true, guard: $4}
+	WHILE expression { $$ = tyran_parser_while($2); }
 
 while: 
-	while_condition block {$1.addBody $2}
-	| statement  while_condition {$2.addBody block.wrap $1}
-	| expression while_condition {$2.addBody block.wrap $1}
-	| loop {$1}
-
-loop: 
-	LOOP block {new While(new literal true).addBody $2}
-	| LOOP expression {new While(new literal true).addBody block.wrap $2}
+	while_condition block { $$ = tyran_parser_while_condition($1, $2); }
 
 for: 
-	statement for_body {new for $1, $2}
-	| expression for_body {new for $1, $2}
-	| for_body block {new for $2, $1}
+	statement for_body { $$ = tyran_parser_for($1, $2); }
+	| expression for_body { $$ = tyran_parser_for($1, $2); }
+	| for_body block { $$ = tyran_parser_for($1, $2); }
 
 for_body: 
-	FOR range {source: new value($2)}
+	FOR range { $$ = tyran_parser_for_body($2); }
 	| for_start for_source {}
 
 for_start: 
-	FOR for_variables {$2}
-	| FOR OWN for_variables {$3.own = yes; $3}
+	FOR for_variables { $$ = tyran_parser_for_start($2, 0); }
+	| FOR OWN for_variables { $$ = tyran_parser_for_start($3, 1); }
 
 for_value: 
 	identifier
 	| self_member
-	| array {new value $1}
-	| object {new value $1}
+	| array { $$ = tyran_parser_array($1); }
+	| object { $$ = tyran_parser_object($1); }
 
 for_variables: 
-	for_value {$1}
-	| for_value ',' for_value {$1, $3}
+	for_value { $$ = tyran_parser_for_variables($1); }
+	| for_value ',' for_value { $$ = tyran_parser_for_variables($1, $3); }
 
 for_source: 
-	FORIN expression {source: $2}
-	| FOROF expression {source: $2, object: yes}
-	| FORIN expression WHEN expression {source: $2, guard: $4}
-	| FOROF expression WHEN expression {source: $2, guard: $4, object: yes}
-	| FORIN expression BY expression {source: $2, step: $4}
-	| FORIN expression WHEN expression BY expression {source: $2, guard: $4, step: $6}
-	| FORIN expression BY expression WHEN expression {source: $2, step:  $4, guard: $6}
+	FORIN expression { $$ = tyran_parser_for_in($2); }
+	| FOROF expression { $$ = tyran_parser_for_of($2); }
+	| FORIN expression WHEN expression {$$ = tyran_parser_for_in_when($2, $4); }
+	| FOROF expression WHEN expression {$$ = tyran_parser_for_of_when($2, $4); }
+	| FORIN expression BY expression { $$ = tyran_parser_for_in_by($2, $4); }
+	| FORIN expression WHEN expression BY expression { $$ = tyran_parser_for_in_when($2, $4, $6); }
+	| FORIN expression BY expression WHEN expression { $$ = tyran_parser_for_in_by($2, $4, $6);}
 
 switch: 
-	SWITCH expression INDENT whens OUTDENT {new switch $2, $4}
-	| SWITCH expression INDENT whens ELSE block OUTDENT {new switch $2, $4, $6}
-	| SWITCH INDENT whens OUTDENT {new switch null, $3}
-	| SWITCH INDENT whens ELSE block OUTDENT {new switch null, $3, $5}
+	SWITCH expression INDENT whens OUTDENT { $$ = tyran_parser_switch($2, $4); }
+	| SWITCH expression INDENT whens ELSE block OUTDENT { $$ = tyran_parser_switch($2, $4, $6); }
+	| SWITCH INDENT whens OUTDENT { $$ = tyran_parser_switch($2, $4); }
+	| SWITCH INDENT whens ELSE block OUTDENT { $$ = tyran_parser_switch($2, $4); }
 
 whens: 
 	when
-	| whens when {$1.concat $2}
+	| whens when { tyran_parser_concat($1, $2); }
 
 when: 
-	LEADING_WHEN basic_arguments block {$2, $3}
-	| LEADING_WHEN basic_arguments block TERMINATOR {$2, $3}
+	LEADING_WHEN basic_arguments block { tyran_parser_when($2, $3); }
+	| LEADING_WHEN basic_arguments block TERMINATOR { tyran_parser_when($2, $3); }
 
 if_block: 
-	IF expression block {new if $2, $3, type: $1}
-	| if_block ELSE IF expression block {$1.addElse new if $4, $5, type: $3}
+	IF expression block { $$ = tyran_parser_if($2, $3); }
+	| if_block ELSE IF expression block {tyran_parser_if_else($1, $3); }
 
 if: 
 	if_block
-	| if_block ELSE block {$1.addElse $3}
-	| statement POST_IF expression {new if $3, block.wrap($1]), type: $2, statement: true}
-	| expression POST_IF expression {new if $3, block.wrap($1]), type: $2, statement: true}
+	| if_block ELSE block { tyran_parser_if_else($1, $3); }
+	| statement POST_IF expression {}
+	| expression POST_IF expression {}
 
 operation: 
-	UNARY expression {new Op $1 , $2}
-	| '-'     expression {new Op -, $2), prec: UNARY}
-	| '+'    expression {new Op +, $2), prec: UNARY}
-	| "--" basic_assignable {new Op --, $2}
-	| "++" basic_assignable {new Op ++, $2}
-	| basic_assignable "--" {new Op --, $1, null, true}
-	| basic_assignable "++" {new Op ++, $1, null, true}
-	| expression '?' {new Existence $1}
-	| expression '+'  expression {new Op + , $1, $3}
-	| expression '-'  expression {new Op - , $1, $3}
+	UNARY expression { $$ = tyran_parser_operand($1, $2); }
+	| '-' expression { $$ = tyran_parser_operand($1, $2); }
+	| '+' expression { $$ = tyran_parser_operand($1, $2); }
+	| "--" basic_assignable { $$ = tyran_parser_operand($1, $2); }
+	| "++" basic_assignable { $$ = tyran_parser_operand($1, $2); }
+	| basic_assignable "--" {$$ = tyran_parser_operand($1, $2); }
+	| basic_assignable "++" {$$ = tyran_parser_operand($1, $2); }
+	| expression '?' {$$ = tyran_parser_operand($1, $2); }
+	| expression '+'  expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
+	| expression '-'  expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
 
-	| expression MATH     expression {new Op $2, $1, $3}
-	| expression SHIFT    expression {new Op $2, $1, $3}
-	| expression COMPARE  expression {new Op $2, $1, $3}
-	| expression LOGIC    expression {new Op $2, $1, $3}
-	| expression RELATION expression {if $2.charAt(0) is !new Op($2.., $1, $3).invert() else new Op $2, $1, $3}
-	| basic_assignable COMPOUND_ASSIGNMENT expression {new Assign $1, $3, $2}
-	| basic_assignable COMPOUND_ASSIGNMENT INDENT expression OUTDENT {new Assign $1, $4, $2}
-	| basic_assignable EXTENDS expression {new Extends $1, $3}
+	| expression MATH     expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
+	| expression SHIFT    expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
+	| expression COMPARE  expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
+	| expression LOGIC    expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
+	| basic_assignable COMPOUND_ASSIGNMENT expression { $$ = tyran_parser_assignment($1, $3, $2); }
+	| basic_assignable COMPOUND_ASSIGNMENT INDENT expression OUTDENT {$$ = tyran_parser_assignment($1, $3, $2); }
+	| basic_assignable EXTENDS expression { tyran_parser_extends($1, $3); }
 %%
