@@ -18,18 +18,12 @@
 tyran_parser_state* tyran_parser_state_new(tyran_runtime* runtime, tyran_value* context, const char *str, int length)
 {
 	tyran_parser_state* parser_state = TYRAN_CALLOC(tyran_parser_state);
-	tyran_lexer* lexer = TYRAN_CALLOC(tyran_lexer);
+	tyran_lexer* lexer = tyran_lexer_new(str);
 	parser_state->lexer = lexer;
 	tyran_value_copy(parser_state->context, *context);
 	parser_state->runtime = runtime;
 
 	tyran_parser_state_reset(parser_state);
-
-	int number_of_octets = sizeof(char) * length;
-	lexer->buffer = TYRAN_MALLOC_TYPE(char, length + 1);
-	tyran_memcpy(lexer->buffer, str, number_of_octets);
-	lexer->buffer[length] = 0;
-	lexer->line = 1;
 
 	return parser_state;
 }

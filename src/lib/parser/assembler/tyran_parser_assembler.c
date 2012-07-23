@@ -45,6 +45,14 @@ enum {
 	TYRAN_TOKEN_ASSEMBLER_NEW,
 	TYRAN_TOKEN_ASSEMBLER_FUNC,
 	TYRAN_TOKEN_ASSEMBLER_COLON,
+	TYRAN_TOKEN_ASSEMBLER_TRUE,
+	TYRAN_TOKEN_ASSEMBLER_FALSE,
+	TYRAN_TOKEN_ASSEMBLER_IDENTIFIER,
+	TYRAN_TOKEN_ASSEMBLER_REGISTER,
+	TYRAN_TOKEN_ASSEMBLER_MEMBER,
+	TYRAN_TOKEN_ASSEMBLER_NUMBER,
+	TYRAN_TOKEN_ASSEMBLER_STRING
+
 } tyran_assembler_token;
 
 
@@ -108,14 +116,14 @@ int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c
 	}
 
 	if (tyran_strcmp(buf, "true") == 0) {
-		return TYRAN_TOKEN_TRUE;
+		return TYRAN_TOKEN_ASSEMBLER_TRUE;
 	} else if (tyran_strcmp(buf, "false") == 0) {
-		return TYRAN_TOKEN_FALSE;
+		return TYRAN_TOKEN_ASSEMBLER_FALSE;
 	}
 
 	*token = (void*) tyran_string_from_c_str(buf);
 	tyran_lexer_set_end(lexer_position_info, lexer);
-	return TYRAN_TOKEN_IDENTIFIER;
+	return TYRAN_TOKEN_ASSEMBLER_IDENTIFIER;
 }
 
 
@@ -129,23 +137,25 @@ static int tyran_lexer_assembler_next_token(tyran_lexer_token_data token, tyran_
 	}
 
 	if (c=='@') {
-		return TYRAN_TOKEN_REGISTER;
+		return TYRAN_TOKEN_ASSEMBLER_REGISTER;
 	}
 
 	if (c==':') {
-		return TYRAN_TOKEN_COLON;
+		return TYRAN_TOKEN_ASSEMBLER_COLON;
 	}
 
 	if (c=='.') {
-		return TYRAN_TOKEN_MEMBER;
+		return TYRAN_TOKEN_ASSEMBLER_MEMBER;
 	}
 
 	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
 		return tyran_lexer_assembler_parse_identifier_or_keyword(lexer, c, lexer_position_info, token);
 	} else if (tyran_lexer_is_digit(c) || c == '-') {
 		return tyran_lexer_parse_number(lexer, c, lexer_position_info, token);
+		return TYRAN_TOKEN_ASSEMBLER_NUMBER;	
 	} else if (c == '"' || c == '\'') {
-		return tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, token);
+		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, token);
+		return TYRAN_TOKEN_ASSEMBLER_STRING;
 	} else if (c == '/') {
 		int r = tyran_lexer_parse_comment(lexer);
 		if (r) {
@@ -186,7 +196,7 @@ void parse_r_index(tyran_parser_state* state, tyran_reg_index* a)
 	tyran_number* number;
 	tyran_lexer_position_info position;
 	int token = tyran_lexer_assembler_next_token(&number, &position, state->lexer);
-	if (token != TYRAN_TOKEN_NUMBER) {
+	if (token != TYRAN_TOKEN_ASSEMBLER_NUMBER) {
 		return error();
 	}
 
@@ -199,7 +209,7 @@ void parse_s(tyran_parser_state* state, int* s)
 	tyran_lexer_position_info position;
 
 	int token = tyran_lexer_assembler_next_token(&number, &position, state->lexer);
-	if (token != TYRAN_TOKEN_NUMBER)
+	if (token != TYRAN_TOKEN_ASSEMBLER_NUMBER)
 	{
 		error();
 	} else {
@@ -213,17 +223,17 @@ tyran_reg_or_constant_index parse_constant(tyran_parser_state* parser_state, tyr
 
 	int token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
 	switch (token) {
-		case TYRAN_TOKEN_NUMBER:
+		case TYRAN_TOKEN_ASSEMBLER_NUMBER:
 			return tyran_constants_add_number(parser_state->constants, *(tyran_number*)data);
 			break;
-		case TYRAN_TOKEN_STRING:
+		case TYRAN_TOKEN_ASSEMBLER_STRING:
 			return tyran_constants_add_string(parser_state->constants, (tyran_string*)data);
 			break;
-		case TYRAN_TOKEN_TRUE:
-		case TYRAN_TOKEN_FALSE:
+		case TYRAN_TOKEN_ASSEMBLER_TRUE:
+		case TYRAN_TOKEN_ASSEMBLER_FALSE:
 			return tyran_constants_add_boolean(parser_state->constants, *(tyran_boolean*)data);
 			break;
-		case TYRAN_TOKEN_REGISTER:
+		case TYRAN_TOKEN_ASSEMBLER_REGISTER:
 			if (!allow_register) {
 				error();
 				return -1;
@@ -252,7 +262,7 @@ void parse_r(tyran_parser_state* state, tyran_reg_index* a)
 	tyran_lexer_position_info position;
 
 	int token = tyran_lexer_assembler_next_token((tyran_lexer_token_data*)0, &position, state->lexer);
-	if (token != TYRAN_TOKEN_REGISTER) {
+	if (token != TYRAN_TOKEN_ASSEMBLER_REGISTER) {
 		return error();
 	}
 	parse_r_index(state, a);
@@ -264,7 +274,7 @@ void parse_identifier(tyran_parser_state* state)
 	tyran_lexer_position_info position;
 
 	int token = tyran_lexer_assembler_next_token((tyran_lexer_token_data*)&name, &position, state->lexer);
-	if (token != TYRAN_TOKEN_IDENTIFIER) {
+	if (token != TYRAN_TOKEN_ASSEMBLER_IDENTIFIER) {
 		return error();
 	}
 	add_label_reference(state, name);
@@ -275,11 +285,11 @@ void parse_b(tyran_parser_state* state, tyran_boolean* b)
 	tyran_lexer_position_info position;
 
 	int token = tyran_lexer_assembler_next_token((tyran_lexer_token_data*)0, &position, state->lexer);
-	if (token != TYRAN_TOKEN_TRUE && token != TYRAN_TOKEN_FALSE) {
+	if (token != TYRAN_TOKEN_ASSEMBLER_TRUE && token != TYRAN_TOKEN_ASSEMBLER_FALSE) {
 		return error();
 	}
 
-	*b = (token == TYRAN_TOKEN_TRUE);
+	*b = (token == TYRAN_TOKEN_ASSEMBLER_TRUE);
 }
 
 void parse_r_rc(tyran_parser_state* state, tyran_reg_index* a, tyran_reg_or_constant_index* c)
@@ -420,14 +430,14 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 	tyran_opcodes* opcodes = parser_state->opcodes;
 
 	switch (token) {
-		case TYRAN_TOKEN_MEMBER:
+		case TYRAN_TOKEN_ASSEMBLER_MEMBER:
 			token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
 			if (token == TYRAN_TOKEN_ASSEMBLER_FUNC) {
 				if (parser_state->inside_function) {
 					tyran_lexer_assembler_end_of_function(parser_state);
 				}
 				token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
-				if (token != TYRAN_TOKEN_IDENTIFIER) {
+				if (token != TYRAN_TOKEN_ASSEMBLER_IDENTIFIER) {
 					error();
 					return -1;
 				}
@@ -438,9 +448,9 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 				parser_state->inside_function = 1;
 			}
 			break;
-		case TYRAN_TOKEN_IDENTIFIER:
+		case TYRAN_TOKEN_ASSEMBLER_IDENTIFIER:
 			token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
-			if (token == TYRAN_TOKEN_COLON) {
+			if (token == TYRAN_TOKEN_ASSEMBLER_COLON) {
 				add_label(parser_state, (tyran_string*)data);
 			} else {
 				TYRAN_LOG("error token:%d", token);

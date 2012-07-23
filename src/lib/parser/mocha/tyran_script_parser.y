@@ -1,23 +1,29 @@
+%{
+	#include <tyranscript/parser/mocha/tyran_parser.h>	
+%}
+
+%pure-parser
+%locations
+%parse-param {tyran_parser* parser}
+%lex-param {tyran_parser* parser}
+%error-verbose
 
 %token COMMENT
 %token UNARY
-%token EXTENDS
 %token COMPARE
 %token FOROF
 %token IDENTIFIER
 %token TERMINATOR
 %token INDEX_START
-%token CLASS
-%token ELSE
-%token LOOP
 %token SHIFT
-%token BOOL
 %token INDENT
 %token SWITCH
 %token PARAM_END
-%token NULL
+%token TYRAN_TOKEN_NULL
 %token CALL_START
 %token UNDEFINED
+%token TYRAN_TOKEN_TRUE
+%token TYRAN_TOKEN_FALSE
 %token WHILE
 %token INDEX_SOAK
 %token OUTDENT
@@ -60,13 +66,12 @@
 %right IF ELSE FOR WHILE UNTIL LOOP SUPER CLASS
 %right POST_IF
 
-%expect 9
+%expect 19
 
 %%
 
 root: 
 	body
-	| block TERMINATOR
 
 body:
 	line { $$ = $1; }
@@ -78,7 +83,6 @@ line:
 statement: 
 	return
 	| comment
-	| STATEMENT { $$ = tyran_parser_literal($1); }
 
 expression: 
 	value
@@ -88,7 +92,6 @@ expression:
 	| assignment
 	| if
 	| while
-	| for
 	| switch
 	| class
 
@@ -97,27 +100,28 @@ block:
 	| INDENT body OUTDENT { $$ = tyran_parser_block($2); }
 
 identifier: 
-	IDENTIFIER {$$ = literal_create_identifier($1);}
+	IDENTIFIER { $$ = tyran_parser_literal_identifier($1); }
 
 alpha_numeric: 
-	NUMBER {$$ = literal_create_number($1);}
-	| STRING {$$ = literal_create_string($1);}
+	NUMBER { $$ = tyran_parser_literal_number($1); }
+	| STRING { $$ = tyran_parser_literal_string($1); }
 
 literal: 
 	alpha_numeric
-	| UNDEFINED {$$ = undefined_create();}
-	| NULL {$$ = null_create();}
-	| BOOL {$$ = bool_create($1);}
+	| UNDEFINED { $$ = tyran_parser_undefined(); }
+	| TYRAN_TOKEN_NULL { $$ = tyran_parser_null(); }
+	| TYRAN_TOKEN_TRUE { $$ = tyran_parser_bool(1); }
+	| TYRAN_TOKEN_FALSE { $$ = tyran_parser_bool(0); }
 
 assignment: 
-	assignable '=' expression {$$ = tyran_parser_assignment($1, $3);}
-	| assignable '=' TERMINATOR expression {$$ = tyran_parser_assignment($1, $4);}
-	| assignable '=' INDENT expression OUTDENT {$$ = tyran_parser_assignment($1, $4);}
+	assignable '=' expression { $$ = tyran_parser_assignment($1, $3); }
+	| assignable '=' TERMINATOR expression { $$ = tyran_parser_assignment($1, $4); }
+	| assignable '=' INDENT expression OUTDENT { $$ = tyran_parser_assignment($1, $4); }
 
 object_assignment:
 	object_assignable {}
-	| object_assignable ':' expression {$$ = tyran_parser_assignment(tyran_parser_value($1), $3, "object");}
-	| object_assignable ':' INDENT expression OUTDENT {$$ = tyran_parser_assignment(tyran_parser_value($1), $4, "object");}
+	| object_assignable ':' expression { $$ = tyran_parser_object_assignment(tyran_parser_value($1), $3); }
+	| object_assignable ':' INDENT expression OUTDENT { $$ = tyran_parser_object_assignment(tyran_parser_value($1), $4); }
 	| comment
 
 object_assignable: 
@@ -126,8 +130,8 @@ object_assignable:
 	| self_member
 
 return: 
-	RETURN expression {$$ = tyran_parser_return($2);}
-	| RETURN {$$ = tyran_parser_return(0);}
+	"return" expression {$$ = tyran_parser_return($2);}
+	| "return" {$$ = tyran_parser_return(0);}
 
 comment: 
 	COMMENT {$$ = tyran_parser_comment($1);}
@@ -149,10 +153,10 @@ parameter_list:
 	| parameter_list ',' parameter {$$ = tyran_parser_concat($1, $3);}
 	| parameter_list optional_comma TERMINATOR parameter {$$ = tyran_parser_concat($1, $4);}
 	| parameter_list optional_comma INDENT parameter_list optional_comma OUTDENT {$$ = tyran_parser_concat($1, $4);}
-
+ 
 parameter: 
 	parameter_variable {$$ = tyran_parser_parameter($1, 0, 0);}
-	| parameter_variable "..." {$$ = tyran_parser_parameter($1, 0, 1);}
+	| parameter_variable "..." {$$ = tyran_parser_parameter($1, 0, 0);}
 	| parameter_variable '=' expression {$$ = tyran_parser_parameter($1, $3, 0);}
 
 parameter_variable:
@@ -166,7 +170,7 @@ splat:
 
 basic_assignable: 
 	identifier  {$$ = tyran_parser_value($1);}
-	| value accessor { $$ = tyran_parser_accessor($1, $2); }
+	| value accessor { $$ = tyran_parser_accessor($2); }
 	| invocation accessor { $$ = tyran_parser_concat(tyran_parser_value($1), $2); }
 	| self_member
 
@@ -185,12 +189,12 @@ value:
 accessor:
 	'.'  identifier { $$ = tyran_parser_accessor($2); }
 	| "?." identifier { $$ = tyran_parser_accessor($2); }
-	| "::" identifier { $$ = tyran_parser_accessor(tyran_parser_accessor()); }
+	| "::" identifier { $$ = tyran_parser_accessor($2); }
 	| index {}
 
 index: 
 	INDEX_START index_value INDEX_END { $$ = $2; }
-	| INDEX_SOAK index { tyran_parser_index_soakt($2); }
+	| INDEX_SOAK index { tyran_parser_index_soak($2); }
 
 index_value: 
 	expression { $$ = tyran_parser_index($1); }
@@ -207,15 +211,15 @@ assign_list:
 	| assign_list optional_comma INDENT assign_list optional_comma OUTDENT { $$ = tyran_parser_concat($1, $4); }
 
 class: 
-	CLASS basic_assignable { $$ = tyran_parser_class(0, 0, 0); }
-	| CLASS basic_assignable block { $$ = tyran_parser_class($2, 0, $3); }
-	| CLASS basic_assignable EXTENDS expression { $$ = tyran_parser_class($2, $4, 0); }
-	| CLASS basic_assignable EXTENDS expression block { $$ = tyran_parser_class($2, $4, $5); }
+	"class" basic_assignable { $$ = tyran_parser_class(0, 0, 0); }
+	| "class" basic_assignable block { $$ = tyran_parser_class($2, 0, $3); }
+	| "class" basic_assignable "extends" expression { $$ = tyran_parser_class($2, $4, 0); }
+	| "class" basic_assignable "extends" expression block { $$ = tyran_parser_class($2, $4, $5); }
 
 invocation: 
 	value IDENTIFIER arguments { $$ = tyran_parser_call($1, $3, $2); }
 	| invocation IDENTIFIER arguments { $$ = tyran_parser_call($1, $3, $2); }
-	| SUPER { $$ = tyran_parser_call(); }
+	| SUPER { $$ = tyran_parser_call_super(0); }
 	| SUPER arguments { $$ = tyran_parser_call_super($2); }
 
 arguments: 
@@ -270,43 +274,12 @@ while_condition:
 while: 
 	while_condition block { $$ = tyran_parser_while_condition($1, $2); }
 
-for: 
-	statement for_body { $$ = tyran_parser_for($1, $2); }
-	| expression for_body { $$ = tyran_parser_for($1, $2); }
-	| for_body block { $$ = tyran_parser_for($1, $2); }
-
-for_body: 
-	FOR range { $$ = tyran_parser_for_body($2); }
-	| for_start for_source {}
-
-for_start: 
-	FOR for_variables { $$ = tyran_parser_for_start($2, 0); }
-	| FOR OWN for_variables { $$ = tyran_parser_for_start($3, 1); }
-
-for_value: 
-	identifier
-	| self_member
-	| array { $$ = tyran_parser_array($1); }
-	| object { $$ = tyran_parser_object($1); }
-
-for_variables: 
-	for_value { $$ = tyran_parser_for_variables($1); }
-	| for_value ',' for_value { $$ = tyran_parser_for_variables($1, $3); }
-
-for_source: 
-	FORIN expression { $$ = tyran_parser_for_in($2); }
-	| FOROF expression { $$ = tyran_parser_for_of($2); }
-	| FORIN expression WHEN expression {$$ = tyran_parser_for_in_when($2, $4); }
-	| FOROF expression WHEN expression {$$ = tyran_parser_for_of_when($2, $4); }
-	| FORIN expression BY expression { $$ = tyran_parser_for_in_by($2, $4); }
-	| FORIN expression WHEN expression BY expression { $$ = tyran_parser_for_in_when($2, $4, $6); }
-	| FORIN expression BY expression WHEN expression { $$ = tyran_parser_for_in_by($2, $4, $6);}
 
 switch: 
-	SWITCH expression INDENT whens OUTDENT { $$ = tyran_parser_switch($2, $4); }
-	| SWITCH expression INDENT whens ELSE block OUTDENT { $$ = tyran_parser_switch($2, $4, $6); }
-	| SWITCH INDENT whens OUTDENT { $$ = tyran_parser_switch($2, $4); }
-	| SWITCH INDENT whens ELSE block OUTDENT { $$ = tyran_parser_switch($2, $4); }
+	"switch" expression INDENT whens OUTDENT { $$ = tyran_parser_switch($2, $4, 0); }
+	| "switch" expression INDENT whens ELSE block OUTDENT { $$ = tyran_parser_switch($2, $4, $6); }
+	| "switch" INDENT whens OUTDENT { $$ = tyran_parser_switch($2, $4, 0); }
+	| "switch" INDENT whens ELSE block OUTDENT { $$ = tyran_parser_switch($2, $4, 0); }
 
 whens: 
 	when
@@ -317,12 +290,12 @@ when:
 	| LEADING_WHEN basic_arguments block TERMINATOR { tyran_parser_when($2, $3); }
 
 if_block: 
-	IF expression block { $$ = tyran_parser_if($2, $3); }
-	| if_block ELSE IF expression block {tyran_parser_if_else($1, $3); }
+	"if" expression block { $$ = tyran_parser_if($2, $3); }
+	| if_block "else" "if" expression block {tyran_parser_if_else($1, $3); }
 
 if: 
 	if_block
-	| if_block ELSE block { tyran_parser_if_else($1, $3); }
+	| if_block "else" block { tyran_parser_if_else($1, $3); }
 	| statement POST_IF expression {}
 	| expression POST_IF expression {}
 
@@ -338,11 +311,11 @@ operation:
 	| expression '+'  expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
 	| expression '-'  expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
 
-	| expression MATH     expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
-	| expression SHIFT    expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
-	| expression COMPARE  expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
-	| expression LOGIC    expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
-	| basic_assignable COMPOUND_ASSIGNMENT expression { $$ = tyran_parser_assignment($1, $3, $2); }
-	| basic_assignable COMPOUND_ASSIGNMENT INDENT expression OUTDENT {$$ = tyran_parser_assignment($1, $3, $2); }
+	| expression MATH expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
+	| expression SHIFT expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
+	| expression COMPARE expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
+	| expression LOGIC expression { $$ = tyran_parser_operand_binary($2, $1, $3); }
+	| basic_assignable COMPOUND_ASSIGNMENT expression { $$ = tyran_parser_compound_assignment($1, $3, $2); }
+	| basic_assignable COMPOUND_ASSIGNMENT INDENT expression OUTDENT {$$ = tyran_parser_compound_assignment($1, $3, $2); }
 	| basic_assignable EXTENDS expression { tyran_parser_extends($1, $3); }
 %%

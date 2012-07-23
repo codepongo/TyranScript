@@ -1,7 +1,6 @@
 #ifndef _TYRAN_LEXER_H
 #define _TYRAN_LEXER_H
 
-#include "tyran_parser.h"
 #include <tyranscript/tyran_string.h>
 
 struct tyran_parser_state;
@@ -14,8 +13,22 @@ typedef struct tyran_lexer {
 	int last_token;
 } tyran_lexer;
 
+typedef struct tyran_lexer_position_info {
+	int first_line;
+	int last_line;
+	int first_column;
+	int last_column;
+} tyran_lexer_position_info;
+
+typedef void* tyran_lexer_token_data;
+
+
+/*
 int yylex(tyran_lexer_token_data* token, tyran_lexer_position_info* lexer_position_info, struct tyran_parser_state* parser_state);
 void yyerror(tyran_lexer_position_info* lexer_position_info, struct tyran_parser_state* ps, const char* error_message);
+*/
+
+tyran_lexer* tyran_lexer_new(const char* buf);
 
 int tyran_lexer_is_alpha(int c);
 int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max_length);
