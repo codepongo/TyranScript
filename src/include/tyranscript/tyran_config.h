@@ -52,6 +52,7 @@ typedef unsigned short tyran_uint16;
 
 #define tyran_strcmp strcmp
 #define tyran_strlen strlen
+#define tyran_strdup strdup
 #define tyran_strncmp strncmp
 #define tyran_printf printf
 #define tyran_fflush fflush

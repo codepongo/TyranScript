@@ -11,6 +11,8 @@
 
 const int TYRAN_TOKEN_COMMENT = -1;
 
+
+
 void yyerror(tyran_lexer_position_info* lexer_position_info, tyran_parser_state* ps, const char *msg)
 {
 	TYRAN_SOFT_ERROR("%d[%d-%d]:%s", lexer_position_info->first_line, lexer_position_info->first_column, lexer_position_info->last_column, msg);
@@ -27,7 +29,7 @@ tyran_lexer* tyran_lexer_new(const char* buf)
 	return lexer;
 }
 
-static char tyran_lexer_pop_character(tyran_lexer* lexer)
+char tyran_lexer_pop_character(tyran_lexer* lexer)
 {
 	char c = 0;
 
@@ -67,17 +69,14 @@ int tyran_lexer_is_alpha_numeric(int c)
 	return tyran_lexer_is_alpha(c) || tyran_lexer_is_digit(c);
 }
 
-const tyran_string* tyran_lexer_parse_string(tyran_lexer* lexer)
+int tyran_lexer_parse_string(tyran_lexer* lexer, char* buf, int* length)
 {
 	char c = tyran_lexer_pop_character(lexer);
 	char endchar = c;
 
-	#define max_string_length 4096
-	tyran_string_char buf[max_string_length];
-
 	int index = 0;
 
-	while (index < max_string_length) {
+	while (index < *length) {
 		c = tyran_lexer_pop_character(lexer);
 		if (c == 0) {
 			TYRAN_SOFT_ERROR("Unexpected End of File");
@@ -115,7 +114,9 @@ const tyran_string* tyran_lexer_parse_string(tyran_lexer* lexer)
 		}
 	}
 
-	return tyran_string_from_characters(buf, index);;
+	buf[index] = 0;
+	*length = index;
+	return 1;
 }
 
 static void tyran_lexer_skip_comment(tyran_lexer *lexer)
@@ -144,6 +145,17 @@ char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
 
 	return c;
 }
+
+char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexer)
+{
+	char c;
+	
+	while ((c = tyran_lexer_pop_character(lexer)) == ' ' || c == '\t' || c == '\r')
+		;
+
+	return c;
+}
+
 
 void tyran_lexer_set_begin(tyran_lexer_position_info* lexer_position_info, const tyran_lexer* lexer)	
 {
@@ -246,8 +258,10 @@ int tyran_lexer_parse_comment(tyran_lexer* lexer)
 int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
 {
 	tyran_lexer_push_character(c, lexer);
-	*token = (void *) tyran_lexer_parse_string(lexer);
-
+	char buf[256];
+	int length = 256;
+	tyran_lexer_parse_string(lexer, buf, &length);
+	*token = tyran_strdup(buf);
 	tyran_lexer_set_end(lexer_position_info, lexer);
 	return 1;
 }

@@ -3,7 +3,162 @@
 #include "tyran_script_parser.tab.h"
 #include <tyranscript/tyran_string.h>
 
-tyran_parser* tyran_parser_alloc(const char* buf)
+enum tyran_parser_type {
+	TYRAN_PARSER_NODE_TYPE_NUMBER,
+	TYRAN_PARSER_NODE_TYPE_BOOLEAN,
+	TYRAN_PARSER_NODE_TYPE_STRING,
+	TYRAN_PARSER_NODE_TYPE_RETURN,
+	TYRAN_PARSER_NODE_TYPE_IDENTIFIER,
+	TYRAN_PARSER_NODE_TYPE_ASSIGNMENT,
+	TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY
+};
+
+typedef struct tyran_parser_node
+{
+	enum tyran_parser_type type;
+} tyran_parser_node;
+
+typedef struct tyran_parser_node_value
+{
+	tyran_parser_node node;
+} tyran_parser_node_value;
+
+typedef struct tyran_parser_node_number
+{
+	tyran_parser_node node;
+	tyran_number number;
+} tyran_parser_node_number;
+
+typedef struct tyran_parser_node_boolean
+{
+	tyran_parser_node node;
+	tyran_boolean boolean;
+} tyran_parser_node_boolean;
+
+typedef struct tyran_parser_node_string
+{
+	tyran_parser_node node;
+	const char* string;
+	int length;
+} tyran_parser_node_string;
+
+typedef struct tyran_parser_node_identifier
+{
+	tyran_parser_node node;
+	const char* string;
+	int length;
+} tyran_parser_node_identifier;
+
+typedef struct tyran_parser_node_assignment
+{
+	tyran_parser_node node;
+	tyran_parser_node* source;
+	tyran_parser_node* target;
+} tyran_parser_node_assignment;
+
+typedef struct tyran_parser_node_operand_binary
+{
+	tyran_parser_node node;
+	char operator_type;
+	tyran_parser_node* left;
+	tyran_parser_node* right;
+} tyran_parser_node_operand_binary;
+
+typedef struct tyran_parser_node_return
+{
+	tyran_parser_node node;
+	tyran_parser_node* expression;
+} tyran_parser_node_return;
+
+
+void TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(const char* buf, const char* description, int tab_count)
+{
+	char tabs[200];
+	tyran_memset_type_n(tabs, '\t', tab_count);
+	tabs[tab_count] = 0;
+	
+	TYRAN_LOG("%s%s %s", tabs, description, buf);
+}
+
+void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* node, int tab_count)
+{
+
+	const int buf_size = 256;
+	char buf[buf_size];
+	buf[0] = 0;
+	if (!node) {
+		tyran_snprintf(buf, buf_size, "null");
+		TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+	} else {
+	
+	switch (node->type)
+	{
+	case TYRAN_PARSER_NODE_TYPE_NUMBER:
+		{
+			tyran_parser_node_number* number = (tyran_parser_node_number*)node;
+			tyran_snprintf(buf, buf_size, "number:%f", number->number);
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_BOOLEAN:
+		{
+			tyran_parser_node_boolean* number = (tyran_parser_node_boolean*)node;
+			tyran_snprintf(buf, buf_size, "bool:%d", number->boolean);
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_STRING:
+		{
+			tyran_parser_node_string* string = (tyran_parser_node_string*)node;
+			tyran_snprintf(buf, buf_size, "string: '%s'", string->string);
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_RETURN:
+		{
+			tyran_parser_node_return* ret = (tyran_parser_node_return*)node;
+			tyran_snprintf(buf, buf_size, "return");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("expression", ret->expression, tab_count + 1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_IDENTIFIER:
+		{
+			tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*)node;
+			tyran_snprintf(buf, buf_size, "identifier: '%s'", identifier->string);
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_ASSIGNMENT:
+		{
+			tyran_snprintf(buf, buf_size, "assignment");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			tyran_parser_node_assignment* assignment = (tyran_parser_node_assignment*)node;
+			TYRAN_PARSER_NODE_PRINT_HELPER("assignment source", assignment->source, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("assignment target", assignment->target, tab_count+1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY:
+		{
+			tyran_parser_node_operand_binary* operand = (tyran_parser_node_operand_binary*)node;
+			tyran_snprintf(buf, buf_size, "operand binary '%c'", operand->operator_type);
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("operand left", operand->left, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("operand right", operand->right, tab_count+1);
+		}
+	break;
+	
+	}
+	}
+}
+
+void TYRAN_PARSER_NODE_PRINT(const char* description, tyran_parser_node* node)
+{
+	TYRAN_PARSER_NODE_PRINT_HELPER(description, node, 0);
+}
+
+
+tyran_parser* tyran_parser_new(const char* buf)
 {
 	tyran_parser* parser = TYRAN_MALLOC_TYPE(tyran_parser, 1);
 	parser->position = 0;
@@ -12,31 +167,182 @@ tyran_parser* tyran_parser_alloc(const char* buf)
 	return parser;
 }
 
+int tyran_parser_parse_operand(int c, tyran_lexer* lexer)
+{
+	tyran_lexer_push_character(c, lexer);
+	typedef struct tyran_operand_info {
+		const char* name;
+		int len;
+		int value;
+	} tyran_operand_info;
 
-static int tyran_parser_next_token(tyran_lexer_token_data* token, tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
+	static tyran_operand_info operands[] = {
+		{ "++", 2, INCREMENT },
+		{ "--", 2, DECREMENT },
+		{ "+=", 2, 0 },
+		{ "-=", 2, 0 },
+		{ "*=", 2, 0 },
+		{ "/=", 2, 0 },
+		{ "%=", 2, 0 },
+		{ "&=", 2, 0 },
+		{ "|=", 2, 0 },
+		{ "^=", 2, 0 },
+		{ "<<", 2, 0 },
+		{ ">>", 2, 0 },
+		{ "<", 1, 0 },
+		{ ">", 1, 0 },
+		{ "&", 1, 0 },
+		{ "|", 1, 0 },
+		{ "^", 1, 0 },
+		{ "/", 1, DIVIDE },
+		{ "*", 1, MULTIPLY },
+		{ "%", 1, MODULUS },
+		{ "=", 1, EQUAL },
+		{ "+", 1, ADD },
+		{ "-", 1, SUBTRACT },
+		{ "~", 1, 0 },
+		{ "not", 3, NOT },
+		{ ".", 1, MEMBER },
+		{ "(", 1, PARENTHESES_LEFT },
+		{ ")", 1, PARENTHESES_RIGHT },
+		{ "[", 1, BRACKET_LEFT },
+		{ "]", 1, BRACKET_RIGHT },
+		{ ";", 1, TERMINATOR },
+		{ "\n", 1, TERMINATOR },
+		{ "{", 1, OBJECT_START },
+		{ "}", 1, OBJECT_END },
+		{ ":", 1, COLON },
+		{ ",", 1, COMMA },
+		{ "?", 1, 0 },
+	};
+	int index;
+	char buf[5];
+	size_t i;
+	for (index = 0; index < 4; ++index) {
+		char c = tyran_lexer_pop_character(lexer);
+		if (c == 0 || c == '\n') {
+			break;
+		}
+		buf[index] = c;
+	}
+	buf[index] = 0;
+	if (!index) {
+		return 0;
+	}
+
+	for (i = 0; i < sizeof(operands)/sizeof(tyran_operand_info); ++i) {
+		if (index < operands[i].len) {
+			continue;
+		}
+
+		if (tyran_strncmp(buf, operands[i].name, operands[i].len) == 0) {
+			int j;
+			for (j = index - 1; j >= operands[i].len; --j) {
+				tyran_lexer_push_character(buf[j], lexer);
+			}
+			return operands[i].value;
+		}
+	}
+
+	for (i = index - 1; i >= 1; --i) {
+		tyran_lexer_push_character(buf[i], lexer);
+	}
+	return 0;
+}
+
+
+int tyran_parser_parse_token(int c, tyran_lexer* lexer)
+{
+	tyran_lexer_push_character(c, lexer);
+	typedef struct tyran_operand_info {
+		const char* name;
+		int len;
+		int value;
+	} tyran_operand_info;
+
+	static tyran_operand_info operands[] = {
+		{ "if", 2, IF },
+		{ "else", 4, ELSE },
+		{ "true", 4, TYRAN_TOKEN_TRUE },
+		{ "false", 5, TYRAN_TOKEN_FALSE },
+		{ "class", 5, _CLASS },
+		{ "return", 6, RETURN },
+		{ "while", 5, WHILE },
+		{ "switch", 6, SWITCH },
+		{ "when", 4, WHEN },
+		{ "for", 3, FOR },
+		{ "super", 5, SUPER },
+		{ "until", 5, UNTIL },
+		{ "own", 3, OWN },
+	};
+	int index;
+	const int max_characters = 6;
+	char buf[max_characters+1];
+	size_t i;
+	for (index = 0; index < max_characters; ++index) {
+		char c = tyran_lexer_pop_character(lexer);
+		if (c == 0 || c == '\n') {
+			break;
+		}
+		buf[index] = c;
+	}
+	buf[index] = 0;
+	if (!index) {
+		return 0;
+	}
+
+	for (i = 0; i < sizeof(operands)/sizeof(tyran_operand_info); ++i) {
+		if (index < operands[i].len) {
+			continue;
+		}
+
+		if (tyran_strncmp(buf, operands[i].name, operands[i].len) == 0) {
+			int j;
+			for (j = index - 1; j >= operands[i].len; --j) {
+				tyran_lexer_push_character(buf[j], lexer);
+			}
+			return operands[i].value;
+		}
+	}
+
+	for (i = index - 1; i >= 1; --i) {
+		tyran_lexer_push_character(buf[i], lexer);
+	}
+	return 0;
+}
+
+
+static int tyran_parser_next_token(tyran_lexer_token_data* token_data, tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
 	tyran_lexer_set_begin(lexer_position_info, lexer);
 
-	char c = tyran_lexer_next_character_skip_whitespace(lexer);
+	char c = tyran_lexer_next_character_skip_whitespace_except_newline(lexer);
 	if (!c) {
 		return 0;
 	}
 
 	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
-		tyran_lexer_parse_identifier(lexer, c, lexer_position_info, token);
-		return IDENTIFIER;
+		int len = 100;
+		char* identifier = TYRAN_MALLOC_TYPE(char, len);
+		int token = tyran_parser_parse_token(c, lexer);
+		if (token) {
+			return token;
+		} else {
+			tyran_lexer_parse_identifier(lexer, c, identifier, &len);
+			*token_data = identifier;
+			return IDENTIFIER;
+		}
 	} else if (tyran_lexer_is_digit(c)) {
-		tyran_lexer_parse_number(lexer, c, lexer_position_info, token);
+		tyran_lexer_parse_number(lexer, c, lexer_position_info, token_data);
 		return NUMBER;
 	} else if (c == '"' || c == '\'') {
-		return tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, token);
-	} else if (c == '/') {
-		int r = tyran_lexer_parse_comment(lexer);
-		if (r) {
-			return r;
-		}
+		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, token_data);
+		return STRING;
 	} else {
-		return c;
+		int found = tyran_parser_parse_operand(c, lexer);
+		if (found >=0) {
+			return found;
+		}
 	}
 
 	tyran_lexer_push_character(c, lexer);
@@ -47,19 +353,26 @@ static int tyran_parser_next_token(tyran_lexer_token_data* token, tyran_lexer_po
 }
 
 
-int TYRAN_PARSER_lex(YYSTYPE *lvalp, YYLTYPE *llocp, tyran_parser* parser)
+int TYRAN_PARSER_lex(YYSTYPE *lvalp, struct tyran_lexer_position_info* llocp, tyran_parser* parser)
 {
-	tyran_lexer_token_data token;
+	tyran_lexer_token_data token_data = 0;
 	tyran_lexer_position_info info;
 	
-	int ch = tyran_parser_next_token(&token, &info, parser->lexer);
+	int ch = tyran_parser_next_token(&token_data, &info, parser->lexer);
 	// TYRAN_LOG("Lex:%d", ch);
+	*lvalp = token_data;
 	return ch;
 }
 
-void TYRAN_PARSER_error(YYLTYPE* lexer_position_info, tyran_parser* ps, const char* message)
+void TYRAN_PARSER_error(struct tyran_lexer_position_info* lexer_position_info, tyran_parser* ps, const char* message)
 {
 	TYRAN_LOG("Error:%s", message);
+}
+
+void tyran_parser_root(tyran_parser* parser, NODE root)
+{
+	parser->root = root;
+	TYRAN_PARSER_NODE_PRINT("root", parser->root);
 }
 
 int tyran_parser_parse(tyran_parser* parser)
@@ -78,10 +391,14 @@ NODE tyran_parser_compound_assignment(NODE a, NODE b, NODE c)
 	TYRAN_LOG("compound assignment");
 	return 0;
 }
-NODE tyran_parser_assignment(NODE a, NODE b)
+NODE tyran_parser_assignment(NODE target, NODE source)
 {
-	TYRAN_LOG("assignment");
-	return 0;
+	tyran_parser_node_assignment* node = TYRAN_MALLOC_TYPE(tyran_parser_node_assignment, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_ASSIGNMENT;
+	node->target = target;
+	node->source = source;
+
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_object_assignment(NODE a, NODE b)
 {
@@ -92,12 +409,15 @@ NODE tyran_parser_object_assignment(NODE a, NODE b)
 NODE tyran_parser_value(NODE a)
 {
 	TYRAN_LOG("value");
-	return 0;
+	return a;
 }
 NODE tyran_parser_return(NODE expression)
 {
-	TYRAN_LOG("return");
-	return 0;
+	tyran_parser_node_return* node = TYRAN_MALLOC_TYPE(tyran_parser_node_return, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_RETURN;
+	node->expression = expression;
+
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_comment(NODE comment)
 {
@@ -241,10 +561,14 @@ NODE tyran_parser_operand(NODE a, NODE b)
 	TYRAN_LOG("operand");
 	return 0;
 }
-NODE tyran_parser_operand_binary(NODE a, NODE b, NODE c)
+NODE tyran_parser_operand_binary(char operator_type, NODE left, NODE right)
 {
-	TYRAN_LOG("operand binary");
-	return 0;
+	tyran_parser_node_operand_binary* node = TYRAN_MALLOC_TYPE(tyran_parser_node_operand_binary, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY;
+	node->left = left;
+	node->right = right;
+	node->operator_type = operator_type;
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_extends(NODE a, NODE b)
 {
@@ -260,27 +584,38 @@ NODE tyran_parser_null()
 NODE tyran_parser_bool(int boolean)
 {
 	TYRAN_LOG("bool");
-	return 0;
+	tyran_parser_node_boolean* node = TYRAN_MALLOC_TYPE(tyran_parser_node_boolean, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_BOOLEAN;
+	node->boolean = boolean;
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_undefined()
 {
 	TYRAN_LOG("undefined");
 	return 0;
 }
-NODE tyran_parser_literal_number(NODE number)
+NODE tyran_parser_literal_number(float* number)
 {
-	TYRAN_LOG("literal number");
-	return 0;
+	tyran_parser_node_number* node = TYRAN_MALLOC_TYPE(tyran_parser_node_number, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_NUMBER;
+	node->number = *number;
+	return (tyran_parser_node*)node;
 }
-NODE tyran_parser_literal_string(struct tyran_string* string)
+NODE tyran_parser_literal_string(const char* string)
 {
-	TYRAN_LOG("literal string");
-	return 0;
+	tyran_parser_node_string* node = TYRAN_MALLOC_TYPE(tyran_parser_node_string, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_STRING;
+	node->string = tyran_strdup(string);
+	node->length = strlen(node->string);
+	return (tyran_parser_node*)node;
 }
-NODE tyran_parser_literal_identifier(struct tyran_string* string)
+NODE tyran_parser_literal_identifier(const char* string)
 {
-	TYRAN_LOG("literal identifier");
-	return 0;
+	tyran_parser_node_identifier* node = TYRAN_MALLOC_TYPE(tyran_parser_node_identifier, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_IDENTIFIER;
+	node->string = tyran_strdup(string);
+	node->length = strlen(node->string);
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_call_super(NODE a)
 {

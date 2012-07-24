@@ -1,23 +1,33 @@
 #ifndef _TYRAN_PARSER_H_
 #define _TYRAN_PARSER_H_
 
-#define NODE void*
+#include <tyranscript/parser/tyran_lexer.h>
+
+struct tyran_parser_node;
+#define NODE struct tyran_parser_node*
 
 #define YYSTYPE void*
-
+#define YYLTYPE struct tyran_lexer_position_info
 
 struct tyran_string;
 struct tyran_lexer;
+struct tyran_lexer_position_info;
 
 typedef struct tyran_parser {
 	struct tyran_lexer* lexer;
 	int position;
+	NODE root;
 } tyran_parser;
 
 
-struct tyran_parser* tyran_parser_alloc(const char* buf);
+int TYRAN_PARSER_lex(YYSTYPE *lvalp, struct tyran_lexer_position_info* llocp, tyran_parser* parser);
+void TYRAN_PARSER_error(struct tyran_lexer_position_info* lexer_position_info, tyran_parser* ps, const char* message);
+
+struct tyran_parser* tyran_parser_new(const char* buf);
 int tyran_parser_parse(tyran_parser* parser);
 
+
+void tyran_parser_root(tyran_parser* parser, NODE root);
 NODE tyran_parser_block(NODE b);
 NODE tyran_parser_assignment(NODE target, NODE source);
 NODE tyran_parser_object_assignment(NODE a, NODE b);
@@ -53,14 +63,14 @@ NODE tyran_parser_when(NODE a, NODE b);
 NODE tyran_parser_if(NODE a, NODE b);
 NODE tyran_parser_if_else(NODE a, NODE b);
 NODE tyran_parser_operand(NODE a, NODE b);
-NODE tyran_parser_operand_binary(NODE a, NODE b, NODE c);
+NODE tyran_parser_operand_binary(char operator_type, NODE b, NODE c);
 NODE tyran_parser_extends(NODE a, NODE b);
 NODE tyran_parser_null();
 NODE tyran_parser_bool(int boolean);
 NODE tyran_parser_undefined();
-NODE tyran_parser_literal_number(NODE a);
-NODE tyran_parser_literal_string(struct tyran_string* string);
-NODE tyran_parser_literal_identifier(struct tyran_string* string);
+NODE tyran_parser_literal_number(float* a);
+NODE tyran_parser_literal_string(const char* string);
+NODE tyran_parser_literal_identifier(const char* string);
 NODE tyran_parser_call_super(NODE a);
 
 #endif

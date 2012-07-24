@@ -9,8 +9,11 @@ int main(int argc, char* argv[])
 	while (1)
 	{
 		TYRAN_LOG_NO_LF("> ");
-		scanf("%511s", buf);
-		tyran_parser* parser = tyran_parser_alloc(buf);
+		char* p = fgets(buf, 512, stdin);
+		if (!p) {
+			break;
+		}
+		tyran_parser* parser = tyran_parser_new(p);
 		tyran_parser_parse(parser);
 	}
 

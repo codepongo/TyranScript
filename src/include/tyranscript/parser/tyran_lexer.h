@@ -3,8 +3,6 @@
 
 #include <tyranscript/tyran_string.h>
 
-struct tyran_parser_state;
-
 typedef struct tyran_lexer {
 	char* buffer;
 	int index;
@@ -22,26 +20,20 @@ typedef struct tyran_lexer_position_info {
 
 typedef void* tyran_lexer_token_data;
 
-
-/*
-int yylex(tyran_lexer_token_data* token, tyran_lexer_position_info* lexer_position_info, struct tyran_parser_state* parser_state);
-void yyerror(tyran_lexer_position_info* lexer_position_info, struct tyran_parser_state* ps, const char* error_message);
-*/
-
 tyran_lexer* tyran_lexer_new(const char* buf);
-
 int tyran_lexer_is_alpha(int c);
 int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max_length);
 void tyran_lexer_set_begin(tyran_lexer_position_info* lexer_position_info, const tyran_lexer* lexer);
 char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer);
+char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexer);
 void tyran_lexer_set_end(tyran_lexer_position_info* lexer_position_info, const tyran_lexer* lexer);
 int tyran_lexer_is_digit(int c);
 int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token);
 int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token);
 int tyran_lexer_parse_comment(tyran_lexer* lexer);
 void tyran_lexer_push_character(char c, tyran_lexer* lexer);
-
-
+char tyran_lexer_pop_character(tyran_lexer* lexer);
+int tyran_lexer_parse_string(tyran_lexer* lexer, char* buf, int* length);
 
 #endif
 
