@@ -94,7 +94,7 @@
 %nonassoc INCREMENT DECREMENT
 %left CALL_START CALL_END
 
-%expect 31
+%expect 30
 
 %%
 
@@ -328,14 +328,13 @@ if:
 	| expression POST_IF expression {}
 
 operation: 
-	UNARY expression { $$ = tyran_parser_operand($1, $2); }
-	| ADD expression { $$ = tyran_parser_operand($1, $2); }
-	| SUBTRACT expression { $$ = tyran_parser_operand($1, $2); }
-	| DECREMENT basic_assignable { $$ = tyran_parser_operand($1, $2); }
-	| INCREMENT basic_assignable { $$ = tyran_parser_operand($1, $2); }
-	| basic_assignable DECREMENT {$$ = tyran_parser_operand($1, $2); }
-	| basic_assignable INCREMENT {$$ = tyran_parser_operand($1, $2); }
-	| expression QUESTION_MARK {$$ = tyran_parser_operand($1, $2); }
+	ADD expression { $$ = tyran_parser_operand_unary(ADD, $2, 0); }
+	| SUBTRACT expression { $$ = tyran_parser_operand_unary(SUBTRACT, $2, 0); }
+	| DECREMENT basic_assignable { $$ = tyran_parser_operand_unary(DECREMENT, $2, 0); }
+	| INCREMENT basic_assignable { $$ = tyran_parser_operand_unary(INCREMENT, $2, 0); }
+	| basic_assignable DECREMENT {$$ = tyran_parser_operand_unary(DECREMENT, $1, 1); }
+	| basic_assignable INCREMENT {$$ = tyran_parser_operand_unary(INCREMENT, $1, 1); }
+	| expression QUESTION_MARK {$$ = tyran_parser_operand_unary(QUESTION_MARK, $1, 1); }
 	| expression ADD expression { $$ = tyran_parser_operand_binary('+', $1, $3); }
 	| expression SUBTRACT expression { $$ = tyran_parser_operand_binary('-', $1, $3); }
 	| expression MULTIPLY expression { $$ = tyran_parser_operand_binary('*', $1, $3); }

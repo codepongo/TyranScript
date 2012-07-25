@@ -62,7 +62,7 @@ NODE tyran_parser_switch(NODE a, NODE b, NODE block);
 NODE tyran_parser_when(NODE a, NODE b);
 NODE tyran_parser_if(NODE a, NODE b);
 NODE tyran_parser_if_else(NODE a, NODE b);
-NODE tyran_parser_operand(NODE a, NODE b);
+NODE tyran_parser_operand_unary(int operator_type, NODE b, tyran_boolean post);
 NODE tyran_parser_operand_binary(char operator_type, NODE b, NODE c);
 NODE tyran_parser_extends(NODE a, NODE b);
 NODE tyran_parser_null();

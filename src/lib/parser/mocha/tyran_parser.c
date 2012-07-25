@@ -10,7 +10,8 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_RETURN,
 	TYRAN_PARSER_NODE_TYPE_IDENTIFIER,
 	TYRAN_PARSER_NODE_TYPE_ASSIGNMENT,
-	TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY
+	TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY,
+	TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY
 };
 
 typedef struct tyran_parser_node
@@ -63,6 +64,14 @@ typedef struct tyran_parser_node_operand_binary
 	tyran_parser_node* left;
 	tyran_parser_node* right;
 } tyran_parser_node_operand_binary;
+
+typedef struct tyran_parser_node_operand_unary
+{
+	tyran_parser_node node;
+	char operator_type;
+	tyran_parser_node* expression;
+	tyran_boolean post;
+} tyran_parser_node_operand_unary;
 
 typedef struct tyran_parser_node_return
 {
@@ -145,6 +154,14 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
 			TYRAN_PARSER_NODE_PRINT_HELPER("operand left", operand->left, tab_count+1);
 			TYRAN_PARSER_NODE_PRINT_HELPER("operand right", operand->right, tab_count+1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY:
+		{
+			tyran_parser_node_operand_unary* operand = (tyran_parser_node_operand_unary*)node;
+			tyran_snprintf(buf, buf_size, "operand unary '%d' (%d)", operand->operator_type, operand->post);
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("operand expression", operand->expression, tab_count+1);
 		}
 	break;
 	
@@ -556,10 +573,14 @@ NODE tyran_parser_if_else(NODE a, NODE b)
 	TYRAN_LOG("if else");
 	return 0;
 }
-NODE tyran_parser_operand(NODE a, NODE b)
+NODE tyran_parser_operand_unary(int operator_type, NODE expression, tyran_boolean post)
 {
-	TYRAN_LOG("operand");
-	return 0;
+	tyran_parser_node_operand_unary* node = TYRAN_MALLOC_TYPE(tyran_parser_node_operand_unary, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY;
+	node->expression = expression;
+	node->post = post;
+	node->operator_type = operator_type;
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_operand_binary(char operator_type, NODE left, NODE right)
 {
