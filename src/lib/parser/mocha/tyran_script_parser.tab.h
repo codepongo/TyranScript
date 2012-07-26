@@ -111,10 +111,10 @@
      PARENTHESES_RIGHT = 327,
      MODULUS = 328,
      NOT = 329,
-     CLASS = 330,
-     LOOP = 331,
-     ELSE = 332,
-     EXTENDS = 333
+     EXTENDS = 330,
+     CLASS = 331,
+     LOOP = 332,
+     ELSE = 333
    };
 #endif
 /* Tokens.  */
@@ -190,10 +190,10 @@
 #define PARENTHESES_RIGHT 327
 #define MODULUS 328
 #define NOT 329
-#define CLASS 330
-#define LOOP 331
-#define ELSE 332
-#define EXTENDS 333
+#define EXTENDS 330
+#define CLASS 331
+#define LOOP 332
+#define ELSE 333
 
 
 

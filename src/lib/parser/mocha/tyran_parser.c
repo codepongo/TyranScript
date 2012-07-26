@@ -12,7 +12,11 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_ASSIGNMENT,
 	TYRAN_PARSER_NODE_TYPE_COMPOUND_ASSIGNMENT,
 	TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY,
-	TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY
+	TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY,
+	TYRAN_PARSER_NODE_TYPE_CLASS,
+	TYRAN_PARSER_NODE_TYPE_OBJECT_ASSIGNMENT,
+	TYRAN_PARSER_NODE_TYPE_OBJECT,
+	TYRAN_PARSER_NODE_TYPE_CONCAT
 };
 
 typedef struct tyran_parser_node
@@ -87,6 +91,34 @@ typedef struct tyran_parser_node_return
 	tyran_parser_node node;
 	tyran_parser_node* expression;
 } tyran_parser_node_return;
+
+typedef struct tyran_parser_node_class
+{
+	tyran_parser_node node;
+	tyran_parser_node* name;
+	tyran_parser_node* extends;
+	tyran_parser_node* block;
+} tyran_parser_node_class;
+
+typedef struct tyran_parser_node_object
+{
+	tyran_parser_node node;
+	tyran_parser_node* assignment_list;
+} tyran_parser_node_object;
+
+typedef struct tyran_parser_node_object_assignment
+{
+	tyran_parser_node node;
+	tyran_parser_node* name;
+	tyran_parser_node* source;
+} tyran_parser_node_object_assignment;
+
+typedef struct tyran_parser_node_concat
+{
+	tyran_parser_node node;
+	tyran_parser_node** nodes;
+	int length;
+} tyran_parser_node_concat;
 
 
 void TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(const char* buf, const char* description, int tab_count)
@@ -180,6 +212,45 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 			tyran_snprintf(buf, buf_size, "operand unary '%d' (%d)", operand->operator_type, operand->post);
 			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
 			TYRAN_PARSER_NODE_PRINT_HELPER("operand expression", operand->expression, tab_count+1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_CLASS:
+		{
+			tyran_parser_node_class* operand = (tyran_parser_node_class*)node;
+			tyran_snprintf(buf, buf_size, "* class");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("class name", operand->name, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("class extends", operand->extends, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("class block", operand->block, tab_count+1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_OBJECT:
+		{
+			tyran_parser_node_object* object = (tyran_parser_node_object*)node;
+			tyran_snprintf(buf, buf_size, "object");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("object assignments", object->assignment_list, tab_count+1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_OBJECT_ASSIGNMENT:
+		{
+			tyran_parser_node_object_assignment* object = (tyran_parser_node_object_assignment*)node;
+			tyran_snprintf(buf, buf_size, "object_assignment");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("object_assignment name", object->name, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("object_assignment source", object->source, tab_count+1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_CONCAT:
+		{
+			tyran_parser_node_concat* concat = (tyran_parser_node_concat*)node;
+			tyran_snprintf(buf, buf_size, "concat");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			int i;
+			for (i=0; i<concat->length; ++i)
+			{
+				TYRAN_PARSER_NODE_PRINT_HELPER(" ", concat->nodes[i], tab_count+1);
+			}
 		}
 	break;
 	
@@ -300,6 +371,7 @@ int tyran_parser_parse_token(int c, tyran_lexer* lexer)
 		{ "true", 4, TYRAN_TOKEN_TRUE },
 		{ "false", 5, TYRAN_TOKEN_FALSE },
 		{ "class", 5, _CLASS },
+		{ "extends", 7, EXTENDS },
 		{ "return", 6, RETURN },
 		{ "while", 5, WHILE },
 		{ "switch", 6, SWITCH },
@@ -310,8 +382,8 @@ int tyran_parser_parse_token(int c, tyran_lexer* lexer)
 		{ "own", 3, OWN },
 	};
 	int index;
-	const int max_characters = 6;
-	char buf[max_characters+1];
+	const int max_characters = 7;
+	char buf[max_characters + 1];
 	size_t i;
 	for (index = 0; index < max_characters; ++index) {
 		char c = tyran_lexer_pop_character(lexer);
@@ -440,10 +512,14 @@ NODE tyran_parser_assignment(NODE target, NODE source)
 
 	return (tyran_parser_node*)node;
 }
-NODE tyran_parser_object_assignment(NODE a, NODE b)
+NODE tyran_parser_object_assignment(NODE name, NODE source)
 {
-	TYRAN_LOG("object assignment");
-	return 0;
+	tyran_parser_node_object_assignment* node = TYRAN_MALLOC_TYPE(tyran_parser_node_object_assignment, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_OBJECT_ASSIGNMENT;
+	node->name = name;
+	node->source = source;
+
+	return (tyran_parser_node*)node;
 }
 
 NODE tyran_parser_value(NODE a)
@@ -470,7 +546,31 @@ NODE tyran_parser_code(NODE a, NODE b, NODE c)
 }
 NODE tyran_parser_concat(NODE a, NODE b)
 {
-	return 0;
+	tyran_parser_node_concat* node;
+
+	int new_node_count;
+	if (a->type == TYRAN_PARSER_NODE_TYPE_CONCAT) {
+		node = (tyran_parser_node_concat*)a;
+		new_node_count = 1;
+	} else {
+		node = TYRAN_MALLOC_TYPE(tyran_parser_node_concat, 1);
+		node->node.type = TYRAN_PARSER_NODE_TYPE_CONCAT;
+		node->length = 0;
+		node->nodes = 0;
+		new_node_count = 2;
+	}
+	tyran_parser_node** new_nodes = TYRAN_MALLOC_TYPE(tyran_parser_node*, node->length + new_node_count);
+	tyran_memcpy(new_nodes, node->nodes, (node->length) * sizeof(tyran_parser_node*));
+	tyran_free(node->nodes);
+	node->nodes = new_nodes;
+	if (new_node_count == 2) {
+		node->nodes[node->length] = a;
+		node->length++;
+	}
+	node->nodes[node->length] = b;
+	node->length++;
+
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_parameter(NODE a, NODE b, NODE c)
 {
@@ -501,15 +601,22 @@ NODE tyran_parser_slice(NODE b)
 	TYRAN_LOG("slice");
 	return 0;
 }
-NODE tyran_parser_object(NODE a)
+NODE tyran_parser_object(NODE assignment_list)
 {
-	TYRAN_LOG("object");
-	return 0;
+	tyran_parser_node_object* node = TYRAN_MALLOC_TYPE(tyran_parser_node_object, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_OBJECT;
+	node->assignment_list = assignment_list;
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_class(NODE name, NODE extends, NODE block)
 {
-	TYRAN_LOG("class");
-	return 0;
+	tyran_parser_node_class* node = TYRAN_MALLOC_TYPE(tyran_parser_node_class, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_CLASS;
+	node->name = name;
+	node->extends = extends;
+	node->block = block;
+
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_call(NODE a, NODE b, NODE c)
 {

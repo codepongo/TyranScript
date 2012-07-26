@@ -80,6 +80,7 @@
 %token PARENTHESES_RIGHT
 %token MODULUS
 %token NOT
+%token EXTENDS
 
 %right POST_IF
 %right IF ELSE FOR WHILE UNTIL LOOP SUPER CLASS
@@ -98,7 +99,7 @@
 %nonassoc INCREMENT DECREMENT
 %left CALL_START CALL_END
 
-%expect 34
+%expect 28
 
 %%
 
@@ -236,17 +237,17 @@ object:
 	OBJECT_START assign_list OBJECT_END { $$ = tyran_parser_object($2); }
 
 assign_list:
-	COMMA {}
+	{}
 	| object_assignment { $$ = $1; }
 	| assign_list COMMA object_assignment { $$ = tyran_parser_concat($1, $3); }
 	| assign_list TERMINATOR object_assignment { $$ = tyran_parser_concat($1, $3); }
 	| assign_list INDENT assign_list OUTDENT { $$ = tyran_parser_concat($1, $3); }
 
 class: 
-	_CLASS basic_assignable { $$ = tyran_parser_class(0, 0, 0); }
+	_CLASS basic_assignable { $$ = tyran_parser_class($2, 0, 0); }
 	| _CLASS basic_assignable block { $$ = tyran_parser_class($2, 0, $3); }
-	| _CLASS basic_assignable "extends" expression { $$ = tyran_parser_class($2, $4, 0); }
-	| _CLASS basic_assignable "extends" expression block { $$ = tyran_parser_class($2, $4, $5); }
+	| _CLASS basic_assignable EXTENDS expression { $$ = tyran_parser_class($2, $4, 0); }
+	| _CLASS basic_assignable EXTENDS expression block { $$ = tyran_parser_class($2, $4, $5); }
 
 invocation: 
 	value IDENTIFIER arguments { $$ = tyran_parser_call($1, $3, $2); }
@@ -347,6 +348,6 @@ operation:
 	| basic_assignable COMPOUND_DIVIDE expression { $$ = tyran_parser_compound_assignment(COMPOUND_DIVIDE, $1, $3); }
 	| basic_assignable COMPOUND_MULTIPLY expression { $$ = tyran_parser_compound_assignment(COMPOUND_MULTIPLY, $1, $3); }
 	| basic_assignable COMPOUND_SUBTRACT expression { $$ = tyran_parser_compound_assignment(COMPOUND_SUBTRACT, $1, $3); }
-	| basic_assignable COMPOUND_MODULUS expression { $$ = tyran_parser_compound_assignment(COMPOUND_SUBTRACT, $1, $3); }
+	| basic_assignable COMPOUND_MODULUS expression { $$ = tyran_parser_compound_assignment(COMPOUND_MODULUS, $1, $3); }
 	| basic_assignable EXTENDS expression { tyran_parser_extends($1, $3); }
 %%
