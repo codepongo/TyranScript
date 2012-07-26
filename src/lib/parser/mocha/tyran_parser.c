@@ -436,7 +436,8 @@ int tyran_parser_parse_token(int c, tyran_lexer* lexer)
 		{ "until", 5, UNTIL },
 		{ "own", 3, OWN },
 		{ "undefined", 9, UNDEFINED },
-		{ "null", 4, TYRAN_TOKEN_NULL },
+		{ "->", 2, FUNCTION_GLYPH },
+		{ "=>", 2, FUNCTION_GLYPH_BOUND },
 	};
 	int index;
 	const int max_characters = 9;
@@ -558,7 +559,6 @@ NODE tyran_parser_compound_assignment(int operator_type, NODE target, NODE sourc
 	node->source = source;
 
 	return (tyran_parser_node*)node;
-	return 0;
 }
 NODE tyran_parser_assignment(NODE target, NODE source)
 {
