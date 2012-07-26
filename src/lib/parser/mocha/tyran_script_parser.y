@@ -47,7 +47,11 @@
 %token UNTIL
 %token OWN
 %token STATEMENT
-%token COMPOUND_ASSIGNMENT
+%token COMPOUND_MULTIPLY
+%token COMPOUND_DIVIDE
+%token COMPOUND_ADD
+%token COMPOUND_SUBTRACT
+%token COMPOUND_MODULUS
 %token ADD
 %token SUBTRACT
 %token MULTIPLY
@@ -80,7 +84,7 @@
 %right POST_IF
 %right IF ELSE FOR WHILE UNTIL LOOP SUPER CLASS
 %right FORIN FOROF BY WHEN
-%right EQUAL COLON COMPOUND_ASSIGNMENT RETURN EXTENDS
+%right EQUAL COLON COMPOUND_MULTIPLY COMPOUND_DIVIDE COMPOUND_ADD COMPOUND_SUBTRACT COMPOUND_MODULUS RETURN EXTENDS
 %nonassoc INDENT OUTDENT
 %left LOGIC
 %left COMPARE
@@ -94,7 +98,7 @@
 %nonassoc INCREMENT DECREMENT
 %left CALL_START CALL_END
 
-%expect 30
+%expect 34
 
 %%
 
@@ -339,7 +343,10 @@ operation:
 	| expression SUBTRACT expression { $$ = tyran_parser_operand_binary('-', $1, $3); }
 	| expression MULTIPLY expression { $$ = tyran_parser_operand_binary('*', $1, $3); }
 	| expression DIVIDE expression { $$ = tyran_parser_operand_binary('/', $1, $3); }
-	| basic_assignable COMPOUND_ASSIGNMENT expression { $$ = tyran_parser_compound_assignment($1, $3, $2); }
-	| basic_assignable COMPOUND_ASSIGNMENT INDENT expression OUTDENT {$$ = tyran_parser_compound_assignment($1, $3, $2); }
+	| basic_assignable COMPOUND_ADD expression { $$ = tyran_parser_compound_assignment(COMPOUND_ADD, $1, $3); }
+	| basic_assignable COMPOUND_DIVIDE expression { $$ = tyran_parser_compound_assignment(COMPOUND_DIVIDE, $1, $3); }
+	| basic_assignable COMPOUND_MULTIPLY expression { $$ = tyran_parser_compound_assignment(COMPOUND_MULTIPLY, $1, $3); }
+	| basic_assignable COMPOUND_SUBTRACT expression { $$ = tyran_parser_compound_assignment(COMPOUND_SUBTRACT, $1, $3); }
+	| basic_assignable COMPOUND_MODULUS expression { $$ = tyran_parser_compound_assignment(COMPOUND_SUBTRACT, $1, $3); }
 	| basic_assignable EXTENDS expression { tyran_parser_extends($1, $3); }
 %%

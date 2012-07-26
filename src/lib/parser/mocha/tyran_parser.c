@@ -10,6 +10,7 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_RETURN,
 	TYRAN_PARSER_NODE_TYPE_IDENTIFIER,
 	TYRAN_PARSER_NODE_TYPE_ASSIGNMENT,
+	TYRAN_PARSER_NODE_TYPE_COMPOUND_ASSIGNMENT,
 	TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY,
 	TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY
 };
@@ -56,6 +57,14 @@ typedef struct tyran_parser_node_assignment
 	tyran_parser_node* source;
 	tyran_parser_node* target;
 } tyran_parser_node_assignment;
+
+typedef struct tyran_parser_node_compound_assignment
+{
+	tyran_parser_node node;
+	int operator_type;
+	tyran_parser_node* source;
+	tyran_parser_node* target;
+} tyran_parser_node_compound_assignment;
 
 typedef struct tyran_parser_node_operand_binary
 {
@@ -147,6 +156,15 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 			TYRAN_PARSER_NODE_PRINT_HELPER("assignment target", assignment->target, tab_count+1);
 		}
 	break;
+	case TYRAN_PARSER_NODE_TYPE_COMPOUND_ASSIGNMENT:
+		{
+			tyran_parser_node_compound_assignment* assignment = (tyran_parser_node_compound_assignment*)node;
+			tyran_snprintf(buf, buf_size, "compound assignment %d", assignment->operator_type);
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("assignment source", assignment->source, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("assignment target", assignment->target, tab_count+1);
+		}
+	break;
 	case TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY:
 		{
 			tyran_parser_node_operand_binary* operand = (tyran_parser_node_operand_binary*)node;
@@ -196,12 +214,11 @@ int tyran_parser_parse_operand(int c, tyran_lexer* lexer)
 	static tyran_operand_info operands[] = {
 		{ "++", 2, INCREMENT },
 		{ "--", 2, DECREMENT },
-		{ "+=", 2, 0 },
-		{ "-=", 2, 0 },
-		{ "*=", 2, 0 },
-		{ "/=", 2, 0 },
-		{ "%=", 2, 0 },
-		{ "&=", 2, 0 },
+		{ "+=", 2, COMPOUND_ADD },
+		{ "-=", 2, COMPOUND_SUBTRACT },
+		{ "*=", 2, COMPOUND_MULTIPLY },
+		{ "/=", 2, COMPOUND_DIVIDE },
+		{ "%=", 2, COMPOUND_MODULUS },
 		{ "|=", 2, 0 },
 		{ "^=", 2, 0 },
 		{ "<<", 2, 0 },
@@ -403,9 +420,15 @@ NODE tyran_parser_block(NODE b)
 	TYRAN_LOG("block");
 	return 0;
 }
-NODE tyran_parser_compound_assignment(NODE a, NODE b, NODE c)
+NODE tyran_parser_compound_assignment(int operator_type, NODE target, NODE source)
 {
-	TYRAN_LOG("compound assignment");
+	tyran_parser_node_compound_assignment* node = TYRAN_MALLOC_TYPE(tyran_parser_node_compound_assignment, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_COMPOUND_ASSIGNMENT;
+	node->operator_type = operator_type;
+	node->target = target;
+	node->source = source;
+
+	return (tyran_parser_node*)node;
 	return 0;
 }
 NODE tyran_parser_assignment(NODE target, NODE source)

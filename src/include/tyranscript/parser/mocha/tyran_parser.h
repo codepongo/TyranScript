@@ -31,7 +31,7 @@ void tyran_parser_root(tyran_parser* parser, NODE root);
 NODE tyran_parser_block(NODE b);
 NODE tyran_parser_assignment(NODE target, NODE source);
 NODE tyran_parser_object_assignment(NODE a, NODE b);
-NODE tyran_parser_compound_assignment(NODE a, NODE b, NODE c);
+NODE tyran_parser_compound_assignment(int type, NODE b, NODE c);
 NODE tyran_parser_value(NODE a);
 NODE tyran_parser_return(NODE expression);
 NODE tyran_parser_comment(NODE comment);

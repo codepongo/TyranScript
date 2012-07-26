@@ -1,21 +1,24 @@
-/* A Bison parser, made by GNU Bison 2.6.  */
+/* A Bison parser, made by GNU Bison 2.3.  */
 
-/* Bison interface for Yacc-like parsers in C
-   
-      Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
-   
-   This program is free software: you can redistribute it and/or modify
+/* Skeleton interface for Bison's Yacc-like parsers in C
+
+   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-   
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   Boston, MA 02110-1301, USA.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -26,19 +29,9 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
-
-#ifndef TYRAN_PARSER_TYRAN_SCRIPT_PARSER_TAB_H
-# define TYRAN_PARSER_TYRAN_SCRIPT_PARSER_TAB_H
-/* Enabling traces.  */
-#ifndef YYDEBUG
-# define YYDEBUG 1
-#endif
-#if YYDEBUG
-extern int TYRAN_PARSER_debug;
-#endif
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -85,49 +78,134 @@ extern int TYRAN_PARSER_debug;
      UNTIL = 294,
      OWN = 295,
      STATEMENT = 296,
-     COMPOUND_ASSIGNMENT = 297,
-     ADD = 298,
-     SUBTRACT = 299,
-     MULTIPLY = 300,
-     DIVIDE = 301,
-     MEMBER = 302,
-     SOAK_MEMBER = 303,
-     SCOPING = 304,
-     INCREMENT = 305,
-     DECREMENT = 306,
-     EQUAL = 307,
-     COLON = 308,
-     COMMA = 309,
-     MEMBER_SOAK = 310,
-     _CLASS = 311,
-     FUNCTION_GLYPH = 312,
-     FUNCTION_GLYPH_BOUND = 313,
-     SELF = 314,
-     QUESTION_MARK = 315,
-     OBJECT_START = 316,
-     OBJECT_END = 317,
-     RANGE_INCLUSIVE = 318,
-     RANGE_EXCLUSIVE = 319,
-     BRACKET_LEFT = 320,
-     BRACKET_RIGHT = 321,
-     PARENTHESES_LEFT = 322,
-     PARENTHESES_RIGHT = 323,
-     MODULUS = 324,
-     NOT = 325,
-     CLASS = 326,
-     LOOP = 327,
-     ELSE = 328,
-     EXTENDS = 329
+     COMPOUND_MULTIPLY = 297,
+     COMPOUND_DIVIDE = 298,
+     COMPOUND_ADD = 299,
+     COMPOUND_SUBTRACT = 300,
+     COMPOUND_MODULUS = 301,
+     ADD = 302,
+     SUBTRACT = 303,
+     MULTIPLY = 304,
+     DIVIDE = 305,
+     MEMBER = 306,
+     SOAK_MEMBER = 307,
+     SCOPING = 308,
+     INCREMENT = 309,
+     DECREMENT = 310,
+     EQUAL = 311,
+     COLON = 312,
+     COMMA = 313,
+     MEMBER_SOAK = 314,
+     _CLASS = 315,
+     FUNCTION_GLYPH = 316,
+     FUNCTION_GLYPH_BOUND = 317,
+     SELF = 318,
+     QUESTION_MARK = 319,
+     OBJECT_START = 320,
+     OBJECT_END = 321,
+     RANGE_INCLUSIVE = 322,
+     RANGE_EXCLUSIVE = 323,
+     BRACKET_LEFT = 324,
+     BRACKET_RIGHT = 325,
+     PARENTHESES_LEFT = 326,
+     PARENTHESES_RIGHT = 327,
+     MODULUS = 328,
+     NOT = 329,
+     CLASS = 330,
+     LOOP = 331,
+     ELSE = 332,
+     EXTENDS = 333
    };
 #endif
+/* Tokens.  */
+#define COMMENT 258
+#define UNARY 259
+#define COMPARE 260
+#define FOROF 261
+#define IDENTIFIER 262
+#define TERMINATOR 263
+#define INDEX_START 264
+#define SHIFT 265
+#define INDENT 266
+#define SWITCH 267
+#define PARAM_END 268
+#define TYRAN_TOKEN_NULL 269
+#define CALL_START 270
+#define UNDEFINED 271
+#define TYRAN_TOKEN_TRUE 272
+#define TYRAN_TOKEN_FALSE 273
+#define WHILE 274
+#define INDEX_SOAK 275
+#define OUTDENT 276
+#define RETURN 277
+#define INDEX_END 278
+#define RELATION 279
+#define CALL_END 280
+#define MATH 281
+#define WHEN 282
+#define FOR 283
+#define SUPER 284
+#define LOGIC 285
+#define POST_IF 286
+#define FORIN 287
+#define STRING 288
+#define NUMBER 289
+#define BY 290
+#define IF 291
+#define LEADING_WHEN 292
+#define PARAM_START 293
+#define UNTIL 294
+#define OWN 295
+#define STATEMENT 296
+#define COMPOUND_MULTIPLY 297
+#define COMPOUND_DIVIDE 298
+#define COMPOUND_ADD 299
+#define COMPOUND_SUBTRACT 300
+#define COMPOUND_MODULUS 301
+#define ADD 302
+#define SUBTRACT 303
+#define MULTIPLY 304
+#define DIVIDE 305
+#define MEMBER 306
+#define SOAK_MEMBER 307
+#define SCOPING 308
+#define INCREMENT 309
+#define DECREMENT 310
+#define EQUAL 311
+#define COLON 312
+#define COMMA 313
+#define MEMBER_SOAK 314
+#define _CLASS 315
+#define FUNCTION_GLYPH 316
+#define FUNCTION_GLYPH_BOUND 317
+#define SELF 318
+#define QUESTION_MARK 319
+#define OBJECT_START 320
+#define OBJECT_END 321
+#define RANGE_INCLUSIVE 322
+#define RANGE_EXCLUSIVE 323
+#define BRACKET_LEFT 324
+#define BRACKET_RIGHT 325
+#define PARENTHESES_LEFT 326
+#define PARENTHESES_RIGHT 327
+#define MODULUS 328
+#define NOT 329
+#define CLASS 330
+#define LOOP 331
+#define ELSE 332
+#define EXTENDS 333
+
+
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef int YYSTYPE;
-# define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
+# define YYSTYPE_IS_TRIVIAL 1
 #endif
+
+
 
 #if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
 typedef struct YYLTYPE
@@ -143,18 +221,3 @@ typedef struct YYLTYPE
 #endif
 
 
-#ifdef YYPARSE_PARAM
-#if defined __STDC__ || defined __cplusplus
-int TYRAN_PARSER_parse (void *YYPARSE_PARAM);
-#else
-int TYRAN_PARSER_parse ();
-#endif
-#else /* ! YYPARSE_PARAM */
-#if defined __STDC__ || defined __cplusplus
-int TYRAN_PARSER_parse (tyran_parser* parser);
-#else
-int TYRAN_PARSER_parse ();
-#endif
-#endif /* ! YYPARSE_PARAM */
-
-#endif /* !TYRAN_PARSER_TYRAN_SCRIPT_PARSER_TAB_H  */
