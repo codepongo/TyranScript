@@ -51,70 +51,68 @@
      SWITCH = 267,
      PARAM_END = 268,
      TYRAN_TOKEN_NULL = 269,
-     CALL_START = 270,
-     UNDEFINED = 271,
-     TYRAN_TOKEN_TRUE = 272,
-     TYRAN_TOKEN_FALSE = 273,
-     WHILE = 274,
-     INDEX_SOAK = 275,
-     OUTDENT = 276,
-     RETURN = 277,
-     INDEX_END = 278,
-     RELATION = 279,
-     CALL_END = 280,
-     MATH = 281,
-     WHEN = 282,
-     FOR = 283,
-     SUPER = 284,
-     LOGIC = 285,
-     POST_IF = 286,
-     FORIN = 287,
-     STRING = 288,
-     NUMBER = 289,
-     BY = 290,
-     IF = 291,
-     LEADING_WHEN = 292,
-     PARAM_START = 293,
-     UNTIL = 294,
-     OWN = 295,
-     STATEMENT = 296,
-     COMPOUND_MULTIPLY = 297,
-     COMPOUND_DIVIDE = 298,
-     COMPOUND_ADD = 299,
-     COMPOUND_SUBTRACT = 300,
-     COMPOUND_MODULUS = 301,
-     ADD = 302,
-     SUBTRACT = 303,
-     MULTIPLY = 304,
-     DIVIDE = 305,
-     MEMBER = 306,
-     SOAK_MEMBER = 307,
-     SCOPING = 308,
-     INCREMENT = 309,
-     DECREMENT = 310,
-     EQUAL = 311,
-     COLON = 312,
-     COMMA = 313,
-     MEMBER_SOAK = 314,
-     _CLASS = 315,
-     FUNCTION_GLYPH = 316,
-     FUNCTION_GLYPH_BOUND = 317,
-     SELF = 318,
-     QUESTION_MARK = 319,
-     OBJECT_START = 320,
-     OBJECT_END = 321,
-     RANGE_INCLUSIVE = 322,
-     RANGE_EXCLUSIVE = 323,
-     BRACKET_LEFT = 324,
-     BRACKET_RIGHT = 325,
-     PARENTHESES_LEFT = 326,
-     PARENTHESES_RIGHT = 327,
-     MODULUS = 328,
-     NOT = 329,
-     EXTENDS = 330,
-     CLASS = 331,
-     LOOP = 332,
-     ELSE = 333
+     UNDEFINED = 270,
+     TYRAN_TOKEN_TRUE = 271,
+     TYRAN_TOKEN_FALSE = 272,
+     WHILE = 273,
+     INDEX_SOAK = 274,
+     OUTDENT = 275,
+     RETURN = 276,
+     INDEX_END = 277,
+     RELATION = 278,
+     MATH = 279,
+     WHEN = 280,
+     FOR = 281,
+     SUPER = 282,
+     LOGIC = 283,
+     POST_IF = 284,
+     FORIN = 285,
+     STRING = 286,
+     NUMBER = 287,
+     BY = 288,
+     IF = 289,
+     LEADING_WHEN = 290,
+     PARAM_START = 291,
+     UNTIL = 292,
+     OWN = 293,
+     STATEMENT = 294,
+     COMPOUND_MULTIPLY = 295,
+     COMPOUND_DIVIDE = 296,
+     COMPOUND_ADD = 297,
+     COMPOUND_SUBTRACT = 298,
+     COMPOUND_MODULUS = 299,
+     ADD = 300,
+     SUBTRACT = 301,
+     MULTIPLY = 302,
+     DIVIDE = 303,
+     MEMBER = 304,
+     SOAK_MEMBER = 305,
+     SCOPING = 306,
+     INCREMENT = 307,
+     DECREMENT = 308,
+     EQUAL = 309,
+     COLON = 310,
+     COMMA = 311,
+     MEMBER_SOAK = 312,
+     _CLASS = 313,
+     FUNCTION_GLYPH = 314,
+     FUNCTION_GLYPH_BOUND = 315,
+     SELF = 316,
+     QUESTION_MARK = 317,
+     OBJECT_START = 318,
+     OBJECT_END = 319,
+     RANGE_INCLUSIVE = 320,
+     RANGE_EXCLUSIVE = 321,
+     BRACKET_LEFT = 322,
+     BRACKET_RIGHT = 323,
+     PARENTHESES_LEFT = 324,
+     PARENTHESES_RIGHT = 325,
+     MODULUS = 326,
+     NOT = 327,
+     EXTENDS = 328,
+     CLASS = 329,
+     LOOP = 330,
+     ELSE = 331
    };
 #endif
 /* Tokens.  */
@@ -130,70 +128,68 @@
 #define SWITCH 267
 #define PARAM_END 268
 #define TYRAN_TOKEN_NULL 269
-#define CALL_START 270
-#define UNDEFINED 271
-#define TYRAN_TOKEN_TRUE 272
-#define TYRAN_TOKEN_FALSE 273
-#define WHILE 274
-#define INDEX_SOAK 275
-#define OUTDENT 276
-#define RETURN 277
-#define INDEX_END 278
-#define RELATION 279
-#define CALL_END 280
-#define MATH 281
-#define WHEN 282
-#define FOR 283
-#define SUPER 284
-#define LOGIC 285
-#define POST_IF 286
-#define FORIN 287
-#define STRING 288
-#define NUMBER 289
-#define BY 290
-#define IF 291
-#define LEADING_WHEN 292
-#define PARAM_START 293
-#define UNTIL 294
-#define OWN 295
-#define STATEMENT 296
-#define COMPOUND_MULTIPLY 297
-#define COMPOUND_DIVIDE 298
-#define COMPOUND_ADD 299
-#define COMPOUND_SUBTRACT 300
-#define COMPOUND_MODULUS 301
-#define ADD 302
-#define SUBTRACT 303
-#define MULTIPLY 304
-#define DIVIDE 305
-#define MEMBER 306
-#define SOAK_MEMBER 307
-#define SCOPING 308
-#define INCREMENT 309
-#define DECREMENT 310
-#define EQUAL 311
-#define COLON 312
-#define COMMA 313
-#define MEMBER_SOAK 314
-#define _CLASS 315
-#define FUNCTION_GLYPH 316
-#define FUNCTION_GLYPH_BOUND 317
-#define SELF 318
-#define QUESTION_MARK 319
-#define OBJECT_START 320
-#define OBJECT_END 321
-#define RANGE_INCLUSIVE 322
-#define RANGE_EXCLUSIVE 323
-#define BRACKET_LEFT 324
-#define BRACKET_RIGHT 325
-#define PARENTHESES_LEFT 326
-#define PARENTHESES_RIGHT 327
-#define MODULUS 328
-#define NOT 329
-#define EXTENDS 330
-#define CLASS 331
-#define LOOP 332
-#define ELSE 333
+#define UNDEFINED 270
+#define TYRAN_TOKEN_TRUE 271
+#define TYRAN_TOKEN_FALSE 272
+#define WHILE 273
+#define INDEX_SOAK 274
+#define OUTDENT 275
+#define RETURN 276
+#define INDEX_END 277
+#define RELATION 278
+#define MATH 279
+#define WHEN 280
+#define FOR 281
+#define SUPER 282
+#define LOGIC 283
+#define POST_IF 284
+#define FORIN 285
+#define STRING 286
+#define NUMBER 287
+#define BY 288
+#define IF 289
+#define LEADING_WHEN 290
+#define PARAM_START 291
+#define UNTIL 292
+#define OWN 293
+#define STATEMENT 294
+#define COMPOUND_MULTIPLY 295
+#define COMPOUND_DIVIDE 296
+#define COMPOUND_ADD 297
+#define COMPOUND_SUBTRACT 298
+#define COMPOUND_MODULUS 299
+#define ADD 300
+#define SUBTRACT 301
+#define MULTIPLY 302
+#define DIVIDE 303
+#define MEMBER 304
+#define SOAK_MEMBER 305
+#define SCOPING 306
+#define INCREMENT 307
+#define DECREMENT 308
+#define EQUAL 309
+#define COLON 310
+#define COMMA 311
+#define MEMBER_SOAK 312
+#define _CLASS 313
+#define FUNCTION_GLYPH 314
+#define FUNCTION_GLYPH_BOUND 315
+#define SELF 316
+#define QUESTION_MARK 317
+#define OBJECT_START 318
+#define OBJECT_END 319
+#define RANGE_INCLUSIVE 320
+#define RANGE_EXCLUSIVE 321
+#define BRACKET_LEFT 322
+#define BRACKET_RIGHT 323
+#define PARENTHESES_LEFT 324
+#define PARENTHESES_RIGHT 325
+#define MODULUS 326
+#define NOT 327
+#define EXTENDS 328
+#define CLASS 329
+#define LOOP 330
+#define ELSE 331
 
 
 

@@ -20,7 +20,6 @@
 %token SWITCH
 %token PARAM_END
 %token TYRAN_TOKEN_NULL
-%token CALL_START
 %token UNDEFINED
 %token TYRAN_TOKEN_TRUE
 %token TYRAN_TOKEN_FALSE
@@ -30,7 +29,6 @@
 %token RETURN
 %token INDEX_END
 %token RELATION
-%token CALL_END
 %token MATH
 %token WHEN
 %token FOR
@@ -97,9 +95,9 @@
 %right UNARY
 %left QUESTION_MARK
 %nonassoc INCREMENT DECREMENT
-%left CALL_START CALL_END
+%left PARENTHESES_LEFT PARENTHESES_RIGHT
 
-%expect 28
+%expect 27
 
 %%
 
@@ -250,14 +248,13 @@ class:
 	| _CLASS basic_assignable EXTENDS expression block { $$ = tyran_parser_class($2, $4, $5); }
 
 invocation: 
-	value IDENTIFIER arguments { $$ = tyran_parser_call($1, $3, $2); }
-	| invocation IDENTIFIER arguments { $$ = tyran_parser_call($1, $3, $2); }
+	basic_assignable arguments { $$ = tyran_parser_call(0, $1, $2); }
 	| SUPER { $$ = tyran_parser_call_super(0); }
 	| SUPER arguments { $$ = tyran_parser_call_super($2); }
 
 arguments: 
-	CALL_START CALL_END
-	| CALL_START argument_list CALL_END { $$ = tyran_parser_arguments($2); }
+	PARENTHESES_LEFT PARENTHESES_RIGHT
+	| PARENTHESES_LEFT argument_list PARENTHESES_RIGHT { $$ = tyran_parser_arguments($2); }
 
 self: 
 	SELF { $$ = tyran_parser_self(); }
@@ -349,5 +346,4 @@ operation:
 	| basic_assignable COMPOUND_MULTIPLY expression { $$ = tyran_parser_compound_assignment(COMPOUND_MULTIPLY, $1, $3); }
 	| basic_assignable COMPOUND_SUBTRACT expression { $$ = tyran_parser_compound_assignment(COMPOUND_SUBTRACT, $1, $3); }
 	| basic_assignable COMPOUND_MODULUS expression { $$ = tyran_parser_compound_assignment(COMPOUND_MODULUS, $1, $3); }
-	| basic_assignable EXTENDS expression { tyran_parser_extends($1, $3); }
 %%

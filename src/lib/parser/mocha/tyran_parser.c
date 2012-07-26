@@ -6,6 +6,8 @@
 enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_NUMBER,
 	TYRAN_PARSER_NODE_TYPE_BOOLEAN,
+	TYRAN_PARSER_NODE_TYPE_NULL,
+	TYRAN_PARSER_NODE_TYPE_UNDEFINED,
 	TYRAN_PARSER_NODE_TYPE_STRING,
 	TYRAN_PARSER_NODE_TYPE_RETURN,
 	TYRAN_PARSER_NODE_TYPE_IDENTIFIER,
@@ -16,6 +18,8 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_CLASS,
 	TYRAN_PARSER_NODE_TYPE_OBJECT_ASSIGNMENT,
 	TYRAN_PARSER_NODE_TYPE_OBJECT,
+	TYRAN_PARSER_NODE_TYPE_ARGUMENTS,
+	TYRAN_PARSER_NODE_TYPE_CALL,
 	TYRAN_PARSER_NODE_TYPE_CONCAT
 };
 
@@ -113,6 +117,19 @@ typedef struct tyran_parser_node_object_assignment
 	tyran_parser_node* source;
 } tyran_parser_node_object_assignment;
 
+typedef struct tyran_parser_node_arguments
+{
+	tyran_parser_node node;
+	tyran_parser_node* argument_list;
+} tyran_parser_node_arguments;
+
+typedef struct tyran_parser_node_call
+{
+	tyran_parser_node node;
+	tyran_parser_node* function_name;
+	tyran_parser_node* arguments;
+} tyran_parser_node_call;
+
 typedef struct tyran_parser_node_concat
 {
 	tyran_parser_node node;
@@ -120,6 +137,15 @@ typedef struct tyran_parser_node_concat
 	int length;
 } tyran_parser_node_concat;
 
+typedef struct tyran_parser_node_null
+{
+	tyran_parser_node node;
+} tyran_parser_node_null;
+
+typedef struct tyran_parser_node_undefined
+{
+	tyran_parser_node node;
+} tyran_parser_node_undefined;
 
 void TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(const char* buf, const char* description, int tab_count)
 {
@@ -154,6 +180,18 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 		{
 			tyran_parser_node_boolean* number = (tyran_parser_node_boolean*)node;
 			tyran_snprintf(buf, buf_size, "bool:%d", number->boolean);
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_NULL:
+		{
+			tyran_snprintf(buf, buf_size, "null");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_UNDEFINED:
+		{
+			tyran_snprintf(buf, buf_size, "undefined");
 			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
 		}
 	break;
@@ -217,11 +255,28 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 	case TYRAN_PARSER_NODE_TYPE_CLASS:
 		{
 			tyran_parser_node_class* operand = (tyran_parser_node_class*)node;
-			tyran_snprintf(buf, buf_size, "* class");
+			tyran_snprintf(buf, buf_size, "class");
 			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
 			TYRAN_PARSER_NODE_PRINT_HELPER("class name", operand->name, tab_count+1);
 			TYRAN_PARSER_NODE_PRINT_HELPER("class extends", operand->extends, tab_count+1);
 			TYRAN_PARSER_NODE_PRINT_HELPER("class block", operand->block, tab_count+1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_ARGUMENTS:
+		{
+			tyran_parser_node_arguments* arguments = (tyran_parser_node_arguments*)node;
+			tyran_snprintf(buf, buf_size, "arguments");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("arguments argument_list", arguments->argument_list, tab_count+1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_CALL:
+		{
+			tyran_parser_node_call* call = (tyran_parser_node_call*)node;
+			tyran_snprintf(buf, buf_size, "call");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("call function_name", call->function_name, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("call arguments", call->arguments, tab_count+1);
 		}
 	break;
 	case TYRAN_PARSER_NODE_TYPE_OBJECT:
@@ -380,9 +435,11 @@ int tyran_parser_parse_token(int c, tyran_lexer* lexer)
 		{ "super", 5, SUPER },
 		{ "until", 5, UNTIL },
 		{ "own", 3, OWN },
+		{ "undefined", 9, UNDEFINED },
+		{ "null", 4, TYRAN_TOKEN_NULL },
 	};
 	int index;
-	const int max_characters = 7;
+	const int max_characters = 9;
 	char buf[max_characters + 1];
 	size_t i;
 	for (index = 0; index < max_characters; ++index) {
@@ -524,7 +581,6 @@ NODE tyran_parser_object_assignment(NODE name, NODE source)
 
 NODE tyran_parser_value(NODE a)
 {
-	TYRAN_LOG("value");
 	return a;
 }
 NODE tyran_parser_return(NODE expression)
@@ -618,15 +674,22 @@ NODE tyran_parser_class(NODE name, NODE extends, NODE block)
 
 	return (tyran_parser_node*)node;
 }
-NODE tyran_parser_call(NODE a, NODE b, NODE c)
+NODE tyran_parser_call(NODE previous_node, NODE function_name, NODE arguments)
 {
-	TYRAN_LOG("call");
-	return 0;
+	tyran_parser_node_call* node = TYRAN_MALLOC_TYPE(tyran_parser_node_call, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_CALL;
+	node->arguments = arguments;
+	node->function_name = function_name;
+
+	return (tyran_parser_node*)node;
 }
-NODE tyran_parser_arguments(NODE a)
+NODE tyran_parser_arguments(NODE argument_list)
 {
-	TYRAN_LOG("arguments");
-	return 0;
+	tyran_parser_node_arguments* node = TYRAN_MALLOC_TYPE(tyran_parser_node_arguments, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_ARGUMENTS;
+	node->argument_list = argument_list;
+
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_self()
 {
@@ -721,20 +784,15 @@ NODE tyran_parser_operand_binary(char operator_type, NODE left, NODE right)
 	node->operator_type = operator_type;
 	return (tyran_parser_node*)node;
 }
-NODE tyran_parser_extends(NODE a, NODE b)
-{
-	TYRAN_LOG("extends");
-	return 0;
-}
 
 NODE tyran_parser_null()
 {
-	TYRAN_LOG("null");
-	return 0;
+	tyran_parser_node_null* node = TYRAN_MALLOC_TYPE(tyran_parser_node_null, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_NULL;
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_bool(int boolean)
 {
-	TYRAN_LOG("bool");
 	tyran_parser_node_boolean* node = TYRAN_MALLOC_TYPE(tyran_parser_node_boolean, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_BOOLEAN;
 	node->boolean = boolean;
@@ -742,8 +800,9 @@ NODE tyran_parser_bool(int boolean)
 }
 NODE tyran_parser_undefined()
 {
-	TYRAN_LOG("undefined");
-	return 0;
+	tyran_parser_node_undefined* node = TYRAN_MALLOC_TYPE(tyran_parser_node_undefined, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_UNDEFINED;
+	return (tyran_parser_node*)node;
 }
 NODE tyran_parser_literal_number(float* number)
 {
