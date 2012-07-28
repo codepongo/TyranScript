@@ -1,0 +1,40 @@
+_ <- WHITESPACE*
+__ <- WHITESPACE (WHITESPACE)*
+
+WHITESPACE <- "\t" / " "
+
+TERMINATOR <- "\n" { TYRAN_LOG("TERMINATOR!"); }
+
+start <- body { TYRAN_LOG("start!"); }
+
+return <- "return" (__ expression)? { TYRAN_LOG("return!"); }
+
+body <- line
+
+function_glyph <- "->" / "=>" { TYRAN_LOG("function!"); }
+
+function <- _ '(' _ parameter_list _ ')' _ function_glyph { TYRAN_LOG("function!"); }
+
+value <-
+	number
+
+parameter_list <-
+	(parameter (',' parameter )*)* { TYRAN_LOG("parameters!"); }
+
+parameter <-
+	value
+
+line <-
+	expression _ TERMINATOR { TYRAN_LOG("line!"); }
+	/ statement _ TERMINATOR { TYRAN_LOG("statement!"); }
+
+digit <- [0-9]
+
+number <- digit* { TYRAN_LOG("number!"); }
+
+expression <-
+	value
+	/ function
+
+statement <-
+	return

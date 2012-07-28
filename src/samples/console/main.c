@@ -13,8 +13,7 @@ int main(int argc, char* argv[])
 		if (!p) {
 			break;
 		}
-		tyran_parser* parser = tyran_parser_new(p);
-		tyran_parser_parse(parser);
+		tyran_parser_parse(buf, tyran_strlen(buf));
 	}
 
 	return 0;

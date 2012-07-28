@@ -1,7 +1,24 @@
 #include <tyranscript/parser/mocha/tyran_parser.h>
 #include <tyranscript/parser/tyran_lexer.h>
-#include "tyran_script_parser.tab.h"
 #include <tyranscript/tyran_string.h>
+
+
+const char* g_buf;
+int g_buf_size;
+int g_buf_pos;
+
+#define YY_INPUT(buf, result, max_size) \
+	int remaining = (g_buf_size - g_buf_pos); \
+	result = remaining < max_size ? remaining : max_size; \
+	TYRAN_LOG("Tjoho:%d result:%d", max_size, result); \
+	tyran_memcpy(buf, g_buf + g_buf_pos, result); \
+	g_buf_pos += result;
+	
+// #define YY_DEBUG 1
+	
+#include "mocha_script.c"
+
+
 
 enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_NUMBER,
@@ -327,221 +344,19 @@ tyran_parser* tyran_parser_new(const char* buf)
 
 	return parser;
 }
-
-int tyran_parser_parse_operand(int c, tyran_lexer* lexer)
-{
-	tyran_lexer_push_character(c, lexer);
-	typedef struct tyran_operand_info {
-		const char* name;
-		int len;
-		int value;
-	} tyran_operand_info;
-
-	static tyran_operand_info operands[] = {
-		{ "++", 2, INCREMENT },
-		{ "--", 2, DECREMENT },
-		{ "+=", 2, COMPOUND_ADD },
-		{ "-=", 2, COMPOUND_SUBTRACT },
-		{ "*=", 2, COMPOUND_MULTIPLY },
-		{ "/=", 2, COMPOUND_DIVIDE },
-		{ "%=", 2, COMPOUND_MODULUS },
-		{ "|=", 2, 0 },
-		{ "^=", 2, 0 },
-		{ "<<", 2, 0 },
-		{ ">>", 2, 0 },
-		{ "<", 1, 0 },
-		{ ">", 1, 0 },
-		{ "&", 1, 0 },
-		{ "|", 1, 0 },
-		{ "^", 1, 0 },
-		{ "/", 1, DIVIDE },
-		{ "*", 1, MULTIPLY },
-		{ "%", 1, MODULUS },
-		{ "=", 1, EQUAL },
-		{ "+", 1, ADD },
-		{ "-", 1, SUBTRACT },
-		{ "~", 1, 0 },
-		{ "not", 3, NOT },
-		{ ".", 1, MEMBER },
-		{ "(", 1, PARENTHESES_LEFT },
-		{ ")", 1, PARENTHESES_RIGHT },
-		{ "[", 1, BRACKET_LEFT },
-		{ "]", 1, BRACKET_RIGHT },
-		{ ";", 1, TERMINATOR },
-		{ "\n", 1, TERMINATOR },
-		{ "{", 1, OBJECT_START },
-		{ "}", 1, OBJECT_END },
-		{ ":", 1, COLON },
-		{ ",", 1, COMMA },
-		{ "?", 1, 0 },
-	};
-	int index;
-	char buf[5];
-	size_t i;
-	for (index = 0; index < 4; ++index) {
-		char c = tyran_lexer_pop_character(lexer);
-		if (c == 0 || c == '\n') {
-			break;
-		}
-		buf[index] = c;
-	}
-	buf[index] = 0;
-	if (!index) {
-		return 0;
-	}
-
-	for (i = 0; i < sizeof(operands)/sizeof(tyran_operand_info); ++i) {
-		if (index < operands[i].len) {
-			continue;
-		}
-
-		if (tyran_strncmp(buf, operands[i].name, operands[i].len) == 0) {
-			int j;
-			for (j = index - 1; j >= operands[i].len; --j) {
-				tyran_lexer_push_character(buf[j], lexer);
-			}
-			return operands[i].value;
-		}
-	}
-
-	for (i = index - 1; i >= 1; --i) {
-		tyran_lexer_push_character(buf[i], lexer);
-	}
-	return 0;
-}
-
-
-int tyran_parser_parse_token(int c, tyran_lexer* lexer)
-{
-	tyran_lexer_push_character(c, lexer);
-	typedef struct tyran_operand_info {
-		const char* name;
-		int len;
-		int value;
-	} tyran_operand_info;
-
-	static tyran_operand_info operands[] = {
-		{ "if", 2, IF },
-		{ "else", 4, ELSE },
-		{ "true", 4, TYRAN_TOKEN_TRUE },
-		{ "false", 5, TYRAN_TOKEN_FALSE },
-		{ "class", 5, _CLASS },
-		{ "extends", 7, EXTENDS },
-		{ "return", 6, RETURN },
-		{ "while", 5, WHILE },
-		{ "switch", 6, SWITCH },
-		{ "when", 4, WHEN },
-		{ "for", 3, FOR },
-		{ "super", 5, SUPER },
-		{ "until", 5, UNTIL },
-		{ "own", 3, OWN },
-		{ "undefined", 9, UNDEFINED },
-		{ "->", 2, FUNCTION_GLYPH },
-		{ "=>", 2, FUNCTION_GLYPH_BOUND },
-	};
-	int index;
-	const int max_characters = 9;
-	char buf[max_characters + 1];
-	size_t i;
-	for (index = 0; index < max_characters; ++index) {
-		char c = tyran_lexer_pop_character(lexer);
-		if (c == 0 || c == '\n') {
-			break;
-		}
-		buf[index] = c;
-	}
-	buf[index] = 0;
-	if (!index) {
-		return 0;
-	}
-
-	for (i = 0; i < sizeof(operands)/sizeof(tyran_operand_info); ++i) {
-		if (index < operands[i].len) {
-			continue;
-		}
-
-		if (tyran_strncmp(buf, operands[i].name, operands[i].len) == 0) {
-			int j;
-			for (j = index - 1; j >= operands[i].len; --j) {
-				tyran_lexer_push_character(buf[j], lexer);
-			}
-			return operands[i].value;
-		}
-	}
-
-	for (i = index - 1; i >= 1; --i) {
-		tyran_lexer_push_character(buf[i], lexer);
-	}
-	return 0;
-}
-
-
-static int tyran_parser_next_token(tyran_lexer_token_data* token_data, tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
-{
-	tyran_lexer_set_begin(lexer_position_info, lexer);
-
-	char c = tyran_lexer_next_character_skip_whitespace_except_newline(lexer);
-	if (!c) {
-		return 0;
-	}
-
-	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
-		int len = 100;
-		char* identifier = TYRAN_MALLOC_TYPE(char, len);
-		int token = tyran_parser_parse_token(c, lexer);
-		if (token) {
-			return token;
-		} else {
-			tyran_lexer_parse_identifier(lexer, c, identifier, &len);
-			*token_data = identifier;
-			return IDENTIFIER;
-		}
-	} else if (tyran_lexer_is_digit(c)) {
-		tyran_lexer_parse_number(lexer, c, lexer_position_info, token_data);
-		return NUMBER;
-	} else if (c == '"' || c == '\'') {
-		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, token_data);
-		return STRING;
-	} else {
-		int found = tyran_parser_parse_operand(c, lexer);
-		if (found >=0) {
-			return found;
-		}
-	}
-
-	tyran_lexer_push_character(c, lexer);
-
-	tyran_lexer_set_end(lexer_position_info, lexer);
-
-	return 0;
-}
-
-
-int TYRAN_PARSER_lex(YYSTYPE *lvalp, struct tyran_lexer_position_info* llocp, tyran_parser* parser)
-{
-	tyran_lexer_token_data token_data = 0;
-	tyran_lexer_position_info info;
-	
-	int ch = tyran_parser_next_token(&token_data, &info, parser->lexer);
-	// TYRAN_LOG("Lex:%d", ch);
-	*lvalp = token_data;
-	return ch;
-}
-
-void TYRAN_PARSER_error(struct tyran_lexer_position_info* lexer_position_info, tyran_parser* ps, const char* message)
-{
-	TYRAN_LOG("Error:%s", message);
-}
-
 void tyran_parser_root(tyran_parser* parser, NODE root)
 {
 	parser->root = root;
 	TYRAN_PARSER_NODE_PRINT("root", parser->root);
 }
 
-int tyran_parser_parse(tyran_parser* parser)
+int tyran_parser_parse(const char* buf, int length)
 {
-	TYRAN_PARSER_parse(parser);
+	g_buf = buf;
+	g_buf_size = length;
+	g_buf_pos = 0;
+	int result = yyparse();
+	TYRAN_LOG("yyparse() returned %d", result);
 	return 0;
 }
 

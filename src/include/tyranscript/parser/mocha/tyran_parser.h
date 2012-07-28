@@ -24,7 +24,7 @@ int TYRAN_PARSER_lex(YYSTYPE *lvalp, struct tyran_lexer_position_info* llocp, ty
 void TYRAN_PARSER_error(struct tyran_lexer_position_info* lexer_position_info, tyran_parser* ps, const char* message);
 
 struct tyran_parser* tyran_parser_new(const char* buf);
-int tyran_parser_parse(tyran_parser* parser);
+int tyran_parser_parse(const char* buf, int length);
 
 
 void tyran_parser_root(tyran_parser* parser, NODE root);
