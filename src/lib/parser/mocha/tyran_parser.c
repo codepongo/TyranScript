@@ -14,11 +14,8 @@ int g_buf_pos;
 	tyran_memcpy(buf, g_buf + g_buf_pos, result); \
 	g_buf_pos += result;
 	
-// #define YY_DEBUG 1
+#define YY_DEBUG 1
 	
-#include "mocha_script.c"
-
-
 
 enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_NUMBER,
@@ -355,8 +352,6 @@ int tyran_parser_parse(const char* buf, int length)
 	g_buf = buf;
 	g_buf_size = length;
 	g_buf_pos = 0;
-	int result = yyparse();
-	TYRAN_LOG("yyparse() returned %d", result);
 	return 0;
 }
 

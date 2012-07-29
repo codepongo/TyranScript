@@ -1,5 +1,6 @@
 #include <tyranscript/tyran_api.h>
-#include <tyranscript/parser/mocha/tyran_parser.h>
+#include <tyranscript/parser/mocha/tyran_mocha_lexer.h>
+#include <tyranscript/parser/mocha/tyran_mocha_lexer_debug.h>
 
 int main(int argc, char* argv[])
 {
@@ -13,7 +14,9 @@ int main(int argc, char* argv[])
 		if (!p) {
 			break;
 		}
-		tyran_parser_parse(buf, tyran_strlen(buf));
+		tyran_mocha_lexer* mocha_lexer = tyran_mocha_lexer_lex(buf, tyran_strlen(buf));
+		
+		tyran_mocha_lexer_debug(mocha_lexer);
 	}
 
 	return 0;

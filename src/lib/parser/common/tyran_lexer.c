@@ -177,11 +177,11 @@ int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max
 	while (string_index < 1020) {
 		c = tyran_lexer_pop_character(lexer);
 		if (!tyran_lexer_is_alpha_numeric(c) && c != '_' && c != '$') {
+			tyran_lexer_push_character(c, lexer);
 			break;
 		}
 		buf[string_index++] = c;
 	}
-	tyran_lexer_push_character(c, lexer);
 
 	buf[string_index] = 0;
 	*max_length = string_index;
@@ -239,19 +239,13 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_in
 	return 1;
 }
 
-int tyran_lexer_parse_comment(tyran_lexer* lexer)
+int tyran_lexer_parse_to_eol(tyran_lexer* lexer)
 {
 	char d = tyran_lexer_pop_character(lexer);
-	if (d == '/') {
-		while ((d = tyran_lexer_pop_character(lexer)) != '\n' && d != '\n' && d != 0)
-			;
-		return TYRAN_TOKEN_COMMENT;
-	} else if (d == '*') {
-		tyran_lexer_skip_comment(lexer);
-		return TYRAN_TOKEN_COMMENT;
-	}
+	while ((d = tyran_lexer_pop_character(lexer)) != '\n' && d != '\n' && d != 0)
+		;
+	return TYRAN_TOKEN_COMMENT;
 
-	tyran_lexer_push_character(d, lexer);
 	return 0;
 }
 
@@ -261,7 +255,8 @@ int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, tyran_lexer_posit
 	char buf[256];
 	int length = 256;
 	tyran_lexer_parse_string(lexer, buf, &length);
-	*token = tyran_strdup(buf);
+	char* copy = tyran_strdup(buf);
+	*token = copy;
 	tyran_lexer_set_end(lexer_position_info, lexer);
 	return 1;
 }

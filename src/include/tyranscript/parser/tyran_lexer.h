@@ -30,10 +30,11 @@ void tyran_lexer_set_end(tyran_lexer_position_info* lexer_position_info, const t
 int tyran_lexer_is_digit(int c);
 int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token);
 int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token);
-int tyran_lexer_parse_comment(tyran_lexer* lexer);
+int tyran_lexer_parse_to_eol(tyran_lexer* lexer);
 void tyran_lexer_push_character(char c, tyran_lexer* lexer);
 char tyran_lexer_pop_character(tyran_lexer* lexer);
 int tyran_lexer_parse_string(tyran_lexer* lexer, char* buf, int* length);
+int tyran_lexer_parse_to_eol(tyran_lexer* lexer);
 
 #endif
 

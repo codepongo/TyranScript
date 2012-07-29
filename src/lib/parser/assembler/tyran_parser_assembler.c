@@ -156,8 +156,8 @@ static int tyran_lexer_assembler_next_token(tyran_lexer_token_data token, tyran_
 	} else if (c == '"' || c == '\'') {
 		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, token);
 		return TYRAN_TOKEN_ASSEMBLER_STRING;
-	} else if (c == '/') {
-		int r = tyran_lexer_parse_comment(lexer);
+	} else if (c == '#') {
+		int r = tyran_lexer_parse_to_eol(lexer);
 		if (r) {
 			return r;
 		}
