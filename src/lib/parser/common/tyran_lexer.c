@@ -1,6 +1,6 @@
 #include <tyranscript/parser/tyran_lexer.h>
 #include <tyranscript/tyran_string.h>
-#include <tyranscript/parser/mocha/tyran_parser.h>
+#include <tyranscript/parser/mocha/tyran_parser_tree.h>
 #include <tyranscript/parser/tyran_parser_state.h>
 
 #include <tyranscript/tyran_config.h>

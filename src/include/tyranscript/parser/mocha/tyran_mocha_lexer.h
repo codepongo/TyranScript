@@ -2,7 +2,7 @@
 #define _TYRAN_MOCHA_LEXER_H
 
 
-enum tyran_mocha_token_id {
+typedef enum tyran_mocha_token_id {
 	TYRAN_MOCHA_TOKEN_END,
 	TYRAN_MOCHA_TOKEN_INCREMENT,
 	TYRAN_MOCHA_TOKEN_DECREMENT,
@@ -41,7 +41,7 @@ enum tyran_mocha_token_id {
 	TYRAN_MOCHA_TOKEN_IDENTIFIER,
 	TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH,
 	TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND,
-};
+} tyran_mocha_token_id;
 
 typedef struct tyran_mocha_token {
 	enum tyran_mocha_token_id token_id;
@@ -59,5 +59,14 @@ typedef struct tyran_mocha_lexer {
 tyran_mocha_lexer* tyran_mocha_lexer_new();
 void tyran_mocha_lexer_destroy(tyran_mocha_lexer* lexer);
 tyran_mocha_lexer* tyran_mocha_lexer_lex(const char* buf, int length);
+
+tyran_mocha_token* tyran_mocha_lexer_find(tyran_mocha_token* first, tyran_mocha_token* last, tyran_mocha_token_id id);
+tyran_mocha_token* tyran_mocha_lexer_find_terminator(tyran_mocha_token* first, tyran_mocha_token* last);
+
+tyran_mocha_token* tyran_mocha_lexer_first(tyran_mocha_lexer* lexer);
+tyran_mocha_token* tyran_mocha_lexer_last(tyran_mocha_lexer* lexer);
+
+tyran_mocha_token* tyran_mocha_lexer_next(tyran_mocha_token* first, tyran_mocha_token* last);
+tyran_mocha_token* tyran_mocha_lexer_previous(tyran_mocha_token* token, tyran_mocha_token* first);
 
 #endif
