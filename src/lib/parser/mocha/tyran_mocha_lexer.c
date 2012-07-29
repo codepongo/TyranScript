@@ -241,7 +241,7 @@ tyran_mocha_token* tyran_mocha_lexer_first(tyran_mocha_lexer* lexer)
 
 tyran_mocha_token* tyran_mocha_lexer_last(tyran_mocha_lexer* lexer)
 {
-	return &lexer->tokens[lexer->token_count];
+	return &lexer->tokens[lexer->token_count - 1];
 }
 
 tyran_mocha_token* tyran_mocha_lexer_find_terminator(tyran_mocha_token* first, tyran_mocha_token* last)

@@ -37,6 +37,8 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_CONCAT
 };
 
+const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "EQUAL", "ADD", "SUBTRACT" };
+
 typedef struct tyran_parser_node
 {
 	enum tyran_parser_type type;
@@ -252,7 +254,7 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 	case TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY:
 		{
 			tyran_parser_node_operand_binary* operand = (tyran_parser_node_operand_binary*)node;
-			tyran_snprintf(buf, buf_size, "operand binary '%c'", operand->operator_type);
+			tyran_snprintf(buf, buf_size, "operand binary '%s'", tyran_parser_binary_operand_to_string[operand->operator_type]);
 			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
 			TYRAN_PARSER_NODE_PRINT_HELPER("operand left", operand->left, tab_count+1);
 			TYRAN_PARSER_NODE_PRINT_HELPER("operand right", operand->right, tab_count+1);
@@ -585,7 +587,7 @@ NODE tyran_parser_operand_unary(int operator_type, NODE expression, tyran_boolea
 	node->operator_type = operator_type;
 	return (tyran_parser_node*)node;
 }
-NODE tyran_parser_operand_binary(char operator_type, NODE left, NODE right)
+NODE tyran_parser_operand_binary(tyran_parser_binary_operand_type operator_type, NODE left, NODE right)
 {
 	tyran_parser_node_operand_binary* node = TYRAN_MALLOC_TYPE(tyran_parser_node_operand_binary, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY;

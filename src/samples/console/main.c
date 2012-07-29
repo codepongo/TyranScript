@@ -17,7 +17,9 @@ int main(int argc, char* argv[])
 		}
 		tyran_mocha_lexer* mocha_lexer = tyran_mocha_lexer_lex(buf, tyran_strlen(buf));
 		tyran_mocha_lexer_debug(mocha_lexer);
-		tyran_mocha_parser_parse(mocha_lexer);
+		struct tyran_parser_node* mocha_parser_tree = tyran_mocha_parser_parse(mocha_lexer);
+		
+		TYRAN_PARSER_NODE_PRINT("result", mocha_parser_tree);
 	}
 
 	return 0;
