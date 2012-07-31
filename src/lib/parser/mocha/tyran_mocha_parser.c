@@ -81,7 +81,7 @@ tyran_parser_unary_operand_type tyran_mocha_parser_convert_unary_operand(tyran_m
 
 NODE tyran_mocha_parser_expression_operands(tyran_mocha_token* first, tyran_mocha_token* last)
 {
-	tyran_mocha_lexer_debug_tokens("operand check", first, last);
+	// tyran_mocha_lexer_debug_tokens("operand check", first, last);
 	if (first == last) {
 		return 0;
 	}
@@ -129,13 +129,13 @@ NODE tyran_mocha_parser_expression(tyran_mocha_token* first, tyran_mocha_token* 
 		}
 	}
 	
-	tyran_mocha_lexer_debug_tokens("expression check", first, last);
+	// tyran_mocha_lexer_debug_tokens("expression check", first, last);
 
 	tyran_mocha_token_id end_token_id = tyran_mocha_enclosing_start_token(first->token_id);
 	
 	if (end_token_id != TYRAN_MOCHA_TOKEN_END) {
 		tyran_mocha_token* end_token = tyran_mocha_parser_find_matching_operand(first->token_id, end_token_id, first, last);
-		tyran_mocha_lexer_debug_tokens("expression match", first, end_token);
+		// tyran_mocha_lexer_debug_tokens("expression match", first, end_token);
 		NODE left = tyran_mocha_parser_expression(tyran_mocha_lexer_next(first, last), tyran_mocha_lexer_previous(end_token, first));
 		tyran_mocha_token* operand = tyran_mocha_lexer_next(end_token, last);
 		if (operand) {

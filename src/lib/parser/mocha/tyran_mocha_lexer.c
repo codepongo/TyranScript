@@ -286,7 +286,7 @@ tyran_mocha_token* tyran_mocha_lexer_find_ignore_parentheses(tyran_mocha_token* 
 	int match = 0;
 	while (token->token_id != id || match != 0)
 	{
-		if (closing_token_id != TYRAN_MOCHA_TOKEN_END) {
+		if (closing_token_id == TYRAN_MOCHA_TOKEN_END) {
 			closing_token_id = tyran_mocha_enclosing_start_token(token->token_id);
 			if (closing_token_id != TYRAN_MOCHA_TOKEN_END) {
 				starting_token_id = token->token_id;
