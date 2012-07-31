@@ -29,6 +29,11 @@ typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX
 } tyran_parser_binary_operand_type;
 
+typedef enum tyran_parser_unary_operand_type {
+	TYRAN_PARSER_UNARY_OPERAND_ADD,
+	TYRAN_PARSER_UNARY_OPERAND_SUBTRACT,
+	TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX
+} tyran_parser_unary_operand_type;
 
 void TYRAN_PARSER_NODE_PRINT(const char* description, struct tyran_parser_node* node);
 

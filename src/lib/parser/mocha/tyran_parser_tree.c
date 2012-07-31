@@ -38,6 +38,7 @@ enum tyran_parser_type {
 };
 
 const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "EQUAL", "ADD", "SUBTRACT" };
+const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT" };
 
 typedef struct tyran_parser_node
 {
@@ -263,7 +264,7 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 	case TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY:
 		{
 			tyran_parser_node_operand_unary* operand = (tyran_parser_node_operand_unary*)node;
-			tyran_snprintf(buf, buf_size, "operand unary '%d' (%d)", operand->operator_type, operand->post);
+			tyran_snprintf(buf, buf_size, "operand unary '%s' (%d)", tyran_parser_unary_operand_to_string[operand->operator_type], operand->post);
 			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
 			TYRAN_PARSER_NODE_PRINT_HELPER("operand expression", operand->expression, tab_count+1);
 		}
