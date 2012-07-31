@@ -60,6 +60,9 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	case TYRAN_MOCHA_TOKEN_COMMA:
 		operand = TYRAN_PARSER_COMMA;
 		break;
+	case TYRAN_MOCHA_TOKEN_EQUAL:
+		operand = TYRAN_PARSER_ASSIGNMENT;
+		break;
 	default:
 		TYRAN_ERROR("unknown token to convert");
 	}
@@ -101,6 +104,7 @@ NODE tyran_mocha_parser_expression_operands(tyran_mocha_token* first, tyran_moch
 	} operands;
 
 	operands operands_to_match[] = {
+		{TYRAN_MOCHA_TOKEN_EQUAL, 0},
 		{TYRAN_MOCHA_TOKEN_COMMA, 0},
 		{TYRAN_MOCHA_TOKEN_ADD, 1},
 		{TYRAN_MOCHA_TOKEN_SUBTRACT, 1},
