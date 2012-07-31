@@ -51,6 +51,9 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	case TYRAN_MOCHA_TOKEN_SUBTRACT:
 		operand = TYRAN_PARSER_SUBTRACT;
 		break;
+	case TYRAN_MOCHA_TOKEN_BRACKET_LEFT:
+		operand = TYRAN_PARSER_INDEX;
+		break;
 	default:
 		TYRAN_ERROR("unknown token to convert");
 	}
@@ -90,7 +93,7 @@ NODE tyran_mocha_parser_expression_operands(tyran_mocha_token* first, tyran_moch
 		tyran_mocha_token_id token_id;
 	} operands;
 
-	operands operands_to_match[] = {TYRAN_MOCHA_TOKEN_ADD, TYRAN_MOCHA_TOKEN_SUBTRACT, TYRAN_MOCHA_TOKEN_MULTIPLY, TYRAN_MOCHA_TOKEN_MULTIPLY};
+	operands operands_to_match[] = {TYRAN_MOCHA_TOKEN_ADD, TYRAN_MOCHA_TOKEN_SUBTRACT, TYRAN_MOCHA_TOKEN_MULTIPLY, TYRAN_MOCHA_TOKEN_MULTIPLY, TYRAN_MOCHA_TOKEN_BRACKET_LEFT};
 	
 	int i;
 	
@@ -98,9 +101,16 @@ NODE tyran_mocha_parser_expression_operands(tyran_mocha_token* first, tyran_moch
 	{
 		tyran_mocha_token* found_operand = tyran_mocha_lexer_find_ignore_parentheses(first, last, operands_to_match[i].token_id);
 		if (found_operand) {
-		
-			NODE left = tyran_mocha_parser_expression(first, tyran_mocha_lexer_previous(found_operand, first));
-			NODE right = tyran_mocha_parser_expression(tyran_mocha_lexer_next(found_operand, last), last);
+			NODE left;
+			NODE right;
+			if (found_operand->token_id == TYRAN_MOCHA_TOKEN_BRACKET_LEFT) {
+				tyran_mocha_token* end_token = tyran_mocha_parser_find_matching_operand(TYRAN_MOCHA_TOKEN_BRACKET_LEFT, TYRAN_MOCHA_TOKEN_BRACKET_RIGHT, tyran_mocha_lexer_next(first, last), last);
+				right = tyran_mocha_parser_expression(tyran_mocha_lexer_next(found_operand, last), tyran_mocha_lexer_previous(end_token, first));
+				left = tyran_mocha_parser_expression(first, tyran_mocha_lexer_previous(found_operand, first));
+			} else {
+				left = tyran_mocha_parser_expression(first, tyran_mocha_lexer_previous(found_operand, first));
+				right = tyran_mocha_parser_expression(tyran_mocha_lexer_next(found_operand, last), last);
+			}
 			
 			if (left && right) {
 				return tyran_parser_operand_binary(tyran_mocha_parser_convert_binary_operand(found_operand->token_id), left, right);
@@ -113,6 +123,7 @@ NODE tyran_mocha_parser_expression_operands(tyran_mocha_token* first, tyran_moch
 	
 	return 0;
 }
+
 
 NODE tyran_mocha_parser_expression(tyran_mocha_token* first, tyran_mocha_token* last)
 {
@@ -132,14 +143,20 @@ NODE tyran_mocha_parser_expression(tyran_mocha_token* first, tyran_mocha_token* 
 	// tyran_mocha_lexer_debug_tokens("expression check", first, last);
 
 	tyran_mocha_token_id end_token_id = tyran_mocha_enclosing_start_token(first->token_id);
-	
 	if (end_token_id != TYRAN_MOCHA_TOKEN_END) {
 		tyran_mocha_token* end_token = tyran_mocha_parser_find_matching_operand(first->token_id, end_token_id, first, last);
 		// tyran_mocha_lexer_debug_tokens("expression match", first, end_token);
 		NODE left = tyran_mocha_parser_expression(tyran_mocha_lexer_next(first, last), tyran_mocha_lexer_previous(end_token, first));
 		tyran_mocha_token* operand = tyran_mocha_lexer_next(end_token, last);
 		if (operand) {
-			NODE right = tyran_mocha_parser_expression(tyran_mocha_lexer_next(operand, last), last);
+			NODE right;
+			if (operand->token_id == TYRAN_MOCHA_TOKEN_BRACKET_LEFT) {
+				tyran_mocha_token* end_token = tyran_mocha_parser_find_matching_operand(TYRAN_MOCHA_TOKEN_BRACKET_LEFT, TYRAN_MOCHA_TOKEN_BRACKET_RIGHT, tyran_mocha_lexer_next(operand, last), last);
+				right = tyran_mocha_parser_expression(tyran_mocha_lexer_next(operand, last), tyran_mocha_lexer_previous(end_token, first));
+			} else {
+				right = tyran_mocha_parser_expression(tyran_mocha_lexer_next(operand, last), last);
+			}
+
 			return tyran_parser_operand_binary(tyran_mocha_parser_convert_binary_operand(operand->token_id), left, right);
 		} else {
 			return left;
