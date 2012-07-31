@@ -27,6 +27,7 @@ typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_ADD,
 	TYRAN_PARSER_SUBTRACT,
 	TYRAN_PARSER_INDEX,
+	TYRAN_PARSER_COMMA,
 	TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX
 } tyran_parser_binary_operand_type;
 

@@ -37,7 +37,7 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_CONCAT
 };
 
-const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "EQUAL", "ADD", "SUBTRACT", "INDEX" };
+const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "EQUAL", "ADD", "SUBTRACT", "INDEX", "COMMA" };
 const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT" };
 
 typedef struct tyran_parser_node

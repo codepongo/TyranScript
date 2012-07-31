@@ -57,6 +57,9 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	case TYRAN_MOCHA_TOKEN_MEMBER:
 		operand = TYRAN_PARSER_INDEX;
 		break;
+	case TYRAN_MOCHA_TOKEN_COMMA:
+		operand = TYRAN_PARSER_COMMA;
+		break;
 	default:
 		TYRAN_ERROR("unknown token to convert");
 	}
@@ -94,20 +97,28 @@ NODE tyran_mocha_parser_expression_operands(tyran_mocha_token* first, tyran_moch
 	
 	typedef struct operands {
 		tyran_mocha_token_id token_id;
+		int direction;
 	} operands;
 
-	operands operands_to_match[] = {TYRAN_MOCHA_TOKEN_ADD, TYRAN_MOCHA_TOKEN_SUBTRACT, TYRAN_MOCHA_TOKEN_MULTIPLY, TYRAN_MOCHA_TOKEN_MULTIPLY, TYRAN_MOCHA_TOKEN_MEMBER, TYRAN_MOCHA_TOKEN_BRACKET_LEFT};
+	operands operands_to_match[] = {
+		{TYRAN_MOCHA_TOKEN_COMMA, 0},
+		{TYRAN_MOCHA_TOKEN_ADD, 1},
+		{TYRAN_MOCHA_TOKEN_SUBTRACT, 1},
+		{TYRAN_MOCHA_TOKEN_MULTIPLY, 1},
+		{TYRAN_MOCHA_TOKEN_MEMBER, 1},
+		{TYRAN_MOCHA_TOKEN_BRACKET_LEFT, 1},
+	};
 	
 	int i;
 	
 	for (i=0; i < sizeof(operands_to_match)/sizeof(operands); ++i)
 	{
-		tyran_mocha_token* found_operand = tyran_mocha_lexer_find_ignore_parentheses(first, last, operands_to_match[i].token_id, 1);
+		tyran_mocha_token* found_operand = tyran_mocha_lexer_find_ignore_parentheses(first, last, operands_to_match[i].token_id, operands_to_match[i].direction);
 		if (found_operand) {
 			NODE left;
 			NODE right;
 			if (found_operand->token_id == TYRAN_MOCHA_TOKEN_BRACKET_LEFT) {
-				tyran_mocha_token* end_token = tyran_mocha_parser_find_matching_operand(TYRAN_MOCHA_TOKEN_BRACKET_LEFT, TYRAN_MOCHA_TOKEN_BRACKET_RIGHT, tyran_mocha_lexer_next(first, last), last);
+				tyran_mocha_token* end_token = tyran_mocha_parser_find_matching_operand(TYRAN_MOCHA_TOKEN_BRACKET_LEFT, TYRAN_MOCHA_TOKEN_BRACKET_RIGHT, tyran_mocha_lexer_next(found_operand, last), last);
 				right = tyran_mocha_parser_expression(tyran_mocha_lexer_next(found_operand, last), tyran_mocha_lexer_previous(end_token, first));
 				left = tyran_mocha_parser_expression(first, tyran_mocha_lexer_previous(found_operand, first));
 			} else {
