@@ -62,7 +62,7 @@ tyran_mocha_lexer* tyran_mocha_lexer_lex(const char* buf, int length);
 
 tyran_mocha_token* tyran_mocha_lexer_find(tyran_mocha_token* first, tyran_mocha_token* last, tyran_mocha_token_id id);
 tyran_mocha_token* tyran_mocha_lexer_find_terminator(tyran_mocha_token* first, tyran_mocha_token* last);
-tyran_mocha_token* tyran_mocha_lexer_find_ignore_parentheses(tyran_mocha_token* first, tyran_mocha_token* last, tyran_mocha_token_id id);
+tyran_mocha_token* tyran_mocha_lexer_find_ignore_parentheses(tyran_mocha_token* first, tyran_mocha_token* last, tyran_mocha_token_id id, int reverse);
 tyran_mocha_token* tyran_mocha_lexer_first(tyran_mocha_lexer* lexer);
 tyran_mocha_token* tyran_mocha_lexer_last(tyran_mocha_lexer* lexer);
 

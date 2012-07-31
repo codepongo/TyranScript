@@ -54,6 +54,9 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	case TYRAN_MOCHA_TOKEN_BRACKET_LEFT:
 		operand = TYRAN_PARSER_INDEX;
 		break;
+	case TYRAN_MOCHA_TOKEN_MEMBER:
+		operand = TYRAN_PARSER_INDEX;
+		break;
 	default:
 		TYRAN_ERROR("unknown token to convert");
 	}
@@ -93,13 +96,13 @@ NODE tyran_mocha_parser_expression_operands(tyran_mocha_token* first, tyran_moch
 		tyran_mocha_token_id token_id;
 	} operands;
 
-	operands operands_to_match[] = {TYRAN_MOCHA_TOKEN_ADD, TYRAN_MOCHA_TOKEN_SUBTRACT, TYRAN_MOCHA_TOKEN_MULTIPLY, TYRAN_MOCHA_TOKEN_MULTIPLY, TYRAN_MOCHA_TOKEN_BRACKET_LEFT};
+	operands operands_to_match[] = {TYRAN_MOCHA_TOKEN_ADD, TYRAN_MOCHA_TOKEN_SUBTRACT, TYRAN_MOCHA_TOKEN_MULTIPLY, TYRAN_MOCHA_TOKEN_MULTIPLY, TYRAN_MOCHA_TOKEN_MEMBER, TYRAN_MOCHA_TOKEN_BRACKET_LEFT};
 	
 	int i;
 	
 	for (i=0; i < sizeof(operands_to_match)/sizeof(operands); ++i)
 	{
-		tyran_mocha_token* found_operand = tyran_mocha_lexer_find_ignore_parentheses(first, last, operands_to_match[i].token_id);
+		tyran_mocha_token* found_operand = tyran_mocha_lexer_find_ignore_parentheses(first, last, operands_to_match[i].token_id, 1);
 		if (found_operand) {
 			NODE left;
 			NODE right;

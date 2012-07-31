@@ -274,13 +274,13 @@ tyran_mocha_token_id tyran_mocha_enclosing_start_token(tyran_mocha_token_id toke
 	return TYRAN_MOCHA_TOKEN_END;
 }
 
-tyran_mocha_token* tyran_mocha_lexer_find_ignore_parentheses(tyran_mocha_token* first, tyran_mocha_token* last, tyran_mocha_token_id id)
+tyran_mocha_token* tyran_mocha_lexer_find_ignore_parentheses(tyran_mocha_token* first, tyran_mocha_token* last, tyran_mocha_token_id id, int reverse)
 {
 	if (first->token_id == TYRAN_MOCHA_TOKEN_END) {
 		return 0;
 	}
 	
-	tyran_mocha_token* token = first;
+	tyran_mocha_token* token = reverse ? last : first;
 	tyran_mocha_token_id starting_token_id = 0;
 	tyran_mocha_token_id closing_token_id = 0;
 	int match = 0;
@@ -297,7 +297,12 @@ tyran_mocha_token* tyran_mocha_lexer_find_ignore_parentheses(tyran_mocha_token* 
 			match--;
 		}
 		
-		token = tyran_mocha_lexer_next(token, last);
+		if (reverse) {
+			token = tyran_mocha_lexer_previous(token, first);
+		} else {
+			token = tyran_mocha_lexer_next(token, last);
+		}
+		
 		if (!token) {
 			break;
 		}
