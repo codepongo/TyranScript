@@ -61,7 +61,7 @@ NODE tyran_parser_index(NODE a);
 NODE tyran_parser_slice(NODE b);
 NODE tyran_parser_object(NODE a);
 NODE tyran_parser_class(NODE name, NODE extends, NODE block);
-NODE tyran_parser_call(NODE previous, NODE function_name, NODE arguments);
+NODE tyran_parser_call(NODE function_node, NODE arguments);
 NODE tyran_parser_arguments(NODE a);
 NODE tyran_parser_self();
 NODE tyran_parser_self_identifier(NODE a);

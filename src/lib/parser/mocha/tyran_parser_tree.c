@@ -143,7 +143,7 @@ typedef struct tyran_parser_node_arguments
 typedef struct tyran_parser_node_call
 {
 	tyran_parser_node node;
-	tyran_parser_node* function_name;
+	tyran_parser_node* function_node;
 	tyran_parser_node* arguments;
 } tyran_parser_node_call;
 
@@ -292,7 +292,7 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 			tyran_parser_node_call* call = (tyran_parser_node_call*)node;
 			tyran_snprintf(buf, buf_size, "call");
 			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
-			TYRAN_PARSER_NODE_PRINT_HELPER("call function_name", call->function_name, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("call function_name", call->function_node, tab_count+1);
 			TYRAN_PARSER_NODE_PRINT_HELPER("call arguments", call->arguments, tab_count+1);
 		}
 	break;
@@ -487,12 +487,12 @@ NODE tyran_parser_class(NODE name, NODE extends, NODE block)
 
 	return (tyran_parser_node*)node;
 }
-NODE tyran_parser_call(NODE previous_node, NODE function_name, NODE arguments)
+NODE tyran_parser_call(NODE function_node, NODE arguments)
 {
 	tyran_parser_node_call* node = TYRAN_MALLOC_TYPE(tyran_parser_node_call, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_CALL;
 	node->arguments = arguments;
-	node->function_name = function_name;
+	node->function_node = function_node;
 
 	return (tyran_parser_node*)node;
 }
