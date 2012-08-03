@@ -193,14 +193,6 @@ void tyran_parser_root(tyran_parser* parser, NODE root)
 	TYRAN_PARSER_NODE_PRINT("root", parser->root);
 }
 
-int tyran_parser_parse(const char* buf, int length)
-{
-	g_buf = buf;
-	g_buf_size = length;
-	g_buf_pos = 0;
-	return 0;
-}
-
 NODE tyran_parser_block(NODE b)
 {
 	TYRAN_LOG("block");
