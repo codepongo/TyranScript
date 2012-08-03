@@ -39,6 +39,7 @@ typedef enum tyran_mocha_token_id {
 	TYRAN_MOCHA_TOKEN_NUMBER,
 	TYRAN_MOCHA_TOKEN_STRING,
 	TYRAN_MOCHA_TOKEN_IDENTIFIER,
+	TYRAN_MOCHA_TOKEN_INVOKE,
 	TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH,
 	TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND,
 } tyran_mocha_token_id;
@@ -68,6 +69,7 @@ tyran_mocha_token* tyran_mocha_lexer_last(tyran_mocha_lexer* lexer);
 
 tyran_mocha_token* tyran_mocha_lexer_next(tyran_mocha_token* first, tyran_mocha_token* last);
 tyran_mocha_token* tyran_mocha_lexer_previous(tyran_mocha_token* token, tyran_mocha_token* first);
-tyran_mocha_token_id tyran_mocha_enclosing_start_token(tyran_mocha_token_id token_id);
+tyran_mocha_token_id tyran_mocha_enclosing_end_token(tyran_mocha_token_id token_id);
+int tyran_mocha_lexer_is_literal(tyran_mocha_token* token);
 
 #endif

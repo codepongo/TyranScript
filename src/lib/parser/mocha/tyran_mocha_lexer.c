@@ -221,6 +221,13 @@ tyran_mocha_token* tyran_mocha_lexer_previous(tyran_mocha_token* token, tyran_mo
 }
 
 
+int tyran_mocha_lexer_is_literal(tyran_mocha_token* token)
+{
+	tyran_mocha_token_id token_id = token->token_id;
+	
+	return (token_id == TYRAN_MOCHA_TOKEN_STRING || token_id == TYRAN_MOCHA_TOKEN_NUMBER || token_id == TYRAN_MOCHA_TOKEN_IDENTIFIER);
+}
+
 tyran_mocha_token* tyran_mocha_lexer_next(tyran_mocha_token* first, tyran_mocha_token* last)
 {
 	if (first == last) {
@@ -253,7 +260,7 @@ tyran_mocha_token* tyran_mocha_lexer_find_terminator(tyran_mocha_token* first, t
 	return terminator;
 }
 
-tyran_mocha_token_id tyran_mocha_enclosing_start_token(tyran_mocha_token_id token_id)
+tyran_mocha_token_id tyran_mocha_enclosing_end_token(tyran_mocha_token_id token_id)
 {
 	typedef struct tyran_mocha_matching_tokens {
 		tyran_mocha_token_id start;
@@ -267,49 +274,13 @@ tyran_mocha_token_id tyran_mocha_enclosing_start_token(tyran_mocha_token_id toke
 
 	int i;
 	for (i=0; i<sizeof(enclosing_tokens) / sizeof(tyran_mocha_matching_tokens); ++i) {
-		if (token_id == enclosing_tokens[i].start) {
-			return enclosing_tokens[i].end;
+		if (token_id == enclosing_tokens[i].end) {
+			return enclosing_tokens[i].start;
 		}
 	}
 	return TYRAN_MOCHA_TOKEN_END;
 }
 
-tyran_mocha_token* tyran_mocha_lexer_find_ignore_parentheses(tyran_mocha_token* first, tyran_mocha_token* last, tyran_mocha_token_id id, int reverse)
-{
-	if (first->token_id == TYRAN_MOCHA_TOKEN_END) {
-		return 0;
-	}
-	
-	tyran_mocha_token* token = reverse ? last : first;
-	tyran_mocha_token_id starting_token_id = 0;
-	tyran_mocha_token_id closing_token_id = 0;
-	int match = 0;
-	while (token->token_id != id || match != 0)
-	{
-		if (closing_token_id == TYRAN_MOCHA_TOKEN_END) {
-			closing_token_id = tyran_mocha_enclosing_start_token(token->token_id);
-			if (closing_token_id != TYRAN_MOCHA_TOKEN_END) {
-				starting_token_id = token->token_id;
-				match++;
-			}
-		}
-		else if (match && closing_token_id == token->token_id) {
-			match--;
-		}
-		
-		if (reverse) {
-			token = tyran_mocha_lexer_previous(token, first);
-		} else {
-			token = tyran_mocha_lexer_next(token, last);
-		}
-		
-		if (!token) {
-			break;
-		}
-	}
-	
-	return token;
-}
 
 
 tyran_mocha_token* tyran_mocha_lexer_find(tyran_mocha_token* first, tyran_mocha_token* last, tyran_mocha_token_id id)

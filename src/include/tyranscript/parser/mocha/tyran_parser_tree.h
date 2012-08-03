@@ -19,6 +19,25 @@ typedef struct tyran_parser {
 	NODE root;
 } tyran_parser;
 
+enum tyran_parser_type {
+	TYRAN_PARSER_NODE_TYPE_NUMBER,
+	TYRAN_PARSER_NODE_TYPE_BOOLEAN,
+	TYRAN_PARSER_NODE_TYPE_NULL,
+	TYRAN_PARSER_NODE_TYPE_UNDEFINED,
+	TYRAN_PARSER_NODE_TYPE_STRING,
+	TYRAN_PARSER_NODE_TYPE_RETURN,
+	TYRAN_PARSER_NODE_TYPE_IDENTIFIER,
+	TYRAN_PARSER_NODE_TYPE_ASSIGNMENT,
+	TYRAN_PARSER_NODE_TYPE_COMPOUND_ASSIGNMENT,
+	TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY,
+	TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY,
+	TYRAN_PARSER_NODE_TYPE_CLASS,
+	TYRAN_PARSER_NODE_TYPE_OBJECT_ASSIGNMENT,
+	TYRAN_PARSER_NODE_TYPE_OBJECT,
+	TYRAN_PARSER_NODE_TYPE_ARGUMENTS,
+	TYRAN_PARSER_NODE_TYPE_CONCAT
+};
+
 typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_DIVIDE,
 	TYRAN_PARSER_MULTIPLY,
@@ -28,14 +47,142 @@ typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_SUBTRACT,
 	TYRAN_PARSER_INDEX,
 	TYRAN_PARSER_COMMA,
+	TYRAN_PARSER_INVOKE,
 	TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX
 } tyran_parser_binary_operand_type;
 
 typedef enum tyran_parser_unary_operand_type {
 	TYRAN_PARSER_UNARY_OPERAND_ADD,
 	TYRAN_PARSER_UNARY_OPERAND_SUBTRACT,
+	TYRAN_PARSER_UNARY_PARENTHESES,
 	TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX
 } tyran_parser_unary_operand_type;
+
+typedef struct tyran_parser_node
+{
+	enum tyran_parser_type type;
+} tyran_parser_node;
+
+typedef struct tyran_parser_node_value
+{
+	tyran_parser_node node;
+} tyran_parser_node_value;
+
+typedef struct tyran_parser_node_number
+{
+	tyran_parser_node node;
+	tyran_number number;
+} tyran_parser_node_number;
+
+typedef struct tyran_parser_node_boolean
+{
+	tyran_parser_node node;
+	tyran_boolean boolean;
+} tyran_parser_node_boolean;
+
+typedef struct tyran_parser_node_string
+{
+	tyran_parser_node node;
+	const char* string;
+	int length;
+} tyran_parser_node_string;
+
+typedef struct tyran_parser_node_identifier
+{
+	tyran_parser_node node;
+	const char* string;
+	int length;
+} tyran_parser_node_identifier;
+
+typedef struct tyran_parser_node_assignment
+{
+	tyran_parser_node node;
+	tyran_parser_node* source;
+	tyran_parser_node* target;
+} tyran_parser_node_assignment;
+
+typedef struct tyran_parser_node_compound_assignment
+{
+	tyran_parser_node node;
+	int operator_type;
+	tyran_parser_node* source;
+	tyran_parser_node* target;
+} tyran_parser_node_compound_assignment;
+
+typedef struct tyran_parser_node_operand_binary
+{
+	tyran_parser_node node;
+	char operator_type;
+	tyran_parser_node* left;
+	tyran_parser_node* right;
+} tyran_parser_node_operand_binary;
+
+typedef struct tyran_parser_node_operand_unary
+{
+	tyran_parser_node node;
+	char operator_type;
+	tyran_parser_node* expression;
+	tyran_boolean post;
+} tyran_parser_node_operand_unary;
+
+typedef struct tyran_parser_node_return
+{
+	tyran_parser_node node;
+	tyran_parser_node* expression;
+} tyran_parser_node_return;
+
+typedef struct tyran_parser_node_class
+{
+	tyran_parser_node node;
+	tyran_parser_node* name;
+	tyran_parser_node* extends;
+	tyran_parser_node* block;
+} tyran_parser_node_class;
+
+typedef struct tyran_parser_node_object
+{
+	tyran_parser_node node;
+	tyran_parser_node* assignment_list;
+} tyran_parser_node_object;
+
+typedef struct tyran_parser_node_object_assignment
+{
+	tyran_parser_node node;
+	tyran_parser_node* name;
+	tyran_parser_node* source;
+} tyran_parser_node_object_assignment;
+
+typedef struct tyran_parser_node_arguments
+{
+	tyran_parser_node node;
+	tyran_parser_node* argument_list;
+} tyran_parser_node_arguments;
+
+typedef struct tyran_parser_node_call
+{
+	tyran_parser_node node;
+	tyran_parser_node* function_node;
+	tyran_parser_node* arguments;
+} tyran_parser_node_call;
+
+typedef struct tyran_parser_node_concat
+{
+	tyran_parser_node node;
+	tyran_parser_node** nodes;
+	int length;
+} tyran_parser_node_concat;
+
+typedef struct tyran_parser_node_null
+{
+	tyran_parser_node node;
+} tyran_parser_node_null;
+
+typedef struct tyran_parser_node_undefined
+{
+	tyran_parser_node node;
+} tyran_parser_node_undefined;
+
+
 
 void TYRAN_PARSER_NODE_PRINT(const char* description, struct tyran_parser_node* node);
 
@@ -61,7 +208,6 @@ NODE tyran_parser_index(NODE a);
 NODE tyran_parser_slice(NODE b);
 NODE tyran_parser_object(NODE a);
 NODE tyran_parser_class(NODE name, NODE extends, NODE block);
-NODE tyran_parser_call(NODE function_node, NODE arguments);
 NODE tyran_parser_arguments(NODE a);
 NODE tyran_parser_self();
 NODE tyran_parser_self_identifier(NODE a);

@@ -80,6 +80,9 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	case TYRAN_MOCHA_TOKEN_INCREMENT:
 		TYRAN_LOG("increment");
 	break;
+	case TYRAN_MOCHA_TOKEN_INVOKE:
+		TYRAN_LOG("invoke");
+	break;
 	case TYRAN_MOCHA_TOKEN_MEMBER:
 		TYRAN_LOG("member");
 	break;
