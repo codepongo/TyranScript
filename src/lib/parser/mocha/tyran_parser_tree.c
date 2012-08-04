@@ -2,8 +2,8 @@
 #include <tyranscript/parser/tyran_lexer.h>
 #include <tyranscript/tyran_string.h>
 
-const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "INDEX", "COMMA", "INVOKE", "EQUAL", "NOT_EQUAL" };
-const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT", "PARENTHESES" };
+const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "INDEX", "COMMA", "INVOKE", "EQUAL", "NOT_EQUAL", "THEN", "ELSE" };
+const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT", "PARENTHESES", "BLOCK", "LINE", "IF"};
 
 void TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(const char* buf, const char* description, int tab_count)
 {
@@ -62,14 +62,6 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
 		}
 	break;
-	case TYRAN_PARSER_NODE_TYPE_RETURN:
-		{
-			tyran_parser_node_return* ret = (tyran_parser_node_return*)node;
-			tyran_snprintf(buf, buf_size, "return");
-			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
-			TYRAN_PARSER_NODE_PRINT_HELPER("expression", ret->expression, tab_count + 1);
-		}
-	break;
 	case TYRAN_PARSER_NODE_TYPE_IDENTIFIER:
 		{
 			tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*)node;
@@ -110,15 +102,6 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 			tyran_snprintf(buf, buf_size, "operand unary '%s' (%d)", tyran_parser_unary_operand_to_string[operand->operator_type], operand->post);
 			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
 			TYRAN_PARSER_NODE_PRINT_HELPER("operand expression", operand->expression, tab_count+1);
-		}
-	break;
-	case TYRAN_PARSER_NODE_TYPE_IF:
-		{
-			tyran_parser_node_if* operand = (tyran_parser_node_if*)node;
-			tyran_snprintf(buf, buf_size, "if");
-			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
-			TYRAN_PARSER_NODE_PRINT_HELPER("if expression", operand->expression, tab_count+1);
-			TYRAN_PARSER_NODE_PRINT_HELPER("if block", operand->block, tab_count+1);
 		}
 	break;
 	case TYRAN_PARSER_NODE_TYPE_CLASS:
@@ -193,7 +176,7 @@ void tyran_parser_root(tyran_parser* parser, NODE root)
 	TYRAN_PARSER_NODE_PRINT("root", parser->root);
 }
 
-NODE tyran_parser_block(NODE b)
+NODE tyran_parser_block()
 {
 	TYRAN_LOG("block");
 	return 0;
@@ -233,15 +216,6 @@ NODE tyran_parser_object_assignment(NODE name, NODE source)
 NODE tyran_parser_value(NODE a)
 {
 	return a;
-}
-
-NODE tyran_parser_return(NODE expression)
-{
-	tyran_parser_node_return* node = TYRAN_MALLOC_TYPE(tyran_parser_node_return, 1);
-	node->node.type = TYRAN_PARSER_NODE_TYPE_RETURN;
-	node->expression = expression;
-
-	return (tyran_parser_node*)node;
 }
 
 NODE tyran_parser_comment(NODE comment)
@@ -419,13 +393,6 @@ NODE tyran_parser_when(NODE a, NODE b)
 	return 0;
 }
 
-NODE tyran_parser_if(NODE expression, NODE block)
-{
-	tyran_parser_node_if* node = TYRAN_MALLOC_TYPE(tyran_parser_node_if, 1);
-	node->node.type = TYRAN_PARSER_NODE_TYPE_IF;
-	node->expression = expression;
-	return (NODE)node;
-}
 
 NODE tyran_parser_if_else(NODE a, NODE b)
 {

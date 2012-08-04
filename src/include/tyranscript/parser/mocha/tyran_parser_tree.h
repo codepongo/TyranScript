@@ -25,7 +25,6 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_NULL,
 	TYRAN_PARSER_NODE_TYPE_UNDEFINED,
 	TYRAN_PARSER_NODE_TYPE_STRING,
-	TYRAN_PARSER_NODE_TYPE_RETURN,
 	TYRAN_PARSER_NODE_TYPE_IDENTIFIER,
 	TYRAN_PARSER_NODE_TYPE_ASSIGNMENT,
 	TYRAN_PARSER_NODE_TYPE_COMPOUND_ASSIGNMENT,
@@ -36,7 +35,6 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_OBJECT,
 	TYRAN_PARSER_NODE_TYPE_ARGUMENTS,
 	TYRAN_PARSER_NODE_TYPE_CONCAT,
-	TYRAN_PARSER_NODE_TYPE_IF,
 };
 
 typedef enum tyran_parser_binary_operand_type {
@@ -51,6 +49,8 @@ typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_INVOKE,
 	TYRAN_PARSER_EQUAL,
 	TYRAN_PARSER_NOT_EQUAL,
+	TYRAN_PARSER_THEN,
+	TYRAN_PARSER_ELSE,
 	TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX
 } tyran_parser_binary_operand_type;
 
@@ -58,6 +58,9 @@ typedef enum tyran_parser_unary_operand_type {
 	TYRAN_PARSER_UNARY_OPERAND_ADD,
 	TYRAN_PARSER_UNARY_OPERAND_SUBTRACT,
 	TYRAN_PARSER_UNARY_PARENTHESES,
+	TYRAN_PARSER_UNARY_BLOCK,
+	TYRAN_PARSER_UNARY_LINE,
+	TYRAN_PARSER_UNARY_IF,
 	TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX
 } tyran_parser_unary_operand_type;
 
@@ -128,21 +131,6 @@ typedef struct tyran_parser_node_operand_unary
 	tyran_boolean post;
 } tyran_parser_node_operand_unary;
 
-typedef struct tyran_parser_node_if
-{
-	tyran_parser_node node;
-	char operator_type;
-	tyran_parser_node* expression;
-	tyran_parser_node* block;
-} tyran_parser_node_if;
-
-
-typedef struct tyran_parser_node_return
-{
-	tyran_parser_node node;
-	tyran_parser_node* expression;
-} tyran_parser_node_return;
-
 typedef struct tyran_parser_node_class
 {
 	tyran_parser_node node;
@@ -203,7 +191,7 @@ int tyran_parser_parse(const char* buf, int length);
 
 
 void tyran_parser_root(tyran_parser* parser, NODE root);
-NODE tyran_parser_block(NODE b);
+NODE tyran_parser_block();
 NODE tyran_parser_assignment(NODE target, NODE source);
 NODE tyran_parser_object_assignment(NODE a, NODE b);
 NODE tyran_parser_compound_assignment(int type, NODE b, NODE c);

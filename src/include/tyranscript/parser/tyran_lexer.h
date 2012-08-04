@@ -8,6 +8,8 @@ typedef struct tyran_lexer {
 	int index;
 	int line;
 	int column;
+	int indentation;
+	int tab_count;
 	int last_token;
 } tyran_lexer;
 

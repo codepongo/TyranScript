@@ -54,7 +54,6 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	"PARENTHESES_RIGHT",
 	"BRACKET_LEFT",
 	"BRACKET_RIGHT",
-	"TERMINATOR",
 	"OBJECT_START",
 	"OBJECT_END",
 	"COLON",
@@ -79,7 +78,11 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	"INVOKE",
 	"GLYPH",
 	"GLYPH_BOUND",
+	"BLOCK_START",
+	"BLOCK_END",
+	"LINE_START",
+	"LINE_END",
 	};
 	
-	TYRAN_LOG("%s", token_id_to_string[token->token_id]);
+	TYRAN_LOG_NO_LF("%s ", token_id_to_string[token->token_id]);
 }

@@ -11,18 +11,10 @@
 
 const int TYRAN_TOKEN_COMMENT = -1;
 
-
-
-void yyerror(tyran_lexer_position_info* lexer_position_info, tyran_parser_state* ps, const char *msg)
-{
-	TYRAN_SOFT_ERROR("%d[%d-%d]:%s", lexer_position_info->first_line, lexer_position_info->first_column, lexer_position_info->last_column, msg);
-	ps->error_count++;
-}
-
 tyran_lexer* tyran_lexer_new(const char* buf)
 {
 	int length = tyran_strlen(buf);
-	tyran_lexer* lexer = TYRAN_MALLOC_TYPE(tyran_lexer, 1);
+	tyran_lexer* lexer = TYRAN_CALLOC(tyran_lexer);
 	lexer->buffer = TYRAN_MALLOC_TYPE(char, length + 1);
 	tyran_memcpy(lexer->buffer, buf, length);
 	lexer->buffer[length] = 0;
@@ -41,6 +33,13 @@ char tyran_lexer_pop_character(tyran_lexer* lexer)
 	if (c == '\n') {
 		lexer->line++;
 		lexer->column = 0;
+		lexer->tab_count = 0;
+		lexer->indentation = 0;
+	} else if (c == '\t') {
+		lexer->tab_count++;
+		lexer->column += 4;
+	} else {
+		lexer->indentation = lexer->tab_count;
 	}
 	lexer->column++;
 
@@ -49,6 +48,16 @@ char tyran_lexer_pop_character(tyran_lexer* lexer)
 
 void tyran_lexer_push_character(char c, tyran_lexer* lexer)
 {
+	if (c == '\n') {
+		lexer->line--;
+		lexer->column = -1;
+		lexer->tab_count = 0;
+		lexer->indentation = 0;
+	} else if (c == '\t') {
+		lexer->tab_count--;
+		lexer->column -= 3;
+	}
+	lexer->column++;
 	// TYRAN_ASSERT(c != 0, "Must be a real character");
 	lexer->index--;
 	lexer->buffer[lexer->index] = c;
@@ -150,8 +159,10 @@ char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexe
 {
 	char c;
 	
-	while ((c = tyran_lexer_pop_character(lexer)) == ' ' || c == '\t' || c == '\r')
-		;
+	while ((c = tyran_lexer_pop_character(lexer)) == ' ' || c == '\t' || c == '\r') {
+
+
+	}
 
 	return c;
 }
