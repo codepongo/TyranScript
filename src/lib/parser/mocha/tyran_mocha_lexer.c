@@ -61,8 +61,6 @@ int tyran_mocha_lexer_operand(tyran_lexer* lexer, int c)
 		{ ")", 1, TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT },
 		{ "[", 1, TYRAN_MOCHA_TOKEN_BRACKET_LEFT },
 		{ "]", 1, TYRAN_MOCHA_TOKEN_BRACKET_RIGHT },
-		{ ";", 1, TYRAN_MOCHA_TOKEN_LINE_END },
-		{ "\n", 1, TYRAN_MOCHA_TOKEN_LINE_END },
 		{ "{", 1, TYRAN_MOCHA_TOKEN_OBJECT_START },
 		{ "}", 1, TYRAN_MOCHA_TOKEN_OBJECT_END },
 		{ ":", 1, TYRAN_MOCHA_TOKEN_COLON },
@@ -74,15 +72,12 @@ int tyran_mocha_lexer_operand(tyran_lexer* lexer, int c)
 	size_t i;
 	for (index = 0; index < 4; ++index) {
 		char c = tyran_lexer_pop_character(lexer);
-		if (c == 0 || c == '\n') {
+		buf[index] = c;
+		if (c == 0) {
 			break;
 		}
-		buf[index] = c;
 	}
 	buf[index] = 0;
-	if (!index) {
-		return 0;
-	}
 
 	for (i = 0; i < sizeof(operands)/sizeof(tyran_operand_info); ++i) {
 		if (index < operands[i].len) {
@@ -148,24 +143,10 @@ int tyran_mocha_lexer_keyword(const char* identifier)
 
 tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
-	tyran_mocha_token token;
+	static tyran_mocha_token token;
 	tyran_lexer_token_data token_data;
 	static int last_indentation = 0;
-	static int return_block_end = 0;
-	static int return_line_start = 1;
-	static int in_line_start = 0;
-	
-	if (return_block_end) {
-		return_block_end = 0;
-		token.token_id = TYRAN_MOCHA_TOKEN_BLOCK_END;
-		return token;
-	}
-	if (return_line_start) {
-		return_line_start = 0;
-		token.token_id = TYRAN_MOCHA_TOKEN_LINE_START;
-		in_line_start = 1;
-		return token;
-	}
+	static int indentation = 0;
 
 	tyran_lexer_set_begin(lexer_position_info, lexer);
  
@@ -175,24 +156,14 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		tyran_lexer_push_character(c, lexer);
 		if (lexer->indentation == last_indentation + 1) {
 			token.token_id = TYRAN_MOCHA_TOKEN_BLOCK_START;
-			return_line_start = 1;
 		} else if (c == TYRAN_MOCHA_TOKEN_END || (lexer->indentation == last_indentation - 1)) {
-			return_block_end = 1;
-			token.token_id = TYRAN_MOCHA_TOKEN_LINE_END;
-			in_line_start = 0;
+			token.token_id = TYRAN_MOCHA_TOKEN_BLOCK_END;
 		} else {
 			token.token_id = TYRAN_MOCHA_TOKEN_LINE_END;
-			in_line_start = 0;
-			return_line_start = 1;
 		}
 		last_indentation = lexer->indentation;
 	} else if (!c) {
-		if (in_line_start) {
-			tyran_lexer_push_character(c, lexer);
-			in_line_start = 0;
-			token.token_id = TYRAN_MOCHA_TOKEN_LINE_END;
-		}
-		else if (last_indentation > 0) {
+		if (last_indentation > 0) {
 			tyran_lexer_push_character(c, lexer);
 			last_indentation = 0;
 			token.token_id = TYRAN_MOCHA_TOKEN_BLOCK_END;
@@ -232,7 +203,7 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 			token = tyran_mocha_lexer_next_token(lexer_position_info, lexer);
 		}
 	}
- 
+
 	tyran_lexer_set_end(lexer_position_info, lexer);
  
 	return token;
@@ -301,18 +272,9 @@ tyran_mocha_token* tyran_mocha_lexer_last(tyran_mocha_lexer* lexer)
 	return &lexer->tokens[lexer->token_count - 1];
 }
 
-tyran_mocha_token* tyran_mocha_lexer_find_terminator(tyran_mocha_token* first, tyran_mocha_token* last)
-{
-	tyran_mocha_token* terminator = tyran_mocha_lexer_find(first, last, TYRAN_MOCHA_TOKEN_LINE_END);
-	if (!terminator) {
-		terminator = tyran_mocha_lexer_find(first, last, TYRAN_MOCHA_TOKEN_END);
-	}
-	return terminator;
-}
-
 int tyran_mocha_lexer_is_unary_operator(tyran_mocha_token_id token_id)
 {
-	return (token_id == TYRAN_MOCHA_TOKEN_IF || token_id == TYRAN_MOCHA_TOKEN_PARENTHESES_LEFT || token_id == TYRAN_MOCHA_TOKEN_BLOCK_START || token_id == TYRAN_MOCHA_TOKEN_BRACKET_LEFT || token_id == TYRAN_MOCHA_TOKEN_LINE_START);
+	return (token_id == TYRAN_MOCHA_TOKEN_IF || token_id == TYRAN_MOCHA_TOKEN_PARENTHESES_LEFT || token_id == TYRAN_MOCHA_TOKEN_BLOCK_START || token_id == TYRAN_MOCHA_TOKEN_BRACKET_LEFT);
 }
 
 tyran_mocha_token_id tyran_mocha_enclosing_end_token(tyran_mocha_token_id token_id)
@@ -326,7 +288,6 @@ tyran_mocha_token_id tyran_mocha_enclosing_end_token(tyran_mocha_token_id token_
 		{TYRAN_MOCHA_TOKEN_BRACKET_LEFT, TYRAN_MOCHA_TOKEN_BRACKET_RIGHT},
 		{TYRAN_MOCHA_TOKEN_PARENTHESES_LEFT, TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT},
 		{TYRAN_MOCHA_TOKEN_BLOCK_START, TYRAN_MOCHA_TOKEN_BLOCK_END},
-		{TYRAN_MOCHA_TOKEN_LINE_START, TYRAN_MOCHA_TOKEN_LINE_END},
 	};
 
 	int i;

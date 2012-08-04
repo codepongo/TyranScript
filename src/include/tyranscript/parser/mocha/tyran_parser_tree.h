@@ -51,6 +51,7 @@ typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_NOT_EQUAL,
 	TYRAN_PARSER_THEN,
 	TYRAN_PARSER_ELSE,
+	TYRAN_PARSER_LINE,
 	TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX
 } tyran_parser_binary_operand_type;
 
@@ -59,7 +60,6 @@ typedef enum tyran_parser_unary_operand_type {
 	TYRAN_PARSER_UNARY_OPERAND_SUBTRACT,
 	TYRAN_PARSER_UNARY_PARENTHESES,
 	TYRAN_PARSER_UNARY_BLOCK,
-	TYRAN_PARSER_UNARY_LINE,
 	TYRAN_PARSER_UNARY_IF,
 	TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX
 } tyran_parser_unary_operand_type;

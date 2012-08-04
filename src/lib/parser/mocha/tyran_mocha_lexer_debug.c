@@ -80,7 +80,6 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	"GLYPH_BOUND",
 	"BLOCK_START",
 	"BLOCK_END",
-	"LINE_START",
 	"LINE_END",
 	};
 	
