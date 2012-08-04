@@ -13,10 +13,10 @@ typedef struct tyran_mocha_operator_info {
 tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token_id token_id)
 {
 	tyran_mocha_operator_info operands_to_match[] = {
+		{TYRAN_MOCHA_TOKEN_LINE_END, 1, 1},
 		{TYRAN_MOCHA_TOKEN_IF, 1, 0},
 		{TYRAN_MOCHA_TOKEN_THEN, 1, 0},
 		{TYRAN_MOCHA_TOKEN_ELSE, 1, 0},
-		{TYRAN_MOCHA_TOKEN_LINE_END, 1, 1},
 		{TYRAN_MOCHA_TOKEN_ASSIGNMENT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_NOT_EQUAL, 1, 0},
@@ -319,7 +319,30 @@ void tyran_mocha_parser_reduce(tyran_mocha_parser* parser, tyran_mocha_token* op
 	NODE result;
 	switch (operator->token_id)
 	{
-	default: {
+		case TYRAN_MOCHA_TOKEN_IF: {
+			tyran_parser_node_operand_binary* if_data_node = (tyran_parser_node_operand_binary*)tyran_mocha_parser_stack_pop(parser->stack);
+			NODE if_expression = if_data_node->left;
+			NODE other = if_data_node->right;
+			NODE if_then;
+			NODE if_else = 0;
+			if (other->type == TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY) {
+				tyran_parser_node_operand_binary* node = (tyran_parser_node_operand_binary*) other;
+				if (node->operator_type == TYRAN_PARSER_ELSE) {
+					tyran_parser_node_operand_binary* if_else_binary = 0;
+					if_else_binary = (tyran_parser_node_operand_binary*) node->left;
+					if_then = node->left;
+					if_else = node->right;
+				}
+			}
+			if (if_else) {
+				result = tyran_parser_if_else(if_expression, if_then, if_else);
+			} else {
+				if_then = other;
+				result = tyran_parser_if(if_expression, if_then);
+			}
+		}
+		break;
+		default: {
 		NODE right = 0;
 		if (!tyran_mocha_lexer_is_unary_operator(operator->token_id)) {
 			right = tyran_mocha_parser_stack_pop(parser->stack);

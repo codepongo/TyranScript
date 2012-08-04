@@ -96,6 +96,25 @@ void TYRAN_PARSER_NODE_PRINT_HELPER(const char* description, tyran_parser_node* 
 			TYRAN_PARSER_NODE_PRINT_HELPER("operand right", operand->right, tab_count+1);
 		}
 	break;
+	case TYRAN_PARSER_NODE_TYPE_IF:
+		{
+			tyran_parser_node_if* operand = (tyran_parser_node_if*)node;
+			tyran_snprintf(buf, buf_size, "if ");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("if expression", operand->expression, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("if then", operand->then_block, tab_count+1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_IF_ELSE:
+		{
+			tyran_parser_node_if_else* operand = (tyran_parser_node_if_else*)node;
+			tyran_snprintf(buf, buf_size, "if ");
+			TYRAN_PARSER_NODE_PRINT_HELPER_OUTPUT(buf, description, tab_count);
+			TYRAN_PARSER_NODE_PRINT_HELPER("if expression", operand->expression, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("if then", operand->then_block, tab_count+1);
+			TYRAN_PARSER_NODE_PRINT_HELPER("if else", operand->else_block, tab_count+1);
+		}
+	break;
 	case TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY:
 		{
 			tyran_parser_node_operand_unary* operand = (tyran_parser_node_operand_unary*)node;
@@ -393,11 +412,23 @@ NODE tyran_parser_when(NODE a, NODE b)
 	return 0;
 }
 
-
-NODE tyran_parser_if_else(NODE a, NODE b)
+NODE tyran_parser_if(NODE expression, NODE then_block)
 {
-	TYRAN_LOG("if else");
-	return 0;
+	tyran_parser_node_if* node = TYRAN_MALLOC_TYPE(tyran_parser_node_if, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_IF;
+	node->expression = expression;
+	node->then_block = then_block;
+	return (tyran_parser_node*)node;
+}
+
+NODE tyran_parser_if_else(NODE expression, NODE then_block, NODE else_block)
+{
+	tyran_parser_node_if_else* node = TYRAN_MALLOC_TYPE(tyran_parser_node_if_else, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_IF_ELSE;
+	node->expression = expression;
+	node->then_block = then_block;
+	node->else_block = else_block;
+	return (tyran_parser_node*)node;
 }
 
 NODE tyran_parser_operand_unary(int operator_type, NODE expression, tyran_boolean post)
