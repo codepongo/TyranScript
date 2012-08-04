@@ -61,6 +61,7 @@ typedef enum tyran_parser_unary_operand_type {
 	TYRAN_PARSER_UNARY_PARENTHESES,
 	TYRAN_PARSER_UNARY_BLOCK,
 	TYRAN_PARSER_UNARY_IF,
+	TYRAN_PARSER_UNARY_BRACKET,
 	TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX
 } tyran_parser_unary_operand_type;
 
