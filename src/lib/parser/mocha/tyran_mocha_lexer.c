@@ -69,15 +69,12 @@ int tyran_mocha_lexer_operand(tyran_lexer* lexer, int c)
 	};
 	int index;
 	char buf[5];
-	size_t i;
-	for (index = 0; index < 4; ++index) {
-		char c = tyran_lexer_pop_character(lexer);
-		buf[index] = c;
-		if (c == 0) {
-			break;
-		}
+	int i;
+	char popped_character = 1;
+	for (index = 0; index < 4 && (popped_character != 0); ++index) {
+		popped_character = tyran_lexer_pop_character(lexer);
+		buf[index] = popped_character;
 	}
-	buf[index] = 0;
 
 	for (i = 0; i < sizeof(operands)/sizeof(tyran_operand_info); ++i) {
 		if (index < operands[i].len) {
@@ -93,7 +90,7 @@ int tyran_mocha_lexer_operand(tyran_lexer* lexer, int c)
 		}
 	}
 
-	for (i = index - 1; i >= 1; --i) {
+	for (i = index - 1; i >= 0; --i) {
 		tyran_lexer_push_character(buf[i], lexer);
 	}
 	return 0;
@@ -177,8 +174,8 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 	} else if (!c) {
 		if (current_indentation > 0) {
 			tyran_lexer_push_character(c, lexer);
-			current_indentation = 0;
-			token.token_id = TYRAN_MOCHA_TOKEN_BLOCK_END;
+			target_indentation = 0;
+			return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
 		} else {
 			token.token_id = TYRAN_MOCHA_TOKEN_END;
 		}

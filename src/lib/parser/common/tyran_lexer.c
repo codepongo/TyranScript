@@ -15,20 +15,19 @@ tyran_lexer* tyran_lexer_new(const char* buf)
 {
 	int length = tyran_strlen(buf);
 	tyran_lexer* lexer = TYRAN_CALLOC(tyran_lexer);
-	lexer->buffer = TYRAN_MALLOC_TYPE(char, length + 1);
-	tyran_memcpy(lexer->buffer, buf, length);
-	lexer->buffer[length] = 0;
+	lexer->size = length + 1;
+	lexer->buffer = TYRAN_MALLOC_TYPE(char, lexer->size);
+	tyran_memcpy(lexer->buffer, buf, lexer->size);
 	return lexer;
 }
 
 char tyran_lexer_pop_character(tyran_lexer* lexer)
 {
 	char c = 0;
+	TYRAN_ASSERT(lexer->index < lexer->size, "you popped too far");
 
 	c = lexer->buffer[lexer->index];
-	if (c != 0) {
-		lexer->index++;
-	}
+	lexer->index++;
 
 	if (c == '\n') {
 		lexer->line++;
@@ -59,6 +58,7 @@ void tyran_lexer_push_character(char c, tyran_lexer* lexer)
 	}
 	lexer->column++;
 	// TYRAN_ASSERT(c != 0, "Must be a real character");
+	TYRAN_ASSERT(lexer->index > 0, "You pushed too much");
 	lexer->index--;
 	lexer->buffer[lexer->index] = c;
 }

@@ -5,6 +5,7 @@
 
 typedef struct tyran_lexer {
 	char* buffer;
+	int size;
 	int index;
 	int line;
 	int column;
