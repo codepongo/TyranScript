@@ -253,6 +253,18 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	case TYRAN_MOCHA_TOKEN_NOT_EQUAL:
 		operand = TYRAN_PARSER_NOT_EQUAL;
 		break;
+	case TYRAN_MOCHA_TOKEN_LESS:
+		operand = TYRAN_PARSER_LESS;
+		break;
+	case TYRAN_MOCHA_TOKEN_LESS_EQUAL:
+		operand = TYRAN_PARSER_LESS_EQUAL;
+		break;
+	case TYRAN_MOCHA_TOKEN_GREATER:
+		operand = TYRAN_PARSER_GREATER;
+		break;
+	case TYRAN_MOCHA_TOKEN_GREATER_EQUAL:
+		operand = TYRAN_PARSER_GREATER_EQUAL;
+		break;
 	case TYRAN_MOCHA_TOKEN_THEN:
 		operand = TYRAN_PARSER_THEN;
 		break;
@@ -307,6 +319,12 @@ NODE tyran_mocha_parser_token_to_literal(tyran_mocha_token* first)
 			return tyran_parser_literal_string(first->token_data);
 		case TYRAN_MOCHA_TOKEN_NUMBER:
 			return tyran_parser_literal_number(first->token_data);
+		case TYRAN_MOCHA_TOKEN_TRUE:
+			return tyran_parser_bool(1);
+		case TYRAN_MOCHA_TOKEN_FALSE:
+			return tyran_parser_bool(0);
+		case TYRAN_MOCHA_TOKEN_UNDEFINED:
+			return tyran_parser_undefined();
 		default:
 			TYRAN_ERROR("Illegal token:%d", first->token_id);
 			return 0;
@@ -323,15 +341,19 @@ tyran_parser_node_operand_binary* tyran_mocha_parser_binary_operator_cast(NODE n
 	}
 }
 
-
-void tyran_mocha_parser_reduce(tyran_mocha_parser* parser, tyran_mocha_token* operator)
+NODE tyran_mocha_parser_reduce_while(tyran_mocha_parser* parser)
 {
-	tyran_mocha_parser_debug("reduce", parser, operator);
+	NODE block = tyran_mocha_parser_stack_pop(parser->stack);
+	NODE condition = tyran_mocha_parser_stack_pop(parser->stack);
 	
-	NODE result;
-	switch (operator->token_id)
-	{
-		case TYRAN_MOCHA_TOKEN_IF: {
+	NODE result = tyran_parser_while(condition, block);
+	
+	return result;
+}
+
+
+NODE tyran_mocha_parser_reduce_if(tyran_mocha_parser* parser)
+{
 			NODE if_expression;
 			NODE if_then;
 			NODE if_else = 0;
@@ -355,13 +377,28 @@ void tyran_mocha_parser_reduce(tyran_mocha_parser* parser, tyran_mocha_token* op
 				if_else = binary_operator->right;
 			} 
 			
-
+			NODE result;
 			if (if_else) {
 				result = tyran_parser_if_else(if_expression, if_then, if_else);
 			} else {
 				result = tyran_parser_if(if_expression, if_then);
 			}
-		}
+			
+			return result;
+}
+
+void tyran_mocha_parser_reduce(tyran_mocha_parser* parser, tyran_mocha_token* operator)
+{
+	tyran_mocha_parser_debug("reduce", parser, operator);
+	
+	NODE result;
+	switch (operator->token_id)
+	{
+		case TYRAN_MOCHA_TOKEN_IF:
+			result = tyran_mocha_parser_reduce_if(parser);
+		break;
+		case TYRAN_MOCHA_TOKEN_WHILE:
+			result = tyran_mocha_parser_reduce_while(parser);
 		break;
 		default: {
 		NODE right = 0;

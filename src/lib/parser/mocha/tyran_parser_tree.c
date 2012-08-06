@@ -2,7 +2,7 @@
 #include <tyranscript/parser/tyran_lexer.h>
 #include <tyranscript/tyran_string.h>
 
-const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "INDEX", "COMMA", "INVOKE", "EQUAL", "NOT_EQUAL", "THEN", "ELSE", "LINE" };
+const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "INDEX", "COMMA", "INVOKE", "EQUAL", "NOT_EQUAL", ">=", ">", "<=", "<", "THEN", "ELSE", "LINE" };
 const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT", "PARENTHESES", "BLOCK", "IF", "BRACKET"};
 
 void tyran_parser_node_print_helper_output(const char* buf, const char* description, int tab_count)
@@ -113,6 +113,15 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_parser_node_print_helper("if expression", operand->expression, tab_count+1);
 			tyran_parser_node_print_helper("if then", operand->then_block, tab_count+1);
 			tyran_parser_node_print_helper("if else", operand->else_block, tab_count+1);
+		}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_WHILE:
+		{
+			tyran_parser_node_while* operand = (tyran_parser_node_while*)node;
+			tyran_snprintf(buf, buf_size, "while ");
+			tyran_parser_node_print_helper_output(buf, description, tab_count);
+			tyran_parser_node_print_helper("while condition", operand->condition, tab_count+1);
+			tyran_parser_node_print_helper("while block", operand->block, tab_count+1);
 		}
 	break;
 	case TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY:
@@ -364,17 +373,16 @@ NODE tyran_parser_parens(NODE a)
 	return 0;
 }
 
-NODE tyran_parser_while(NODE a)
+NODE tyran_parser_while(NODE condition, NODE block)
 {
-	TYRAN_LOG("while");
-	return 0;
+	tyran_parser_node_while* node = TYRAN_MALLOC_TYPE(tyran_parser_node_while, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_WHILE;
+	node->condition = condition;
+	node->block = block;
+	return (tyran_parser_node*)node;
+
 }
 
-NODE tyran_parser_while_condition(NODE a, NODE b)
-{
-	TYRAN_LOG("while condition");
-	return 0;
-}
 
 NODE tyran_parser_for(NODE a, NODE b)
 {

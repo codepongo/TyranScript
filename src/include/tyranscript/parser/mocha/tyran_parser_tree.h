@@ -32,6 +32,7 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY,
 	TYRAN_PARSER_NODE_TYPE_IF,
 	TYRAN_PARSER_NODE_TYPE_IF_ELSE,
+	TYRAN_PARSER_NODE_TYPE_WHILE,
 	TYRAN_PARSER_NODE_TYPE_CLASS,
 	TYRAN_PARSER_NODE_TYPE_OBJECT_ASSIGNMENT,
 	TYRAN_PARSER_NODE_TYPE_OBJECT,
@@ -51,6 +52,10 @@ typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_INVOKE,
 	TYRAN_PARSER_EQUAL,
 	TYRAN_PARSER_NOT_EQUAL,
+	TYRAN_PARSER_GREATER_EQUAL,
+	TYRAN_PARSER_GREATER,
+	TYRAN_PARSER_LESS_EQUAL,
+	TYRAN_PARSER_LESS,
 	TYRAN_PARSER_THEN,
 	TYRAN_PARSER_ELSE,
 	TYRAN_PARSER_LINE,
@@ -150,6 +155,14 @@ typedef struct tyran_parser_node_if_else
 	tyran_parser_node* else_block;
 } tyran_parser_node_if_else;
 
+typedef struct tyran_parser_node_while
+{
+	tyran_parser_node node;
+	tyran_parser_node* condition;
+	tyran_parser_node* block;
+} tyran_parser_node_while;
+
+
 
 typedef struct tyran_parser_node_class
 {
@@ -234,8 +247,7 @@ NODE tyran_parser_self_identifier(NODE a);
 NODE tyran_parser_array(NODE a);
 NODE tyran_parser_range(NODE a, NODE b, NODE c);
 NODE tyran_parser_parens(NODE a);
-NODE tyran_parser_while(NODE a);
-NODE tyran_parser_while_condition(NODE a, NODE b);
+NODE tyran_parser_while(NODE condition, NODE block);
 NODE tyran_parser_for(NODE a, NODE b);
 NODE tyran_parser_for_body(NODE a);
 NODE tyran_parser_for_start(NODE a, NODE b);
