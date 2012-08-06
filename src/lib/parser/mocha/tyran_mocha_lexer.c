@@ -161,12 +161,16 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 	if (c == '\n') {
 		if (token.token_id != TYRAN_MOCHA_TOKEN_LINE_END && token.token_id != TYRAN_MOCHA_TOKEN_BLOCK_END) {
 			c = tyran_lexer_next_character_skip_whitespace_except_newline(lexer);
-			tyran_lexer_push_character(c, lexer);
-			target_indentation = lexer->indentation;
-			if (lexer->indentation != current_indentation) {
-				return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
-			} else {
+			if (c == '\n') {
 				token.token_id = TYRAN_MOCHA_TOKEN_LINE_END;
+			} else {
+				tyran_lexer_push_character(c, lexer);
+				target_indentation = lexer->indentation;
+				if (lexer->indentation != current_indentation) {
+					return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
+				} else {
+					token.token_id = TYRAN_MOCHA_TOKEN_LINE_END;
+				}
 			}
 		} else {
 			return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
