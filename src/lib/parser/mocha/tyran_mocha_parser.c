@@ -14,12 +14,12 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 {
 	tyran_mocha_operator_info operands_to_match[] = {
 		{TYRAN_MOCHA_TOKEN_LINE_END, 1, 1},
+		{TYRAN_MOCHA_TOKEN_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_ASSIGNMENT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_IF, 1, 0},
 		{TYRAN_MOCHA_TOKEN_THEN, 1, 0},
 		{TYRAN_MOCHA_TOKEN_ELSE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_BLOCK_START, 1, 1},
-		{TYRAN_MOCHA_TOKEN_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_NOT_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_INVOKE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_MEMBER, 1, 0},
@@ -331,6 +331,7 @@ void tyran_mocha_parser_add_to_empty(tyran_mocha_parser* parser, NODE node)
 	} else {
 		*empty = node;
 	}
+	parser->empty_node = 0;
 	parser->last_inserted_node = empty;
 }
 
@@ -340,7 +341,7 @@ void tyran_mocha_parser_add_default_operator(tyran_mocha_parser* parser, tyran_m
 	} else {
 		tyran_parser_node_operand_binary* node = tyran_parser_operand_binary(tyran_mocha_parser_convert_binary_operand(token_id), 0, 0);
 		TYRAN_LOG("Compare precedence %d  %d", precedence, parser->top_precedence);
-		if (precedence < parser->top_precedence) {
+		if (precedence <= parser->top_precedence) {
 			tyran_mocha_parser_push_root_right(parser, node);
 			parser->top_precedence = precedence;
 		} else {
