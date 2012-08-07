@@ -88,7 +88,7 @@ tyran_mocha_token* tyran_mocha_lexer_next(tyran_mocha_token* first, tyran_mocha_
 tyran_mocha_token* tyran_mocha_lexer_previous(tyran_mocha_token* token, tyran_mocha_token* first);
 
 int tyran_mocha_lexer_is_unary_operator(tyran_mocha_token_id token_id);
-tyran_mocha_token_id tyran_mocha_enclosing_end_token(tyran_mocha_token_id token_id);
+tyran_mocha_token_id tyran_mocha_enclosing_start_token(tyran_mocha_token_id token_id);
 int tyran_mocha_lexer_is_literal(tyran_mocha_token* token);
 
 #endif

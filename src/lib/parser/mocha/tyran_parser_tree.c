@@ -2,7 +2,7 @@
 #include <tyranscript/parser/tyran_lexer.h>
 #include <tyranscript/tyran_string.h>
 
-const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "INDEX", "COMMA", "INVOKE", "EQUAL", "NOT_EQUAL", ">=", ">", "<=", "<", "THEN", "ELSE", "LINE" };
+const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "INDEX", "COMMA", "INVOKE", "EQUAL", "NOT_EQUAL", ">=", ">", "<=", "<", "THEN", "ELSE", "LINE", "WHILE", "CONCAT" };
 const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT", "PARENTHESES", "BLOCK", "IF", "BRACKET"};
 
 void tyran_parser_node_print_helper_output(const char* buf, const char* description, int tab_count)
@@ -167,18 +167,6 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_parser_node_print_helper("object_assignment source", object->source, tab_count+1);
 		}
 	break;
-	case TYRAN_PARSER_NODE_TYPE_CONCAT:
-		{
-			tyran_parser_node_concat* concat = (tyran_parser_node_concat*)node;
-			tyran_snprintf(buf, buf_size, "concat");
-			tyran_parser_node_print_helper_output(buf, description, tab_count);
-			int i;
-			for (i=0; i<concat->length; ++i)
-			{
-				tyran_parser_node_print_helper(" ", concat->nodes[i], tab_count+1);
-			}
-		}
-	break;
 	
 	}
 	}
@@ -257,33 +245,11 @@ NODE tyran_parser_code(NODE a, NODE b, NODE c)
 	return 0;
 }
 
-NODE tyran_parser_concat(NODE a, NODE b)
+tyran_parser_node_operand_binary* tyran_parser_concat(NODE left, NODE right)
 {
-	tyran_parser_node_concat* node;
+	tyran_parser_node_operand_binary* binary = tyran_parser_operand_binary(TYRAN_PARSER_CONCAT, left, right);
 
-	int new_node_count;
-	if (a->type == TYRAN_PARSER_NODE_TYPE_CONCAT) {
-		node = (tyran_parser_node_concat*)a;
-		new_node_count = 1;
-	} else {
-		node = TYRAN_MALLOC_TYPE(tyran_parser_node_concat, 1);
-		node->node.type = TYRAN_PARSER_NODE_TYPE_CONCAT;
-		node->length = 0;
-		node->nodes = 0;
-		new_node_count = 2;
-	}
-	tyran_parser_node** new_nodes = TYRAN_MALLOC_TYPE(tyran_parser_node*, node->length + new_node_count);
-	tyran_memcpy(new_nodes, node->nodes, (node->length) * sizeof(tyran_parser_node*));
-	tyran_free(node->nodes);
-	node->nodes = new_nodes;
-	if (new_node_count == 2) {
-		node->nodes[node->length] = a;
-		node->length++;
-	}
-	node->nodes[node->length] = b;
-	node->length++;
-
-	return (tyran_parser_node*)node;
+	return binary;
 }
 
 NODE tyran_parser_parameter(NODE a, NODE b, NODE c)
@@ -439,14 +405,14 @@ NODE tyran_parser_if_else(NODE expression, NODE then_block, NODE else_block)
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_operand_unary(int operator_type, NODE expression, tyran_boolean post)
+tyran_parser_node_operand_unary* tyran_parser_operand_unary(int operator_type, NODE expression, tyran_boolean post)
 {
 	tyran_parser_node_operand_unary* node = TYRAN_MALLOC_TYPE(tyran_parser_node_operand_unary, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY;
 	node->expression = expression;
 	node->post = post;
 	node->operator_type = operator_type;
-	return (tyran_parser_node*)node;
+	return node;
 }
 
 tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_parser_binary_operand_type operator_type, NODE left, NODE right)
@@ -456,7 +422,7 @@ tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_parser_binar
 	node->left = left;
 	node->right = right;
 	node->operator_type = operator_type;
-	return (tyran_parser_node*)node;
+	return node;
 }
 
 NODE tyran_parser_null()
