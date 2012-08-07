@@ -48,12 +48,6 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 }
 
 
-typedef struct tyran_mocha_operator_stack {
-	tyran_mocha_token** tokens;
-	int length;
-	int alloc_size;
-} tyran_mocha_operator_stack;
-
 typedef struct tyran_mocha_parser_stack {
 	NODE* nodes;
 	int alloc_size;
@@ -61,48 +55,12 @@ typedef struct tyran_mocha_parser_stack {
 } tyran_mocha_parser_stack;
 
 typedef struct tyran_mocha_parser {
-	tyran_mocha_operator_stack* operator_stack;
 	tyran_mocha_parser_stack* stack;
+	int top_precedence;
+	NODE* last_inserted_node;
+	NODE* empty_node;
 } tyran_mocha_parser;
 
-
-tyran_mocha_operator_stack* tyran_mocha_operator_stack_new()
-{
-	tyran_mocha_operator_stack* stack = TYRAN_MALLOC_TYPE(tyran_mocha_operator_stack, 1);
-	stack->length = 0;
-	stack->alloc_size = 100;
-	stack->tokens = TYRAN_MALLOC_TYPE(tyran_mocha_token*, stack->alloc_size);
-	return stack;
-}
-
-void tyran_mocha_operator_stack_push(tyran_mocha_operator_stack* stack, tyran_mocha_token* token)
-{
-	TYRAN_ASSERT(stack->length < stack->alloc_size, "Stack overflow");
-	stack->tokens[stack->length++] = token;
-}
-
-tyran_mocha_token* tyran_mocha_operator_stack_pop(tyran_mocha_operator_stack* stack)
-{
-	if (!stack->length) {
-		return 0;
-	}
-	return stack->tokens[--stack->length];
-}
-
-
-tyran_mocha_token* tyran_mocha_operator_stack_top(tyran_mocha_operator_stack* stack)
-{
-	if (!stack->length) {
-		return 0;
-	}
-	return stack->tokens[stack->length - 1];
-}
-
-void tyran_mocha_operator_stack_free(tyran_mocha_operator_stack* stack)
-{
-	tyran_free(stack->tokens);
-	tyran_free(stack);
-}
 
 tyran_mocha_parser_stack* tyran_mocha_parser_stack_new()
 {
@@ -119,9 +77,12 @@ void tyran_mocha_parser_stack_free(tyran_mocha_parser_stack* stack)
 	tyran_free(stack);
 }
 
-void tyran_mocha_parser_stack_push(tyran_mocha_parser_stack* stack, NODE node)
+NODE* tyran_mocha_parser_stack_push(tyran_mocha_parser_stack* stack, NODE node)
 {
-	stack->nodes[stack->length++] = node;
+	NODE* destination = &stack->nodes[stack->length++];
+	*destination = node;
+	
+	return destination;
 }
 
 NODE tyran_mocha_parser_stack_pop(tyran_mocha_parser_stack* stack)
@@ -139,8 +100,8 @@ NODE tyran_mocha_parser_stack_top(tyran_mocha_parser_stack* stack)
 tyran_mocha_parser* tyran_mocha_parser_new()
 {
 	tyran_mocha_parser* parser = TYRAN_MALLOC_TYPE(tyran_mocha_parser, 1);
-	parser->operator_stack = tyran_mocha_operator_stack_new();
 	parser->stack = tyran_mocha_parser_stack_new();
+	parser->top_precedence = 999999;
 	return parser;
 }
 
@@ -161,54 +122,7 @@ void tyran_mocha_parser_debug(const char* description, tyran_mocha_parser* parse
 		tyran_snprintf(buf, 512,  "%d", i);
 		tyran_parser_node_print(buf, stack->nodes[i]);
 	}
-
-	TYRAN_LOG("---------------");
-	tyran_mocha_operator_stack* operator_stack = parser->operator_stack;
-	for (i=operator_stack->length-1; i>= 0; --i) {
-		TYRAN_LOG_NO_LF("#%d operator:", i);
-		tyran_mocha_lexer_debug_token(operator_stack->tokens[i]);
-		TYRAN_LOG("");
-	}
 	TYRAN_LOG("==============");
-}
-
-tyran_mocha_operator_info tyran_mocha_parser_get_top_operator_info(tyran_mocha_operator_stack* stack)
-{
-	tyran_mocha_token_id token_id;
-	if (!stack->length) {
-		token_id = TYRAN_MOCHA_TOKEN_END;
-	} else {
-		token_id = stack->tokens[stack->length - 1]->token_id;
-	}
-	return tyran_mocha_parser_get_operator_info(token_id);
-}
-
-
-tyran_mocha_token* tyran_mocha_parser_find_matching_operand(tyran_mocha_token_id left, tyran_mocha_token_id right, tyran_mocha_token* first, tyran_mocha_token* last)
-{
-	tyran_mocha_token* token = tyran_mocha_lexer_next(first, last);
-	int count = 0;
-
-	for ( ; ; token = tyran_mocha_lexer_next(token, last))
-	{
-		if (token->token_id == right) {
-			if (!count) {
-				return token;
-			}
-			count--;
-		} else if (token->token_id == left) {
-			count++;
-		}
-	}
-	
-	return 0;
-}
-
-NODE tyran_mocha_parser_expression(tyran_mocha_parser* parser, tyran_mocha_token* first, tyran_mocha_token* last);
-
-NODE tyran_mocha_parser_expression(tyran_mocha_parser* parser, tyran_mocha_token* first, tyran_mocha_token* last)
-{
-	return 0;
 }
 
 tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran_mocha_token_id token_id)
@@ -387,136 +301,106 @@ NODE tyran_mocha_parser_reduce_if(tyran_mocha_parser* parser)
 			return result;
 }
 
-void tyran_mocha_parser_reduce(tyran_mocha_parser* parser, tyran_mocha_token* operator)
+void tyran_mocha_parser_push_root_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node)
 {
-	tyran_mocha_parser_debug("reduce", parser, operator);
-	
-	NODE result;
-	switch (operator->token_id)
-	{
-		case TYRAN_MOCHA_TOKEN_IF:
-			result = tyran_mocha_parser_reduce_if(parser);
-		break;
-		case TYRAN_MOCHA_TOKEN_WHILE:
-			result = tyran_mocha_parser_reduce_while(parser);
-		break;
-		default: {
-		NODE right = 0;
-		if (!tyran_mocha_lexer_is_unary_operator(operator->token_id)) {
-			right = tyran_mocha_parser_stack_pop(parser->stack);
-			// tyran_parser_node_print("right", right);
-		}
-		NODE left = tyran_mocha_parser_stack_pop(parser->stack);
-		if (!left) {
-			return;
-		}
-			// tyran_parser_node_print("left", left);
-		if (!right) {
-			result = tyran_parser_operand_unary(tyran_mocha_parser_convert_unary_operand(operator->token_id), left, 0);
+	NODE root = tyran_mocha_parser_stack_pop(parser->stack);
+	node->right = root;
+	tyran_parser_node_print("PushRootRight", (NODE) node);
+
+	NODE* last_inserted = tyran_mocha_parser_stack_push(parser->stack, (NODE)node);
+	parser->last_inserted_node = last_inserted;
+	parser->empty_node = (NODE*) &node->left;
+}
+
+void tyran_mocha_parser_push_last_inserted_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node)
+{
+	NODE* last_node = parser->last_inserted_node;
+	node->right = *last_node;
+	tyran_parser_node_print("PushLastRight", (NODE)node);
+	*last_node = (NODE) node;
+	parser->last_inserted_node = (NODE*) &node;
+	parser->empty_node = (NODE*) &node->left;
+}
+
+void tyran_mocha_parser_add_to_empty(tyran_mocha_parser* parser, NODE node)
+{
+	tyran_parser_node_print("AddToEmpty", (NODE) node);
+	NODE* empty = parser->empty_node;
+	if (!empty) {
+		empty = tyran_mocha_parser_stack_push(parser->stack, node);
+	} else {
+		*empty = node;
+	}
+	parser->last_inserted_node = empty;
+}
+
+void tyran_mocha_parser_add_default_operator(tyran_mocha_parser* parser, tyran_mocha_token_id token_id, int precedence)
+{
+	if (tyran_mocha_lexer_is_unary_operator(token_id)) {
+	} else {
+		tyran_parser_node_operand_binary* node = tyran_parser_operand_binary(tyran_mocha_parser_convert_binary_operand(token_id), 0, 0);
+		TYRAN_LOG("Compare precedence %d  %d", precedence, parser->top_precedence);
+		if (precedence < parser->top_precedence) {
+			tyran_mocha_parser_push_root_right(parser, node);
+			parser->top_precedence = precedence;
 		} else {
-			result = tyran_parser_operand_binary(tyran_mocha_parser_convert_binary_operand(operator->token_id), left, right);
+			tyran_mocha_parser_push_last_inserted_right(parser, node);
 		}
 	}
-	break;
-		
-	}
-	
-	tyran_mocha_parser_stack_push(parser->stack, result);
 }
 
-int tyran_mocha_parser_reduce_once(tyran_mocha_parser* parser)
+NODE tyran_mocha_parser_if(tyran_mocha_parser_stack* stack)
 {
-		tyran_mocha_token* operator = tyran_mocha_operator_stack_pop(parser->operator_stack);
-		if (operator == 0) {
-			return 0;
-		}
-		
-		tyran_mocha_parser_reduce(parser, operator);
-		return 1;
+	NODE expression = tyran_mocha_parser_stack_pop(stack);
+	NODE block = tyran_mocha_parser_stack_pop(stack);
+
+	return tyran_parser_if(expression, block);
 }
 
-void tyran_mocha_parser_reduce_all_to(tyran_mocha_parser* parser, tyran_mocha_token_id encloser_id)
+void tyran_mocha_parser_add_terminal(tyran_mocha_parser* parser, tyran_mocha_token_id token_id, int precedence)
 {
-	tyran_mocha_token token;
-	token.token_id = encloser_id;
-	tyran_mocha_parser_debug("reduce enclosing", parser, &token);
-
-	for ( ; ; ) {
-		tyran_mocha_token* token = tyran_mocha_operator_stack_top(parser->operator_stack);
-		int worked = tyran_mocha_parser_reduce_once(parser);
-		if (!worked) {
+	NODE node;
+	switch (token_id) {
+		case TYRAN_MOCHA_TOKEN_IF:
+			node = tyran_mocha_parser_if(parser->stack);
 			break;
-		}
-		if (token->token_id == encloser_id) {
+		default:
+			tyran_mocha_parser_add_default_operator(parser, token_id, precedence);
+			return;
 			break;
-		}
 	}
+	NODE* last_inserted = tyran_mocha_parser_stack_push(parser->stack, node);
+	parser->last_inserted_node = last_inserted;
+	parser->top_precedence = 99999;
+	parser->empty_node = 0;
 }
 
-void tyran_mocha_parser_reduce_all(tyran_mocha_parser* parser)
+void tyran_mocha_parser_add_token(tyran_mocha_parser* parser, tyran_mocha_token* token)
 {
-	tyran_mocha_parser_debug("reduce all", parser, 0);
-
-	for ( ; ; ) {
-		int worked = tyran_mocha_parser_reduce_once(parser);
-		if (!worked) {
-			break;
-		}
-	}
-}
-
-void tyran_mocha_parser_operator_stack_push_and_reduce(tyran_mocha_parser* parser, tyran_mocha_token* token)
-{
-	tyran_mocha_operator_stack* stack = parser->operator_stack;
-	if (stack->length > 0) {
-		tyran_mocha_token* top = stack->tokens[stack->length - 1];
-		tyran_mocha_operator_info top_info = tyran_mocha_parser_get_operator_info(top->token_id);
-		tyran_mocha_operator_info add_info = tyran_mocha_parser_get_operator_info(token->token_id);
-		if (!top_info.is_enclosing && add_info.precedence <= top_info.precedence) {
-			tyran_mocha_parser_reduce_once(parser);
-		}
-	}
-	tyran_mocha_operator_stack_push(parser->operator_stack, token);
-}
-
-void tyran_mocha_parser_stack_push_and_check_enclosing(tyran_mocha_parser* parser, tyran_mocha_token* token)
-{
-	tyran_mocha_token_id enclosing_token_id = tyran_mocha_enclosing_end_token(token->token_id);
-	if (enclosing_token_id != TYRAN_MOCHA_TOKEN_END) {
-		tyran_mocha_parser_reduce_all_to(parser, enclosing_token_id);
+	tyran_mocha_parser_debug("before", parser, 0);
+	tyran_mocha_operator_info info = tyran_mocha_parser_get_operator_info(token->token_id);
+	if (info.token_id != TYRAN_MOCHA_TOKEN_END) {
+		tyran_mocha_parser_add_terminal(parser, token->token_id, info.precedence);
 	} else {
 		NODE literal = tyran_mocha_parser_token_to_literal(token);
-		tyran_mocha_parser_stack_push(parser->stack, literal);
+		tyran_mocha_parser_add_to_empty(parser, literal);
 	}
+	
+	tyran_mocha_parser_debug("after", parser, 0);
 }
 
-void tyran_mocha_parser_postfix(tyran_mocha_parser* parser, tyran_mocha_token* first, tyran_mocha_token* last)
+
+void tyran_mocha_parser_add_all(tyran_mocha_parser* parser, tyran_mocha_token* first, tyran_mocha_token* last)
 {
-	tyran_mocha_token* token = first;
-	int last_was_literal = 0;
-	
-	for (; ; token = tyran_mocha_lexer_next(token, last))
+	tyran_mocha_token* token;
+	for (token = last - 1; ; token--)
 	{
-		tyran_mocha_operator_info operator_info = tyran_mocha_parser_get_operator_info(token->token_id);
-		if (operator_info.token_id != TYRAN_MOCHA_TOKEN_END) {
-			tyran_mocha_parser_operator_stack_push_and_reduce(parser, token);
-			last_was_literal = 0;
-		} else if (token->token_id != TYRAN_MOCHA_TOKEN_END) {
-			int is_literal = tyran_mocha_lexer_is_literal(token);
-			if (last_was_literal  && is_literal) {
-				tyran_mocha_token* call = TYRAN_CALLOC(tyran_mocha_token);
-				call->token_id = TYRAN_MOCHA_TOKEN_INVOKE;
-				tyran_mocha_parser_operator_stack_push_and_reduce(parser, call);
-			}
-			last_was_literal = is_literal;
-			tyran_mocha_parser_stack_push_and_check_enclosing(parser, token);
-		}
-		if (token == last) {
+		tyran_mocha_parser_add_token(parser, token);
+		if (token == first) {
 			break;
 		}
 	}
 }
-
 
 NODE tyran_mocha_parser_parse(tyran_mocha_lexer* lexer)
 {
@@ -524,10 +408,7 @@ NODE tyran_mocha_parser_parse(tyran_mocha_lexer* lexer)
 	tyran_mocha_token* last = tyran_mocha_lexer_last(lexer);
 	
 	tyran_mocha_parser* parser = tyran_mocha_parser_new();
+	tyran_mocha_parser_add_all(parser, first, last);
 	
-	tyran_mocha_parser_postfix(parser, first, last);
-	// tyran_mocha_parser_debug("postfix", parser);
-	tyran_mocha_parser_reduce_all(parser);
-	// tyran_mocha_parser_debug("result", parser);
 	return tyran_mocha_parser_stack_top(parser->stack);
 }

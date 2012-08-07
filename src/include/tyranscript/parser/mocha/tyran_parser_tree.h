@@ -257,7 +257,7 @@ NODE tyran_parser_when(NODE a, NODE b);
 NODE tyran_parser_if(NODE expression, NODE then_block);
 NODE tyran_parser_if_else(NODE expression, NODE then_block, NODE else_block);
 NODE tyran_parser_operand_unary(int operator_type, NODE b, tyran_boolean post);
-NODE tyran_parser_operand_binary(tyran_parser_binary_operand_type operator_type, NODE b, NODE c);
+tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_parser_binary_operand_type operator_type, NODE b, NODE c);
 NODE tyran_parser_null();
 NODE tyran_parser_bool(int boolean);
 NODE tyran_parser_undefined();

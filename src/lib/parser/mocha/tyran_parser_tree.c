@@ -449,7 +449,7 @@ NODE tyran_parser_operand_unary(int operator_type, NODE expression, tyran_boolea
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_operand_binary(tyran_parser_binary_operand_type operator_type, NODE left, NODE right)
+tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_parser_binary_operand_type operator_type, NODE left, NODE right)
 {
 	tyran_parser_node_operand_binary* node = TYRAN_MALLOC_TYPE(tyran_parser_node_operand_binary, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY;
