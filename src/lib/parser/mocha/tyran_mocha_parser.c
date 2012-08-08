@@ -105,28 +105,48 @@ tyran_mocha_parser_enclosure_info tyran_mocha_parser_enclosure_stack_pop(tyran_m
 }
 
 
+void tyran_mocha_parser_push_right(tyran_mocha_parser* parser,tyran_parser_node_operand_binary* node, NODE* old_parent)
+{
+	node->right = *old_parent;
+	*old_parent = (NODE)node;
+	parser->next_node_to_overwrite = &node->left;
+}
+
+void tyran_mocha_parser_push_root_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node)
+{
+	tyran_parser_node_print("PushRootRight", (NODE) node);
+	tyran_mocha_parser_push_right(parser, node, parser->root);
+}
+
+void tyran_mocha_parser_push_last_inserted_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node)
+{
+	tyran_parser_node_print("PushLastRight", (NODE)node);
+	tyran_mocha_parser_push_right(parser, node, parser->pointing_to_last_added_node);
+}
+
 
 void tyran_mocha_parser_add_to_empty(tyran_mocha_parser* parser, NODE node)
 {
 	tyran_parser_node_print("AddToEmpty", (NODE) node);
-	tyran_parser_node_operand_unary* unary = 0;
-	if (node->type == TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY) {
-		unary = (tyran_parser_node_operand_unary*) node;
-	}
 	
 	if (!parser->next_node_to_overwrite) {
-		tyran_parser_node_operand_binary* binary = tyran_parser_concat(node, *parser->root);
-		node = (NODE)binary;
-		parser->pointing_to_last_added_node = &binary->left;
-		*parser->root = node;
+		tyran_parser_node_operand_binary* binary = tyran_parser_concat(0, *parser->root);
+		tyran_mocha_parser_push_root_right(parser, binary);
+		tyran_mocha_parser_add_to_empty(parser, node);
+		parser->root = &binary->left;
 	} else {
+		tyran_parser_node_operand_unary* unary = 0;
+		if (node->type == TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY) {
+			unary = (tyran_parser_node_operand_unary*) node;
+		}
+	
 		*parser->next_node_to_overwrite = node;
 		parser->pointing_to_last_added_node = parser->next_node_to_overwrite;
-		parser->next_node_to_overwrite = 0;
-	}
-	
-	if (unary) {
-		parser->next_node_to_overwrite = &unary->expression;
+		if (unary) {
+			parser->next_node_to_overwrite = &unary->expression;
+		} else {
+			parser->next_node_to_overwrite = 0;
+		}
 	}
 }
 
@@ -342,25 +362,6 @@ NODE tyran_mocha_parser_reduce_if(tyran_mocha_parser* parser)
 			}
 			
 			return result;
-}
-
-void tyran_mocha_parser_push_right(tyran_mocha_parser* parser,tyran_parser_node_operand_binary* node, NODE* old_parent)
-{
-	node->right = *old_parent;
-	*old_parent = (NODE)node;
-	parser->next_node_to_overwrite = &node->left;
-}
-
-void tyran_mocha_parser_push_root_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node)
-{
-	tyran_parser_node_print("PushRootRight", (NODE) node);
-	tyran_mocha_parser_push_right(parser, node, parser->root);
-}
-
-void tyran_mocha_parser_push_last_inserted_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node)
-{
-	tyran_parser_node_print("PushLastRight", (NODE)node);
-	tyran_mocha_parser_push_right(parser, node, parser->pointing_to_last_added_node);
 }
 
 NODE tyran_mocha_parser_add_default_operator(tyran_mocha_parser* parser, tyran_mocha_token_id token_id, int precedence)
