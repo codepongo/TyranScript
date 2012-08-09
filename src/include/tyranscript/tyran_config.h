@@ -26,7 +26,7 @@ typedef unsigned short tyran_uint16;
 #define tyran_memcpy memcpy
 #define tyran_memcmp memcmp
 #define tyran_memset_type(T, V) memset(T, V, sizeof(*T))
-#define tyran_memset_type_n(T, V, N) memset(T, V, sizeof(*T) * N)
+#define tyran_memset_type_n(T, V, N) memset(T, V, sizeof(*T) * (N))
 
 
 #if defined WIN32
