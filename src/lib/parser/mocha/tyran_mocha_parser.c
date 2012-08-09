@@ -13,12 +13,13 @@ typedef struct tyran_mocha_operator_info {
 tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token_id token_id)
 {
 	tyran_mocha_operator_info operands_to_match[] = {
-		{TYRAN_MOCHA_TOKEN_LINE_END, 1, 1},
 		{TYRAN_MOCHA_TOKEN_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_ASSIGNMENT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_IF, 1, 0},
 		{TYRAN_MOCHA_TOKEN_WHILE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_FOR, 1, 0},
+		{TYRAN_MOCHA_TOKEN_CASE, 1, 0},
+		{TYRAN_MOCHA_TOKEN_WHEN, 1, 0},
 		{TYRAN_MOCHA_TOKEN_THEN, 1, 0},
 		{TYRAN_MOCHA_TOKEN_ELSE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_BLOCK_START, 1, 1},
@@ -32,6 +33,7 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_MULTIPLY, 1, 0},
 		{TYRAN_MOCHA_TOKEN_DIVIDE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_MEMBER, 1, 0},
+		{TYRAN_MOCHA_TOKEN_LINE_END, 1, 1},
 		{TYRAN_MOCHA_TOKEN_BRACKET_RIGHT, 1, 1},
 		{TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT, 1, 1},
 	};
@@ -257,6 +259,12 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	case TYRAN_MOCHA_TOKEN_WHILE:
 		operand = TYRAN_PARSER_WHILE;
 		break;
+	case TYRAN_MOCHA_TOKEN_WHEN:
+		operand = TYRAN_PARSER_WHEN;
+		break;
+	case TYRAN_MOCHA_TOKEN_CASE:
+		operand = TYRAN_PARSER_CASE;
+		break;
 	case TYRAN_MOCHA_TOKEN_ELSE:
 		operand = TYRAN_PARSER_ELSE;
 		break;
@@ -410,6 +418,20 @@ NODE tyran_mocha_parser_for(tyran_mocha_parser* parser)
 	return tyran_parser_for(for_in->left, for_in->right, block);
 }
 
+NODE tyran_mocha_parser_when(tyran_mocha_parser* parser)
+{
+	NODE expression = tyran_mocha_parser_concat_pop(parser);
+	NODE block = tyran_mocha_parser_concat_pop(parser);
+	return tyran_parser_when(expression, block);
+}
+
+NODE tyran_mocha_parser_case(tyran_mocha_parser* parser)
+{
+	NODE expression = tyran_mocha_parser_concat_pop(parser);
+	NODE block = tyran_mocha_parser_concat_pop(parser);
+	return tyran_parser_case(expression, block);
+}
+
 NODE tyran_mocha_parser_add_terminal(tyran_mocha_parser* parser, tyran_mocha_token_id token_id, int precedence)
 {
 	NODE node;
@@ -422,6 +444,12 @@ NODE tyran_mocha_parser_add_terminal(tyran_mocha_parser* parser, tyran_mocha_tok
 			break;
 		case TYRAN_MOCHA_TOKEN_FOR:
 			node = tyran_mocha_parser_for(parser);
+			break;
+		case TYRAN_MOCHA_TOKEN_CASE:
+			node = tyran_mocha_parser_case(parser);
+			break;
+		case TYRAN_MOCHA_TOKEN_WHEN:
+			node = tyran_mocha_parser_when(parser);
 			break;
 		default:
 			return tyran_mocha_parser_add_default_operator(parser, token_id, precedence);
@@ -464,6 +492,9 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_mocha_to
 
 void tyran_mocha_parser_add_token(tyran_mocha_parser* parser, tyran_mocha_token* token)
 {
+	if (token->token_id == TYRAN_MOCHA_TOKEN_LINE_END) {
+		return;
+	}
 	tyran_mocha_parser_debug("before", parser, 0);
 	if (parser->waiting_for_start_enclosure_id == token->token_id) {
 		tyran_mocha_parser_end_enclosure(parser, token->token_id);

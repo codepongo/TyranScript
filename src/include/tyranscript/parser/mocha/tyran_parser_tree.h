@@ -35,6 +35,8 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_WHILE,
 	TYRAN_PARSER_NODE_TYPE_FOR,
 	TYRAN_PARSER_NODE_TYPE_CLASS,
+	TYRAN_PARSER_NODE_TYPE_WHEN,
+	TYRAN_PARSER_NODE_TYPE_CASE,
 	TYRAN_PARSER_NODE_TYPE_OBJECT_ASSIGNMENT,
 	TYRAN_PARSER_NODE_TYPE_OBJECT,
 	TYRAN_PARSER_NODE_TYPE_ARGUMENTS,
@@ -62,6 +64,8 @@ typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_WHILE,
 	TYRAN_PARSER_CONCAT,
 	TYRAN_PARSER_IN,
+	TYRAN_PARSER_WHEN,
+	TYRAN_PARSER_CASE,
 	TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX
 } tyran_parser_binary_operand_type;
 
@@ -174,6 +178,20 @@ typedef struct tyran_parser_node_for
 } tyran_parser_node_for;
 
 
+typedef struct tyran_parser_node_when
+{
+	tyran_parser_node node;
+	tyran_parser_node* expression;
+	tyran_parser_node* block;
+} tyran_parser_node_when;
+
+typedef struct tyran_parser_node_case
+{
+	tyran_parser_node node;
+	tyran_parser_node* expression;
+	tyran_parser_node* block;
+} tyran_parser_node_case;
+
 typedef struct tyran_parser_node_class
 {
 	tyran_parser_node node;
@@ -252,7 +270,7 @@ NODE tyran_parser_range(NODE a, NODE b, NODE c);
 NODE tyran_parser_parens(NODE a);
 NODE tyran_parser_while(NODE condition, NODE block);
 NODE tyran_parser_for(NODE variables, NODE expression, NODE block);
-NODE tyran_parser_case(NODE a, NODE b, NODE block);
+NODE tyran_parser_case(NODE expression, NODE block);
 NODE tyran_parser_when(NODE a, NODE b);
 NODE tyran_parser_if(NODE expression, NODE then_block);
 NODE tyran_parser_if_else(NODE expression, NODE then_block, NODE else_block);
