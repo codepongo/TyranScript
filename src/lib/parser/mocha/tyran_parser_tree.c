@@ -2,7 +2,7 @@
 #include <tyranscript/parser/tyran_lexer.h>
 #include <tyranscript/tyran_string.h>
 
-const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "INDEX", "COMMA", "INVOKE", "EQUAL", "NOT_EQUAL", ">=", ">", "<=", "<", "THEN", "ELSE", "LINE", "WHILE", "CONCAT" };
+const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "INDEX", "COMMA", "INVOKE", "EQUAL", "NOT_EQUAL", ">=", ">", "<=", "<", "THEN", "ELSE", "LINE", "WHILE", "CONCAT", "IN" };
 const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT", "PARENTHESES", "BLOCK", "IF", "BRACKET"};
 
 void tyran_parser_node_print_helper_output(const char* buf, const char* description, int tab_count)
@@ -133,6 +133,16 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_parser_node_print_helper("while block", operand->block, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
+	case TYRAN_PARSER_NODE_TYPE_FOR:
+		{
+			tyran_parser_node_for* operand = (tyran_parser_node_for*)node;
+			tyran_snprintf(buf, buf_size, "for ");
+			tyran_parser_node_print_helper_output(buf, description, tab_count);
+			tyran_parser_node_print_helper("for variables", operand->variables, current_root, next_to_overwrite, tab_count+1);
+			tyran_parser_node_print_helper("for collection", operand->collection, current_root, next_to_overwrite, tab_count+1);
+			tyran_parser_node_print_helper("for block", operand->block, current_root, next_to_overwrite, tab_count+1);
+		}
+	break;
 	case TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY:
 		{
 			tyran_parser_node_operand_unary* operand = (tyran_parser_node_operand_unary*)node;
@@ -185,6 +195,27 @@ void tyran_parser_node_print(const char* description, tyran_parser_node* node, t
 {
 	tyran_parser_node_print_helper(description, node, current_root, 0, 0);
 }
+
+tyran_parser_node_operand_binary* tyran_parser_binary_operator_cast(NODE node)
+{
+	if (!node || node->type != TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY) {
+		return 0;
+	} else {
+		tyran_parser_node_operand_binary* binary_operator = (tyran_parser_node_operand_binary*) node;
+		return binary_operator;
+	}
+}
+
+tyran_parser_node_operand_binary* tyran_parser_binary_operator_type_cast(NODE node, int operator_type)
+{
+	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_cast(node);
+	if (binary && binary->operator_type == operator_type) {
+		return binary;
+	} else {
+		return 0;
+	}
+}
+
 
 tyran_parser* tyran_parser_new(const char* buf)
 {
@@ -353,32 +384,17 @@ NODE tyran_parser_while(NODE condition, NODE block)
 
 }
 
-
-NODE tyran_parser_for(NODE a, NODE b)
+NODE tyran_parser_for(NODE variables, NODE collection, NODE block)
 {
-	TYRAN_LOG("for");
-	return 0;
+	tyran_parser_node_for* node = TYRAN_MALLOC_TYPE(tyran_parser_node_for, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_FOR;
+	node->variables = variables;
+	node->collection = collection;
+	node->block = block;
+	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_for_body(NODE a)
-{
-	TYRAN_LOG("for body");
-	return 0;
-}
-
-NODE tyran_parser_for_start(NODE a, NODE b)
-{
-	TYRAN_LOG("for start");
-	return 0;
-}
-
-NODE tyran_parser_for_variables(NODE a)
-{
-	TYRAN_LOG("for var");
-	return 0;
-}
-
-NODE tyran_parser_switch(NODE a, NODE b, NODE block)
+NODE tyran_parser_case(NODE a, NODE b, NODE block)
 {
 	TYRAN_LOG("switch");
 	return 0;
