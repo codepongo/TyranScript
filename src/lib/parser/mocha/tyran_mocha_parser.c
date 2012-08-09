@@ -33,6 +33,8 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_MULTIPLY, 1, 0},
 		{TYRAN_MOCHA_TOKEN_DIVIDE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_MEMBER, 1, 0},
+		{TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE, 1, 0},
+		{TYRAN_MOCHA_TOKEN_RANGE_INCLUSIVE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_LINE_END, 1, 1},
 		{TYRAN_MOCHA_TOKEN_BRACKET_RIGHT, 1, 1},
 		{TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT, 1, 1},
@@ -273,6 +275,12 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 		break;
 	case TYRAN_MOCHA_TOKEN_IN:
 		operand = TYRAN_PARSER_IN;
+		break;
+	case TYRAN_MOCHA_TOKEN_RANGE_INCLUSIVE:
+		operand = TYRAN_PARSER_RANGE_INCLUSIVE;
+		break;
+	case TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE:
+		operand = TYRAN_PARSER_RANGE;
 		break;
 	default:
 		TYRAN_ERROR("unknown token to convert");

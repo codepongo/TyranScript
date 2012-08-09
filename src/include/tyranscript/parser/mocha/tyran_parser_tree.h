@@ -66,6 +66,8 @@ typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_IN,
 	TYRAN_PARSER_WHEN,
 	TYRAN_PARSER_CASE,
+	TYRAN_PARSER_RANGE,
+	TYRAN_PARSER_RANGE_INCLUSIVE,
 	TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX
 } tyran_parser_binary_operand_type;
 

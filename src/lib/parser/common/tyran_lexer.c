@@ -215,6 +215,12 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_in
 		if (tyran_lexer_is_digit(c)) {
 			buf[string_index++] = (int) c;
 		} else if (c == '.') {
+			int next = tyran_lexer_pop_character(lexer);
+			if (next == '.') {
+				tyran_lexer_push_character(next, lexer);
+				tyran_lexer_push_character(next, lexer);
+				break;
+			}
 			if (decimal_point_detected || hex_number_detected) {
 				TYRAN_SOFT_ERROR("Number format error");
 				return 0;

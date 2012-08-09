@@ -86,6 +86,8 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	"BLOCK_START",
 	"BLOCK_END",
 	"LINE_END",
+	"RANGE_INCLUSIVE",
+	"RANGE",
 	};
 	
 	TYRAN_LOG_NO_LF("%s ", token_id_to_string[token->token_id]);

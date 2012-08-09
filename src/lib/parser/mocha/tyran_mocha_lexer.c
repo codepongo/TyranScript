@@ -56,6 +56,8 @@ int tyran_mocha_lexer_operand(tyran_lexer* lexer, int c)
 		{ "+", 1, TYRAN_MOCHA_TOKEN_ADD },
 		{ "-", 1, TYRAN_MOCHA_TOKEN_SUBTRACT },
 		{ "~", 1, 0 },
+		{ "...", 3, TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE },
+		{ "..", 2, TYRAN_MOCHA_TOKEN_RANGE_INCLUSIVE },
 		{ ".", 1, TYRAN_MOCHA_TOKEN_MEMBER },
 		{ "(", 1, TYRAN_MOCHA_TOKEN_PARENTHESES_LEFT },
 		{ ")", 1, TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT },
@@ -149,6 +151,7 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 	tyran_lexer_token_data token_data;
 	static int target_indentation = 0;
 	static int current_indentation = 0;
+	token.token_id = 0;
 	
 	tyran_lexer_set_begin(lexer_position_info, lexer);
 
@@ -203,7 +206,10 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 			token.token_id = TYRAN_MOCHA_TOKEN_IDENTIFIER;
 		}
 	} else if (tyran_lexer_is_digit(c)) {
-		tyran_lexer_parse_number(lexer, c, lexer_position_info, &token_data);
+		int worked = tyran_lexer_parse_number(lexer, c, lexer_position_info, &token_data);
+		if (!worked) {
+			return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
+		}
 		token.token_data = token_data;
 		token.token_id = TYRAN_MOCHA_TOKEN_NUMBER;
 	} else if (c == '"' || c == '\'') {
