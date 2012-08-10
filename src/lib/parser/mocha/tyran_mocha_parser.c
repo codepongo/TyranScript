@@ -192,7 +192,7 @@ void tyran_mocha_parser_debug(const char* description, tyran_mocha_parser* parse
 	TYRAN_LOG_NO_LF("==== %s token:", description);
 	if (operator) {
 		tyran_mocha_lexer_debug_token(operator);
-		TYRAN_LOG("");
+		TYRAN_LOG(" ");
 	} else {
 		TYRAN_LOG("===========");
 	}
@@ -476,7 +476,7 @@ void tyran_mocha_parser_add_enclosure(tyran_mocha_parser* parser, tyran_parser_n
 	end_token.token_id = end_closure;
 	TYRAN_LOG_NO_LF("Add enclosure:");
 	tyran_mocha_lexer_debug_token(&end_token);
-	TYRAN_LOG("");
+	TYRAN_LOG(" ");
 	
 	tyran_mocha_parser_enclosure_stack_push(parser->enclosure_stack, parser->pointing_to_last_added_node, parser->root, parser->waiting_for_start_enclosure_id, parser->top_precedence);
 	parser->waiting_for_start_enclosure_id = start_closure;
@@ -490,7 +490,7 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_mocha_to
 	end_token.token_id = start_closure;
 	TYRAN_LOG_NO_LF("End enclosure:");
 	tyran_mocha_lexer_debug_token(&end_token);
-	TYRAN_LOG("");
+	TYRAN_LOG(" ");
 
 	tyran_mocha_parser_enclosure_info info = tyran_mocha_parser_enclosure_stack_pop(parser->enclosure_stack);
 	parser->waiting_for_start_enclosure_id = info.start_token_id;

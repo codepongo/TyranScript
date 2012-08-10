@@ -135,7 +135,7 @@ typedef struct tyran_parser_node_compound_assignment
 typedef struct tyran_parser_node_operand_binary
 {
 	tyran_parser_node node;
-	char operator_type;
+	int operator_type;
 	tyran_parser_node* left;
 	tyran_parser_node* right;
 } tyran_parser_node_operand_binary;
@@ -143,7 +143,7 @@ typedef struct tyran_parser_node_operand_binary
 typedef struct tyran_parser_node_operand_unary
 {
 	tyran_parser_node node;
-	char operator_type;
+	int operator_type;
 	tyran_parser_node* expression;
 	tyran_boolean post;
 } tyran_parser_node_operand_unary;

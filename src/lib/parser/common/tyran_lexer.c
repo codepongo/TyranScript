@@ -128,23 +128,6 @@ int tyran_lexer_parse_string(tyran_lexer* lexer, char* buf, int* length)
 	return 1;
 }
 
-static void tyran_lexer_skip_comment(tyran_lexer *lexer)
-{
-	char c;
-	do {
-		c = tyran_lexer_pop_character(lexer);
-		if (c == '*') {
-			c = tyran_lexer_pop_character(lexer);
-			if (c == '/') {
-				return;
-			}
-			tyran_lexer_push_character(c, lexer);
-		}
-	} while (c);
-	TYRAN_SOFT_ERROR("Unexpected end of file");
-}
-
-
 char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
 {
 	char c;
