@@ -1,4 +1,4 @@
-#include <tyranscript/parser/mocha/tyran_parser_tree.h>
+#include <tyranscript/parser/common/tyran_parser_tree.h>
 #include <tyranscript/parser/tyran_lexer.h>
 #include <tyranscript/tyran_string.h>
 
@@ -521,4 +521,16 @@ NODE tyran_parser_call_super(NODE a)
 {
 	TYRAN_LOG("super");
 	return 0;
+}
+
+int tyran_parser_node_is_constant(NODE node)
+{
+	enum tyran_parser_type type = node->type;
+	return (type == TYRAN_PARSER_NODE_TYPE_NUMBER  || type ==  TYRAN_PARSER_NODE_TYPE_BOOLEAN  || type == TYRAN_PARSER_NODE_TYPE_NULL || type == TYRAN_PARSER_NODE_TYPE_UNDEFINED ||  type == TYRAN_PARSER_NODE_TYPE_STRING);
+}
+
+int tyran_parser_node_is_literal(NODE node)
+{
+	enum tyran_parser_type type = node->type;
+	return (tyran_parser_node_is_constant(node) || type == TYRAN_PARSER_NODE_TYPE_IDENTIFIER);
 }

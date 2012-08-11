@@ -2,6 +2,7 @@
 #include "tyranscript/parser/tyran_parser_state.h"
 #include <tyranscript/parser/tyran_label.h>
 #include <tyranscript/parser/tyran_label_reference.h>
+#include <tyranscript/parser/common/tyran_code.h>
 
 #include "tyranscript/tyran_opcodes.h"
 #include <tyranscript/tyran_string.h>
@@ -174,22 +175,6 @@ void error()
 	TYRAN_LOG("ERROR!!");
 }
 
-void add_label(tyran_parser_state* state, tyran_string* name)
-{
-	struct tyran_label* label = &state->labels[state->label_count++];
-	label->name = tyran_string_strdup(name);
-	label->position = state->opcodes->code_len + 1;
-	TYRAN_LOG("Adding label at pos:%d", label->position);
-}
-
-void add_label_reference(tyran_parser_state* state, tyran_string* name)
-{
-	TYRAN_LOG("Adding label reference");
-	struct tyran_label_reference* label_reference = &state->label_references[state->label_reference_count++];
-	label_reference->name = tyran_string_strdup(name);
-	label_reference->opcode = &state->opcodes->codes[state->opcodes->code_len];
-}
-
 
 void parse_r_index(tyran_parser_state* state, tyran_reg_index* a)
 {
@@ -277,7 +262,7 @@ void parse_identifier(tyran_parser_state* state)
 	if (token != TYRAN_TOKEN_ASSEMBLER_IDENTIFIER) {
 		return error();
 	}
-	add_label_reference(state, name);
+	tyran_code_add_label_reference(state->code, name);
 }
 
 void parse_b(tyran_parser_state* state, tyran_boolean* b)
@@ -351,47 +336,12 @@ void parse_r_s_s(tyran_parser_state* state, tyran_reg_index* a, int* s, int* s2)
 	parse_s(state, s2);
 }
 
-void change_opcode_branch(tyran_opcode* code, int position)
-{
-	u16t br = (position + 0x8000);
-	*code = (*code & 0x3f) | (br << 6);
-}
-
-tyran_label* get_label(tyran_label* labels, int count, const tyran_string* name)
-{
-	int i;
-	for (i=0; i<count; ++i)
-	{
-		if (tyran_string_strcmp(labels[i].name, name) == 0) {
-			return &labels[i];
-		}
-	}
-
-	return 0;
-}
-
-void fixup_label_references(tyran_parser_state* state)
-{
-	int i;
-	for (i=0; i<state->label_reference_count;++i)
-	{
-		tyran_label_reference* ref = &state->label_references[i];
-		tyran_label* label = get_label(state->labels, state->label_count, ref->name);
-		if (!label) {
-			error();
-			return;
-		}
-		int delta = label->position - (ref->opcode - state->opcodes->codes) - 2; 
-		change_opcode_branch(ref->opcode, delta);
-	}
-}
-
 
 void tyran_lexer_assembler_end_of_function(tyran_parser_state* parser_state)
 {
 	TYRAN_LOG("*** End of function!");
 
-	fixup_label_references(parser_state);
+	tyran_code_fixup_label_references(parser_state->code);
 	tyran_print_constants(parser_state->constants);
 	tyran_print_opcodes(parser_state->opcodes, 0, parser_state->constants);
 
@@ -451,7 +401,7 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 		case TYRAN_TOKEN_ASSEMBLER_IDENTIFIER:
 			token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
 			if (token == TYRAN_TOKEN_ASSEMBLER_COLON) {
-				add_label(parser_state, (tyran_string*)data);
+				tyran_code_add_label(parser_state->code, (tyran_string*)data);
 			} else {
 				TYRAN_LOG("error token:%d", token);
 				error();

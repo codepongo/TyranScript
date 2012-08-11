@@ -7,6 +7,7 @@ struct tyran_constants;
 struct tyran_label;
 struct tyran_label_reference;
 struct tyran_runtime;
+struct tyran_code_state;
 
 #include <tyranscript/tyran_value.h>
 
@@ -18,6 +19,7 @@ typedef struct tyran_parser_state {
 	struct tyran_value context;
 	struct tyran_runtime* runtime;
 	struct tyran_label* labels;
+	struct tyran_code_state* code;
 	int label_count;
 	struct tyran_label_reference* label_references;
 	int label_reference_count;

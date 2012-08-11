@@ -5,11 +5,14 @@
 
 static const u16t TYRAN_OPCODE_CONSTANT_BIT = 0x100;
 static const u16t TYRAN_OPCODE_REGISTER_MASK = 0xff;
+static const u8t TYRAN_OPCODE_REGISTER_ILLEGAL = 0xff;
 
 typedef u32t tyran_opcode;
 typedef u8t tyran_reg_index;
 typedef u16t tyran_reg_or_constant_index;
 typedef u16t tyran_constant_index;
+
+static int tyran_opcodes_is_constant(tyran_reg_or_constant_index index) { return index >= TYRAN_OPCODE_CONSTANT_BIT; }
 
 struct tyran_function;
 

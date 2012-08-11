@@ -4,7 +4,7 @@
 #include <tyranscript/tyran_opcodes.h>
 
 typedef struct tyran_label_reference {
-	const tyran_string* name;
+	const struct tyran_string* name;
 	tyran_opcode* opcode;
 } tyran_label_reference;
 

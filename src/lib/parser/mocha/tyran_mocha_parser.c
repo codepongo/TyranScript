@@ -1,6 +1,6 @@
 #include <tyranscript/parser/mocha/tyran_mocha_lexer.h>
 #include <tyranscript/parser/mocha/tyran_mocha_lexer_debug.h>
-#include <tyranscript/parser/mocha/tyran_parser_tree.h>
+#include <tyranscript/parser/common/tyran_parser_tree.h>
 
 typedef struct tyran_mocha_operator_info {
 	tyran_mocha_token_id token_id;
@@ -40,7 +40,7 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT, 1, 1},
 	};
 
-	int i;
+	size_t i;
 	for (i = 0; i < sizeof(operands_to_match) / sizeof(tyran_mocha_operator_info); ++i) {
 		if (operands_to_match[i].token_id == token_id) {
 			operands_to_match[i].precedence = i;
@@ -543,5 +543,5 @@ NODE tyran_mocha_parser_parse(tyran_mocha_lexer* lexer)
 	tyran_mocha_parser* parser = tyran_mocha_parser_new();
 	tyran_mocha_parser_add_all(parser, first, last);
 	
-	return (NODE)parser->root;
+	return parser->original_root;
 }

@@ -38,7 +38,7 @@ tyran_constant_index tyran_constants_add_number(tyran_constants* constants, tyra
 	return tyran_constants_reserve_index(constants, &value);
 }
 
-tyran_constant_index tyran_constants_add_string(tyran_constants* constants, struct tyran_string* v)
+tyran_constant_index tyran_constants_add_string(tyran_constants* constants, const struct tyran_string* v)
 {
 	tyran_value value;
 	tyran_value_set_string(value, v);

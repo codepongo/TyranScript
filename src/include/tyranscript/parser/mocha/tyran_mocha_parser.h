@@ -1,7 +1,7 @@
 #ifndef tyranscript_tyran_mocha_parser_h
 #define tyranscript_tyran_mocha_parser_h
 
-#include <tyranscript/parser/mocha/tyran_parser_tree.h>
+#include <tyranscript/parser/common/tyran_parser_tree.h>
 
 struct tyran_mocha_lexer;
 
