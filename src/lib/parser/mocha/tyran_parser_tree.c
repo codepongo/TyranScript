@@ -124,6 +124,14 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_parser_node_print_helper("if else", operand->else_block, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
+	case TYRAN_PARSER_NODE_TYPE_ELSE:
+		{
+			tyran_parser_node_else* operand = (tyran_parser_node_else*)node;
+			tyran_snprintf(buf, buf_size, "else ");
+			tyran_parser_node_print_helper_output(buf, description, tab_count);
+			tyran_parser_node_print_helper("else block", operand->block, current_root, next_to_overwrite, tab_count+1);
+		}
+	break;
 	case TYRAN_PARSER_NODE_TYPE_WHILE:
 		{
 			tyran_parser_node_while* operand = (tyran_parser_node_while*)node;
@@ -448,6 +456,15 @@ NODE tyran_parser_if_else(NODE expression, NODE then_block, NODE else_block)
 	node->else_block = else_block;
 	return (tyran_parser_node*)node;
 }
+
+NODE tyran_parser_else(NODE else_block)
+{
+	tyran_parser_node_else* node = TYRAN_MALLOC_TYPE(tyran_parser_node_else, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_ELSE;
+	node->block = else_block;
+	return (tyran_parser_node*)node;
+}
+
 
 tyran_parser_node_operand_unary* tyran_parser_operand_unary(int operator_type, NODE expression, tyran_boolean post)
 {

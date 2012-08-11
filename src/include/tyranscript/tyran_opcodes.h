@@ -43,7 +43,7 @@ void tyran_opcodes_op_pow(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_
 void tyran_opcodes_op_sub(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y);
 
 /* Branch */
-void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_index y, int boolean);
+void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_or_constant_index y, int boolean);
 
 void tyran_opcodes_op_jbld(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index y, int boolean);
 void tyran_opcodes_op_jeq(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean);

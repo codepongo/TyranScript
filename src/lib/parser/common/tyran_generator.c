@@ -168,6 +168,53 @@ tyran_reg_or_constant_index tyran_generator_traverse_unary(tyran_code_state* cod
 	return tyran_generator_traverse(code, unary->expression);
 }
 
+int tyran_generator_prepare_label(tyran_code_state* code)
+{
+	return tyran_code_prepare_label(code);
+}
+
+void tyran_generator_define_label(tyran_code_state* code, int label_index)
+{
+	tyran_code_define_label(code, label_index);
+}
+
+void tyran_generator_label_reference(tyran_code_state* code, int label_index)
+{
+	tyran_code_add_label_index_reference(code, label_index);
+	tyran_opcodes_op_jmp(code->opcodes, 0);
+}
+
+void tyran_generator_resolve_labels(tyran_code_state* code)
+{
+	tyran_code_fixup_label_references(code);
+}
+
+tyran_reg_or_constant_index tyran_generator_traverse_if(tyran_code_state* code, tyran_parser_node* expression, tyran_parser_node* then_node, tyran_parser_node* else_node) {
+	code->true_label = tyran_generator_prepare_label(code);
+	code->false_label = tyran_generator_prepare_label(code);
+	tyran_reg_or_constant_index expression_index = tyran_generator_traverse(code, expression);
+	
+	
+	tyran_opcodes_op_jb(code->opcodes, expression_index, 0);
+	tyran_generator_label_reference(code, code->false_label);
+	
+	tyran_generator_define_label(code, code->true_label);
+	tyran_generator_traverse(code, then_node);
+	if (else_node) {
+		int end_of_if = tyran_generator_prepare_label(code);
+		tyran_generator_label_reference(code, end_of_if);
+		tyran_generator_define_label(code, code->false_label);
+
+		tyran_generator_traverse(code, else_node);
+
+		tyran_generator_define_label(code, end_of_if);
+	} else {
+		tyran_generator_define_label(code, code->false_label);
+	}
+	tyran_generator_resolve_labels(code);
+	return expression_index;
+}
+
 tyran_reg_or_constant_index tyran_generator_traverse(tyran_code_state* code, tyran_parser_node* node) {
 	tyran_reg_or_constant_index result;
 	
@@ -180,6 +227,16 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_code_state* code, tyr
 		case TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY: {
 			tyran_parser_node_operand_unary* unary = (tyran_parser_node_operand_unary*)node;
 			result = tyran_generator_traverse_unary(code, unary);
+		}
+		break;
+		case TYRAN_PARSER_NODE_TYPE_IF: {
+			tyran_parser_node_if* if_node = (tyran_parser_node_if*)node;
+			result = tyran_generator_traverse_if(code, if_node->expression, if_node->then_block, 0);
+		}
+		break;
+		case TYRAN_PARSER_NODE_TYPE_IF_ELSE: {
+			tyran_parser_node_if_else* if_node = (tyran_parser_node_if_else*)node;
+			result = tyran_generator_traverse_if(code, if_node->expression, if_node->then_block, if_node->else_block);
 		}
 		break;
 		default: {

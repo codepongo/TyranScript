@@ -113,9 +113,9 @@ void tyran_opcodes_op_sub(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_
 }
 
 /* Branch */
-void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_index a, tyran_boolean boolean)
+void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_boolean boolean)
 {
-	tyran_opcodes_add_code_a_x(codes, TYRAN_OPCODE_JB, a, boolean);
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_JB, boolean, x, 0);
 }
 
 void tyran_opcodes_op_jbld(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_boolean boolean)

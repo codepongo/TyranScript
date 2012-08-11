@@ -14,14 +14,18 @@ typedef struct tyran_code_state {
 
 	struct tyran_label_reference* label_references;
 	int label_reference_count;
+	
+	int true_label;
+	int false_label;
 } tyran_code_state;
 
 tyran_code_state* tyran_code_new();
 
-void tyran_code_add_label(tyran_code_state* state, tyran_string* name);
-void tyran_code_add_label_reference(tyran_code_state* state, tyran_string* name);
-struct tyran_label* tyran_code_get_label(struct tyran_label* labels, int count, const tyran_string* name);
-void tyran_code_change_opcode_branch(tyran_opcode* code, int position);
+int tyran_code_prepare_label(tyran_code_state* state);
+void tyran_code_define_label(tyran_code_state* state, int label_index);
+void tyran_code_add_label_index_reference(tyran_code_state* state, int label_index);
+int tyran_code_get_label(struct tyran_label* labels, int count, const tyran_string* name);
 void tyran_code_fixup_label_references(tyran_code_state* state);
+void tyran_code_add_label(tyran_code_state* state, tyran_string* name);
 
 #endif

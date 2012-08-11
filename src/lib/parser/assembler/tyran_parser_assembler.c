@@ -262,7 +262,8 @@ void parse_identifier(tyran_parser_state* state)
 	if (token != TYRAN_TOKEN_ASSEMBLER_IDENTIFIER) {
 		return error();
 	}
-	tyran_code_add_label_reference(state->code, name);
+	int label_index = tyran_code_get_label(state->labels, state->label_count, name);
+	tyran_code_add_label_index_reference(state->code, label_index);
 }
 
 void parse_b(tyran_parser_state* state, tyran_boolean* b)
