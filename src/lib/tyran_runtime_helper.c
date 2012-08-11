@@ -42,7 +42,9 @@ void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opco
 	runtime_info->c = constants->values;
 	runtime_info->opcodes = opcodes;
 	runtime_info->pc = opcodes->codes;
-	tyran_value_copy(*runtime_info->_this, *_this);
+	if (_this) {
+		tyran_value_copy(*runtime_info->_this, *_this);
+	}
 
 	rt->stack[rt->stack_pointer] = *runtime_info;
 	rt->stack_pointer++;

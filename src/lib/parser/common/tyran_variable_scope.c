@@ -1,7 +1,6 @@
 #include <tyranscript/parser/common/tyran_variable_scope.h>
 #include <tyranscript/tyran_config.h>
 
-
 void tyran_variable_scopes_add_scope(tyran_variable_scopes* scopes)
 {
 	TYRAN_ASSERT(scopes->scope_count < scopes->allocated_scope_count, "Out of memory adding a scope");
@@ -21,8 +20,6 @@ tyran_variable_scopes* tyran_variable_scopes_new(int max_count)
 	tyran_variable_scopes_add_scope(scopes);
 	return scopes;
 }
-
-
 
 tyran_reg_index tyran_variable_scope_get_identifier(tyran_variable_scope* scope, const char* variable_name)
 {
@@ -54,11 +51,11 @@ tyran_reg_index tyran_variable_scopes_get_identifier(tyran_variable_scopes* scop
 void tyran_variable_scope_add_identifier(tyran_variable_scope* scope, const char* variable_name, tyran_reg_index register_index)
 {
 	TYRAN_ASSERT(scope->variable_count < scope->allocated_variable_count, "Out of memory adding an identifier");
+	TYRAN_LOG("Defining variable '%s' to register %d", variable_name, register_index);
 	tyran_variable_info* info = &scope->variables[scope->variable_count++];
 	info->name = tyran_strdup(variable_name);
 	info->register_index = register_index;
 }
-
 
 tyran_reg_index tyran_variable_scopes_define_temporary_variable(tyran_variable_scopes* scopes)
 {

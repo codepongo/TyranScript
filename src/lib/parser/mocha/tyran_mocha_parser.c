@@ -389,7 +389,7 @@ NODE tyran_mocha_parser_add_default_operator(tyran_mocha_parser* parser, tyran_m
 	} else {
 		tyran_parser_node_operand_binary* node = tyran_parser_operand_binary(tyran_mocha_parser_convert_binary_operand(token_id), 0, 0);
 		TYRAN_LOG("Compare precedence %d  %d", precedence, parser->top_precedence);
-		if (precedence <= parser->top_precedence) {
+		if (precedence < parser->top_precedence) {
 			tyran_mocha_parser_push_root_right(parser, node);
 			parser->top_precedence = precedence;
 		} else {

@@ -8,7 +8,8 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_code_state* code, tyr
 
 tyran_generator* tyran_generator_new(tyran_parser_node* tree, tyran_code_state* code) {
 	tyran_generator* generator = TYRAN_CALLOC(tyran_generator);
-	tyran_generator_traverse(code, tree);
+	tyran_reg_or_constant_index return_index = tyran_generator_traverse(code, tree);
+	tyran_opcodes_op_ret(code->opcodes, return_index, 1);
 	
 	return generator;
 }

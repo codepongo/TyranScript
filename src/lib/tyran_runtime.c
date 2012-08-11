@@ -207,10 +207,11 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_RET:
 			TYRAN_REGISTER_A_X;
+			tyran_value* from = &r[a];
 			if (sp == base_sp) {
+				tyran_value_copy(*return_value, *from);
 				return;
 			}
-			tyran_value* from = &r[a];
 			tyran_register_copy(sp->return_register, from, x);
 			TYRAN_STACK_POP;
 			break;
