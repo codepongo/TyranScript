@@ -41,7 +41,7 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_MEMBER, 1, 0},
 		{TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_RANGE_INCLUSIVE, 1, 0},
-		{TYRAN_MOCHA_TOKEN_LINE_END, 1, 1},
+		{TYRAN_MOCHA_TOKEN_LINE_START, 1, 1},
 		{TYRAN_MOCHA_TOKEN_BRACKET_RIGHT, 1, 1},
 		{TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT, 1, 1},
 	};
@@ -279,9 +279,6 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	case TYRAN_MOCHA_TOKEN_ELSE:
 		operand = TYRAN_PARSER_ELSE;
 		break;
-	case TYRAN_MOCHA_TOKEN_LINE_END:
-		operand = TYRAN_PARSER_LINE;
-		break;
 	case TYRAN_MOCHA_TOKEN_IN:
 		operand = TYRAN_PARSER_IN;
 		break;
@@ -376,16 +373,35 @@ NODE tyran_mocha_parser_concat_pop(tyran_mocha_parser* parser) {
 	return result;
 }
 
+NODE tyran_mocha_parser_concat_peek_helper(NODE node, int* count)
+{
+	NODE result = 0;
+	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_type_cast(node, TYRAN_PARSER_CONCAT);
+	if (binary) {
+		result = tyran_mocha_parser_concat_peek_helper(binary->left, count);
+		*count = *count - 1;
+		if (*count >= 0) {
+			result = tyran_mocha_parser_concat_peek_helper(binary->right, count);
+			*count = *count - 1;
+		}
+		
+	} else if (*count == 0) {
+		result = node;
+	}
+	
+	return result;
+}
+
+
+NODE tyran_mocha_parser_concat_peek_position(tyran_mocha_parser* parser, int position) {
+	tyran_parser_node_print("PEEK_POSITION", parser->original_root, *parser->root);
+	return tyran_mocha_parser_concat_peek_helper(*parser->root, &position);
+}
+
+
 NODE tyran_mocha_parser_concat_peek(tyran_mocha_parser* parser) {
 	tyran_parser_node_print("PEEK", parser->original_root, *parser->root);
-	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_type_cast(*parser->root, TYRAN_PARSER_CONCAT);
-	NODE result;
-	if (binary) {
-		return binary->left;
-	} else {
-		result = *parser->root;
-	}
-	return result;
+	return tyran_mocha_parser_concat_peek_position(parser, 0);
 }
 
 
@@ -425,7 +441,7 @@ NODE tyran_mocha_parser_if(tyran_mocha_parser* parser)
 	NODE expression = tyran_mocha_parser_concat_pop(parser);
 	NODE block = tyran_mocha_parser_concat_pop(parser);
 	NODE else_block = tyran_mocha_parser_concat_peek(parser);
-	if (else_block->type == TYRAN_PARSER_NODE_TYPE_ELSE) {
+	if (else_block && else_block->type == TYRAN_PARSER_NODE_TYPE_ELSE) {
 		else_block = tyran_mocha_parser_concat_pop(parser);
 		return tyran_parser_if_else(expression, block, ((tyran_parser_node_else*)else_block)->block);
 	} else {
@@ -555,9 +571,23 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_mocha_to
 	parser->root = info.root;
 }
 
+void tyran_mocha_parser_line(tyran_mocha_parser* parser)
+{
+	TYRAN_LOG("LINE");
+	NODE node = tyran_mocha_parser_concat_peek_position(parser, 1);
+	if (node && node->type == TYRAN_PARSER_NODE_TYPE_IF) {
+		TYRAN_LOG("FOUND IF");
+		tyran_parser_node_if* if_node = (tyran_parser_node_if*) node;
+		if (!if_node->then_block) {
+			if_node->then_block = tyran_mocha_parser_concat_pop(parser);
+		}
+	}
+}
+
 void tyran_mocha_parser_add_token(tyran_mocha_parser* parser, tyran_mocha_token* token)
 {
-	if (token->token_id == TYRAN_MOCHA_TOKEN_LINE_END) {
+	if (token->token_id == TYRAN_MOCHA_TOKEN_LINE_START) {
+		tyran_mocha_parser_line(parser);
 		return;
 	}
 	tyran_mocha_parser_debug("before", parser, 0);
