@@ -17,7 +17,7 @@ tyran_lexer* tyran_lexer_new(const char* buf)
 	tyran_lexer* lexer = TYRAN_CALLOC(tyran_lexer);
 	lexer->size = length + 1;
 	lexer->buffer = TYRAN_MALLOC_TYPE(char, lexer->size);
-	tyran_memcpy(lexer->buffer, buf, lexer->size);
+	tyran_memcpy_type(char, lexer->buffer, buf, lexer->size);
 	return lexer;
 }
 

@@ -21,7 +21,7 @@ const tyran_string* tyran_string_strdup(const tyran_string* str)
 {
 	int len = str->len;
 	const tyran_string* duplicate = tyran_string_new(len);
-	tyran_memcpy(duplicate->buf, str->buf, len * sizeof(tyran_string_char));
+	tyran_memcpy_type(tyran_string_char, duplicate->buf, str->buf, len);
 	return duplicate;
 }
 
@@ -53,7 +53,7 @@ const tyran_string* tyran_string_substr(const tyran_string* str, int start, int 
 	characters_to_copy = characters_to_copy < len ? characters_to_copy : len;
 	const tyran_string* rr = tyran_string_new(characters_to_copy);
 
-	tyran_memcpy(rr->buf, str->buf + start, characters_to_copy * sizeof(tyran_string_char));
+	tyran_memcpy_type(tyran_string_char, rr->buf, str->buf + start, characters_to_copy);
 	
 	return rr;
 }
@@ -62,7 +62,7 @@ const tyran_string* tyran_string_strcpy(const tyran_string* from)
 {
 	int len = from->len;
 	const tyran_string* to = tyran_string_new(len);
-	tyran_memcpy(to->buf, from->buf, len * sizeof(tyran_string_char));
+	tyran_memcpy_type(tyran_string_char, to->buf, from->buf, len);
 
 	return to;
 }
@@ -93,7 +93,7 @@ const tyran_string* tyran_string_from_characters(const tyran_string_char* str, i
 {
 	const tyran_string* target = tyran_string_new(len);
 
-	tyran_memcpy(target->buf, str, len * sizeof(tyran_string_char));
+	tyran_memcpy_type(tyran_string_char, target->buf, str, len);
 
 	return target;
 }
@@ -124,7 +124,7 @@ const tyran_string* tyran_string_strcat(const tyran_string* str1, const tyran_st
 	int len = str1->len + str2->len;
 	const tyran_string* rr = tyran_string_new(len);
 
-	tyran_memcpy(rr->buf, str1->buf, str1->len * sizeof(tyran_string_char));
-	tyran_memcpy(rr->buf + str1->len, str2->buf, str2->len * sizeof(tyran_string_char));
+	tyran_memcpy_type(tyran_string_char, rr->buf, str1->buf, str1->len);
+	tyran_memcpy_type(tyran_string_char, rr->buf + str1->len, str2->buf, str2->len);
 	return rr;
 }

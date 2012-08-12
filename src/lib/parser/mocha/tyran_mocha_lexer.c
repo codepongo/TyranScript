@@ -6,7 +6,7 @@ tyran_mocha_lexer* tyran_mocha_lexer_new(const tyran_mocha_token* tokens, int to
 	tyran_mocha_lexer* lexer = TYRAN_MALLOC_TYPE(tyran_mocha_lexer, 1);
 
 	lexer->tokens = TYRAN_MALLOC_TYPE(tyran_mocha_token, token_count);
-	tyran_memcpy(lexer->tokens, tokens, sizeof(tyran_mocha_token) * token_count);
+	tyran_memcpy_type(tyran_mocha_token, lexer->tokens, tokens, token_count);
 	lexer->token_count = token_count;
 	return lexer;
 }
