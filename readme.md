@@ -56,6 +56,40 @@ All opcodes are coded within a 32-bit instruction.
 * **NEXT A X**. R(A) = next key for iterator R(X).
 
 
+## Syntax
+
+##### Conditional
+* if then else (with postfix)
+* unless (if not)
+* case/switch when
+
+##### Loops
+* while (with postfix)
+* until (while not)
+* for in/of (with postfix) [when EXPRESSION]
+
+##### Array
+* slicing [0..2]
+
+##### Existential
+* ?
+
+##### Class
+* class
+* extends
+* super
+
+##### Destructuring assignments
+* [a, b, c] = [1, 2, 3]
+
+##### Functions
+* =>
+* ->
+
+
+##### Other
+* Splats ...
+* String interpolation "result:#{something.other()}"
 
 ## Licenses
 
