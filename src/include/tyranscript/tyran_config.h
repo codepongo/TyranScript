@@ -14,6 +14,10 @@ typedef unsigned int u32t;
 typedef float tyran_number;
 typedef int tyran_boolean;
 
+#define TYRAN_TRUE (1)
+#define TYRAN_FALSE (0)
+
+
 typedef unsigned short tyran_uint16;
 
 #define tyran_malloc malloc

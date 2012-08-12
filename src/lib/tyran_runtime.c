@@ -16,6 +16,8 @@
 #include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_constants.h>
 
+#define TYRAN_RUNTIME_DEBUG
+
 void tyran_register_copy(tyran_value* target, tyran_value* source, int count)
 {
 	int i;

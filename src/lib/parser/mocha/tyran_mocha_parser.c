@@ -14,6 +14,11 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 {
 	tyran_mocha_operator_info operands_to_match[] = {
 		{TYRAN_MOCHA_TOKEN_EQUAL, 1, 0},
+		{TYRAN_MOCHA_TOKEN_NOT_EQUAL, 1, 0},
+		{TYRAN_MOCHA_TOKEN_LESS, 1, 0},
+		{TYRAN_MOCHA_TOKEN_LESS_EQUAL, 1, 0},
+		{TYRAN_MOCHA_TOKEN_GREATER, 1, 0},
+		{TYRAN_MOCHA_TOKEN_GREATER_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_ASSIGNMENT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_IF, 1, 0},
 		{TYRAN_MOCHA_TOKEN_WHILE, 1, 0},

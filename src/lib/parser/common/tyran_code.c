@@ -18,18 +18,18 @@ tyran_code_state* tyran_code_new()
 	return state;
 }
 
-int tyran_code_label_new(tyran_code_state* state)
+tyran_label_id tyran_code_label_new(tyran_code_state* state)
 {
-	int label_index = state->label_count++;
+	tyran_label_id label_index = state->label_count++;
 	return label_index;
 }
 
-int tyran_code_prepare_label(tyran_code_state* state)
+tyran_label_id tyran_code_prepare_label(tyran_code_state* state)
 {
 	return tyran_code_label_new(state);
 }
 
-void tyran_code_define_label(tyran_code_state* state, int label_index)
+void tyran_code_define_label(tyran_code_state* state, tyran_label_id label_index)
 {
 	struct tyran_label* label = &state->labels[label_index];
 	label->position = state->opcodes->code_len + 1;
@@ -39,7 +39,7 @@ void tyran_code_define_label(tyran_code_state* state, int label_index)
 
 void tyran_code_add_label(tyran_code_state* state, tyran_string* name)
 {
-	int label_index = tyran_code_label_new(state);
+	tyran_label_id label_index = tyran_code_label_new(state);
 
 	tyran_code_define_label(state, label_index);
 
@@ -47,7 +47,7 @@ void tyran_code_add_label(tyran_code_state* state, tyran_string* name)
 	label->name = tyran_string_strdup(name);
 }
 
-void tyran_code_add_label_index_reference(tyran_code_state* state, int label_index)
+void tyran_code_add_label_index_reference(tyran_code_state* state, tyran_label_id label_index)
 {
 	TYRAN_LOG("Adding label reference");
 	struct tyran_label_reference* label_reference = &state->label_references[state->label_reference_count++];

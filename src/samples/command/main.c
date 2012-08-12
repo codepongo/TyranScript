@@ -8,12 +8,15 @@
 int main(int argc, char* argv[])
 {
 	TYRAN_LOG("Mocha command");
+	if (argc <= 1) {
+		return -1;
+	}
+	const char* input_filename = argv[1];
 
 	const int max_size = 32 * 1024;
 	char buf[max_size];
-	
-	FILE* file = fopen("/Users/peter/work/TyranScript/src/samples/executor/test.mocha", "r");
-	
+	FILE* file = fopen(input_filename, "r");
+	TYRAN_LOG("Reading '%s'", input_filename);
 	int octets_read = fread(buf, 1, max_size, file);
 	buf[octets_read] = 0;
 	fclose(file);
