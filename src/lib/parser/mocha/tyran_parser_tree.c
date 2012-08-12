@@ -158,7 +158,6 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_snprintf(buf, buf_size, "when ");
 			tyran_parser_node_print_helper_output(buf, description, tab_count);
 			tyran_parser_node_print_helper("when expression", operand->expression, current_root, next_to_overwrite, tab_count+1);
-			tyran_parser_node_print_helper("when block", operand->block, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
 	case TYRAN_PARSER_NODE_TYPE_CASE:
@@ -233,7 +232,7 @@ tyran_parser_node_operand_binary* tyran_parser_binary_operator_cast(NODE node)
 	}
 }
 
-tyran_parser_node_operand_binary* tyran_parser_binary_operator_type_cast(NODE node, int operator_type)
+tyran_parser_node_operand_binary* tyran_parser_binary_operator_type_cast(NODE node, tyran_parser_binary_operand_type operator_type)
 {
 	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_cast(node);
 	if (binary && binary->operator_type == operator_type) {
@@ -242,6 +241,27 @@ tyran_parser_node_operand_binary* tyran_parser_binary_operator_type_cast(NODE no
 		return 0;
 	}
 }
+
+tyran_parser_node_operand_unary* tyran_parser_unary_operator_cast(NODE node)
+{
+	if (!node || node->type != TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY) {
+		return 0;
+	} else {
+		tyran_parser_node_operand_unary* unary_operator = (tyran_parser_node_operand_unary*) node;
+		return unary_operator;
+	}
+}
+
+tyran_parser_node_operand_unary* tyran_parser_unary_operator_type_cast(NODE node, tyran_parser_unary_operand_type operator_type)
+{
+	tyran_parser_node_operand_unary* unary = tyran_parser_unary_operator_cast(node);
+	if (unary && unary->operator_type == operator_type) {
+		return unary;
+	} else {
+		return 0;
+	}
+}
+
 
 
 tyran_parser* tyran_parser_new(const char* buf)
@@ -421,12 +441,14 @@ NODE tyran_parser_for(NODE variables, NODE collection, NODE block)
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_case(NODE expression, NODE block)
+NODE tyran_parser_case(NODE expression, tyran_parser_node_when** whens, int when_count)
 {
 	tyran_parser_node_case* node = TYRAN_MALLOC_TYPE(tyran_parser_node_case, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_CASE;
 	node->expression = expression;
-	node->block = block;
+	node->when_count = when_count;
+	node->whens = TYRAN_MALLOC_TYPE(tyran_parser_node_when*, node->when_count);
+	tyran_memcpy_type(tyran_parser_node_when*, node->whens, whens, when_count);
 	return (tyran_parser_node*)node;
 }
 

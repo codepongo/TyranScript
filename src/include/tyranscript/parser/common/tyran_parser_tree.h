@@ -201,7 +201,8 @@ typedef struct tyran_parser_node_case
 {
 	tyran_parser_node node;
 	tyran_parser_node* expression;
-	tyran_parser_node* block;
+	struct tyran_parser_node_when** whens;
+	int when_count;
 } tyran_parser_node_case;
 
 typedef struct tyran_parser_node_class
@@ -282,8 +283,8 @@ NODE tyran_parser_range(NODE a, NODE b, NODE c);
 NODE tyran_parser_parens(NODE a);
 NODE tyran_parser_while(NODE condition, NODE block);
 NODE tyran_parser_for(NODE variables, NODE expression, NODE block);
-NODE tyran_parser_case(NODE expression, NODE block);
-NODE tyran_parser_when(NODE a, NODE b);
+NODE tyran_parser_case(NODE expression, tyran_parser_node_when** whens, int when_count);
+NODE tyran_parser_when(NODE a, NODE block);
 NODE tyran_parser_if(NODE expression, NODE then_block);
 NODE tyran_parser_if_else(NODE expression, NODE then_block, NODE else_block);
 NODE tyran_parser_else(NODE else_block);
@@ -297,9 +298,12 @@ NODE tyran_parser_literal_string(const char* string);
 NODE tyran_parser_literal_identifier(const char* string);
 NODE tyran_parser_call_super(NODE a);
 
-
-tyran_parser_node_operand_binary* tyran_parser_binary_operator_type_cast(NODE node, int operator_type);
+tyran_parser_node_operand_binary* tyran_parser_binary_operator_type_cast(NODE node, tyran_parser_binary_operand_type operator_type);
 tyran_parser_node_operand_binary* tyran_parser_binary_operator_cast(NODE node);
+
+tyran_parser_node_operand_unary* tyran_parser_unary_operator_cast(NODE node);
+tyran_parser_node_operand_unary* tyran_parser_unary_operator_type_cast(NODE node, tyran_parser_unary_operand_type operator_type);
+
 int tyran_parser_node_is_literal(NODE node);
 int tyran_parser_node_is_constant(NODE node);
 #endif

@@ -257,6 +257,31 @@ tyran_reg_or_constant_index tyran_generator_traverse_while(tyran_code_state* cod
 	return result;
 }
 
+void tyran_generator_traverse_when(tyran_code_state* code, tyran_reg_or_constant_index compare_register, tyran_parser_node_when* when_node, tyran_label_id end_of_case_label)
+{
+	tyran_reg_or_constant_index value_register = tyran_generator_traverse(code, when_node->expression, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, 0);
+	tyran_opcodes_op_jeq(code->opcodes, compare_register, value_register, TYRAN_FALSE);
+	tyran_label_id end_of_when_label = tyran_generator_prepare_label(code);
+	tyran_generator_label_reference(code, end_of_when_label);
+	tyran_generator_traverse(code, when_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, 0);
+	tyran_generator_label_reference(code, end_of_case_label);
+	tyran_generator_define_label(code, end_of_when_label);
+}
+
+tyran_reg_or_constant_index tyran_generator_traverse_case(tyran_code_state* code, tyran_parser_node_case* case_node)
+{
+	tyran_reg_or_constant_index compare_register = tyran_generator_traverse(code, case_node->expression, 0, 0, 0);
+	tyran_label_id end_of_case_label = tyran_generator_prepare_label(code);
+	int i;
+	for (i = 0; i < case_node->when_count; ++i) {
+		tyran_generator_traverse_when(code, compare_register, case_node->whens[i], end_of_case_label);
+	}
+	
+	tyran_generator_define_label(code, end_of_case_label);
+	tyran_generator_resolve_labels(code);
+	return TYRAN_OPCODE_REGISTER_ILLEGAL;
+}
+
 tyran_reg_or_constant_index tyran_generator_traverse(tyran_code_state* code, tyran_parser_node* node, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic) {
 	tyran_reg_or_constant_index result;
 	
@@ -285,6 +310,11 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_code_state* code, tyr
 		case TYRAN_PARSER_NODE_TYPE_UNTIL: {
 			tyran_parser_node_while* while_node = (tyran_parser_node_while*)node;
 			result = tyran_generator_traverse_while(code, while_node, true_label, false_label, node->type == TYRAN_PARSER_NODE_TYPE_UNTIL);
+		}
+		break;
+		case TYRAN_PARSER_NODE_TYPE_CASE: {
+			tyran_parser_node_case* case_node = (tyran_parser_node_case*)node;
+			result = tyran_generator_traverse_case(code, case_node);
 		}
 		break;
 		default: {

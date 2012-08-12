@@ -352,6 +352,7 @@ NODE tyran_mocha_parser_token_to_literal(tyran_mocha_token* first)
 }
 
 NODE tyran_mocha_parser_concat_pop_helper(tyran_mocha_parser* parser, NODE* pointer_to_root, NODE* root, NODE replace_with) {
+	tyran_parser_node_print("POP", parser->original_root, *root);
 	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_type_cast(*root, TYRAN_PARSER_CONCAT);
 	NODE result;
 	if (binary) {
@@ -366,14 +367,12 @@ NODE tyran_mocha_parser_concat_pop_helper(tyran_mocha_parser* parser, NODE* poin
 			parser->next_node_to_overwrite = pointer_to_root;
 		}
 	}
+	tyran_parser_node_print("POP AFTER", parser->original_root, *root);
 	return result;
 }
 
 NODE tyran_mocha_parser_concat_pop(tyran_mocha_parser* parser) {
-	tyran_parser_node_print("POP", parser->original_root, *parser->root);
 	NODE result = tyran_mocha_parser_concat_pop_helper(parser, parser->root, parser->root, 0);
-	
-	tyran_parser_node_print("POP AFTER", parser->original_root, *parser->root);
 	return result;
 }
 
@@ -463,11 +462,32 @@ NODE tyran_mocha_parser_when(tyran_mocha_parser* parser)
 	return tyran_parser_when(expression, block);
 }
 
+void tyran_mocha_parser_when_nodes(tyran_parser_node_when** when_nodes, int* index, NODE node)
+{
+	tyran_parser_node_operand_binary* concat = tyran_parser_binary_operator_type_cast(node, TYRAN_PARSER_CONCAT);
+	if (concat) {
+		tyran_mocha_parser_when_nodes(when_nodes, index, concat->left);
+		tyran_mocha_parser_when_nodes(when_nodes, index, concat->right);
+	} else {
+		tyran_parser_node_when* when_node = (tyran_parser_node_when*) node;
+		when_nodes[*index] = when_node;
+		*index = *index + 1;
+	}
+}
+
 NODE tyran_mocha_parser_case(tyran_mocha_parser* parser)
 {
 	NODE expression = tyran_mocha_parser_concat_pop(parser);
-	NODE block = tyran_mocha_parser_concat_pop(parser);
-	return tyran_parser_case(expression, block);
+	NODE block_node = tyran_mocha_parser_concat_pop(parser);
+
+	tyran_parser_node_operand_unary* block = tyran_parser_unary_operator_type_cast(block_node, TYRAN_PARSER_UNARY_BLOCK);
+
+	tyran_parser_node_when* when_nodes[100];
+	int when_node_count = 0;
+
+	tyran_mocha_parser_when_nodes(when_nodes, &when_node_count, block->expression);
+
+	return tyran_parser_case(expression, when_nodes, when_node_count);
 }
 
 NODE tyran_mocha_parser_add_terminal(tyran_mocha_parser* parser, tyran_mocha_token_id token_id, int precedence)

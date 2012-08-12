@@ -28,6 +28,9 @@ typedef unsigned short tyran_uint16;
 #define TYRAN_MALLOC_TYPE(type, count) (type*) tyran_malloc(sizeof(type) * count);
 #define TYRAN_MALLOC(count) tyran_malloc(count);
 #define tyran_memcpy memcpy
+#define tyran_memcpy_type(T, dest, source, N) memcpy(dest, source, (N) * sizeof(T))
+
+
 #define tyran_memcmp memcmp
 #define tyran_memset_type(T, V) memset(T, V, sizeof(*T))
 #define tyran_memset_type_n(T, V, N) memset(T, V, sizeof(*T) * (N))
