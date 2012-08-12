@@ -22,6 +22,7 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_ASSIGNMENT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_IF, 1, 0},
 		{TYRAN_MOCHA_TOKEN_WHILE, 1, 0},
+		{TYRAN_MOCHA_TOKEN_UNTIL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_FOR, 1, 0},
 		{TYRAN_MOCHA_TOKEN_CASE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_WHEN, 1, 0},
@@ -266,6 +267,9 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	case TYRAN_MOCHA_TOKEN_WHILE:
 		operand = TYRAN_PARSER_WHILE;
 		break;
+	case TYRAN_MOCHA_TOKEN_UNTIL:
+		operand = TYRAN_PARSER_UNTIL;
+		break;
 	case TYRAN_MOCHA_TOKEN_WHEN:
 		operand = TYRAN_PARSER_WHEN;
 		break;
@@ -477,7 +481,11 @@ NODE tyran_mocha_parser_add_terminal(tyran_mocha_parser* parser, tyran_mocha_tok
 			node = tyran_mocha_parser_else(parser);
 			break;
 		case TYRAN_MOCHA_TOKEN_WHILE:
+		case TYRAN_MOCHA_TOKEN_UNTIL:
 			node = tyran_mocha_parser_while(parser);
+			if (token_id == TYRAN_MOCHA_TOKEN_UNTIL) {
+				((tyran_parser_node_while*)node)->node.type = TYRAN_PARSER_NODE_TYPE_UNTIL;
+			}
 			break;
 		case TYRAN_MOCHA_TOKEN_FOR:
 			node = tyran_mocha_parser_for(parser);

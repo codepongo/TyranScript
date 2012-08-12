@@ -238,14 +238,14 @@ tyran_reg_or_constant_index tyran_generator_traverse_if(tyran_code_state* code, 
 	return result;
 }
 
-tyran_reg_or_constant_index tyran_generator_traverse_while(tyran_code_state* code, tyran_parser_node_while* while_node, tyran_label_id true_label, tyran_label_id false_label) {
+tyran_reg_or_constant_index tyran_generator_traverse_while(tyran_code_state* code, tyran_parser_node_while* while_node, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic) {
 	tyran_label_id while_true_label = tyran_generator_prepare_label(code);
 	tyran_label_id while_false_label = tyran_generator_prepare_label(code);
 	tyran_label_id while_loop_label = tyran_generator_prepare_label(code);
 	
 	tyran_generator_define_label(code, while_loop_label);
 
-	tyran_generator_traverse(code, while_node->condition, while_true_label, while_false_label, TYRAN_FALSE);
+	tyran_generator_traverse(code, while_node->condition, while_true_label, while_false_label, invert_logic);
 	tyran_generator_define_label(code, while_true_label);
 	
 	tyran_reg_or_constant_index result;
@@ -281,9 +281,10 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_code_state* code, tyr
 			result = tyran_generator_traverse_if(code, if_node->expression, if_node->then_block, if_node->else_block);
 		}
 		break;
-		case TYRAN_PARSER_NODE_TYPE_WHILE: {
+		case TYRAN_PARSER_NODE_TYPE_WHILE:
+		case TYRAN_PARSER_NODE_TYPE_UNTIL: {
 			tyran_parser_node_while* while_node = (tyran_parser_node_while*)node;
-			result = tyran_generator_traverse_while(code, while_node, true_label, false_label);
+			result = tyran_generator_traverse_while(code, while_node, true_label, false_label, node->type == TYRAN_PARSER_NODE_TYPE_UNTIL);
 		}
 		break;
 		default: {
