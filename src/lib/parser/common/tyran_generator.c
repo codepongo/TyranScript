@@ -33,6 +33,11 @@ tyran_generator* tyran_generator_new(tyran_parser_node* tree, tyran_code_state* 
 	tyran_label_id false_label = tyran_generator_prepare_label(code);
 	tyran_reg_or_constant_index return_index = tyran_generator_traverse(code, tree, TYRAN_OPCODE_REGISTER_ILLEGAL, false_label, 0);
 	tyran_generator_define_label(code, false_label);
+	if (tyran_opcodes_is_constant(return_index)) {
+		tyran_constant_index constant_index = return_index;
+		return_index = tyran_variable_scopes_define_temporary_variable(code->scope);
+		tyran_opcodes_op_ldc(code->opcodes, return_index, constant_index);
+	}
 	tyran_opcodes_op_ret(code->opcodes, return_index, 1);
 	tyran_generator_resolve_labels(code);
 	
