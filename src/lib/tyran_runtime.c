@@ -203,6 +203,15 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				TYRAN_RUNTIME_DO_JMP;
 			}
 			break;
+		case TYRAN_OPCODE_NEXT:
+			TYRAN_REGISTER_A;
+			/* Insert code */
+			if (0) {
+				pc++;
+			} else {
+				TYRAN_RUNTIME_DO_JMP;
+			}
+			break;
 		case TYRAN_OPCODE_JMP:
 			TYRAN_REGISTER_BR;
 			pc += br;
@@ -250,6 +259,10 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A_RCX_RCY;
 			TYRAN_ASSERT(tyran_value_is_string(&rcx), "Must be string");
 			tyran_value_object_insert_string_key(&r[a], rcx.data.str, &rcy);
+			break;
+		case TYRAN_OPCODE_KEY:
+			TYRAN_REGISTER_A_RCX;
+			tyran_value_set_number(r[a], -1);
 			break;
 		case TYRAN_OPCODE_DEBUG:
 			return;

@@ -169,3 +169,13 @@ void tyran_opcodes_op_get(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_ind
 {
 	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_GET, a, r, y);
 }
+
+void tyran_opcodes_op_key(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x)
+{
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_KEY, a, x, 0);
+}
+
+void tyran_opcodes_op_next(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index x)
+{
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_NEXT, a, x, 0);
+}

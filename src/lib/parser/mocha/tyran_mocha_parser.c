@@ -468,7 +468,17 @@ NODE tyran_mocha_parser_for(tyran_mocha_parser* parser)
 	NODE for_in_node = tyran_mocha_parser_concat_pop(parser);
 	NODE block = tyran_mocha_parser_concat_pop(parser);
 	tyran_parser_node_operand_binary* for_in = tyran_parser_binary_operator_type_cast(for_in_node, TYRAN_PARSER_IN);
-	return tyran_parser_for(for_in->left, for_in->right, block);
+	tyran_parser_node_operand_binary* variables = tyran_parser_binary_operator_type_cast(for_in->left, TYRAN_PARSER_COMMA);
+	NODE key_variable;
+	NODE value_variable;
+	if (variables) {
+		key_variable = variables->left;
+		value_variable = variables->right;
+	} else {
+		value_variable = for_in->left;
+		key_variable = 0;
+	}
+	return tyran_parser_for(key_variable, value_variable, for_in->right, block);
 }
 
 NODE tyran_mocha_parser_when(tyran_mocha_parser* parser)

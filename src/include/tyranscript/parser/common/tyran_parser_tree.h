@@ -184,7 +184,8 @@ typedef struct tyran_parser_node_while
 typedef struct tyran_parser_node_for
 {
 	tyran_parser_node node;
-	tyran_parser_node* variables;
+	tyran_parser_node_identifier* key_variable;
+	tyran_parser_node_identifier* value_variable;
 	tyran_parser_node* collection;
 	tyran_parser_node* block;
 } tyran_parser_node_for;
@@ -282,7 +283,7 @@ NODE tyran_parser_array(NODE a);
 NODE tyran_parser_range(NODE a, NODE b, NODE c);
 NODE tyran_parser_parens(NODE a);
 NODE tyran_parser_while(NODE condition, NODE block);
-NODE tyran_parser_for(NODE variables, NODE expression, NODE block);
+NODE tyran_parser_for(NODE key_variable, NODE value_variable, NODE expression, NODE block);
 NODE tyran_parser_case(NODE expression, tyran_parser_node_when** whens, int when_count);
 NODE tyran_parser_when(NODE a, NODE block);
 NODE tyran_parser_if(NODE expression, NODE then_block);

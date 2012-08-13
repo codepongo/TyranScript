@@ -33,6 +33,8 @@ const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
 	"NEW",
 	"SET",
 	"GET",
+	"KEY",
+	"NEXT",
 	"DEBUG"
 };
 
@@ -103,6 +105,12 @@ void print_r_r_rc(tyran_opcode code, const tyran_constants* constants, char* buf
 	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
 	print_r(TYRAN_OPCODE_ARG_X(code), buf, size);
 	print_rc(TYRAN_OPCODE_ARG_Y(code), constants, buf, size);
+}
+
+void print_r_r(tyran_opcode code, char* buf, int size)
+{
+	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
+	print_r(TYRAN_OPCODE_ARG_X(code), buf, size);
 }
 
 void print_r_rc(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
@@ -219,6 +227,12 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 			break;
 		case TYRAN_OPCODE_GET:
 			print_r_r_rc(code, constants, buf, size);
+			break;
+		case TYRAN_OPCODE_KEY:
+			print_r_r(code, buf, size);
+			break;
+		case TYRAN_OPCODE_NEXT:
+			print_r_r(code, buf, size);
 			break;
 		case TYRAN_OPCODE_DEBUG:
 			break;

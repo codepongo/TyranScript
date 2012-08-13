@@ -147,7 +147,8 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_parser_node_for* operand = (tyran_parser_node_for*)node;
 			tyran_snprintf(buf, buf_size, "for ");
 			tyran_parser_node_print_helper_output(buf, description, tab_count);
-			tyran_parser_node_print_helper("for variables", operand->variables, current_root, next_to_overwrite, tab_count+1);
+			tyran_parser_node_print_helper("for key", operand->key_variable, current_root, next_to_overwrite, tab_count+1);
+			tyran_parser_node_print_helper("for value", operand->value_variable, current_root, next_to_overwrite, tab_count+1);
 			tyran_parser_node_print_helper("for collection", operand->collection, current_root, next_to_overwrite, tab_count+1);
 			tyran_parser_node_print_helper("for block", operand->block, current_root, next_to_overwrite, tab_count+1);
 		}
@@ -431,11 +432,12 @@ NODE tyran_parser_while(NODE condition, NODE block)
 
 }
 
-NODE tyran_parser_for(NODE variables, NODE collection, NODE block)
+NODE tyran_parser_for(NODE key_variable, NODE value_variable, NODE collection, NODE block)
 {
 	tyran_parser_node_for* node = TYRAN_MALLOC_TYPE(tyran_parser_node_for, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_FOR;
-	node->variables = variables;
+	node->key_variable = key_variable;
+	node->value_variable = value_variable;
 	node->collection = collection;
 	node->block = block;
 	return (tyran_parser_node*)node;
