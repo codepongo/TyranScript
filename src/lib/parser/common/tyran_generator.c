@@ -30,8 +30,11 @@ void tyran_generator_resolve_labels(tyran_code_state* code)
 
 tyran_generator* tyran_generator_new(tyran_parser_node* tree, tyran_code_state* code) {
 	tyran_generator* generator = TYRAN_CALLOC(tyran_generator);
-	tyran_reg_or_constant_index return_index = tyran_generator_traverse(code, tree, 0, 0, 0);
+	tyran_label_id false_label = tyran_generator_prepare_label(code);
+	tyran_reg_or_constant_index return_index = tyran_generator_traverse(code, tree, TYRAN_OPCODE_REGISTER_ILLEGAL, false_label, 0);
+	tyran_generator_define_label(code, false_label);
 	tyran_opcodes_op_ret(code->opcodes, return_index, 1);
+	tyran_generator_resolve_labels(code);
 	
 	return generator;
 }
@@ -66,6 +69,31 @@ tyran_constant_index tyran_generator_literal_to_constant_index(tyran_constants* 
 	}
 	
 	return result;
+}
+
+tyran_reg_or_constant_index tyran_generator_logical_operator(tyran_code_state* code, tyran_parser_node_operand_binary* binary, tyran_label_id true_label, tyran_label_id false_label)
+{
+	switch (binary->operator_type) {
+	case TYRAN_PARSER_AND: {
+		tyran_label_id and_false = tyran_generator_prepare_label(code);
+		tyran_label_id and_true = true_label;
+		tyran_reg_or_constant_index left_register = tyran_generator_traverse(code, binary->left, TYRAN_OPCODE_REGISTER_ILLEGAL, and_false, TYRAN_FALSE);
+		tyran_reg_or_constant_index right_register = tyran_generator_traverse(code, binary->right, and_true, and_false, TYRAN_FALSE);
+		tyran_generator_define_label(code, and_false);
+		tyran_generator_resolve_labels(code);
+		}
+	break;
+	case TYRAN_PARSER_OR: {
+		tyran_label_id or_true = tyran_generator_prepare_label(code);
+		tyran_label_id or_false = false_label;
+		tyran_reg_or_constant_index left_register = tyran_generator_traverse(code, binary->left, TYRAN_OPCODE_REGISTER_ILLEGAL, or_true, TYRAN_TRUE);
+		tyran_reg_or_constant_index right_register = tyran_generator_traverse(code, binary->right, TYRAN_OPCODE_REGISTER_ILLEGAL, or_false, TYRAN_FALSE);
+		tyran_generator_define_label(code, or_true);
+		}
+	break;
+	}
+	
+	return TYRAN_OPCODE_REGISTER_ILLEGAL;
 }
 
 void tyran_generator_comparison_operator(tyran_code_state* code, tyran_parser_binary_operand_type operator_type, tyran_reg_or_constant_index left, tyran_reg_or_constant_index right, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic)
@@ -196,6 +224,10 @@ tyran_reg_or_constant_index tyran_generator_traverse_binary(tyran_code_state* co
 	switch (binary->operator_type) {
 		case TYRAN_PARSER_ASSIGNMENT:
 			result = tyran_generator_traverse_assignment(code, binary, true_label, false_label);
+			break;
+		case TYRAN_PARSER_AND:
+		case TYRAN_PARSER_OR:
+			result = tyran_generator_logical_operator(code, binary, true_label, false_label);
 			break;
 		default:
 			result = tyran_generator_traverse_default_binary(code, binary, true_label, false_label, invert_logic);

@@ -13,6 +13,8 @@ typedef struct tyran_mocha_operator_info {
 tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token_id token_id)
 {
 	tyran_mocha_operator_info operands_to_match[] = {
+		{TYRAN_MOCHA_TOKEN_AND, 1, 0},
+		{TYRAN_MOCHA_TOKEN_OR, 1, 0},
 		{TYRAN_MOCHA_TOKEN_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_NOT_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_LESS, 1, 0},
@@ -260,6 +262,12 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 		break;
 	case TYRAN_MOCHA_TOKEN_GREATER_EQUAL:
 		operand = TYRAN_PARSER_GREATER_EQUAL;
+		break;
+	case TYRAN_MOCHA_TOKEN_AND:
+		operand = TYRAN_PARSER_AND;
+		break;
+	case TYRAN_MOCHA_TOKEN_OR:
+		operand = TYRAN_PARSER_OR;
 		break;
 	case TYRAN_MOCHA_TOKEN_THEN:
 		operand = TYRAN_PARSER_THEN;
