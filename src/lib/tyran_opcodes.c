@@ -155,6 +155,11 @@ void tyran_opcodes_op_call(tyran_opcodes* codes, tyran_reg_index a, int s, int s
 }
 
 /* Object */
+void tyran_opcodes_op_func(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x)
+{
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_FUNC, a, x, 0);
+}
+
 void tyran_opcodes_op_new(tyran_opcodes* codes, tyran_reg_index a)
 {
 	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_NEW, a, 0, 0);

@@ -322,6 +322,18 @@ tyran_reg_or_constant_index tyran_generator_traverse_case(tyran_code_state* code
 	return TYRAN_OPCODE_REGISTER_ILLEGAL;
 }
 
+tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* code, tyran_parser_node_function* func_node)
+{
+	tyran_opcodes* old_codes = code->opcodes;
+	code->opcodes = tyran_opcodes_new(1024);
+	tyran_generator_traverse(code, func_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, 0);
+	tyran_constant_index function_constant_index = tyran_constants_add_function(code->constants, code->opcodes);
+	code->opcodes = old_codes;
+	tyran_reg_index function_object_index = tyran_variable_scopes_define_temporary_variable(code->scope);
+	tyran_opcodes_op_func(code->opcodes, function_object_index, function_constant_index);
+	return function_object_index;
+}
+
 tyran_reg_or_constant_index tyran_generator_traverse_for(tyran_code_state* code, tyran_parser_node_for* for_node)
 {
 	tyran_reg_or_constant_index collection_register = tyran_generator_traverse(code, for_node->collection, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, 0);
@@ -392,6 +404,12 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_code_state* code, tyr
 			tyran_parser_node_for* for_node = (tyran_parser_node_for*)node;
 			result = tyran_generator_traverse_for(code, for_node);
 		}
+		break;
+		case TYRAN_PARSER_NODE_TYPE_FUNCTION: {
+			tyran_parser_node_function* func_node = (tyran_parser_node_function*)node;
+			result = tyran_generator_traverse_function(code, func_node);
+		}
+		break;
 		default: {
 			result = tyran_generator_handle_node(code, node);
 		}

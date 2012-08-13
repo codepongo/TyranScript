@@ -38,6 +38,7 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_FOR,
 	TYRAN_PARSER_NODE_TYPE_CLASS,
 	TYRAN_PARSER_NODE_TYPE_WHEN,
+	TYRAN_PARSER_NODE_TYPE_FUNCTION,
 	TYRAN_PARSER_NODE_TYPE_CASE,
 	TYRAN_PARSER_NODE_TYPE_OBJECT_ASSIGNMENT,
 	TYRAN_PARSER_NODE_TYPE_OBJECT,
@@ -200,6 +201,14 @@ typedef struct tyran_parser_node_when
 	tyran_parser_node* block;
 } tyran_parser_node_when;
 
+typedef struct tyran_parser_node_function
+{
+	tyran_parser_node node;
+	tyran_parser_node* parameters;
+	tyran_parser_node* block;
+	tyran_boolean bound;
+} tyran_parser_node_function;
+
 typedef struct tyran_parser_node_case
 {
 	tyran_parser_node node;
@@ -285,9 +294,10 @@ NODE tyran_parser_array(NODE a);
 NODE tyran_parser_range(NODE a, NODE b, NODE c);
 NODE tyran_parser_parens(NODE a);
 NODE tyran_parser_while(NODE condition, NODE block);
-NODE tyran_parser_for(NODE key_variable, NODE value_variable, NODE expression, NODE block);
+NODE tyran_parser_for(tyran_parser_node_identifier* key_variable, tyran_parser_node_identifier* value_variable, NODE expression, NODE block);
 NODE tyran_parser_case(NODE expression, tyran_parser_node_when** whens, int when_count);
 NODE tyran_parser_when(NODE a, NODE block);
+NODE tyran_parser_function(NODE parameters, NODE block, tyran_boolean bound);
 NODE tyran_parser_if(NODE expression, NODE then_block);
 NODE tyran_parser_if_else(NODE expression, NODE then_block, NODE else_block);
 NODE tyran_parser_else(NODE else_block);

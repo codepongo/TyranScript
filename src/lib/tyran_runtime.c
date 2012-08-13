@@ -264,6 +264,16 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A_RCX;
 			tyran_value_set_number(r[a], -1);
 			break;
+		case TYRAN_OPCODE_FUNC: {
+			TYRAN_REGISTER_A_RCX;
+			TYRAN_ASSERT(c[x].type == TYRAN_VALUE_TYPE_STATIC_FUNCTION, "Must be a function");
+			tyran_function* static_function = c[x].data.static_function;
+			tyran_function_object* function_object = tyran_function_object_new(static_function);
+			tyran_object* object = tyran_object_new(runtime);
+			tyran_object_set_function(object, function_object);
+			tyran_value_set_object(r[a], object);
+			}
+			break;
 		case TYRAN_OPCODE_DEBUG:
 			return;
 			break;

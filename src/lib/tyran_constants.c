@@ -1,6 +1,7 @@
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_function.h>
 #include <tyranscript/tyran_object_macros.h>
 
 tyran_constants* tyran_constants_new(int size)
@@ -49,5 +50,13 @@ tyran_constant_index tyran_constants_add_boolean(tyran_constants* constants, tyr
 {
 	tyran_value value;
 	tyran_value_set_boolean(value, v);
+	return tyran_constants_reserve_index(constants, &value);
+}
+
+tyran_constant_index tyran_constants_add_function(tyran_constants* constants, tyran_opcodes* opcodes)
+{
+	tyran_value value;
+	struct tyran_function* func = tyran_function_new(opcodes, constants);
+	tyran_value_set_static_function(value, func);
 	return tyran_constants_reserve_index(constants, &value);
 }

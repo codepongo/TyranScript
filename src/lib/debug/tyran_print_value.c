@@ -66,6 +66,9 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 			}
 
 			break;
+		case TYRAN_VALUE_TYPE_STATIC_FUNCTION:
+			tyran_snprintf(buf, max_length, "static func");
+			break;
 		default:
 			TYRAN_ERROR("Unknown value type");
 	}

@@ -56,6 +56,9 @@ void tyran_opcodes_op_ret(tyran_opcodes* codes, tyran_reg_index, int s);
 void tyran_opcodes_op_call(tyran_opcodes* codes, tyran_reg_index, int s, int s2);
 
 /* Object */
+
+void tyran_opcodes_op_func(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x);
+
 void tyran_opcodes_op_new(tyran_opcodes* codes, tyran_reg_index a);
 void tyran_opcodes_op_set(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y);
 void tyran_opcodes_op_get(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index r, tyran_reg_or_constant_index y);

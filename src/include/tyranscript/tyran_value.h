@@ -14,6 +14,7 @@ typedef enum {
 	TYRAN_VALUE_TYPE_NUMBER,
 	TYRAN_VALUE_TYPE_STRING,
 	TYRAN_VALUE_TYPE_OBJECT,
+	TYRAN_VALUE_TYPE_STATIC_FUNCTION
 } tyran_value_type;
 
 typedef struct tyran_value {
@@ -23,6 +24,7 @@ typedef struct tyran_value {
 		tyran_number number;
 		const struct tyran_string* str;
 		struct tyran_object* object;
+		struct tyran_function* static_function;
 		u32t data;
 	} data;
 } tyran_value;
@@ -56,6 +58,12 @@ typedef struct tyran_value {
 	(v).type = TYRAN_VALUE_TYPE_BOOLEAN; \
 	(v).data.boolean = (b); \
 }
+
+#define tyran_value_set_static_function(v, f) { \
+	(v).type = TYRAN_VALUE_TYPE_STATIC_FUNCTION; \
+	(v).data.static_function = (f); \
+}
+
 
 #define tyran_value_set_string(v, s) { \
 	(v).type = TYRAN_VALUE_TYPE_STRING; \

@@ -13,6 +13,8 @@ typedef struct tyran_mocha_operator_info {
 tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token_id token_id)
 {
 	tyran_mocha_operator_info operands_to_match[] = {
+		{TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH, 1, 0},
+		{TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND, 1, 0},
 		{TYRAN_MOCHA_TOKEN_AND, 1, 0},
 		{TYRAN_MOCHA_TOKEN_OR, 1, 0},
 		{TYRAN_MOCHA_TOKEN_EQUAL, 1, 0},
@@ -477,13 +479,13 @@ NODE tyran_mocha_parser_for(tyran_mocha_parser* parser)
 	NODE block = tyran_mocha_parser_concat_pop(parser);
 	tyran_parser_node_operand_binary* for_in = tyran_parser_binary_operator_type_cast(for_in_node, TYRAN_PARSER_IN);
 	tyran_parser_node_operand_binary* variables = tyran_parser_binary_operator_type_cast(for_in->left, TYRAN_PARSER_COMMA);
-	NODE key_variable;
-	NODE value_variable;
+	tyran_parser_node_identifier* key_variable;
+	tyran_parser_node_identifier* value_variable;
 	if (variables) {
-		key_variable = variables->left;
-		value_variable = variables->right;
+		key_variable = (tyran_parser_node_identifier*) variables->left;
+		value_variable = (tyran_parser_node_identifier*) variables->right;
 	} else {
-		value_variable = for_in->left;
+		value_variable = (tyran_parser_node_identifier*) for_in->left;
 		key_variable = 0;
 	}
 	return tyran_parser_for(key_variable, value_variable, for_in->right, block);
@@ -494,6 +496,13 @@ NODE tyran_mocha_parser_when(tyran_mocha_parser* parser)
 	NODE expression = tyran_mocha_parser_concat_pop(parser);
 	NODE block = tyran_mocha_parser_concat_pop(parser);
 	return tyran_parser_when(expression, block);
+}
+
+NODE tyran_mocha_parser_function(tyran_mocha_parser* parser, tyran_boolean bound)
+{
+	NODE block = tyran_mocha_parser_concat_pop(parser);
+	NODE parameters = 0;
+	return tyran_parser_function(parameters, block, bound);
 }
 
 void tyran_mocha_parser_when_nodes(tyran_parser_node_when** when_nodes, int* index, NODE node)
@@ -549,6 +558,10 @@ NODE tyran_mocha_parser_add_terminal(tyran_mocha_parser* parser, tyran_mocha_tok
 			break;
 		case TYRAN_MOCHA_TOKEN_WHEN:
 			node = tyran_mocha_parser_when(parser);
+			break;
+		case TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH:
+		case TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND:
+			node = tyran_mocha_parser_function(parser, (token_id == TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND));
 			break;
 		default:
 			return tyran_mocha_parser_add_default_operator(parser, token_id, precedence);
