@@ -13,6 +13,7 @@ typedef struct tyran_mocha_operator_info {
 tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token_id token_id)
 {
 	tyran_mocha_operator_info operands_to_match[] = {
+		{TYRAN_MOCHA_TOKEN_CALL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH, 1, 0},
 		{TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND, 1, 0},
 		{TYRAN_MOCHA_TOKEN_AND, 1, 0},
@@ -164,6 +165,7 @@ void tyran_mocha_parser_add_to_empty(tyran_mocha_parser* parser, NODE node)
 	
 	if (!parser->next_node_to_overwrite) {
 		NODE* actual_root = tyran_mocha_parser_actual_root(parser);
+		
 		tyran_parser_node_operand_binary* binary = tyran_parser_concat(0, *actual_root);
 		tyran_mocha_parser_push_root_right(parser, binary);
 		tyran_mocha_parser_add_to_empty(parser, node);
@@ -297,6 +299,9 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 		break;
 	case TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE:
 		operand = TYRAN_PARSER_RANGE;
+		break;
+	case TYRAN_MOCHA_TOKEN_CALL:
+		operand = TYRAN_PARSER_CALL;
 		break;
 	default:
 		TYRAN_ERROR("unknown token to convert");
@@ -617,13 +622,16 @@ void tyran_mocha_parser_line(tyran_mocha_parser* parser)
 
 void tyran_mocha_parser_add_token(tyran_mocha_parser* parser, tyran_mocha_token* token)
 {
+	static tyran_boolean last_literal = 0;
 	if (token->token_id == TYRAN_MOCHA_TOKEN_LINE_START) {
 		tyran_mocha_parser_line(parser);
+		last_literal = TYRAN_FALSE;
 		return;
 	}
 	tyran_mocha_parser_debug("before", parser, 0);
 	if (parser->waiting_for_start_enclosure_id == token->token_id) {
 		tyran_mocha_parser_end_enclosure(parser, token->token_id);
+		last_literal = TYRAN_FALSE;
 	} else {
 		tyran_mocha_operator_info info = tyran_mocha_parser_get_operator_info(token->token_id);
 		if (info.token_id != TYRAN_MOCHA_TOKEN_END) {
@@ -632,8 +640,15 @@ void tyran_mocha_parser_add_token(tyran_mocha_parser* parser, tyran_mocha_token*
 			if (end_closing_token_id != TYRAN_MOCHA_TOKEN_END) {
 				tyran_mocha_parser_add_enclosure(parser, (tyran_parser_node_operand_unary*)terminal, token->token_id, end_closing_token_id);
 			}
+			last_literal = TYRAN_FALSE;
 		} else {
 			NODE literal = tyran_mocha_parser_token_to_literal(token);
+			if (last_literal) {
+				tyran_mocha_token* token = TYRAN_CALLOC(tyran_mocha_token);
+				token->token_id = TYRAN_MOCHA_TOKEN_CALL;
+				tyran_mocha_parser_add_token(parser, token);
+			}
+			last_literal = TYRAN_TRUE;
 			tyran_mocha_parser_add_to_empty(parser, literal);
 		}
 	}

@@ -88,6 +88,7 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	"LINE_START",
 	"RANGE_INCLUSIVE",
 	"RANGE",
+	"CALL"
 	};
 	
 	TYRAN_LOG_NO_LF("%s ", token_id_to_string[token->token_id]);

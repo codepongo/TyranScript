@@ -168,6 +168,9 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 		target = TYRAN_OPCODE_REGISTER_ILLEGAL;
 		tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
 		break;
+	case TYRAN_PARSER_CALL:
+		tyran_opcodes_op_call(codes, left, right, target);
+		break;
 	}
 	
 	return target;
@@ -326,8 +329,11 @@ tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* 
 {
 	tyran_opcodes* old_codes = code->opcodes;
 	code->opcodes = tyran_opcodes_new(1024);
-	tyran_generator_traverse(code, func_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, 0);
+	
+	tyran_reg_index temp_index = tyran_variable_scopes_define_temporary_variable(code->scope);
+	tyran_generator_traverse_force_register(code, func_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, 0, temp_index);
 	tyran_constant_index function_constant_index = tyran_constants_add_function(code->constants, code->opcodes);
+	tyran_opcodes_op_ret(code->opcodes, temp_index, 1);
 	code->opcodes = old_codes;
 	tyran_reg_index function_object_index = tyran_variable_scopes_define_temporary_variable(code->scope);
 	tyran_opcodes_op_func(code->opcodes, function_object_index, function_constant_index);

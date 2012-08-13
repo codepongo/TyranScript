@@ -74,6 +74,7 @@ typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_UNTIL,
 	TYRAN_PARSER_AND,
 	TYRAN_PARSER_OR,
+	TYRAN_PARSER_CALL,
 	TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX
 } tyran_parser_binary_operand_type;
 
