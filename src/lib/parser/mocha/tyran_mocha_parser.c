@@ -215,14 +215,15 @@ NODE tyran_mocha_parser_concat_pop(tyran_mocha_parser* parser) {
 	return result;
 }
 
-void tyran_mocha_parser_parameters(tyran_parser_node_parameter** parameter_nodes, int* index, NODE node)
+void tyran_mocha_parser_parameters(tyran_parser_node_parameter* parameter_nodes, int* index, NODE node)
 {
-	tyran_parser_node_operand_binary* concat = tyran_parser_binary_operator_type_cast(node, TYRAN_PARSER_CONCAT);
-	if (concat) {
-		tyran_mocha_parser_parameters(parameter_nodes, index, concat->left);
-		tyran_mocha_parser_parameters(parameter_nodes, index, concat->right);
+	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_cast(node);
+	if (binary && (binary->operator_type == TYRAN_PARSER_COMMA || binary->operator_type == TYRAN_PARSER_CONCAT)) {
+		tyran_mocha_parser_parameters(parameter_nodes, index, binary->left);
+		tyran_mocha_parser_parameters(parameter_nodes, index, binary->right);
 	} else {
-		tyran_parser_node_parameter* parameter_node = (tyran_parser_node_parameter*) node;
+		tyran_parser_node_parameter parameter_node;
+		parameter_node.identifier = (tyran_parser_node_identifier*) node;
 		parameter_nodes[*index] = parameter_node;
 		*index = *index + 1;
 	}
@@ -230,12 +231,13 @@ void tyran_mocha_parser_parameters(tyran_parser_node_parameter** parameter_nodes
 
 void tyran_mocha_parser_define_function_parameters(tyran_parser_node_function* function, NODE arguments)
 {
-	tyran_parser_node_parameter* parameter_nodes[100];
+	tyran_parser_node_parameter parameter_nodes[100];
 	int parameter_node_count = 0;
 
 	tyran_mocha_parser_parameters(parameter_nodes, &parameter_node_count, arguments);
 
-	function->parameters = TYRAN_MALLOC_TYPE(tyran_parser_node_parameter*, parameter_node_count);
+	function->parameters = TYRAN_MALLOC_TYPE(tyran_parser_node_parameter, parameter_node_count);
+	tyran_memcpy_type(tyran_parser_node_parameter, function->parameters, parameter_nodes, parameter_node_count);
 	function->parameter_count = parameter_node_count;
 }
 
@@ -655,6 +657,7 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_mocha_to
 		NODE node = tyran_mocha_parser_concat_peek_position(parser, 1);
 		if (node && node->type == TYRAN_PARSER_NODE_TYPE_FUNCTION) {
 			TYRAN_LOG("FUNCTION FOUND!");
+			tyran_mocha_parser_concat_pop(parser);
 			tyran_parser_node_function* function = (tyran_parser_node_function*) node;
 			tyran_mocha_parser_define_function_parameters(function, parentheses->expression);
 		}

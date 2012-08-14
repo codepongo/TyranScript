@@ -325,15 +325,32 @@ tyran_reg_or_constant_index tyran_generator_traverse_case(tyran_code_state* code
 	return TYRAN_OPCODE_REGISTER_ILLEGAL;
 }
 
+
+tyran_reg_or_constant_index tyran_generator_traverse_function_parameters(tyran_code_state* code, tyran_parser_node_function* func_node)
+{
+	int i;
+	
+	for (i = 0; i < func_node->parameter_count; ++i) {
+		tyran_parser_node_parameter parameter = func_node->parameters[i];
+		tyran_reg_index parameter_register = tyran_variable_scopes_define_identifier(code->scope, parameter.identifier->string);
+	}
+}
+
 tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* code, tyran_parser_node_function* func_node)
 {
 	tyran_opcodes* old_codes = code->opcodes;
 	code->opcodes = tyran_opcodes_new(1024);
+	tyran_variable_scopes_push_scope(code->scope);
+	
+	tyran_generator_traverse_function_parameters(code, func_node);
 	
 	tyran_reg_index temp_index = tyran_variable_scopes_define_temporary_variable(code->scope);
 	tyran_generator_traverse_force_register(code, func_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, 0, temp_index);
 	tyran_constant_index function_constant_index = tyran_constants_add_function(code->constants, code->opcodes);
 	tyran_opcodes_op_ret(code->opcodes, temp_index, 1);
+
+	tyran_variable_scopes_pop_scope(code->scope);
+
 	code->opcodes = old_codes;
 	tyran_reg_index function_object_index = tyran_variable_scopes_define_temporary_variable(code->scope);
 	tyran_opcodes_op_func(code->opcodes, function_object_index, function_constant_index);

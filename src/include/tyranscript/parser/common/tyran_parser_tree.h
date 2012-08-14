@@ -204,7 +204,7 @@ typedef struct tyran_parser_node_parameter
 typedef struct tyran_parser_node_function
 {
 	tyran_parser_node node;
-	tyran_parser_node_parameter** parameters;
+	tyran_parser_node_parameter* parameters;
 	int parameter_count;
 	tyran_parser_node* block;
 	tyran_boolean bound;
