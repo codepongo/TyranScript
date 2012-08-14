@@ -14,6 +14,7 @@ typedef struct tyran_variable_scope {
 	int allocated_variable_count;
 	int* registers;
 	int register_count;
+	int highest_register_used;
 } tyran_variable_scope;
 
 typedef struct tyran_variable_scopes {
@@ -36,6 +37,7 @@ tyran_reg_index tyran_variable_scopes_define_identifier(tyran_variable_scopes* s
 tyran_reg_index tyran_variable_scopes_define_temporary_variable(tyran_variable_scopes* scope);
 void tyran_variable_scopes_undefine_variable(tyran_variable_scopes* scope, tyran_reg_index index);
 
+tyran_reg_index tyran_variable_scope_top_free(tyran_variable_scopes* scopes);
 
 void tyran_variable_scopes_push_scope(tyran_variable_scopes* scopes);
 void tyran_variable_scopes_pop_scope(tyran_variable_scopes* scopes);

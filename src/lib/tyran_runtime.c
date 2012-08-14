@@ -79,7 +79,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 
 		result[0] = 0;
 		int reg_index;
-		for (reg_index=0; reg_index < 4; reg_index++)
+		for (reg_index=0; reg_index < 8; reg_index++)
 		{
 			if (reg_index != 0) {
 				tyran_strncat(result, ", ", 512);

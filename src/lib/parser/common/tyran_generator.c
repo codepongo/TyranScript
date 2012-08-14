@@ -133,6 +133,34 @@ void tyran_generator_comparison_operator(tyran_code_state* code, tyran_parser_bi
 	tyran_generator_label_reference(code, false_label);
 }
 
+tyran_reg_index tyran_generator_traverse_call(tyran_code_state* code, tyran_parser_node_call* call_node)
+{
+	tyran_reg_index start_register = 0;
+	int return_value_count = 1;
+	
+	int i;
+	
+	start_register = tyran_variable_scope_top_free(code->scope);
+	tyran_reg_or_constant_index function_register =  tyran_generator_traverse(code, call_node->function_node, 0, 0, 0);
+	tyran_opcodes_op_ld(code->opcodes, start_register, function_register);
+	
+	for (i = 0; i < call_node->argument_count; ++i) {
+		tyran_reg_index target_index = start_register + i + 1;
+		NODE node = call_node->arguments[i];
+		tyran_reg_or_constant_index arg_register = tyran_generator_traverse(code, node, 0, 0, 0);
+		if (tyran_opcodes_is_constant(arg_register)) {
+			tyran_opcodes_op_ldc(code->opcodes, target_index, arg_register);
+		} else {
+			tyran_opcodes_op_ld(code->opcodes, target_index, arg_register);
+		}
+		
+	}
+	tyran_opcodes_op_call(code->opcodes, start_register, call_node->argument_count, return_value_count);
+	
+	return start_register;
+}
+
+
 tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_parser_binary_operand_type operator_type, tyran_reg_or_constant_index left, tyran_reg_or_constant_index right, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic)
 {
 	tyran_opcodes* codes = code->opcodes;
@@ -168,9 +196,6 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 		target = TYRAN_OPCODE_REGISTER_ILLEGAL;
 		tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
 		break;
-	case TYRAN_PARSER_CALL:
-		tyran_opcodes_op_call(codes, left, right, target);
-		break;
 	}
 	
 	return target;
@@ -204,11 +229,13 @@ tyran_reg_index tyran_generator_traverse_default_binary(tyran_code_state* code, 
 	
 	tyran_reg_index target_index = tyran_generator_handle_operator(code, binary, left_index, right_index, true_label, false_label, invert_logic);
 	
-	if (!tyran_opcodes_is_constant(right_index)) {
-		tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)right_index);
-	}
-	if (!tyran_opcodes_is_constant(left_index)) {
-		tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)left_index);
+	if (binary->operator_type != TYRAN_PARSER_CONCAT) {
+		if (!tyran_opcodes_is_constant(right_index)) {
+			tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)right_index);
+		}
+		if (!tyran_opcodes_is_constant(left_index)) {
+			tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)left_index);
+		}
 	}
 	return target_index;
 }
@@ -326,7 +353,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_case(tyran_code_state* code
 }
 
 
-tyran_reg_or_constant_index tyran_generator_traverse_function_parameters(tyran_code_state* code, tyran_parser_node_function* func_node)
+void tyran_generator_traverse_function_parameters(tyran_code_state* code, tyran_parser_node_function* func_node)
 {
 	int i;
 	
@@ -335,6 +362,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_function_parameters(tyran_c
 		tyran_reg_index parameter_register = tyran_variable_scopes_define_identifier(code->scope, parameter.identifier->string);
 	}
 }
+
 
 tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* code, tyran_parser_node_function* func_node)
 {
@@ -345,7 +373,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* 
 	tyran_generator_traverse_function_parameters(code, func_node);
 	
 	tyran_reg_index temp_index = tyran_variable_scopes_define_temporary_variable(code->scope);
-	tyran_generator_traverse_force_register(code, func_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, 0, temp_index);
+	temp_index = tyran_generator_traverse_force_register(code, func_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, 0, temp_index);
 	tyran_constant_index function_constant_index = tyran_constants_add_function(code->constants, code->opcodes);
 	tyran_opcodes_op_ret(code->opcodes, temp_index, 1);
 
@@ -431,6 +459,11 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_code_state* code, tyr
 		case TYRAN_PARSER_NODE_TYPE_FUNCTION: {
 			tyran_parser_node_function* func_node = (tyran_parser_node_function*)node;
 			result = tyran_generator_traverse_function(code, func_node);
+		}
+		break;
+		case TYRAN_PARSER_NODE_TYPE_CALL: {
+			tyran_parser_node_call* call_node = (tyran_parser_node_call*)node;
+			result = tyran_generator_traverse_call(code, call_node);
 		}
 		break;
 		default: {

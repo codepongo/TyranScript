@@ -129,7 +129,6 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_parser_node_function* func_node = (tyran_parser_node_function*)node;
 			tyran_snprintf(buf, buf_size, "function ");
 			tyran_parser_node_print_helper_output(buf, description, tab_count);
-			tyran_parser_node_print_helper("func parameters", func_node->parameters, current_root, next_to_overwrite, tab_count+1);
 			tyran_parser_node_print_helper("func block", func_node->block, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
@@ -170,6 +169,15 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_parser_node_print_helper("when expression", operand->expression, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
+	case TYRAN_PARSER_NODE_TYPE_CALL:
+		{
+			tyran_parser_node_call* call_node = (tyran_parser_node_call*)node;
+			tyran_snprintf(buf, buf_size, "call ");
+			tyran_parser_node_print_helper_output(buf, description, tab_count);
+			tyran_parser_node_print_helper("call function", call_node->function_node, current_root, next_to_overwrite, tab_count+1);
+			tyran_parser_node_print_helper("call arguments", call_node->arguments[0], current_root, next_to_overwrite, tab_count+1);
+		}
+	break;
 	case TYRAN_PARSER_NODE_TYPE_CASE:
 		{
 			tyran_parser_node_when* operand = (tyran_parser_node_when*)node;
@@ -197,14 +205,6 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_parser_node_print_helper("class block", operand->block, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
-	case TYRAN_PARSER_NODE_TYPE_ARGUMENTS:
-		{
-			tyran_parser_node_arguments* arguments = (tyran_parser_node_arguments*)node;
-			tyran_snprintf(buf, buf_size, "arguments");
-			tyran_parser_node_print_helper_output(buf, description, tab_count);
-			tyran_parser_node_print_helper("arguments argument_list", arguments->argument_list, current_root, next_to_overwrite, tab_count+1);
-		}
-	break;
 	case TYRAN_PARSER_NODE_TYPE_OBJECT:
 		{
 			tyran_parser_node_object* object = (tyran_parser_node_object*)node;
@@ -222,6 +222,9 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_parser_node_print_helper("object_assignment source", object->source, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
+	default:
+		TYRAN_ERROR("UNKNOWN NODE!");
+		break;
 	
 	}
 	}
@@ -392,15 +395,6 @@ NODE tyran_parser_class(NODE name, NODE extends, NODE block)
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_arguments(NODE argument_list)
-{
-	tyran_parser_node_arguments* node = TYRAN_MALLOC_TYPE(tyran_parser_node_arguments, 1);
-	node->node.type = TYRAN_PARSER_NODE_TYPE_ARGUMENTS;
-	node->argument_list = argument_list;
-
-	return (tyran_parser_node*)node;
-}
-
 NODE tyran_parser_self()
 {
 	TYRAN_LOG("self");
@@ -472,12 +466,23 @@ NODE tyran_parser_when(NODE expression, NODE block)
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_function(NODE parameters, NODE block, tyran_boolean bound)
+NODE tyran_parser_call(NODE function, NODE* arguments, int argument_count)
+{
+	tyran_parser_node_call* node = TYRAN_MALLOC_TYPE(tyran_parser_node_call, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_CALL;
+	node->argument_count = argument_count;
+	node->arguments = TYRAN_MALLOC_TYPE(NODE, node->argument_count);
+	node->function_node = function;
+	tyran_memcpy_type(NODE, node->arguments, arguments, node->argument_count);
+	return (tyran_parser_node*)node;
+}
+
+NODE tyran_parser_function( NODE block, tyran_boolean bound)
 {
 	tyran_parser_node_function* node = TYRAN_MALLOC_TYPE(tyran_parser_node_function, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_FUNCTION;
 	node->bound = bound;
-	node->parameters = parameters;
+	node->parameters = 0;
 	node->block = block;
 	return (tyran_parser_node*)node;
 }

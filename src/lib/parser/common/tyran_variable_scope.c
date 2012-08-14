@@ -66,6 +66,11 @@ void tyran_variable_scopes_undefine_variable(tyran_variable_scopes* scopes, tyra
 }
 
 
+tyran_reg_index tyran_variable_scope_top_free(tyran_variable_scopes* scopes)
+{
+	return tyran_variable_scopes_top(scopes)->highest_register_used + 1;
+}
+
 void tyran_variable_scope_add_identifier(tyran_variable_scope* scope, const char* variable_name, tyran_reg_index register_index)
 {
 	TYRAN_ASSERT(scope->variable_count < scope->allocated_variable_count, "Out of memory adding an identifier");
@@ -75,22 +80,40 @@ void tyran_variable_scope_add_identifier(tyran_variable_scope* scope, const char
 	info->register_index = register_index;
 }
 
-tyran_reg_index tyran_variable_scope_define_temporary_variable(tyran_variable_scope* scope)
+void tyran_variable_scope_reserve_variable(tyran_variable_scope* scope, tyran_reg_index i, int status)
+{
+	if (i > scope->highest_register_used) {
+		scope->highest_register_used = i;
+	}
+	scope->registers[i] = status;
+}
+
+tyran_reg_index tyran_variable_scope_find_and_reserve_variable(tyran_variable_scope* scope, int status)
 {
 	int i;
 
-	for (i=0; i<255; ++i) {
+	for (i = 0; i < 255; ++i) {
 		if (!scope->registers[i]) {
-			scope->registers[i] = 1;
+			tyran_variable_scope_reserve_variable(scope, i, status);
 			return i;
 		}
 	}
-	
-	return -1;
+	return TYRAN_OPCODE_REGISTER_ILLEGAL;
+}
+
+tyran_reg_index tyran_variable_scope_define_temporary_variable(tyran_variable_scope* scope)
+{
+	return tyran_variable_scope_find_and_reserve_variable(scope, 1);
 }
 
 void tyran_variable_scope_undefine_variable(tyran_variable_scope* scope, tyran_reg_index index)
 {
+	if (scope->registers[index] == 2) {
+		return;
+	}
+	if (scope->highest_register_used == index) {
+		scope->highest_register_used--;
+	}
 	scope->registers[index] = 0;
 }
 
@@ -98,7 +121,7 @@ tyran_reg_index tyran_variable_scope_define_identifier(tyran_variable_scope* top
 {
 	tyran_reg_index current_index = tyran_variable_scope_get_identifier(top_scope, variable_name);
 	if (current_index == TYRAN_OPCODE_REGISTER_ILLEGAL) {
-		current_index = tyran_variable_scope_define_temporary_variable(top_scope);
+		current_index = tyran_variable_scope_find_and_reserve_variable(top_scope, 2);
 		tyran_variable_scope_add_identifier(top_scope, variable_name, current_index);
 	}
 	
