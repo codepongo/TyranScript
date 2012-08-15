@@ -298,11 +298,11 @@ tyran_mocha_parser* tyran_mocha_parser_new()
 	return parser;
 }
 
-void tyran_mocha_parser_debug(const char* description, tyran_mocha_parser* parser, tyran_mocha_token* operator)
+void tyran_mocha_parser_debug(const char* description, tyran_mocha_parser* parser, tyran_mocha_token* operator_token)
 {
 	TYRAN_LOG_NO_LF("==== %s token:", description);
-	if (operator) {
-		tyran_mocha_lexer_debug_token(operator);
+	if (operator_token) {
+		tyran_mocha_lexer_debug_token(operator_token);
 		TYRAN_LOG(" ");
 	} else {
 		TYRAN_LOG("===========");
@@ -445,11 +445,11 @@ NODE tyran_mocha_parser_token_to_literal(tyran_mocha_token* first)
 {
 	switch (first->token_id) {
 		case TYRAN_MOCHA_TOKEN_IDENTIFIER:
-			return tyran_parser_literal_identifier(first->token_data);
+			return tyran_parser_literal_identifier((const char*)first->token_data);
 		case TYRAN_MOCHA_TOKEN_STRING:
-			return tyran_parser_literal_string(first->token_data);
+			return tyran_parser_literal_string((const char*)first->token_data);
 		case TYRAN_MOCHA_TOKEN_NUMBER:
-			return tyran_parser_literal_number(first->token_data);
+			return tyran_parser_literal_number((tyran_number *)first->token_data);
 		case TYRAN_MOCHA_TOKEN_TRUE:
 			return tyran_parser_bool(1);
 		case TYRAN_MOCHA_TOKEN_FALSE:

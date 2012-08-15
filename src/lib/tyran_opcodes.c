@@ -1,6 +1,11 @@
 #include <tyranscript/tyran_opcodes.h>
 #include <tyranscript/tyran_opcode_ids.h>
 
+int tyran_opcodes_is_constant(tyran_reg_or_constant_index index)
+{
+	return index >= TYRAN_OPCODE_CONSTANT_BIT;
+}
+
 /* Opcodes */
 struct tyran_opcodes* tyran_opcodes_new(int size)
 {

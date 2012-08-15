@@ -17,45 +17,45 @@ void tyran_mocha_lexer_destroy(tyran_mocha_lexer* lexer)
 	tyran_free(lexer);
 }
 
-int tyran_mocha_lexer_operand(tyran_lexer* lexer, int c)
+tyran_mocha_token_id tyran_mocha_lexer_operand(tyran_lexer* lexer, int c)
 {
 	tyran_lexer_push_character(c, lexer);
 
 	typedef struct tyran_operand_info {
 		const char* name;
 		int len;
-		int value;
+		tyran_mocha_token_id value;
 	} tyran_operand_info;
 
 	static tyran_operand_info operands[] = {
 		{ "++", 2, TYRAN_MOCHA_TOKEN_INCREMENT },
 		{ "--", 2, TYRAN_MOCHA_TOKEN_DECREMENT },
-		{ "+=", 2, 0 },
-		{ "-=", 2, 0 },
-		{ "*=", 2, 0 },
-		{ "/=", 2, 0 },
-		{ "%=", 2, 0 },
-		{ "&=", 2, 0 },
-		{ "|=", 2, 0 },
-		{ "^=", 2, 0 },
-		{ "<<", 2, 0 },
-		{ ">>", 2, 0 },
+		{ "+=", 2, TYRAN_MOCHA_TOKEN_END },
+		{ "-=", 2, TYRAN_MOCHA_TOKEN_END },
+		{ "*=", 2, TYRAN_MOCHA_TOKEN_END },
+		{ "/=", 2, TYRAN_MOCHA_TOKEN_END },
+		{ "%=", 2, TYRAN_MOCHA_TOKEN_END },
+		{ "&=", 2, TYRAN_MOCHA_TOKEN_END },
+		{ "|=", 2, TYRAN_MOCHA_TOKEN_END },
+		{ "^=", 2, TYRAN_MOCHA_TOKEN_END },
+		{ "<<", 2, TYRAN_MOCHA_TOKEN_END },
+		{ ">>", 2, TYRAN_MOCHA_TOKEN_END },
 		{ "->", 2, TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH },
 		{ "=>", 2, TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND },
 		{ "<=", 2, TYRAN_MOCHA_TOKEN_LESS_EQUAL },
 		{ ">=", 2, TYRAN_MOCHA_TOKEN_GREATER_EQUAL },
 		{ "<", 1, TYRAN_MOCHA_TOKEN_LESS },
 		{ ">", 1, TYRAN_MOCHA_TOKEN_GREATER },
-		{ "&", 1, 0 },
-		{ "|", 1, 0 },
-		{ "^", 1, 0 },
+		{ "&", 1, TYRAN_MOCHA_TOKEN_END },
+		{ "|", 1, TYRAN_MOCHA_TOKEN_END },
+		{ "^", 1, TYRAN_MOCHA_TOKEN_END },
 		{ "/", 1, TYRAN_MOCHA_TOKEN_DIVIDE },
 		{ "*", 1, TYRAN_MOCHA_TOKEN_MULTIPLY },
 		{ "%", 1, TYRAN_MOCHA_TOKEN_MODULUS },
 		{ "=", 1, TYRAN_MOCHA_TOKEN_ASSIGNMENT },
 		{ "+", 1, TYRAN_MOCHA_TOKEN_ADD },
 		{ "-", 1, TYRAN_MOCHA_TOKEN_SUBTRACT },
-		{ "~", 1, 0 },
+		{ "~", 1, TYRAN_MOCHA_TOKEN_END },
 		{ "...", 3, TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE },
 		{ "..", 2, TYRAN_MOCHA_TOKEN_RANGE_INCLUSIVE },
 		{ ".", 1, TYRAN_MOCHA_TOKEN_MEMBER },
@@ -67,44 +67,45 @@ int tyran_mocha_lexer_operand(tyran_lexer* lexer, int c)
 		{ "}", 1, TYRAN_MOCHA_TOKEN_OBJECT_END },
 		{ ":", 1, TYRAN_MOCHA_TOKEN_COLON },
 		{ ",", 1, TYRAN_MOCHA_TOKEN_COMMA },
-		{ "?", 1, 0 },
+		{ "?", 1, TYRAN_MOCHA_TOKEN_END },
 	};
 	int index;
 	char buf[5];
-	int i;
+	size_t operand_index;
 	char popped_character = 1;
 	for (index = 0; index < 4 && (popped_character != 0); ++index) {
 		popped_character = tyran_lexer_pop_character(lexer);
 		buf[index] = popped_character;
 	}
 
-	for (i = 0; i < sizeof(operands)/sizeof(tyran_operand_info); ++i) {
-		if (index < operands[i].len) {
+	for (operand_index = 0; operand_index < sizeof(operands)/sizeof(tyran_operand_info); ++operand_index) {
+		if (index < operands[operand_index].len) {
 			continue;
 		}
 
-		if (tyran_strncmp(buf, operands[i].name, operands[i].len) == 0) {
+		if (tyran_strncmp(buf, operands[operand_index].name, operands[operand_index].len) == 0) {
 			int j;
-			for (j = index - 1; j >= operands[i].len; --j) {
+			for (j = index - 1; j >= operands[operand_index].len; --j) {
 				tyran_lexer_push_character(buf[j], lexer);
 			}
-			return operands[i].value;
+			return operands[operand_index].value;
 		}
 	}
 
+	int i;
 	for (i = index - 1; i >= 0; --i) {
 		tyran_lexer_push_character(buf[i], lexer);
 	}
-	return 0;
+	return TYRAN_MOCHA_TOKEN_END;
 }
 
  
-int tyran_mocha_lexer_keyword(const char* identifier)
+tyran_mocha_token_id tyran_mocha_lexer_keyword(const char* identifier)
 {
 	typedef struct tyran_mocha_keyword_info {
 		const char* name;
 		int len;
-		int value;
+		tyran_mocha_token_id value;
 	} tyran_mocha_keyword_info;
 
 	static tyran_mocha_keyword_info keywords[] = {
@@ -134,14 +135,14 @@ int tyran_mocha_lexer_keyword(const char* identifier)
 		{ "not", 3, TYRAN_MOCHA_TOKEN_NOT },
 	};
 
-	int i;
+	size_t i;
 	for (i = 0; i < sizeof(keywords) / sizeof(tyran_mocha_keyword_info); ++i) {
 		if (tyran_strncmp(identifier, keywords[i].name, keywords[i].len) == 0) {
 			return keywords[i].value;
 		}
 	}
 
-	return 0;
+	return TYRAN_MOCHA_TOKEN_END;
 }
 
 
@@ -151,7 +152,7 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 	tyran_lexer_token_data token_data;
 	static int target_indentation = 0;
 	static int current_indentation = 0;
-	token.token_id = 0;
+	token.token_id = TYRAN_MOCHA_TOKEN_END;
 	
 	tyran_lexer_set_begin(lexer_position_info, lexer);
 
@@ -198,7 +199,7 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		tyran_lexer_parse_identifier(lexer, c, identifier, &len);
 		token_data = identifier;
 
-		int token_id = tyran_mocha_lexer_keyword(identifier);
+		tyran_mocha_token_id token_id = tyran_mocha_lexer_keyword(identifier);
 		token.token_data = identifier;
 		if (token_id) {
 			token.token_id = token_id;
@@ -220,7 +221,7 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		tyran_lexer_parse_to_eol(lexer);
 		token = tyran_mocha_lexer_next_token(lexer_position_info, lexer);
 	} else {
-		int found = tyran_mocha_lexer_operand(lexer, c);
+		tyran_mocha_token_id found = tyran_mocha_lexer_operand(lexer, c);
 		if (found) {
 			token.token_id = found;
 		} else {
@@ -317,7 +318,7 @@ tyran_mocha_token_id tyran_mocha_enclosing_start_token(tyran_mocha_token_id toke
 		{TYRAN_MOCHA_TOKEN_BLOCK_START, TYRAN_MOCHA_TOKEN_BLOCK_END},
 	};
 
-	int i;
+	size_t i;
 	for (i=0; i<sizeof(enclosing_tokens) / sizeof(tyran_mocha_matching_tokens); ++i) {
 		if (token_id == enclosing_tokens[i].end) {
 			return enclosing_tokens[i].start;

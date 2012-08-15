@@ -18,7 +18,7 @@
 #include <tyranscript/debug/tyran_print_constants.h>
 
 
-enum {
+typedef enum {
 	TYRN_TOKEN_NOTHING,
 	TYRAN_TOKEN_ASSEMBLER_LD,
 	TYRAN_TOKEN_ASSEMBLER_LDA,
@@ -150,12 +150,12 @@ static int tyran_lexer_assembler_next_token(tyran_lexer_token_data token, tyran_
 	}
 
 	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
-		return tyran_lexer_assembler_parse_identifier_or_keyword(lexer, c, lexer_position_info, token);
+		return tyran_lexer_assembler_parse_identifier_or_keyword(lexer, c, lexer_position_info, &token);
 	} else if (tyran_lexer_is_digit(c) || c == '-') {
-		return tyran_lexer_parse_number(lexer, c, lexer_position_info, token);
+		return tyran_lexer_parse_number(lexer, c, lexer_position_info, &token);
 		return TYRAN_TOKEN_ASSEMBLER_NUMBER;	
 	} else if (c == '"' || c == '\'') {
-		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, token);
+		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, &token);
 		return TYRAN_TOKEN_ASSEMBLER_STRING;
 	} else if (c == '#') {
 		int r = tyran_lexer_parse_to_eol(lexer);
@@ -412,10 +412,11 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 			parse_r_rc(parser_state, &a, &x);
 			tyran_opcodes_op_ld(opcodes, a, x);
 			break;
-		case TYRAN_TOKEN_ASSEMBLER_LDC:
+		case TYRAN_TOKEN_ASSEMBLER_LDC: {
 			parse_r(parser_state, &a);
 			int c = parse_constant(parser_state, lexer_position, 0);
 			tyran_opcodes_op_ldc(opcodes, a, c);
+			}
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_LDB:
 			parse_r_b(parser_state, &a, &b);

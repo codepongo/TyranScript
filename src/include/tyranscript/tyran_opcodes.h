@@ -12,7 +12,7 @@ typedef u8t tyran_reg_index;
 typedef u16t tyran_reg_or_constant_index;
 typedef u16t tyran_constant_index;
 
-static int tyran_opcodes_is_constant(tyran_reg_or_constant_index index) { return index >= TYRAN_OPCODE_CONSTANT_BIT; }
+int tyran_opcodes_is_constant(tyran_reg_or_constant_index index);
 
 struct tyran_function;
 

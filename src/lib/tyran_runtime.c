@@ -216,7 +216,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_BR;
 			pc += br;
 			break;
-		case TYRAN_OPCODE_RET:
+		case TYRAN_OPCODE_RET: {
 			TYRAN_REGISTER_A_X;
 			tyran_value* from = &r[a];
 			if (sp == base_sp) {
@@ -225,6 +225,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			}
 			tyran_register_copy(sp->return_register, from, x);
 			TYRAN_STACK_POP;
+			}
 			break;
 		case TYRAN_OPCODE_CALL:
 			TYRAN_STACK_PUSH;
@@ -245,7 +246,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A;
 			tyran_value_set_object(r[a], tyran_object_pool_alloc(runtime->object_pool));
 			break;
-		case TYRAN_OPCODE_GET:
+		case TYRAN_OPCODE_GET: {
 			TYRAN_REGISTER_A_RCX_RCY;
 			TYRAN_ASSERT(tyran_value_is_string(&rcy), "Must use string to lookup. for now");
 			tyran_object_key_flag_type flag = tyran_object_key_flag_normal;
@@ -254,6 +255,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			tyran_value* v = tyran_value_object_lookup(&rcx, key, &flag);
 			tyran_value_copy(r[a], *v);
 			TYRAN_ADD_REF(r[a]);
+			}
 			break;
 		case TYRAN_OPCODE_SET:
 			TYRAN_REGISTER_A_RCX_RCY;

@@ -557,7 +557,7 @@ NODE tyran_parser_undefined()
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_literal_number(float* number)
+NODE tyran_parser_literal_number(tyran_number* number)
 {
 	tyran_parser_node_number* node = TYRAN_MALLOC_TYPE(tyran_parser_node_number, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_NUMBER;
