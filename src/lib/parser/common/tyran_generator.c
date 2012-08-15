@@ -100,6 +100,8 @@ tyran_reg_or_constant_index tyran_generator_logical_operator(tyran_code_state* c
 		tyran_generator_define_label(code, or_true);
 		}
 	break;
+	default:
+		TYRAN_ERROR("Unhandled logical operator");
 	}
 	
 	return TYRAN_OPCODE_REGISTER_ILLEGAL;
@@ -128,6 +130,8 @@ void tyran_generator_comparison_operator(tyran_code_state* code, tyran_parser_bi
 	case TYRAN_PARSER_GREATER:
 		tyran_opcodes_op_jle(codes, left, right, !invert_logic);
 		break;
+	default:
+		TYRAN_ERROR("Unhandled comparison operator");
 	}
 	
 	tyran_generator_label_reference(code, false_label);
@@ -196,6 +200,8 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 		target = TYRAN_OPCODE_REGISTER_ILLEGAL;
 		tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
 		break;
+	default:
+		TYRAN_ERROR("Unhandled operator");
 	}
 	
 	return target;
