@@ -17,8 +17,6 @@
 #include <tyranscript/tyran_runtime.h>
 #include <tyranscript/tyran_runtime_callbacks.h>
 #include <tyranscript/tyran_opcodes.h>
-#include <tyranscript/tyran_scope_stack.h>
-#include <tyranscript/tyran_scope.h>
 
 /* Parser */
 #include <tyranscript/parser/tyran_parser_state.h>

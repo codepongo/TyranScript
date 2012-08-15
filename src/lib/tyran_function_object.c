@@ -5,7 +5,6 @@
 #include <tyranscript/tyran_function.h>
 #include <tyranscript/tyran_function_prototype.h>
 #include <tyranscript/tyran_function_object.h>
-#include <tyranscript/tyran_scope_stack.h>
 #include <tyranscript/tyran_value_object.h>
 
 tyran_function_object* tyran_function_object_new(const tyran_function* function)
@@ -18,7 +17,6 @@ tyran_function_object* tyran_function_object_new(const tyran_function* function)
 
 void tyran_function_object_free(tyran_function_object* function_object)
 {
-	tyran_scope_stack_free(function_object->scope);
 	tyran_free(function_object);
 }
 

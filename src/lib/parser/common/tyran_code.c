@@ -3,7 +3,6 @@
 #include <tyranscript/parser/common/tyran_variable_scope.h>
 #include <tyranscript/tyran_string.h>
 
-
 #include <tyranscript/parser/common/tyran_code.h>
 #include <tyranscript/tyran_constants.h>
 

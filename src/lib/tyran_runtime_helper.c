@@ -5,7 +5,6 @@
 #include <tyranscript/tyran_runtime_stack.h>
 #include <tyranscript/tyran_opcodes.h>
 #include <tyranscript/tyran_opcode.h>
-#include "tyran_runtime_helper.h"
 #include "tyran_value_convert.h"
 
 #include <tyranscript/debug/tyran_print_value.h>

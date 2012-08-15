@@ -1,5 +1,5 @@
 #include <tyranscript/parser/mocha/tyran_mocha_lexer.h>
-#include <tyranscript/parser/mocha/tyran_mocha_lexer_debug.h>
+#include <tyranscript/debug/mocha/tyran_mocha_lexer_debug.h>
 #include <tyranscript/parser/common/tyran_parser_tree.h>
 
 typedef struct tyran_mocha_operator_info {

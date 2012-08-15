@@ -8,7 +8,6 @@
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_object_array.h>
 #include <tyranscript/tyran_value_object.h>
-#include <tyranscript/tyran_scope.h>
 #include <tyranscript/debug/tyran_print_value.h>
 
 struct tyran_value* tyran_function_prototype;

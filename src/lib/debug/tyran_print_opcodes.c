@@ -189,7 +189,7 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 			print_r_rc(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_LD:
-			print_r_c(code, constants, buf, size);
+			print_r_r(code, buf, size);
 			break;
 		case TYRAN_OPCODE_LDC:
 			print_r_c(code, constants, buf, size);
@@ -233,8 +233,6 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 			print_r_r_rc(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_KEY:
-			print_r_r(code, buf, size);
-			break;
 		case TYRAN_OPCODE_NEXT:
 			print_r_r(code, buf, size);
 			break;
