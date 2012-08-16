@@ -20,7 +20,7 @@ typedef enum {
 typedef struct tyran_value {
 	tyran_value_type type;
 	union {
-		u32t boolean;
+		tyran_boolean boolean;
 		tyran_number number;
 		const struct tyran_string* str;
 		struct tyran_object* object;

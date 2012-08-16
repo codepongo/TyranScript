@@ -4,7 +4,7 @@
 #include <tyranscript/tyran_function.h>
 #include <tyranscript/tyran_object_macros.h>
 
-tyran_constants* tyran_constants_new(int size)
+tyran_constants* tyran_constants_new(size_t size)
 {
 	tyran_constants* constants = TYRAN_CALLOC(tyran_constants);
 	constants->values = TYRAN_MALLOC_TYPE(tyran_value, size);
@@ -19,7 +19,7 @@ void tyran_constants_free(tyran_constants* constants)
 
 tyran_constant_index tyran_constants_reserve_index(struct tyran_constants* constants, tyran_value* v)
 {
-	int i;
+	tyran_constant_index i;
 	for (i=0; i<constants->size; ++i)
 	{
 		if (tyran_value_is_same(&constants->values[i], v)) {
