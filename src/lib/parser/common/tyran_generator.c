@@ -4,6 +4,8 @@
 #include <tyranscript/parser/common/tyran_variable_scope.h>
 #include <tyranscript/tyran_constants.h>
 
+#include <tyranscript/debug/parser/tyran_print_parser_tree.h>
+
 tyran_reg_or_constant_index tyran_generator_traverse(tyran_code_state* code, tyran_parser_node* tree, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic);
 
 tyran_reg_index tyran_generator_traverse_force_register(tyran_code_state* code, tyran_parser_node* node, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic, tyran_reg_index force_register) {
@@ -144,7 +146,7 @@ tyran_reg_index tyran_generator_traverse_call(tyran_code_state* code, tyran_pars
 	
 	int i;
 	
-	start_register = tyran_variable_scope_top_free(code->scope);
+	start_register = tyran_variable_scopes_top_free(code->scope, return_value_count);
 	tyran_reg_or_constant_index function_register =  tyran_generator_traverse(code, call_node->function_node, 0, 0, 0);
 	tyran_opcodes_op_ld(code->opcodes, start_register, function_register);
 	
@@ -200,8 +202,6 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 		target = TYRAN_OPCODE_REGISTER_ILLEGAL;
 		tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
 		break;
-	case TYRAN_PARSER_CONCAT:
-		break;
 	default:
 		TYRAN_ERROR("Unhandled operator");
 	}
@@ -235,15 +235,18 @@ tyran_reg_index tyran_generator_traverse_default_binary(tyran_code_state* code, 
 	tyran_reg_or_constant_index left_index = tyran_generator_traverse(code, binary->left, true_label, false_label, invert_logic);
 	tyran_reg_or_constant_index right_index = tyran_generator_traverse(code, binary->right, true_label, false_label, invert_logic);
 	
-	tyran_reg_index target_index = tyran_generator_handle_operator(code, binary, left_index, right_index, true_label, false_label, invert_logic);
-	
+	tyran_reg_index target_index;
 	if (binary->operator_type != TYRAN_PARSER_CONCAT) {
+		target_index = tyran_generator_handle_operator(code, binary, left_index, right_index, true_label, false_label, invert_logic);
+	
 		if (!tyran_opcodes_is_constant(right_index)) {
 			tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)right_index);
 		}
 		if (!tyran_opcodes_is_constant(left_index)) {
 			tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)left_index);
 		}
+	} else {
+		target_index = right_index;
 	}
 	return target_index;
 }

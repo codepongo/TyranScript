@@ -268,7 +268,7 @@ typedef struct tyran_parser_node_undefined
 
 
 
-void tyran_parser_node_print(const char* description, tyran_parser_node* current_root, tyran_parser_node* node);
+
 
 struct tyran_parser* tyran_parser_new(const char* buf);
 int tyran_parser_parse(const char* buf, int length);

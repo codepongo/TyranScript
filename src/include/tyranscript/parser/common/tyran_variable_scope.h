@@ -37,7 +37,8 @@ tyran_reg_index tyran_variable_scopes_define_identifier(tyran_variable_scopes* s
 tyran_reg_index tyran_variable_scopes_define_temporary_variable(tyran_variable_scopes* scope);
 void tyran_variable_scopes_undefine_variable(tyran_variable_scopes* scope, tyran_reg_index index);
 
-tyran_reg_index tyran_variable_scope_top_free(tyran_variable_scopes* scopes);
+tyran_reg_index tyran_variable_scope_top_free(tyran_variable_scope* scopes, int return_count);
+tyran_reg_index tyran_variable_scopes_top_free(tyran_variable_scopes* scopes, int return_count);
 
 void tyran_variable_scopes_push_scope(tyran_variable_scopes* scopes);
 void tyran_variable_scopes_pop_scope(tyran_variable_scopes* scopes);

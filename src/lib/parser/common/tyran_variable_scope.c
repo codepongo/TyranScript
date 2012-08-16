@@ -65,12 +65,6 @@ void tyran_variable_scopes_undefine_variable(tyran_variable_scopes* scopes, tyra
 	tyran_variable_scope_undefine_variable(tyran_variable_scopes_top(scopes), index);
 }
 
-
-tyran_reg_index tyran_variable_scope_top_free(tyran_variable_scopes* scopes)
-{
-	return tyran_variable_scopes_top(scopes)->highest_register_used + 1;
-}
-
 void tyran_variable_scope_add_identifier(tyran_variable_scope* scope, const char* variable_name, tyran_reg_index register_index)
 {
 	TYRAN_ASSERT(scope->variable_count < scope->allocated_variable_count, "Out of memory adding an identifier");
@@ -86,6 +80,24 @@ void tyran_variable_scope_reserve_variable(tyran_variable_scope* scope, tyran_re
 		scope->highest_register_used = i;
 	}
 	scope->registers[i] = status;
+}
+
+
+tyran_reg_index tyran_variable_scope_top_free(tyran_variable_scope* scope, int return_count)
+{
+	int highest = scope->highest_register_used + 1;
+	int i;
+	for (i = highest; i < highest + return_count; ++i) {
+		tyran_variable_scope_reserve_variable(scope, i, 1);
+	}
+	
+	return highest;
+}
+
+
+tyran_reg_index tyran_variable_scopes_top_free(tyran_variable_scopes* scopes, int return_count)
+{
+	return tyran_variable_scope_top_free(tyran_variable_scopes_top(scopes), return_count);
 }
 
 tyran_reg_index tyran_variable_scope_find_and_reserve_variable(tyran_variable_scope* scope, int status)

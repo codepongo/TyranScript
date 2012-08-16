@@ -1,6 +1,7 @@
 #include <tyranscript/tyran_api.h>
 #include <tyranscript/parser/mocha/tyran_mocha_lexer.h>
 #include <tyranscript/debug/mocha/tyran_mocha_lexer_debug.h>
+#include <tyranscript/debug/parser/tyran_print_parser_tree.h>
 #include <tyranscript/parser/mocha/tyran_mocha_parser.h>
 #include <tyranscript/parser/common/tyran_generator.h>
 #include <tyranscript/parser/common/tyran_code.h>
