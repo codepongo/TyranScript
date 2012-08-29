@@ -6,14 +6,15 @@
 #include <tyranscript/parser/common/tyran_code.h>
 #include <tyranscript/tyran_constants.h>
 
-tyran_code_state* tyran_code_new()
+tyran_code_state* tyran_code_new(tyran_memory_pool* code_state_pool, tyran_memory_pool* opcodes_pool, tyran_memory_pool* constants_pool, tyran_memory_pool* constant_values_pool, tyran_memory_pool* label_pool, tyran_memory_pool* label_reference_pool, tyran_memory_pool* scopes_pool, tyran_memory_pool* scope_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, tyran_memory* memory)
 {
-	tyran_code_state* state = TYRAN_CALLOC(tyran_code_state);
-	state->opcodes = tyran_opcodes_new(1024);
-	state->constants = tyran_constants_new(1024);
-	state->scope = tyran_variable_scopes_new(1024);
-	state->labels = TYRAN_CALLOC_COUNT(100, tyran_label);
-	state->label_references = TYRAN_CALLOC_COUNT(100, tyran_label_reference);
+	tyran_code_state* state = TYRAN_CALLOC_TYPE(code_state_pool, tyran_code_state);
+	state->opcodes = tyran_opcodes_new(opcodes_pool, memory, 1024);
+	state->constants = tyran_constants_new(constants_pool, constant_values_pool, 1024);
+	
+	state->scope = tyran_variable_scopes_new(scopes_pool, scope_pool, variable_info_pool, register_pool, 1024);
+	state->labels = TYRAN_CALLOC_TYPE_COUNT(label_pool, 100, tyran_label);
+	state->label_references = TYRAN_CALLOC_TYPE_COUNT(label_reference_pool, 100, tyran_label_reference);
 	return state;
 }
 
@@ -36,14 +37,14 @@ void tyran_code_define_label(tyran_code_state* state, tyran_label_id label_index
 }
 
 
-void tyran_code_add_label(tyran_code_state* state, tyran_string* name)
+void tyran_code_add_label(tyran_code_state* state, const char* name)
 {
 	tyran_label_id label_index = tyran_code_label_new(state);
 
 	tyran_code_define_label(state, label_index);
 
 	struct tyran_label* label = &state->labels[label_index];
-	label->name = tyran_string_strdup(name);
+	label->name = tyran_strdup(name);
 }
 
 void tyran_code_add_label_index_reference(tyran_code_state* state, tyran_label_id label_index)
@@ -55,12 +56,12 @@ void tyran_code_add_label_index_reference(tyran_code_state* state, tyran_label_i
 }
 
 
-int tyran_code_get_label(struct tyran_label* labels, int count, const tyran_string* name)
+int tyran_code_get_label(struct tyran_label* labels, int count, const char* name)
 {
 	int i;
 	for (i=0; i<count; ++i)
 	{
-		if (tyran_string_strcmp(labels[i].name, name) == 0) {
+		if (tyran_strcmp(labels[i].name, name) == 0) {
 			return i;
 		}
 	}

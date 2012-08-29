@@ -14,6 +14,6 @@
 	<linker program="g++" flags="" />
 
 	<source directory="../lib" recursive="true"/>
-	<source directory="../samples/console" recursive="true"/>
+	<source directory="../samples/command" recursive="true"/>
 	<header directory="../include" />
 </target>

@@ -40,9 +40,9 @@ void* tyran_object_key_get(struct stree_node* node)
 	return (void*) ((tyran_rb_tree_key_value_node*)(node->node))->key;
 }
 
-tyran_object* tyran_object_new(const struct tyran_runtime* runtime)
+tyran_object* tyran_object_new(tyran_memory_pool* object_pool, const struct tyran_runtime* runtime)
 {
-	tyran_object* object = TYRAN_CALLOC(tyran_object);
+	tyran_object* object = TYRAN_CALLOC_TYPE(object_pool, tyran_object);
 	object->tree = new_rbtree(tyran_object_key_get, tyran_object_key_compare);
 	object->created_in_runtime = runtime;
 	return object;
@@ -71,37 +71,25 @@ void tyran_object_free(struct tyran_object* object)
 	tyran_free(object);
 }
 
-void tyran_object_extend_length_if_needed(struct tyran_object* object, int inserted_index)
+void tyran_object_insert_key(tyran_memory_pool* rb_node_pool, struct tyran_object* object, const struct tyran_object_key* key, struct tyran_value* value)
 {
-	int len = tyran_object_length(object);
-	if (len < 0) {
-		return;
-	}
-
-	if (len < inserted_index + 1) {
-		tyran_object_set_length(object, inserted_index + 1);
-	}
-}
-
-void tyran_object_insert_key(struct tyran_object* object, const struct tyran_object_key* key, struct tyran_value* value)
-{
-	tyran_rb_tree_key_value_node* node = TYRAN_MALLOC_TYPE(tyran_rb_tree_key_value_node, 1);
+	tyran_rb_tree_key_value_node* node = TYRAN_MALLOC_TYPE_COUNT(rb_node_pool, tyran_rb_tree_key_value_node, 1);
 	node->key = key;
 	tyran_value_copy(node->value, *value);
 	rb_tree_insert(object->tree, node);
 }
 
-void tyran_object_insert_c_string_key(struct tyran_object* object, const char* key_string, struct tyran_value* value)
+void tyran_object_insert_c_string_key(tyran_memory_pool* object_key_pool, tyran_memory_pool* rb_node_pool, struct tyran_object* object, const char* key_string, struct tyran_value* value)
 {
-	const tyran_string* s = tyran_string_from_c_str(key_string);
-	tyran_object_insert_string_key(object, s, value);
+	// const tyran_string* s = tyran_string_from_c_str(key_string);
+	// tyran_object_insert_string_key(object_key_pool, rb_node_pool, object, s, value);
 }
 
-void tyran_object_insert_string_key(struct tyran_object* object, const struct tyran_string* key_string, struct tyran_value* value)
+void tyran_object_insert_string_key(tyran_memory_pool* object_key_pool, tyran_memory_pool* rb_node_pool, struct tyran_object* object, const struct tyran_string* key_string, struct tyran_value* value)
 {
 	tyran_object_key_flag_type flag = tyran_object_key_flag_normal;
-	const struct tyran_object_key* key = tyran_object_key_new(key_string, flag);
-	tyran_object_insert_key(object, key, value);
+	const struct tyran_object_key* key = tyran_object_key_new(object_key_pool, key_string, flag);
+	tyran_object_insert_key(rb_node_pool, object, key, value);
 }
 
 void tyran_object_insert_array(struct tyran_object* object, int index, struct tyran_value* value)
@@ -131,7 +119,7 @@ void tyran_object_delete(struct tyran_object* object, const struct tyran_object_
 	rb_tree_delete(object->tree, (void*)key);
 }
 
-void tyran_object_get_keys(const struct tyran_object* target, tyran_object_iterator* target_iterator)
+void tyran_object_get_keys(tyran_memory_pool* object_key_pool, const struct tyran_object* target, tyran_object_iterator* target_iterator)
 {
 	tree_root* root = target->tree;
 
@@ -139,13 +127,13 @@ void tyran_object_get_keys(const struct tyran_object* target, tyran_object_itera
 	while (tree_iterator_has_next(iterator)) {
 		tyran_rb_tree_key_value_node* node = (tyran_rb_tree_key_value_node*) tree_iterator_next(iterator);
 		if (tyran_object_key_has_enumerate(node->key)) {
-			tyran_object_iterator_insert(target_iterator, node->key);
+			tyran_object_iterator_insert(object_key_pool, target_iterator, node->key);
 		}
 	}
 	destroy_iterator(iterator);
 
 	if (target->prototype) {
-		tyran_object_get_keys(target->prototype->data.object, target_iterator);
+		tyran_object_get_keys(object_key_pool, target->prototype->data.object, target_iterator);
 	}
 }
 
@@ -153,7 +141,7 @@ void tyran_object_set_prototype(struct tyran_object* target, struct tyran_value*
 {
 	// TYRAN_ASSERT(target->prototype == 0, "Prototype already set, this is a problem");
 	TYRAN_OBJECT_RETAIN(proto->data.object);
-	tyran_object_insert_key(target, target->created_in_runtime->prototype_key, proto);
+	// tyran_object_insert_key(target, target->created_in_runtime->prototype_key, proto);
 	target->prototype = proto;
 }
 
@@ -170,36 +158,6 @@ tyran_value* tyran_object_lookup_prototype(const struct tyran_object* o, const s
 	return retValue;
 }
 
-tyran_object* tyran_object_new_from_items(const struct tyran_runtime* runtime, const struct tyran_value* items, int count)
-{
-	tyran_object* object = tyran_object_new(runtime);
-	const struct tyran_object_key* ok;
-	tyran_value* v;
-	int i;
-
-	for (i = 0; i < count; i += 2) {
-		ok = tyran_object_key_new(items[i].data.str, tyran_object_key_flag_normal);
-		v = tyran_value_new();
-		tyran_value_copy(*v, items[i + 1]);
-		tyran_object_insert_key(object, ok, v);
-	}
-	tyran_object_set_prototype(object, tyran_object_prototype);
-	return object;
-}
-
-void tyran_object_set_length(struct tyran_object* object, int len)
-{
-	tyran_object_key_flag_type flag;
-	tyran_value* r = tyran_object_lookup(object, object->created_in_runtime->length_key, &flag);
-	if (!r) {
-		tyran_value* n = tyran_value_new();
-		tyran_value_set_number(*n, len);
-
-		tyran_object_insert_key(object, object->created_in_runtime->length_key, n);
-	} else {
-		tyran_value_set_number(*r, len);
-	}
-}
 
 int tyran_object_length(const struct tyran_object* object)
 {

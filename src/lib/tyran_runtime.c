@@ -60,11 +60,13 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 
 	// Context
 	const tyran_opcode* pc = sp->pc;
-	tyran_value* registers = TYRAN_MALLOC_TYPE(tyran_value, 128);
+	tyran_value* registers = runtime->registers;
 	tyran_value_copy(registers[0], *sp->_this);
 
 	tyran_value* r = registers;
 	const tyran_value* c = sp->c;
+	
+	tyran_object* object;
 
 
 	u32t i;
@@ -244,13 +246,14 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_NEW:
 			TYRAN_REGISTER_A;
-			tyran_value_set_object(r[a], tyran_object_pool_alloc(runtime->object_pool));
+			object = TYRAN_CALLOC_TYPE(object_pool, tyran_object);
+			tyran_value_set_object(r[a], object);
 			break;
 		case TYRAN_OPCODE_GET: {
 			TYRAN_REGISTER_A_RCX_RCY;
 			TYRAN_ASSERT(tyran_value_is_string(&rcy), "Must use string to lookup. for now");
 			tyran_object_key_flag_type flag = tyran_object_key_flag_normal;
-			const struct tyran_object_key* key = tyran_object_key_new(rcy.data.str, flag);
+			const struct tyran_object_key* key = tyran_object_key_new(runtime->object_key_pool, rcy.data.str, flag);
 			TYRAN_ASSERT(tyran_value_is_object(&rcx), "Must lookup object");
 			tyran_value* v = tyran_value_object_lookup(&rcx, key, &flag);
 			tyran_value_copy(r[a], *v);
@@ -270,8 +273,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A_RCX;
 			TYRAN_ASSERT(c[x].type == TYRAN_VALUE_TYPE_STATIC_FUNCTION, "Must be a function");
 			tyran_function* static_function = c[x].data.static_function;
-			tyran_function_object* function_object = tyran_function_object_new(static_function);
-			tyran_object* object = tyran_object_new(runtime);
+			tyran_function_object* function_object = tyran_function_object_new(runtime->function_object_pool, static_function);
+			tyran_object* object = tyran_object_new(runtime->object_pool, runtime);
 			tyran_object_set_function(object, function_object);
 			tyran_value_set_object(r[a], object);
 			}

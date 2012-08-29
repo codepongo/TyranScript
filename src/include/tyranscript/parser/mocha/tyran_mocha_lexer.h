@@ -1,6 +1,8 @@
 #ifndef _TYRAN_MOCHA_LEXER_H
 #define _TYRAN_MOCHA_LEXER_H
 
+struct tyran_memory_pool;
+struct tyran_memory;
 
 typedef enum tyran_mocha_token_id {
 	TYRAN_MOCHA_TOKEN_END,
@@ -79,7 +81,7 @@ typedef struct tyran_mocha_lexer {
 
 tyran_mocha_lexer* tyran_mocha_lexer_new();
 void tyran_mocha_lexer_destroy(tyran_mocha_lexer* lexer);
-tyran_mocha_lexer* tyran_mocha_lexer_lex(const char* buf, int length);
+tyran_mocha_lexer* tyran_mocha_lexer_lex(struct tyran_memory_pool* mocha_lexer_pool, struct tyran_memory_pool* mocha_token_pool, struct tyran_memory_pool* lexer_pool, struct tyran_memory* memory, const char* buf, int length);
 
 tyran_mocha_token* tyran_mocha_lexer_find(tyran_mocha_token* first, tyran_mocha_token* last, tyran_mocha_token_id id);
 tyran_mocha_token* tyran_mocha_lexer_find_terminator(tyran_mocha_token* first, tyran_mocha_token* last);

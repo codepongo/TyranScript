@@ -8,6 +8,7 @@ struct tyran_value;
 struct tyran_opcodes;
 struct tyran_string_array;
 struct tyran_constants;
+struct tyran_memory_pool;
 
 typedef enum {
 	tyran_function_type_normal,
@@ -25,7 +26,7 @@ typedef struct tyran_function {
 	const struct tyran_constants* constants;
 } tyran_function;
 
-tyran_function* tyran_function_new(const struct tyran_opcodes* opcodes, const struct tyran_constants* constants);
-tyran_function* tyran_function_callback_new(tyran_function_callback callback);
+tyran_function* tyran_function_new(struct tyran_memory_pool* function_pool, const struct tyran_opcodes* opcodes, const struct tyran_constants* constants);
+tyran_function* tyran_function_callback_new(struct tyran_memory_pool* function_pool, tyran_function_callback callback);
 
 #endif

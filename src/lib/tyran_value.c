@@ -12,17 +12,10 @@ void tyran_value_set_program_specific(tyran_value* value, void* program_specific
 	value->data.object->program_specific = program_specific_context;
 }
 
-tyran_value* tyran_value_new()
+tyran_value* tyran_value_new(tyran_memory_pool* value_pool)
 {
-	tyran_value* value = TYRAN_CALLOC(tyran_value);
+	tyran_value* value = TYRAN_CALLOC_TYPE(value_pool, tyran_value);
 	return value;
-}
-
-tyran_value* tyran_value_duplicate(const tyran_value* value)
-{
-	tyran_value* duplicate = tyran_value_new();
-	tyran_value_copy(*duplicate, *value);
-	return duplicate;
 }
 
 void tyran_value_free(tyran_value* value)

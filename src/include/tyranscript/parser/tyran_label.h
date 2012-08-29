@@ -4,7 +4,7 @@
 struct tyran_string;
 
 typedef struct tyran_label {
-	const struct tyran_string* name;
+	const char* name;
 	int position;
 } tyran_label;
 

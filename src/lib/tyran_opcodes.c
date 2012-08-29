@@ -7,10 +7,10 @@ int tyran_opcodes_is_constant(tyran_reg_or_constant_index index)
 }
 
 /* Opcodes */
-struct tyran_opcodes* tyran_opcodes_new(int size)
+struct tyran_opcodes* tyran_opcodes_new(tyran_memory_pool* opcodes_pool, tyran_memory* memory, int size)
 {
-	tyran_opcodes* codes = TYRAN_CALLOC(tyran_opcodes);
-	codes->codes = TYRAN_MALLOC_TYPE(tyran_opcode, size);
+	tyran_opcodes* codes = TYRAN_CALLOC_TYPE(opcodes_pool, tyran_opcodes);
+	codes->codes = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_opcode, size);
 	return codes;
 }
 

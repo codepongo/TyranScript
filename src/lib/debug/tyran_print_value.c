@@ -9,8 +9,8 @@
 #include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_number.h>
+#include <tyranscript/tyran_string.h>
 
-#include "../tyran_string_array.h"
 #include <tyranscript/debug/tyran_print_value.h>
 
 void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, int quote)
@@ -160,8 +160,8 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 			}
 		} /*else*/ {
 			tabs++;
-			tyran_object_iterator* target_iterator = tyran_object_iterator_new();
-			tyran_object_get_keys(v->data.object, target_iterator);
+			tyran_object_iterator* target_iterator = tyran_object_iterator_new(0);
+			tyran_object_get_keys(0, v->data.object, target_iterator);
 			tyran_object_key_flag_type flag;
 			int i;
 			for (i=0; i<target_iterator->count; ++i) {

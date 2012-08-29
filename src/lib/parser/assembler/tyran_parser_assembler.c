@@ -101,7 +101,7 @@ static int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffe
 	return 0;
 }
 
-int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
+int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, char* token, int max_size)
 {
 	char buf[512];
 	int len = 512;
@@ -122,13 +122,13 @@ int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c
 		return TYRAN_TOKEN_ASSEMBLER_FALSE;
 	}
 
-	*token = (void*) tyran_string_from_c_str(buf);
+	tyran_strncpy(token, max_size, buf, 512);
 	tyran_lexer_set_end(lexer_position_info, lexer);
 	return TYRAN_TOKEN_ASSEMBLER_IDENTIFIER;
 }
 
 
-static int tyran_lexer_assembler_next_token(tyran_lexer_token_data token, tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
+static int tyran_lexer_assembler_next_token(tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
 	tyran_lexer_set_begin(lexer_position_info, lexer);
 
@@ -150,12 +150,12 @@ static int tyran_lexer_assembler_next_token(tyran_lexer_token_data token, tyran_
 	}
 
 	if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
-		return tyran_lexer_assembler_parse_identifier_or_keyword(lexer, c, lexer_position_info, &token);
+		return tyran_lexer_assembler_parse_identifier_or_keyword(lexer, c, lexer_position_info, lexer->string_buffer, lexer->string_buffer_max_size);
 	} else if (tyran_lexer_is_digit(c) || c == '-') {
-		return tyran_lexer_parse_number(lexer, c, lexer_position_info, &token);
+		return tyran_lexer_parse_number(lexer, c, lexer_position_info, &lexer->number);
 		return TYRAN_TOKEN_ASSEMBLER_NUMBER;	
 	} else if (c == '"' || c == '\'') {
-		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, &token);
+		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, lexer->string_buffer, lexer->string_buffer_max_size);
 		return TYRAN_TOKEN_ASSEMBLER_STRING;
 	} else if (c == '#') {
 		int r = tyran_lexer_parse_to_eol(lexer);
@@ -178,45 +178,40 @@ void error()
 
 void parse_r_index(tyran_parser_state* state, tyran_reg_index* a)
 {
-	tyran_number* number;
 	tyran_lexer_position_info position;
-	int token = tyran_lexer_assembler_next_token(&number, &position, state->lexer);
+	int token = tyran_lexer_assembler_next_token(&position, state->lexer);
 	if (token != TYRAN_TOKEN_ASSEMBLER_NUMBER) {
 		return error();
 	}
 
-	*a = (int) *number;
+	*a = (int) state->lexer->number;
 }
 
 void parse_s(tyran_parser_state* state, int* s)
 {
-	tyran_number* number;
 	tyran_lexer_position_info position;
 
-	int token = tyran_lexer_assembler_next_token(&number, &position, state->lexer);
-	if (token != TYRAN_TOKEN_ASSEMBLER_NUMBER)
-	{
+	int token = tyran_lexer_assembler_next_token(&position, state->lexer);
+	if (token != TYRAN_TOKEN_ASSEMBLER_NUMBER) {
 		error();
 	} else {
-		*s = *number;
+		*s = state->lexer->number;
 	}
 }
 
 tyran_reg_or_constant_index parse_constant(tyran_parser_state* parser_state, tyran_lexer_position_info* lexer_position, int allow_register)
 {
-	tyran_lexer_token_data data;
-
-	int token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
+	int token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
 	switch (token) {
 		case TYRAN_TOKEN_ASSEMBLER_NUMBER:
-			return tyran_constants_add_number(parser_state->constants, *(tyran_number*)data);
+			return tyran_constants_add_number(parser_state->constants, parser_state->lexer->number);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_STRING:
-			return tyran_constants_add_string(parser_state->constants, (tyran_string*)data);
+			return tyran_constants_add_string(parser_state->constants, (tyran_string*) parser_state->lexer->string_buffer);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_TRUE:
 		case TYRAN_TOKEN_ASSEMBLER_FALSE:
-			return tyran_constants_add_boolean(parser_state->constants, *(tyran_boolean*)data);
+			return tyran_constants_add_boolean(parser_state->constants, 0);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_REGISTER:
 			if (!allow_register) {
@@ -246,7 +241,7 @@ void parse_r(tyran_parser_state* state, tyran_reg_index* a)
 {
 	tyran_lexer_position_info position;
 
-	int token = tyran_lexer_assembler_next_token((tyran_lexer_token_data*)0, &position, state->lexer);
+	int token = tyran_lexer_assembler_next_token(&position, state->lexer);
 	if (token != TYRAN_TOKEN_ASSEMBLER_REGISTER) {
 		return error();
 	}
@@ -255,10 +250,10 @@ void parse_r(tyran_parser_state* state, tyran_reg_index* a)
 
 void parse_identifier(tyran_parser_state* state)
 {
-	tyran_string* name;
+	char* name;
 	tyran_lexer_position_info position;
 
-	int token = tyran_lexer_assembler_next_token((tyran_lexer_token_data*)&name, &position, state->lexer);
+	int token = tyran_lexer_assembler_next_token(&position, state->lexer);
 	if (token != TYRAN_TOKEN_ASSEMBLER_IDENTIFIER) {
 		return error();
 	}
@@ -270,7 +265,7 @@ void parse_b(tyran_parser_state* state, tyran_boolean* b)
 {
 	tyran_lexer_position_info position;
 
-	int token = tyran_lexer_assembler_next_token((tyran_lexer_token_data*)0, &position, state->lexer);
+	int token = tyran_lexer_assembler_next_token(&position, state->lexer);
 	if (token != TYRAN_TOKEN_ASSEMBLER_TRUE && token != TYRAN_TOKEN_ASSEMBLER_FALSE) {
 		return error();
 	}
@@ -338,7 +333,7 @@ void parse_r_s_s(tyran_parser_state* state, tyran_reg_index* a, int* s, int* s2)
 }
 
 
-void tyran_lexer_assembler_end_of_function(tyran_parser_state* parser_state)
+void tyran_lexer_assembler_end_of_function(tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* value_pool, tyran_memory_pool* object_pool, tyran_parser_state* parser_state)
 {
 	TYRAN_LOG("*** End of function!");
 
@@ -346,27 +341,26 @@ void tyran_lexer_assembler_end_of_function(tyran_parser_state* parser_state)
 	tyran_print_constants(parser_state->constants);
 	tyran_print_opcodes(parser_state->opcodes, 0, parser_state->constants);
 
-	tyran_function* func = tyran_function_new(parser_state->opcodes, parser_state->constants);
+	tyran_function* func = tyran_function_new(function_pool, parser_state->opcodes, parser_state->constants);
 	tyran_parser_state_reset(parser_state);
 
-	tyran_function_object* func_obj = tyran_function_object_new(func);
-	tyran_value* func_value_obj = tyran_value_new();
+	tyran_function_object* func_obj = tyran_function_object_new(function_object_pool, func);
+	tyran_value* func_value_obj = tyran_value_new(value_pool);
 
-	tyran_object* obj = tyran_object_new(parser_state->runtime);
+	tyran_object* obj = tyran_object_new(object_pool, parser_state->runtime);
 	tyran_object_set_function(obj, func_obj);
 
 	tyran_value_set_object(*func_value_obj, obj);
 	tyran_value_object_insert_c_string_key(&parser_state->context, parser_state->function_name, func_value_obj);
 }
 
-int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
+int tyran_lexer_assembler_parse_one(tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* value_pool, tyran_memory_pool* object_pool, tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
 {
-	tyran_lexer_token_data data;
-	int token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
+	int token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
 	if (token == 0) {
 		TYRAN_LOG("END OF FILE!");
 		if (parser_state->inside_function) {
-			tyran_lexer_assembler_end_of_function(parser_state);
+			tyran_lexer_assembler_end_of_function(function_pool, function_object_pool, value_pool, object_pool, parser_state);
 		}
 		return 0;
 	}
@@ -382,27 +376,27 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 
 	switch (token) {
 		case TYRAN_TOKEN_ASSEMBLER_MEMBER:
-			token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
+			token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
 			if (token == TYRAN_TOKEN_ASSEMBLER_FUNC) {
 				if (parser_state->inside_function) {
-					tyran_lexer_assembler_end_of_function(parser_state);
+					tyran_lexer_assembler_end_of_function(function_pool, function_object_pool, value_pool, object_pool, parser_state);
 				}
-				token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
+				token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
 				if (token != TYRAN_TOKEN_ASSEMBLER_IDENTIFIER) {
 					error();
 					return -1;
 				}
 				{
-					tyran_string_to_c_str(parser_state->function_name, 512, (tyran_string*)data);
+					tyran_strndup(parser_state->function_name, 512, parser_state->lexer->string_buffer);
 					TYRAN_LOG("function '%s'", parser_state->function_name);
 				}
 				parser_state->inside_function = 1;
 			}
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_IDENTIFIER:
-			token = tyran_lexer_assembler_next_token(&data, lexer_position, parser_state->lexer);
+			token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
 			if (token == TYRAN_TOKEN_ASSEMBLER_COLON) {
-				tyran_code_add_label(parser_state->code, (tyran_string*)data);
+				tyran_code_add_label(parser_state->code, parser_state->lexer->string_buffer);
 			} else {
 				TYRAN_LOG("error token:%d", token);
 				error();
@@ -420,7 +414,7 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_LDB:
 			parse_r_b(parser_state, &a, &b);
-			tyran_opcodes_op_ldb(opcodes, a, *(int *)data);
+			tyran_opcodes_op_ldb(opcodes, a, parser_state->lexer->number);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_LDN:
 			parse_r_s(parser_state, &a, &s);
@@ -507,11 +501,11 @@ int tyran_lexer_assembler_parse_one(tyran_lexer_position_info* lexer_position, t
 	return token;
 }
 
-int tyran_lexer_assembler_parse(tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
+int tyran_lexer_assembler_parse(tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* value_pool, tyran_memory_pool* object_pool, tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
 {
 	int token;
 	do {
-		token = tyran_lexer_assembler_parse_one(lexer_position, parser_state);
+		token = tyran_lexer_assembler_parse_one(function_pool, function_object_pool, value_pool, object_pool, lexer_position, parser_state);
 	} while (token != 0);
 	
 	return 0;

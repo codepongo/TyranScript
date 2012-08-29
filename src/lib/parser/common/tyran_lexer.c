@@ -11,12 +11,15 @@
 
 const int TYRAN_TOKEN_COMMENT = -1;
 
-tyran_lexer* tyran_lexer_new(const char* buf)
+tyran_lexer* tyran_lexer_new(tyran_memory_pool* lexer_pool, tyran_memory* memory, const char* buf)
 {
 	int length = tyran_strlen(buf);
-	tyran_lexer* lexer = TYRAN_CALLOC(tyran_lexer);
+	tyran_lexer* lexer = TYRAN_CALLOC_TYPE(lexer_pool, tyran_lexer);
 	lexer->size = length + 1;
-	lexer->buffer = TYRAN_MALLOC_TYPE(char, lexer->size);
+	lexer->buffer = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, lexer->size);
+	lexer->string_buffer_max_size = 512;
+	lexer->string_buffer = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, lexer->string_buffer_max_size);
+	
 	tyran_memcpy_type(char, lexer->buffer, buf, lexer->size);
 	return lexer;
 }
@@ -183,7 +186,7 @@ int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max
 	return 0;
 }
 
-int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
+int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_number* number_pointer)
 {
 	int decimal_point_detected = 0;
 	int hex_number_detected = 0;
@@ -225,7 +228,6 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_in
 
 	buf[string_index] = 0;
 
-	tyran_number* number_pointer = TYRAN_MALLOC_TYPE(tyran_number, 1);
 	if (hex_number_detected) {
 		unsigned int temp_value;
 		tyran_sscanf(buf, "%X", &temp_value);
@@ -235,7 +237,6 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_in
 		tyran_sscanf(buf, "%f", number_pointer);
 	}
 
-	*token = number_pointer;
 	return 1;
 }
 
@@ -249,14 +250,10 @@ int tyran_lexer_parse_to_eol(tyran_lexer* lexer)
 	return 0;
 }
 
-int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_lexer_token_data* token)
+int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, char* buf, int length)
 {
 	tyran_lexer_push_character(c, lexer);
-	char buf[256];
-	int length = 256;
 	tyran_lexer_parse_string(lexer, buf, &length);
-	char* copy = tyran_strdup(buf);
-	*token = copy;
 	tyran_lexer_set_end(lexer_position_info, lexer);
 	return 1;
 }

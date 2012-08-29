@@ -20,13 +20,49 @@ typedef int tyran_boolean;
 
 typedef unsigned short tyran_uint16;
 
+typedef struct tyran_memory
+{
+	u8t* memory;
+	size_t size;
+	u8t* next;
+} tyran_memory;
+
+typedef struct tyran_memory_pool
+{
+	u8t* memory;
+	size_t size;
+	u8t* next;
+} tyran_memory_pool;
+
+
+void tyran_memory_construct(tyran_memory* memory, u8t* start, size_t size);
+void* tyran_memory_alloc(size_t size);
+void* tyran_memory_alloc_debug(tyran_memory* memory, size_t size, const char* source_file, int line, const char* description);
+
+#define TYRAN_MEMORY_ALLOC(memory, size, description) tyran_memory_alloc_debug(memory, size, __FILE__, __LINE__, description);
+
+
+
+tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count);
+void* tyran_memory_pool_alloc(tyran_memory_pool*, size_t count);
+
+
+#define TYRAN_MEMORY_POOL_CONSTRUCT(memory, T, count) tyran_memory_pool_construct(memory, sizeof(T), count)
+
+
 #define tyran_malloc malloc
 #define tyran_realloc realloc
 #define tyran_free free
-#define TYRAN_CALLOC(T) (T*) calloc(1, sizeof(T));
-#define TYRAN_CALLOC_COUNT(cnt, T) (T*) calloc(cnt, sizeof(T));
-#define TYRAN_MALLOC_TYPE(type, count) (type*) tyran_malloc(sizeof(type) * count);
-#define TYRAN_MALLOC(count) tyran_malloc(count);
+
+
+#define TYRAN_CALLOC_TYPE(pool, T) (T*) calloc(1, sizeof(T));
+#define TYRAN_CALLOC_TYPE_COUNT(pool, cnt, T) (T*) calloc(cnt, sizeof(T));
+
+#define TYRAN_MALLOC_TYPE(pool, type) (type*) tyran_memory_pool_alloc(pool, 1);
+#define TYRAN_MALLOC_TYPE_COUNT(pool, type, count) (type*) tyran_memory_pool_alloc(pool, count);
+
+#define TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, type, count) (type*) tyran_memory_alloc(count * sizeof(type));
+
 #define tyran_memcpy_type(T, dest, source, N) memcpy(dest, source, (N) * sizeof(T))
 
 

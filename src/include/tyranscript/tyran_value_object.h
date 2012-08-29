@@ -7,9 +7,10 @@ struct tyran_string;
 struct tyran_value;
 struct tyran_runtime;
 struct tyran_object_key;
+struct tyran_memory_pool;
 
 /* Create and Destroy */
-struct tyran_value* tyran_value_object_new(const struct tyran_runtime* runtime);
+struct tyran_value* tyran_value_object_new(struct tyran_memory_pool* value_pool, struct tyran_memory_pool* object_pool, const struct tyran_runtime* runtime);
 void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_value* prototype);
 
 /* Insert and Delete */

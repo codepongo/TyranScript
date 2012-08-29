@@ -1,11 +1,11 @@
 #include <tyranscript/parser/mocha/tyran_mocha_lexer.h>
 #include <tyranscript/parser/tyran_lexer.h>
 
-tyran_mocha_lexer* tyran_mocha_lexer_new(const tyran_mocha_token* tokens, int token_count)
+tyran_mocha_lexer* tyran_mocha_lexer_new(tyran_memory_pool* mocha_lexer_pool, tyran_memory_pool* mocha_token_pool, const tyran_mocha_token* tokens, int token_count)
 {
-	tyran_mocha_lexer* lexer = TYRAN_MALLOC_TYPE(tyran_mocha_lexer, 1);
+	tyran_mocha_lexer* lexer = TYRAN_MALLOC_TYPE(mocha_lexer_pool, tyran_mocha_lexer);
 
-	lexer->tokens = TYRAN_MALLOC_TYPE(tyran_mocha_token, token_count);
+	lexer->tokens = TYRAN_MALLOC_TYPE_COUNT(mocha_token_pool, tyran_mocha_token, token_count);
 	tyran_memcpy_type(tyran_mocha_token, lexer->tokens, tokens, token_count);
 	lexer->token_count = token_count;
 	return lexer;
@@ -194,7 +194,7 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		}
 	} else if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
 		int len = 100;
-		char* identifier = TYRAN_MALLOC_TYPE(char, len);
+		char identifier[100];
 
 		tyran_lexer_parse_identifier(lexer, c, identifier, &len);
 		token_data = identifier;
@@ -207,14 +207,14 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 			token.token_id = TYRAN_MOCHA_TOKEN_IDENTIFIER;
 		}
 	} else if (tyran_lexer_is_digit(c)) {
-		int worked = tyran_lexer_parse_number(lexer, c, lexer_position_info, &token_data);
+		int worked = tyran_lexer_parse_number(lexer, c, lexer_position_info, &lexer->number);
 		if (!worked) {
 			return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
 		}
 		token.token_data = token_data;
 		token.token_id = TYRAN_MOCHA_TOKEN_NUMBER;
 	} else if (c == '"' || c == '\'') {
-		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, &token_data);
+		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, lexer->string_buffer, lexer->string_buffer_max_size);
 		token.token_data = token_data;
 		token.token_id = TYRAN_MOCHA_TOKEN_STRING;
 	} else if (c == '#') {
@@ -234,13 +234,13 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 	return token;
 }
 
-tyran_mocha_lexer* tyran_mocha_lexer_lex(const char* buf, int length)
+tyran_mocha_lexer* tyran_mocha_lexer_lex(tyran_memory_pool* mocha_lexer_pool, tyran_memory_pool* mocha_token_pool, tyran_memory_pool* lexer_pool, tyran_memory* memory, const char* buf, int length)
 {
 	tyran_lexer_position_info position_info;
-	tyran_mocha_token* temp_buffer = TYRAN_MALLOC_TYPE(tyran_mocha_token, 8192);
+	tyran_mocha_token* temp_buffer = TYRAN_MALLOC_TYPE_COUNT(mocha_token_pool, tyran_mocha_token, 8192);
 	int count = 0;
 
-	tyran_lexer* lexer = tyran_lexer_new(buf);
+	tyran_lexer* lexer = tyran_lexer_new(lexer_pool, memory, buf);
 	tyran_mocha_token start_token;
 	start_token.token_id = TYRAN_MOCHA_TOKEN_LINE_START;
 	
@@ -253,8 +253,8 @@ tyran_mocha_lexer* tyran_mocha_lexer_lex(const char* buf, int length)
 			break;
 		}
 	}
-
-	tyran_mocha_lexer* mocha_lexer = tyran_mocha_lexer_new(temp_buffer, count);
+	
+	tyran_mocha_lexer* mocha_lexer = tyran_mocha_lexer_new(mocha_lexer_pool, mocha_token_pool, temp_buffer, count);
 	tyran_free(temp_buffer);
 	
 	return mocha_lexer;

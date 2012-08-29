@@ -4,10 +4,10 @@
 #include <tyranscript/tyran_function.h>
 #include <tyranscript/tyran_object_macros.h>
 
-tyran_constants* tyran_constants_new(size_t size)
+tyran_constants* tyran_constants_new(tyran_memory_pool* constants_pool, tyran_memory_pool* constant_values_pool, size_t size)
 {
-	tyran_constants* constants = TYRAN_CALLOC(tyran_constants);
-	constants->values = TYRAN_MALLOC_TYPE(tyran_value, size);
+	tyran_constants* constants = TYRAN_CALLOC_TYPE(constants_pool, tyran_constants);
+	constants->values = TYRAN_MALLOC_TYPE_COUNT(constant_values_pool, tyran_value, size);
 	return constants;
 }
 
@@ -53,10 +53,10 @@ tyran_constant_index tyran_constants_add_boolean(tyran_constants* constants, tyr
 	return tyran_constants_reserve_index(constants, &value);
 }
 
-tyran_constant_index tyran_constants_add_function(tyran_constants* constants, tyran_opcodes* opcodes)
+tyran_constant_index tyran_constants_add_function(tyran_memory_pool* function_pool, tyran_constants* constants, tyran_opcodes* opcodes)
 {
 	tyran_value value;
-	struct tyran_function* func = tyran_function_new(opcodes, constants);
+	struct tyran_function* func = tyran_function_new(function_pool, opcodes, constants);
 	tyran_value_set_static_function(value, func);
 	return tyran_constants_reserve_index(constants, &value);
 }

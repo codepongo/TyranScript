@@ -270,50 +270,50 @@ typedef struct tyran_parser_node_undefined
 
 
 
-struct tyran_parser* tyran_parser_new(const char* buf);
+struct tyran_parser* tyran_parser_new(tyran_memory_pool* parser_pool, tyran_memory_pool* lexer_pool, tyran_memory* memory, const char* buf);
 int tyran_parser_parse(const char* buf, int length);
 
 
 void tyran_parser_root(tyran_parser* parser, NODE root);
 NODE tyran_parser_block();
-NODE tyran_parser_assignment(NODE target, NODE source);
-NODE tyran_parser_object_assignment(NODE a, NODE b);
-NODE tyran_parser_compound_assignment(int type, NODE b, NODE c);
+NODE tyran_parser_assignment(tyran_memory* memory, NODE target, NODE source);
+NODE tyran_parser_object_assignment(tyran_memory* memory, NODE a, NODE b);
+NODE tyran_parser_compound_assignment(tyran_memory* memory, int type, NODE b, NODE c);
 NODE tyran_parser_value(NODE a);
 NODE tyran_parser_return(NODE expression);
 NODE tyran_parser_comment(NODE comment);
 NODE tyran_parser_code(NODE a, NODE b, NODE c);
-tyran_parser_node_operand_binary* tyran_parser_concat(NODE a, NODE b);
+tyran_parser_node_operand_binary* tyran_parser_concat(tyran_memory* memory, NODE a, NODE b);
 NODE tyran_parser_parameter(NODE a, NODE b, NODE c);
 NODE tyran_parser_splat(NODE a);
 NODE tyran_parser_accessor(NODE a);
 NODE tyran_parser_index_soak(NODE a);
 NODE tyran_parser_index(NODE a);
 NODE tyran_parser_slice(NODE b);
-NODE tyran_parser_object(NODE a);
-NODE tyran_parser_class(NODE name, NODE extends, NODE block);
+NODE tyran_parser_object(tyran_memory* memory, NODE a);
+NODE tyran_parser_class(tyran_memory* memory, NODE name, NODE extends, NODE block);
 NODE tyran_parser_self();
 NODE tyran_parser_self_identifier(NODE a);
 NODE tyran_parser_array(NODE a);
 NODE tyran_parser_range(NODE a, NODE b, NODE c);
 NODE tyran_parser_parens(NODE a);
-NODE tyran_parser_while(NODE condition, NODE block);
-NODE tyran_parser_for(tyran_parser_node_identifier* key_variable, tyran_parser_node_identifier* value_variable, NODE expression, NODE block);
-NODE tyran_parser_case(NODE expression, tyran_parser_node_when** whens, int when_count);
-NODE tyran_parser_when(NODE a, NODE block);
-NODE tyran_parser_call(NODE function, NODE* arguments, int argument_count);
-NODE tyran_parser_function(NODE block, tyran_boolean bound);
-NODE tyran_parser_if(NODE expression, NODE then_block);
-NODE tyran_parser_if_else(NODE expression, NODE then_block, NODE else_block);
-NODE tyran_parser_else(NODE else_block);
-tyran_parser_node_operand_unary* tyran_parser_operand_unary(int operator_type, NODE b, tyran_boolean post);
-tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_parser_binary_operand_type operator_type, NODE b, NODE c);
-NODE tyran_parser_null();
-NODE tyran_parser_bool(int boolean);
-NODE tyran_parser_undefined();
-NODE tyran_parser_literal_number(float* a);
-NODE tyran_parser_literal_string(const char* string);
-NODE tyran_parser_literal_identifier(const char* string);
+NODE tyran_parser_while(tyran_memory* memory, NODE condition, NODE block);
+NODE tyran_parser_for(tyran_memory* memory, tyran_parser_node_identifier* key_variable, tyran_parser_node_identifier* value_variable, NODE expression, NODE block);
+NODE tyran_parser_case(tyran_memory* memory, NODE expression, tyran_parser_node_when** whens, int when_count);
+NODE tyran_parser_when(tyran_memory* memory, NODE a, NODE block);
+NODE tyran_parser_call(tyran_memory* memory, NODE function, NODE* arguments, int argument_count);
+NODE tyran_parser_function(tyran_memory* memory, NODE block, tyran_boolean bound);
+NODE tyran_parser_if(tyran_memory* memory, NODE expression, NODE then_block);
+NODE tyran_parser_if_else(tyran_memory* memory, NODE expression, NODE then_block, NODE else_block);
+NODE tyran_parser_else(tyran_memory* memory, NODE else_block);
+tyran_parser_node_operand_unary* tyran_parser_operand_unary(tyran_memory* memory, int operator_type, NODE b, tyran_boolean post);
+tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_memory* memory, tyran_parser_binary_operand_type operator_type, NODE b, NODE c);
+NODE tyran_parser_null(tyran_memory* memory);
+NODE tyran_parser_bool(tyran_memory* memory, int boolean);
+NODE tyran_parser_undefined(tyran_memory* memory);
+NODE tyran_parser_literal_number(tyran_memory* memory, float* a);
+NODE tyran_parser_literal_string(tyran_memory* memory, const char* string);
+NODE tyran_parser_literal_identifier(tyran_memory* memory, const char* string);
 NODE tyran_parser_call_super(NODE a);
 
 tyran_parser_node_operand_binary* tyran_parser_binary_operator_type_cast(NODE node, tyran_parser_binary_operand_type operator_type);

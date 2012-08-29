@@ -23,7 +23,7 @@ typedef struct tyran_opcodes {
 } tyran_opcodes;
 
 /* Opcodes */
-struct tyran_opcodes* tyran_opcodes_new(int size);
+struct tyran_opcodes* tyran_opcodes_new(tyran_memory_pool* opcode_pool, tyran_memory* memory, int size);
 void tyran_opcodes_free(struct tyran_opcodes* codes);
 
 /* Load values */

@@ -14,33 +14,3 @@
 #include <tyranscript/tyran_object_macros.h>
 
 #include <tyranscript/debug/tyran_print_value.h>
-
-tyran_parser_state* tyran_parser_state_new(tyran_runtime* runtime, tyran_value* context, const char *str, int length)
-{
-	tyran_parser_state* parser_state = TYRAN_CALLOC(tyran_parser_state);
-	tyran_lexer* lexer = tyran_lexer_new(str);
-	parser_state->lexer = lexer;
-	tyran_value_copy(parser_state->context, *context);
-	parser_state->runtime = runtime;
-
-	tyran_parser_state_reset(parser_state);
-
-	return parser_state;
-}
-
-void tyran_parser_state_reset(tyran_parser_state* parser_state)
-{
-	parser_state->opcodes = tyran_opcodes_new(1024);
-	parser_state->constants = tyran_constants_new(1024);
-	parser_state->labels = TYRAN_MALLOC_TYPE(tyran_label, 1024);
-	parser_state->label_references = TYRAN_MALLOC_TYPE(tyran_label_reference, 1024);
-	parser_state->label_reference_count = 0;
-}
-
-void tyran_parser_state_free(tyran_parser_state* parser_state)
-{
-	tyran_free(parser_state->opcodes);
-	tyran_free(parser_state->lexer->buffer);
-	tyran_free(parser_state->lexer);
-	tyran_free(parser_state);
-}

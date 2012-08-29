@@ -1,6 +1,7 @@
 #include <tyranscript/parser/common/tyran_parser_tree.h>
 #include <tyranscript/parser/tyran_lexer.h>
 #include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_config.h>
 
 tyran_parser_node_operand_binary* tyran_parser_binary_operator_cast(NODE node)
 {
@@ -43,11 +44,11 @@ tyran_parser_node_operand_unary* tyran_parser_unary_operator_type_cast(NODE node
 }
 
 
-tyran_parser* tyran_parser_new(const char* buf)
+tyran_parser* tyran_parser_new(tyran_memory_pool* parser_pool, tyran_memory_pool* lexer_pool, tyran_memory* memory, const char* buf)
 {
-	tyran_parser* parser = TYRAN_MALLOC_TYPE(tyran_parser, 1);
+	tyran_parser* parser = TYRAN_MALLOC_TYPE(parser_pool, tyran_parser);
 	parser->position = 0;
-	parser->lexer = tyran_lexer_new(buf);
+	parser->lexer = tyran_lexer_new(lexer_pool, memory, buf);
 
 	return parser;
 }
@@ -59,9 +60,9 @@ NODE tyran_parser_block()
 	return 0;
 }
 
-NODE tyran_parser_compound_assignment(int operator_type, NODE target, NODE source)
+NODE tyran_parser_compound_assignment(tyran_memory* memory, int operator_type, NODE target, NODE source)
 {
-	tyran_parser_node_compound_assignment* node = TYRAN_MALLOC_TYPE(tyran_parser_node_compound_assignment, 1);
+	tyran_parser_node_compound_assignment* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_compound_assignment, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_COMPOUND_ASSIGNMENT;
 	node->operator_type = operator_type;
 	node->target = target;
@@ -70,9 +71,9 @@ NODE tyran_parser_compound_assignment(int operator_type, NODE target, NODE sourc
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_assignment(NODE target, NODE source)
+NODE tyran_parser_assignment(tyran_memory* memory, NODE target, NODE source)
 {
-	tyran_parser_node_assignment* node = TYRAN_MALLOC_TYPE(tyran_parser_node_assignment, 1);
+	tyran_parser_node_assignment* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_assignment, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_ASSIGNMENT;
 	node->target = target;
 	node->source = source;
@@ -80,9 +81,9 @@ NODE tyran_parser_assignment(NODE target, NODE source)
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_object_assignment(NODE name, NODE source)
+NODE tyran_parser_object_assignment(tyran_memory* memory, NODE name, NODE source)
 {
-	tyran_parser_node_object_assignment* node = TYRAN_MALLOC_TYPE(tyran_parser_node_object_assignment, 1);
+	tyran_parser_node_object_assignment* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_object_assignment, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_OBJECT_ASSIGNMENT;
 	node->name = name;
 	node->source = source;
@@ -106,9 +107,9 @@ NODE tyran_parser_code(NODE a, NODE b, NODE c)
 	return 0;
 }
 
-tyran_parser_node_operand_binary* tyran_parser_concat(NODE left, NODE right)
+tyran_parser_node_operand_binary* tyran_parser_concat(tyran_memory* memory, NODE left, NODE right)
 {
-	tyran_parser_node_operand_binary* binary = tyran_parser_operand_binary(TYRAN_PARSER_CONCAT, left, right);
+	tyran_parser_node_operand_binary* binary = tyran_parser_operand_binary(memory, TYRAN_PARSER_CONCAT, left, right);
 
 	return binary;
 }
@@ -130,17 +131,17 @@ NODE tyran_parser_slice(NODE b)
 	return 0;
 }
 
-NODE tyran_parser_object(NODE assignment_list)
+NODE tyran_parser_object(tyran_memory* memory, NODE assignment_list)
 {
-	tyran_parser_node_object* node = TYRAN_MALLOC_TYPE(tyran_parser_node_object, 1);
+	tyran_parser_node_object* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_object, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_OBJECT;
 	node->assignment_list = assignment_list;
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_class(NODE name, NODE extends, NODE block)
+NODE tyran_parser_class(tyran_memory* memory, NODE name, NODE extends, NODE block)
 {
-	tyran_parser_node_class* node = TYRAN_MALLOC_TYPE(tyran_parser_node_class, 1);
+	tyran_parser_node_class* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_class, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_CLASS;
 	node->name = name;
 	node->extends = extends;
@@ -173,18 +174,18 @@ NODE tyran_parser_range(NODE a, NODE b, NODE c)
 	return 0;
 }
 
-NODE tyran_parser_while(NODE condition, NODE block)
+NODE tyran_parser_while(tyran_memory* memory, NODE condition, NODE block)
 {
-	tyran_parser_node_while* node = TYRAN_MALLOC_TYPE(tyran_parser_node_while, 1);
+	tyran_parser_node_while* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_while, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_WHILE;
 	node->condition = condition;
 	node->block = block;
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_for(tyran_parser_node_identifier* key_variable, tyran_parser_node_identifier* value_variable, NODE collection, NODE block)
+NODE tyran_parser_for(tyran_memory* memory, tyran_parser_node_identifier* key_variable, tyran_parser_node_identifier* value_variable, NODE collection, NODE block)
 {
-	tyran_parser_node_for* node = TYRAN_MALLOC_TYPE(tyran_parser_node_for, 1);
+	tyran_parser_node_for* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_for, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_FOR;
 	node->key_variable = key_variable;
 	node->value_variable = value_variable;
@@ -193,40 +194,40 @@ NODE tyran_parser_for(tyran_parser_node_identifier* key_variable, tyran_parser_n
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_case(NODE expression, tyran_parser_node_when** whens, int when_count)
+NODE tyran_parser_case(tyran_memory* memory, NODE expression, tyran_parser_node_when** whens, int when_count)
 {
-	tyran_parser_node_case* node = TYRAN_MALLOC_TYPE(tyran_parser_node_case, 1);
+	tyran_parser_node_case* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_case, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_CASE;
 	node->expression = expression;
 	node->when_count = when_count;
-	node->whens = TYRAN_MALLOC_TYPE(tyran_parser_node_when*, node->when_count);
+	node->whens = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_when*, node->when_count);
 	tyran_memcpy_type(tyran_parser_node_when*, node->whens, whens, when_count);
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_when(NODE expression, NODE block)
+NODE tyran_parser_when(tyran_memory* memory, NODE expression, NODE block)
 {
-	tyran_parser_node_when* node = TYRAN_MALLOC_TYPE(tyran_parser_node_when, 1);
+	tyran_parser_node_when* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_when, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_WHEN;
 	node->expression = expression;
 	node->block = block;
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_call(NODE function, NODE* arguments, int argument_count)
+NODE tyran_parser_call(tyran_memory* memory, NODE function, NODE* arguments, int argument_count)
 {
-	tyran_parser_node_call* node = TYRAN_MALLOC_TYPE(tyran_parser_node_call, 1);
+	tyran_parser_node_call* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_call, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_CALL;
 	node->argument_count = argument_count;
-	node->arguments = TYRAN_MALLOC_TYPE(NODE, node->argument_count);
+	node->arguments = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, NODE, node->argument_count);
 	node->function_node = function;
 	tyran_memcpy_type(NODE, node->arguments, arguments, node->argument_count);
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_function( NODE block, tyran_boolean bound)
+NODE tyran_parser_function(tyran_memory* memory, NODE block, tyran_boolean bound)
 {
-	tyran_parser_node_function* node = TYRAN_MALLOC_TYPE(tyran_parser_node_function, 1);
+	tyran_parser_node_function* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_function, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_FUNCTION;
 	node->bound = bound;
 	node->parameters = 0;
@@ -234,18 +235,18 @@ NODE tyran_parser_function( NODE block, tyran_boolean bound)
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_if(NODE expression, NODE then_block)
+NODE tyran_parser_if(tyran_memory* memory, NODE expression, NODE then_block)
 {
-	tyran_parser_node_if* node = TYRAN_MALLOC_TYPE(tyran_parser_node_if, 1);
+	tyran_parser_node_if* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_if, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_IF;
 	node->expression = expression;
 	node->then_block = then_block;
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_if_else(NODE expression, NODE then_block, NODE else_block)
+NODE tyran_parser_if_else(tyran_memory* memory, NODE expression, NODE then_block, NODE else_block)
 {
-	tyran_parser_node_if_else* node = TYRAN_MALLOC_TYPE(tyran_parser_node_if_else, 1);
+	tyran_parser_node_if_else* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_if_else, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_IF_ELSE;
 	node->expression = expression;
 	node->then_block = then_block;
@@ -253,17 +254,17 @@ NODE tyran_parser_if_else(NODE expression, NODE then_block, NODE else_block)
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_else(NODE else_block)
+NODE tyran_parser_else(tyran_memory* memory, NODE else_block)
 {
-	tyran_parser_node_else* node = TYRAN_MALLOC_TYPE(tyran_parser_node_else, 1);
+	tyran_parser_node_else* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_else, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_ELSE;
 	node->block = else_block;
 	return (tyran_parser_node*)node;
 }
 
-tyran_parser_node_operand_unary* tyran_parser_operand_unary(int operator_type, NODE expression, tyran_boolean post)
+tyran_parser_node_operand_unary* tyran_parser_operand_unary(tyran_memory* memory, int operator_type, NODE expression, tyran_boolean post)
 {
-	tyran_parser_node_operand_unary* node = TYRAN_MALLOC_TYPE(tyran_parser_node_operand_unary, 1);
+	tyran_parser_node_operand_unary* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_operand_unary, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY;
 	node->expression = expression;
 	node->post = post;
@@ -271,9 +272,9 @@ tyran_parser_node_operand_unary* tyran_parser_operand_unary(int operator_type, N
 	return node;
 }
 
-tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_parser_binary_operand_type operator_type, NODE left, NODE right)
+tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_memory* memory, tyran_parser_binary_operand_type operator_type, NODE left, NODE right)
 {
-	tyran_parser_node_operand_binary* node = TYRAN_MALLOC_TYPE(tyran_parser_node_operand_binary, 1);
+	tyran_parser_node_operand_binary* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_operand_binary, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY;
 	node->left = left;
 	node->right = right;
@@ -281,48 +282,48 @@ tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_parser_binar
 	return node;
 }
 
-NODE tyran_parser_null()
+NODE tyran_parser_null(tyran_memory* memory)
 {
-	tyran_parser_node_null* node = TYRAN_MALLOC_TYPE(tyran_parser_node_null, 1);
+	tyran_parser_node_null* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_null, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_NULL;
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_bool(int boolean)
+NODE tyran_parser_bool(tyran_memory* memory, int boolean)
 {
-	tyran_parser_node_boolean* node = TYRAN_MALLOC_TYPE(tyran_parser_node_boolean, 1);
+	tyran_parser_node_boolean* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_boolean, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_BOOLEAN;
 	node->boolean = boolean;
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_undefined()
+NODE tyran_parser_undefined(tyran_memory* memory)
 {
-	tyran_parser_node_undefined* node = TYRAN_MALLOC_TYPE(tyran_parser_node_undefined, 1);
+	tyran_parser_node_undefined* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_undefined, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_UNDEFINED;
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_literal_number(tyran_number* number)
+NODE tyran_parser_literal_number(tyran_memory* memory, tyran_number* number)
 {
-	tyran_parser_node_number* node = TYRAN_MALLOC_TYPE(tyran_parser_node_number, 1);
+	tyran_parser_node_number* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_number, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_NUMBER;
 	node->number = *number;
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_literal_string(const char* string)
+NODE tyran_parser_literal_string(tyran_memory* memory, const char* string)
 {
-	tyran_parser_node_string* node = TYRAN_MALLOC_TYPE(tyran_parser_node_string, 1);
+	tyran_parser_node_string* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_string, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_STRING;
 	node->string = tyran_strdup(string);
 	node->length = strlen(node->string);
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_literal_identifier(const char* string)
+NODE tyran_parser_literal_identifier(tyran_memory* memory, const char* string)
 {
-	tyran_parser_node_identifier* node = TYRAN_MALLOC_TYPE(tyran_parser_node_identifier, 1);
+	tyran_parser_node_identifier* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_identifier, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_IDENTIFIER;
 	node->string = tyran_strdup(string);
 	node->length = strlen(node->string);
