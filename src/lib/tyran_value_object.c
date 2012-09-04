@@ -41,10 +41,23 @@ tyran_value* tyran_value_object_lookup(const tyran_value* target, const struct t
 }
 
 
+void tyran_value_object_insert_c_string_key(struct tyran_value* target, const char* key, struct tyran_value* value)
+{
+}
+
+void tyran_value_object_insert_string_key(struct tyran_value* object, const struct tyran_string* key, struct tyran_value* value)
+{
+}
+
 tyran_value* tyran_value_object_lookup_prototype(const tyran_value* target, const struct tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
 	return tyran_object_lookup_prototype(target->data.object, key, flag);
+}
+
+struct tyran_value* tyran_value_object_lookup_array(const struct tyran_value* object, int index, tyran_object_key_flag_type* flag)
+{
+	return 0;
 }
 
 void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_value* prototype)

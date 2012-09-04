@@ -9,3 +9,13 @@ void* tyran_memory_pool_alloc(tyran_memory_pool* pool, size_t count)
 {
 	return 0;
 }
+
+char* tyran_str_dup(tyran_memory* memory, const char* str)
+{
+	int size = tyran_strlen(str);
+	char* mem = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, size);
+	
+	tyran_strncpy(mem, size, str, size);
+	
+	return mem;
+}

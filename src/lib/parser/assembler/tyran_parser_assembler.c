@@ -354,7 +354,7 @@ void tyran_lexer_assembler_end_of_function(tyran_memory_pool* function_pool, tyr
 	tyran_value_object_insert_c_string_key(&parser_state->context, parser_state->function_name, func_value_obj);
 }
 
-int tyran_lexer_assembler_parse_one(tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* value_pool, tyran_memory_pool* object_pool, tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
+int tyran_lexer_assembler_parse_one(tyran_memory* memory, tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* value_pool, tyran_memory_pool* object_pool, tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
 {
 	int token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
 	if (token == 0) {
@@ -387,7 +387,7 @@ int tyran_lexer_assembler_parse_one(tyran_memory_pool* function_pool, tyran_memo
 					return -1;
 				}
 				{
-					tyran_strndup(parser_state->function_name, 512, parser_state->lexer->string_buffer);
+					tyran_strncpy(parser_state->function_name, 512, parser_state->lexer->string_buffer, parser_state->lexer->string_buffer_max_size);
 					TYRAN_LOG("function '%s'", parser_state->function_name);
 				}
 				parser_state->inside_function = 1;
@@ -396,7 +396,7 @@ int tyran_lexer_assembler_parse_one(tyran_memory_pool* function_pool, tyran_memo
 		case TYRAN_TOKEN_ASSEMBLER_IDENTIFIER:
 			token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
 			if (token == TYRAN_TOKEN_ASSEMBLER_COLON) {
-				tyran_code_add_label(parser_state->code, parser_state->lexer->string_buffer);
+				tyran_code_add_label(memory, parser_state->code, parser_state->lexer->string_buffer);
 			} else {
 				TYRAN_LOG("error token:%d", token);
 				error();
@@ -501,11 +501,11 @@ int tyran_lexer_assembler_parse_one(tyran_memory_pool* function_pool, tyran_memo
 	return token;
 }
 
-int tyran_lexer_assembler_parse(tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* value_pool, tyran_memory_pool* object_pool, tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
+int tyran_lexer_assembler_parse(tyran_memory* memory, tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* value_pool, tyran_memory_pool* object_pool, tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)
 {
 	int token;
 	do {
-		token = tyran_lexer_assembler_parse_one(function_pool, function_object_pool, value_pool, object_pool, lexer_position, parser_state);
+		token = tyran_lexer_assembler_parse_one(memory, function_pool, function_object_pool, value_pool, object_pool, lexer_position, parser_state);
 	} while (token != 0);
 	
 	return 0;

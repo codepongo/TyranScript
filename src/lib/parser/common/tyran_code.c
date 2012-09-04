@@ -5,6 +5,7 @@
 
 #include <tyranscript/parser/common/tyran_code.h>
 #include <tyranscript/tyran_constants.h>
+#include <tyranscript/tyran_config.h>
 
 tyran_code_state* tyran_code_new(tyran_memory_pool* code_state_pool, tyran_memory_pool* opcodes_pool, tyran_memory_pool* constants_pool, tyran_memory_pool* constant_values_pool, tyran_memory_pool* label_pool, tyran_memory_pool* label_reference_pool, tyran_memory_pool* scopes_pool, tyran_memory_pool* scope_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, tyran_memory* memory)
 {
@@ -37,14 +38,14 @@ void tyran_code_define_label(tyran_code_state* state, tyran_label_id label_index
 }
 
 
-void tyran_code_add_label(tyran_code_state* state, const char* name)
+void tyran_code_add_label(tyran_memory* memory, tyran_code_state* state, const char* name)
 {
 	tyran_label_id label_index = tyran_code_label_new(state);
 
 	tyran_code_define_label(state, label_index);
 
 	struct tyran_label* label = &state->labels[label_index];
-	label->name = tyran_strdup(name);
+	label->name = tyran_strdup(memory, name);
 }
 
 void tyran_code_add_label_index_reference(tyran_code_state* state, tyran_label_id label_index)

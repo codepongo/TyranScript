@@ -47,6 +47,8 @@ tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t stru
 void* tyran_memory_pool_alloc(tyran_memory_pool*, size_t count);
 
 
+char* tyran_str_dup(tyran_memory* pool, const char* str);
+
 #define TYRAN_MEMORY_POOL_CONSTRUCT(memory, T, count) tyran_memory_pool_construct(memory, sizeof(T), count)
 
 
@@ -94,11 +96,10 @@ void* tyran_memory_pool_alloc(tyran_memory_pool*, size_t count);
 
 #define tyran_strcmp strcmp
 #define tyran_strlen strlen
-#define tyran_strdup strdup
 #define tyran_strncmp strncmp
 #define tyran_printf printf
 #define tyran_fflush fflush
-
+#define tyran_strdup(pool, str) tyran_str_dup(pool, str)
 
 #define tyran_fmod fmod
 #define tyran_pow pow

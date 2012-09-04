@@ -27,13 +27,13 @@ typedef struct tyran_variable_scopes {
 tyran_variable_scopes* tyran_variable_scopes_new(tyran_memory_pool* scopes_pool, tyran_memory_pool* scope_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, int max_count);
 
 tyran_reg_index tyran_variable_scope_get_identifier(tyran_variable_scope* scope, const char* string);
-tyran_reg_index tyran_variable_scope_define_identifier(tyran_variable_scope* scope, const char* string);
+tyran_reg_index tyran_variable_scope_define_identifier(tyran_memory* memory, tyran_variable_scope* scope, const char* string);
 tyran_reg_index tyran_variable_scope_define_temporary_variable(tyran_variable_scope* scope);
 void tyran_variable_scope_undefine_variable(tyran_variable_scope* scope, tyran_reg_index index);
 
 
 tyran_reg_index tyran_variable_scopes_get_identifier(tyran_variable_scopes* scope, const char* string);
-tyran_reg_index tyran_variable_scopes_define_identifier(tyran_variable_scopes* scope, const char* string);
+tyran_reg_index tyran_variable_scopes_define_identifier(tyran_memory* memory, tyran_variable_scopes* scope, const char* string);
 tyran_reg_index tyran_variable_scopes_define_temporary_variable(tyran_variable_scopes* scope);
 void tyran_variable_scopes_undefine_variable(tyran_variable_scopes* scope, tyran_reg_index index);
 

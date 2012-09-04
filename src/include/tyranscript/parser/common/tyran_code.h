@@ -33,6 +33,6 @@ void tyran_code_define_label(tyran_code_state* state, tyran_label_id label_index
 void tyran_code_add_label_index_reference(tyran_code_state* state, tyran_label_id label_index);
 tyran_label_id tyran_code_get_label(struct tyran_label* labels, int count, const char* name);
 void tyran_code_fixup_label_references(tyran_code_state* state);
-void tyran_code_add_label(tyran_code_state* state, const char* name);
+void tyran_code_add_label(tyran_memory* memory, tyran_code_state* state, const char* name);
 
 #endif
