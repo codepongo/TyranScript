@@ -16,8 +16,8 @@ struct tyran_opcodes* tyran_opcodes_new(tyran_memory_pool* opcodes_pool, tyran_m
 
 void tyran_opcodes_free(struct tyran_opcodes* codes)
 {
-	tyran_free((void*)codes->codes);
-	tyran_free(codes);
+	TYRAN_MALLOC_FREE((void*)codes->codes);
+	TYRAN_MALLOC_FREE(codes);
 }
 
 void tyran_opcodes_add_code(tyran_opcodes* codes, int code, int a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y)

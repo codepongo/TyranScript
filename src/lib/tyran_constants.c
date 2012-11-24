@@ -13,8 +13,8 @@ tyran_constants* tyran_constants_new(tyran_memory_pool* constants_pool, tyran_me
 
 void tyran_constants_free(tyran_constants* constants)
 {
-	tyran_free(constants->values);
-	tyran_free(constants);
+	TYRAN_MALLOC_FREE(constants->values);
+	TYRAN_MALLOC_FREE(constants);
 }
 
 tyran_constant_index tyran_constants_reserve_index(struct tyran_constants* constants, tyran_value* v)

@@ -1,0 +1,7 @@
+require_relative '../../buildscript/builder'
+
+application = 'command'
+
+builder = Builder.new application
+
+task :default => application

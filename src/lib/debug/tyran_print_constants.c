@@ -13,3 +13,4 @@ void tyran_print_constants(tyran_constants* constants)
 		tyran_print_value(buf, &constants->values[i], 1);
 	}
 }
+

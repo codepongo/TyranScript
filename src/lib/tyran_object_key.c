@@ -14,7 +14,7 @@ const struct tyran_object_key* tyran_object_key_new(tyran_memory_pool* object_ke
 void tyran_object_key_free(const struct tyran_object_key* key)
 {
 	tyran_string_free(key->str);
-	tyran_free((void*) key);
+	TYRAN_MALLOC_FREE((void*) key);
 }
 
 const struct tyran_object_key* tyran_object_key_clone(tyran_memory_pool* object_key_pool, const struct tyran_object_key* ori)

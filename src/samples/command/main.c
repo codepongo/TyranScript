@@ -1,10 +1,4 @@
-#include <tyranscript/tyran_api.h>
-#include <tyranscript/parser/mocha/tyran_mocha_lexer.h>
-#include <tyranscript/debug/mocha/tyran_mocha_lexer_debug.h>
-#include <tyranscript/debug/parser/tyran_print_parser_tree.h>
-#include <tyranscript/parser/mocha/tyran_mocha_parser.h>
-#include <tyranscript/parser/common/tyran_generator.h>
-#include <tyranscript/parser/common/tyran_code.h>
+#include <tyranscript/tyran_mocha_api.h>
 
 int main(int argc, char* argv[])
 {
@@ -22,5 +16,10 @@ int main(int argc, char* argv[])
 	buf[octets_read] = 0;
 	fclose(file);
 	
+	
+	tyran_mocha_api api;
+	
+	tyran_mocha_api_new(1024, &api);
+	tyran_mocha_api_eval(&api, buf, tyran_strlen(buf));
 	return 0;
 }

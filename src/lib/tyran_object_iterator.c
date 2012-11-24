@@ -14,8 +14,8 @@ void tyran_object_iterator_free(tyran_object_iterator* iterator)
 	for (i = 0; i < iterator->count; i++) {
 		tyran_object_key_free(iterator->keys[i]);
 	}
-	tyran_free(iterator->keys);
-	tyran_free(iterator);
+	TYRAN_MALLOC_FREE(iterator->keys);
+	TYRAN_MALLOC_FREE(iterator);
 }
 
 void tyran_object_iterator_insert(tyran_memory_pool* object_key_pool, tyran_object_iterator* iterator, const struct tyran_object_key* key)

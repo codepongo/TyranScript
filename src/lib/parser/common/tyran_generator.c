@@ -90,15 +90,15 @@ tyran_reg_or_constant_index tyran_generator_logical_operator(tyran_memory* memor
 	case TYRAN_PARSER_AND: {
 		tyran_label_id and_false = false_label;
 		tyran_label_id and_true = true_label;
-		tyran_reg_or_constant_index left_register = tyran_generator_traverse(memory, code, binary->left, TYRAN_OPCODE_REGISTER_ILLEGAL, and_false, TYRAN_FALSE);
-		tyran_reg_or_constant_index right_register = tyran_generator_traverse(memory, code, binary->right, and_true, and_false, TYRAN_FALSE);
+		tyran_generator_traverse(memory, code, binary->left, TYRAN_OPCODE_REGISTER_ILLEGAL, and_false, TYRAN_FALSE);
+		tyran_generator_traverse(memory, code, binary->right, and_true, and_false, TYRAN_FALSE);
 		}
 	break;
 	case TYRAN_PARSER_OR: {
 		tyran_label_id or_true = tyran_generator_prepare_label(code);
 		tyran_label_id or_false = false_label;
-		tyran_reg_or_constant_index left_register = tyran_generator_traverse(memory, code, binary->left, TYRAN_OPCODE_REGISTER_ILLEGAL, or_true, TYRAN_TRUE);
-		tyran_reg_or_constant_index right_register = tyran_generator_traverse(memory, code, binary->right, TYRAN_OPCODE_REGISTER_ILLEGAL, or_false, TYRAN_FALSE);
+		tyran_generator_traverse(memory, code, binary->left, TYRAN_OPCODE_REGISTER_ILLEGAL, or_true, TYRAN_TRUE);
+		tyran_generator_traverse(memory, code, binary->right, TYRAN_OPCODE_REGISTER_ILLEGAL, or_false, TYRAN_FALSE);
 		tyran_generator_define_label(code, or_true);
 		}
 	break;
@@ -370,7 +370,7 @@ void tyran_generator_traverse_function_parameters(tyran_memory* memory, tyran_co
 	
 	for (i = 0; i < func_node->parameter_count; ++i) {
 		tyran_parser_node_parameter parameter = func_node->parameters[i];
-		tyran_reg_index parameter_register = tyran_variable_scopes_define_identifier(memory, code->scope, parameter.identifier->string);
+		tyran_variable_scopes_define_identifier(memory, code->scope, parameter.identifier->string);
 	}
 }
 

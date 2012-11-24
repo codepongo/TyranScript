@@ -246,7 +246,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_NEW:
 			TYRAN_REGISTER_A;
-			object = TYRAN_CALLOC_TYPE(object_pool, tyran_object);
+			object = TYRAN_CALLOC_TYPE(runtime->object_pool, tyran_object);
 			tyran_value_set_object(r[a], object);
 			break;
 		case TYRAN_OPCODE_GET: {

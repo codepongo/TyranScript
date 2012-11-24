@@ -1,4 +1,5 @@
 #include <tyranscript/parser/mocha/tyran_mocha_lexer.h>
+#include <tyranscript/parser/mocha/tyran_mocha_parser.h>
 #include <tyranscript/debug/mocha/tyran_mocha_lexer_debug.h>
 #include <tyranscript/debug/parser/tyran_print_parser_tree.h>
 #include <tyranscript/parser/common/tyran_parser_tree.h>
@@ -67,32 +68,6 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 	return empty;
 }
 
-
-typedef struct tyran_mocha_parser_enclosure_info {
-	NODE* pointing_to_last_added_node;
-	tyran_mocha_token_id start_token_id;
-	int top_precedence;
-	NODE* root;
-} tyran_mocha_parser_enclosure_info;
-
-typedef struct tyran_mocha_parser_enclosure_stack {
-	tyran_mocha_parser_enclosure_info* nodes;
-	int alloc_size;
-	int length;
-} tyran_mocha_parser_enclosure_stack;
-
-typedef struct tyran_mocha_parser {
-	tyran_mocha_parser_enclosure_stack* enclosure_stack;
-	tyran_mocha_token_id waiting_for_start_enclosure_id;
-	int top_precedence;
-	NODE original_root;
-	NODE* root;
-	NODE* pointing_to_last_added_node;
-	NODE* next_node_to_overwrite;
-	struct tyran_memory_pool* parser_parameter_pool;
-} tyran_mocha_parser;
-
-
 tyran_mocha_parser_enclosure_stack* tyran_mocha_parser_enclosure_stack_new(tyran_memory_pool* enclosure_pool, tyran_memory_pool* enclosure_info_pool)
 {
 	tyran_mocha_parser_enclosure_stack* stack = TYRAN_MALLOC_TYPE(enclosure_pool, tyran_mocha_parser_enclosure_stack);
@@ -104,8 +79,8 @@ tyran_mocha_parser_enclosure_stack* tyran_mocha_parser_enclosure_stack_new(tyran
 
 void tyran_mocha_parser_enclosure_stack_free(tyran_mocha_parser_enclosure_stack* stack)
 {
-	tyran_free(stack->nodes);
-	tyran_free(stack);
+	TYRAN_MALLOC_FREE(stack->nodes);
+	TYRAN_MALLOC_FREE(stack);
 }
 
 void tyran_mocha_parser_enclosure_stack_push(tyran_mocha_parser_enclosure_stack* stack, NODE* pointing_to_last_added_node, NODE* root, tyran_mocha_token_id start_enclosure_id, int top_precedence)
@@ -286,10 +261,10 @@ void tyran_mocha_parser_add_to_empty(tyran_memory* memory, tyran_mocha_parser* p
 	}
 }
 
-tyran_mocha_parser* tyran_mocha_parser_new(tyran_memory_pool* mocha_parser_pool, tyran_memory_pool* enclosure_pool, tyran_memory_pool* enclosure_info_pool, tyran_memory* memory)
+tyran_mocha_parser* tyran_mocha_parser_new(tyran_memory_pool* mocha_parser_pool, tyran_memory_pool* enclosure_stack_pool, tyran_memory_pool* enclosure_info_pool, tyran_memory_pool* parser_parameter_pool, tyran_memory_pool* mocha_token_pool, tyran_memory* memory)
 {
 	tyran_mocha_parser* parser = TYRAN_MALLOC_TYPE(mocha_parser_pool, tyran_mocha_parser);
-	parser->enclosure_stack = tyran_mocha_parser_enclosure_stack_new(enclosure_pool, enclosure_info_pool);
+	parser->enclosure_stack = tyran_mocha_parser_enclosure_stack_new(enclosure_stack_pool, enclosure_info_pool);
 	parser->waiting_for_start_enclosure_id = TYRAN_MOCHA_TOKEN_END;
 	tyran_parser_node_operand_unary* unary = tyran_parser_operand_unary(memory, TYRAN_PARSER_UNARY_BLOCK, 0, 0);
 	parser->original_root = (NODE)unary;
@@ -297,6 +272,9 @@ tyran_mocha_parser* tyran_mocha_parser_new(tyran_memory_pool* mocha_parser_pool,
 	parser->pointing_to_last_added_node = parser->root;
 	parser->next_node_to_overwrite = &unary->expression;
 	parser->top_precedence = 99999;
+	
+	parser->parser_parameter_pool = parser_parameter_pool;
+	parser->mocha_token_pool = mocha_token_pool;
 	return parser;
 }
 
@@ -753,12 +731,12 @@ void tyran_mocha_parser_add_all(tyran_memory* memory, tyran_mocha_parser* parser
 	}
 }
 
-NODE tyran_mocha_parser_parse(tyran_memory* memory, tyran_mocha_lexer* lexer, tyran_memory_pool* mocha_parser_pool, tyran_memory_pool* enclosure_pool, tyran_memory_pool* enclosure_info_pool)
+NODE tyran_mocha_parser_parse(tyran_memory* memory, tyran_mocha_lexer* lexer, tyran_memory_pool* mocha_parser_pool, tyran_memory_pool* enclosure_pool, tyran_memory_pool* enclosure_info_pool,  tyran_memory_pool* parser_parameter_pool, tyran_memory_pool* mocha_token_pool)
 {
 	tyran_mocha_token* first = tyran_mocha_lexer_first(lexer);
 	tyran_mocha_token* last = tyran_mocha_lexer_last(lexer);
 	
-	tyran_mocha_parser* parser = tyran_mocha_parser_new(mocha_parser_pool, enclosure_pool, enclosure_info_pool, memory);
+	tyran_mocha_parser* parser = tyran_mocha_parser_new(mocha_parser_pool, enclosure_pool, enclosure_info_pool, parser_parameter_pool, mocha_token_pool, memory);
 	tyran_mocha_parser_add_all(memory, parser, first, last);
 	
 	return parser->original_root;

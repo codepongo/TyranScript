@@ -170,13 +170,14 @@ static int tyran_lexer_assembler_next_token(tyran_lexer_position_info* lexer_pos
 	return 0;
 }
 
-void error()
+int error()
 {
 	TYRAN_LOG("ERROR!!");
+	return -1;
 }
 
 
-void parse_r_index(tyran_parser_state* state, tyran_reg_index* a)
+int parse_r_index(tyran_parser_state* state, tyran_reg_index* a)
 {
 	tyran_lexer_position_info position;
 	int token = tyran_lexer_assembler_next_token(&position, state->lexer);
@@ -185,6 +186,7 @@ void parse_r_index(tyran_parser_state* state, tyran_reg_index* a)
 	}
 
 	*a = (int) state->lexer->number;
+	return 0;
 }
 
 void parse_s(tyran_parser_state* state, int* s)
@@ -237,7 +239,7 @@ void parse_rc(tyran_parser_state* state, tyran_reg_or_constant_index* a)
 	*a = parse_constant(state, &position, 1);
 }
 
-void parse_r(tyran_parser_state* state, tyran_reg_index* a)
+int parse_r(tyran_parser_state* state, tyran_reg_index* a)
 {
 	tyran_lexer_position_info position;
 
@@ -246,22 +248,24 @@ void parse_r(tyran_parser_state* state, tyran_reg_index* a)
 		return error();
 	}
 	parse_r_index(state, a);
+	return 0;
 }
 
-void parse_identifier(tyran_parser_state* state)
+int parse_label(tyran_parser_state* state)
 {
-	char* name;
 	tyran_lexer_position_info position;
 
 	int token = tyran_lexer_assembler_next_token(&position, state->lexer);
 	if (token != TYRAN_TOKEN_ASSEMBLER_IDENTIFIER) {
 		return error();
 	}
-	int label_index = tyran_code_get_label(state->labels, state->label_count, name);
+	int label_index = tyran_code_get_label(state->labels, state->label_count, state->lexer->string_buffer);
 	tyran_code_add_label_index_reference(state->code, label_index);
+
+	return 0;
 }
 
-void parse_b(tyran_parser_state* state, tyran_boolean* b)
+int parse_b(tyran_parser_state* state, tyran_boolean* b)
 {
 	tyran_lexer_position_info position;
 
@@ -271,6 +275,7 @@ void parse_b(tyran_parser_state* state, tyran_boolean* b)
 	}
 
 	*b = (token == TYRAN_TOKEN_ASSEMBLER_TRUE);
+	return 0;
 }
 
 void parse_r_rc(tyran_parser_state* state, tyran_reg_index* a, tyran_reg_or_constant_index* c)
@@ -473,7 +478,7 @@ int tyran_lexer_assembler_parse_one(tyran_memory* memory, tyran_memory_pool* fun
 			tyran_opcodes_op_jle(opcodes, x, y, b);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_JMP:
-			parse_identifier(parser_state);
+			parse_label(parser_state);
 			tyran_opcodes_op_jmp(opcodes, 0);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_NEW:

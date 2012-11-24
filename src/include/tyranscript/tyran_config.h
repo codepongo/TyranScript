@@ -36,7 +36,7 @@ typedef struct tyran_memory_pool
 
 
 void tyran_memory_construct(tyran_memory* memory, u8t* start, size_t size);
-void* tyran_memory_alloc(size_t size);
+void* tyran_memory_alloc(tyran_memory* memory, size_t size);
 void* tyran_memory_alloc_debug(tyran_memory* memory, size_t size, const char* source_file, int line, const char* description);
 
 #define TYRAN_MEMORY_ALLOC(memory, size, description) tyran_memory_alloc_debug(memory, size, __FILE__, __LINE__, description);
@@ -45,6 +45,8 @@ void* tyran_memory_alloc_debug(tyran_memory* memory, size_t size, const char* so
 
 tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count);
 void* tyran_memory_pool_alloc(tyran_memory_pool*, size_t count);
+void* tyran_memory_pool_calloc(tyran_memory_pool*, size_t count);
+void tyran_memory_pool_free(void*);
 
 
 char* tyran_str_dup(tyran_memory* pool, const char* str);
@@ -54,16 +56,17 @@ char* tyran_str_dup(tyran_memory* pool, const char* str);
 
 #define tyran_malloc malloc
 #define tyran_realloc realloc
-#define tyran_free free
+#define tyran_free tyran_memory_pool_free
 
 
-#define TYRAN_CALLOC_TYPE(pool, T) (T*) calloc(1, sizeof(T));
-#define TYRAN_CALLOC_TYPE_COUNT(pool, cnt, T) (T*) calloc(cnt, sizeof(T));
+#define TYRAN_CALLOC_TYPE(pool, T) (T*) tyran_memory_pool_calloc(pool, 1);
+#define TYRAN_CALLOC_TYPE_COUNT(pool, cnt, T) (T*) tyran_memory_pool_calloc(pool, cnt);
 
 #define TYRAN_MALLOC_TYPE(pool, type) (type*) tyran_memory_pool_alloc(pool, 1);
 #define TYRAN_MALLOC_TYPE_COUNT(pool, type, count) (type*) tyran_memory_pool_alloc(pool, count);
+#define TYRAN_MALLOC_FREE(p) tyran_memory_pool_free(p);
 
-#define TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, type, count) (type*) tyran_memory_alloc(count * sizeof(type));
+#define TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, type, count) (type*) tyran_memory_alloc(memory, count * sizeof(type));
 
 #define tyran_memcpy_type(T, dest, source, N) memcpy(dest, source, (N) * sizeof(T))
 
@@ -71,6 +74,7 @@ char* tyran_str_dup(tyran_memory* pool, const char* str);
 #define tyran_memcmp memcmp
 #define tyran_memset_type(T, V) memset(T, V, sizeof(*T))
 #define tyran_memset_type_n(T, V, N) memset(T, V, sizeof(*T) * (N))
+#define tyran_mem_clear(D, T, N) memset(D, 0, (T)*(N))
 
 
 #if defined WIN32

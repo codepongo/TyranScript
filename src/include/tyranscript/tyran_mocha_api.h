@@ -11,7 +11,7 @@ typedef struct tyran_mocha_api {
 } tyran_mocha_api;
 
 
-tyran_mocha_api* tyran_mocha_api_new(int hunk_size);
+void tyran_mocha_api_new(int hunk_size, tyran_mocha_api*);
 void tyran_mocha_api_eval(tyran_mocha_api* api, const char* s, size_t length);
 
 #endif
