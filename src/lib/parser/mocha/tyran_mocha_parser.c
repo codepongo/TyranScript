@@ -24,7 +24,6 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_LESS_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_GREATER, 1, 0},
 		{TYRAN_MOCHA_TOKEN_GREATER_EQUAL, 1, 0},
-		{TYRAN_MOCHA_TOKEN_ASSIGNMENT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_IF, 1, 0},
 		{TYRAN_MOCHA_TOKEN_WHILE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_UNTIL, 1, 0},
@@ -39,6 +38,7 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_INVOKE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_IN, 1, 0},
 		{TYRAN_MOCHA_TOKEN_COMMA, 1, 0},
+		{TYRAN_MOCHA_TOKEN_ASSIGNMENT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_ADD, 1, 0},
 		{TYRAN_MOCHA_TOKEN_SUBTRACT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_MULTIPLY, 1, 0},
@@ -199,6 +199,12 @@ void tyran_mocha_parser_parameters(tyran_parser_node_parameter* parameter_nodes,
 		tyran_mocha_parser_parameters(parameter_nodes, index, binary->right);
 	} else {
 		tyran_parser_node_parameter parameter_node;
+		if (binary && (binary->operator_type ==  TYRAN_PARSER_ASSIGNMENT)) {
+			parameter_node.default_value = binary->right;
+			node = binary->left;
+		} else {
+			parameter_node.default_value = 0;
+		}
 		parameter_node.identifier = (tyran_parser_node_identifier*) node;
 		parameter_nodes[*index] = parameter_node;
 		*index = *index + 1;
