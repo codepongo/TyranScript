@@ -19,6 +19,7 @@ tyran_lexer* tyran_lexer_new(tyran_memory_pool* lexer_pool, tyran_memory* memory
 	lexer->buffer = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, lexer->size);
 	lexer->string_buffer_max_size = 512;
 	lexer->string_buffer = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, lexer->string_buffer_max_size);
+	lexer->memory = memory;
 	
 	tyran_memcpy_type(char, lexer->buffer, buf, lexer->size);
 	return lexer;

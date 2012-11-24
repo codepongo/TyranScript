@@ -6,7 +6,7 @@
 #include <tyranscript/parser/mocha/tyran_mocha_parser.h>
 #include <tyranscript/parser/mocha/tyran_mocha_lexer.h>
 
-void tyran_mocha_api_new(int hunk_size, tyran_mocha_api* api)
+void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size)
 {
 	u8t* start = tyran_malloc(hunk_size);
 	tyran_memory* memory = (tyran_memory*)start;

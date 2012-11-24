@@ -19,7 +19,8 @@ int main(int argc, char* argv[])
 	
 	tyran_mocha_api api;
 	
-	tyran_mocha_api_new(1024, &api);
+	tyran_mocha_api_new(&api, 1024);
 	tyran_mocha_api_eval(&api, buf, tyran_strlen(buf));
+
 	return 0;
 }

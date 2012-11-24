@@ -17,6 +17,9 @@ typedef struct tyran_lexer {
 	char* string_buffer;
 	int string_buffer_max_size;
 	tyran_number number;
+	
+	tyran_memory* memory;
+
 } tyran_lexer;
 
 typedef struct tyran_lexer_position_info {

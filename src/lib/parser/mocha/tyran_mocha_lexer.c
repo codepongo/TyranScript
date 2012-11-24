@@ -198,7 +198,7 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		tyran_lexer_parse_identifier(lexer, c, identifier, &len);
 
 		tyran_mocha_token_id token_id = tyran_mocha_lexer_keyword(identifier);
-		token.token_data = identifier;
+		token.token_data = tyran_strdup(lexer->memory, identifier);
 		if (token_id) {
 			token.token_id = token_id;
 		} else {
@@ -209,11 +209,13 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		if (!worked) {
 			return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
 		}
-		token.token_data = &lexer->number;
+
+		token.token_data = TYRAN_MALLOC_NO_POOL_TYPE(lexer->memory, tyran_number);
+		tyran_memcpy_type(tyran_number, token.token_data, &lexer->number, 1);
 		token.token_id = TYRAN_MOCHA_TOKEN_NUMBER;
 	} else if (c == '"' || c == '\'') {
 		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, lexer->string_buffer, lexer->string_buffer_max_size);
-		token.token_data = lexer->string_buffer;
+		token.token_data = tyran_strdup(lexer->memory, lexer->string_buffer);
 		token.token_id = TYRAN_MOCHA_TOKEN_STRING;
 	} else if (c == '#') {
 		tyran_lexer_parse_to_eol(lexer);

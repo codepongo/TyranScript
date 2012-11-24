@@ -67,6 +67,7 @@ char* tyran_str_dup(tyran_memory* pool, const char* str);
 #define TYRAN_MALLOC_FREE(p) tyran_memory_pool_free(p);
 
 #define TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, type, count) (type*) tyran_memory_alloc(memory, count * sizeof(type));
+#define TYRAN_MALLOC_NO_POOL_TYPE(memory, type) (type*) tyran_memory_alloc(memory, sizeof(type));
 
 #define tyran_memcpy_type(T, dest, source, N) memcpy(dest, source, (N) * sizeof(T))
 
