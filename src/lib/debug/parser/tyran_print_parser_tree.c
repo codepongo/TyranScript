@@ -13,6 +13,9 @@ void tyran_parser_node_print_helper_output(const char* buf, const char* descript
 	TYRAN_LOG("%s%s %s", tabs, description, buf);
 }
 
+
+void tyran_parser_node_array_print_helper(const char* description, tyran_parser_node** nodes, int count, tyran_parser_node* current_root, tyran_parser_node* next_to_overwrite, int tab_count);
+
 void tyran_parser_node_print_helper(const char* description, tyran_parser_node* node, tyran_parser_node* current_root, tyran_parser_node* next_to_overwrite, int tab_count)
 {
 	const int buf_size = 256;
@@ -173,7 +176,7 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 			tyran_snprintf(buf, buf_size, "call ");
 			tyran_parser_node_print_helper_output(buf, description, tab_count);
 			tyran_parser_node_print_helper("call function", call_node->function_node, current_root, next_to_overwrite, tab_count+1);
-			tyran_parser_node_print_helper("call arguments", call_node->arguments[0], current_root, next_to_overwrite, tab_count+1);
+			tyran_parser_node_array_print_helper("call arguments", call_node->arguments, call_node->argument_count, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
 	case TYRAN_PARSER_NODE_TYPE_CASE:
@@ -227,6 +230,14 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node* 
 	}
 	}
 }
+
+void tyran_parser_node_array_print_helper(const char* description, tyran_parser_node** nodes, int count, tyran_parser_node* current_root, tyran_parser_node* next_to_overwrite, int tab_count)
+{
+	for (int i=0; i<count; ++i) {
+		tyran_parser_node_print_helper(description, nodes[i], current_root, next_to_overwrite, tab_count);
+	}
+}
+
 
 void tyran_parser_node_print(const char* description, tyran_parser_node* node, tyran_parser_node* current_root)
 {
