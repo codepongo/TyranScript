@@ -26,7 +26,7 @@ typedef struct tyran_mocha_parser_enclosure_stack {
 typedef struct tyran_mocha_parser {
 	struct tyran_mocha_parser_enclosure_stack* enclosure_stack;
 	tyran_mocha_token_id waiting_for_start_enclosure_id;
-	int top_precedence;
+	int overwrite_precedence;
 	NODE original_root;
 	NODE* root;
 	NODE* pointing_to_last_added_node;
