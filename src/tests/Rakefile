@@ -1,0 +1,43 @@
+require 'colored'
+
+test_files = FileList['./**/*.test']
+
+o_files = []
+test_files.each do |source_file|
+	object_file = File.basename(source_file).ext('output')
+	o_files << object_file
+
+	file object_file => source_file do |f|
+		test_name = File.basename(source_file).ext('')
+
+		puts "* Testing '".bold.blue + "#{test_name}".cyan + "'".bold.blue
+		f = File.new source_file
+		data = f.read
+		f.close
+		array = data.split "\n---\n"
+		source_text = array[0]
+		expected_output = array[1]
+
+		o = File.new 'test.mocha', 'w'
+		o.write source_text
+		o.close
+
+		sh "./command test.mocha > output.txt"
+
+		output_file = File.new 'output.txt'
+		output_text = output_file.read
+		output_file.close
+
+		if expected_output == output_text 
+			p "Matched!"
+		else
+			puts "#{test_name} didn't match!".red # #{expected_output} #{output_text}"
+		end
+	end
+end
+
+file 'tests' => o_files do
+	
+end
+
+task :default => 'tests'
