@@ -10,7 +10,9 @@ test_files.each do |source_file|
 	file object_file => source_file do |f|
 		test_name = File.basename(source_file).ext('')
 
-		puts "* Testing '".bold.blue + "#{test_name}".cyan + "'".bold.blue
+		print "* Testing '".bold.blue + "#{test_name}".cyan + "'".bold.blue + "..."
+		STDOUT.flush
+
 		f = File.new source_file
 		data = f.read
 		f.close
@@ -22,17 +24,18 @@ test_files.each do |source_file|
 		o.write source_text
 		o.close
 
-		sh "./command test.mocha > output.txt"
+		`./command test.mocha > output.txt`
 
 		output_file = File.new 'output.txt'
 		output_text = output_file.read
 		output_file.close
 
 		if expected_output == output_text 
-			p "Matched!"
+			puts "OK".bold.green
 		else
-			puts "#{test_name} didn't match!".red # #{expected_output} #{output_text}"
+			puts "Failed!".red
 		end
+		STDOUT.flush
 	end
 end
 
