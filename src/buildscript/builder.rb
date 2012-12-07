@@ -52,7 +52,7 @@ class Builder
 
 	def compile source, target
 		p "compile #{source.inspect}"
-		sh "#{@c_compiler} -c #{source} -Wall -pedantic -Werror #{parameter_string('I', @includes)} -std=c99 -o #{target}"
+		sh "#{@c_compiler} -c #{source} -g -Wall -pedantic -Werror #{parameter_string('I', @includes)} -std=c99 -o #{target}"
 	end
 end
 

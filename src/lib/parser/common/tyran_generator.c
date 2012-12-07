@@ -44,10 +44,11 @@ void tyran_generator_resolve_labels(tyran_code_state* code)
 tyran_generator* tyran_generator_new(tyran_memory* memory, tyran_memory_pool* generator_pool, tyran_parser_node* tree, tyran_code_state* code) {
 	tyran_generator* generator = TYRAN_CALLOC_TYPE(generator_pool, tyran_generator);
 	tyran_label_id false_label = tyran_generator_prepare_label(code);
-	tyran_reg_or_constant_index return_index = tyran_generator_traverse(memory, code, tree, TYRAN_OPCODE_REGISTER_ILLEGAL, false_label, 0);
-	tyran_generator_define_label(code, false_label);
-	tyran_opcodes_op_ret(code->opcodes, return_index, 1);
-	tyran_generator_resolve_labels(code);
+	/* tyran_reg_or_constant_index return_index = */ tyran_generator_traverse(memory, code, tree, TYRAN_OPCODE_REGISTER_ILLEGAL, false_label, 0);
+	
+	// tyran_generator_define_label(code, false_label);
+	// tyran_opcodes_op_ret(code->opcodes, return_index, 1);
+	// tyran_generator_resolve_labels(code);
 	
 	return generator;
 }
@@ -377,6 +378,7 @@ void tyran_generator_traverse_function_parameters(tyran_memory* memory, tyran_co
 
 tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* code, tyran_parser_node_function* func_node, tyran_memory_pool* opcodes_pool, tyran_memory_pool* function_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, tyran_memory* memory)
 {
+	TYRAN_LOG("Traverse func");
 	tyran_opcodes* old_codes = code->opcodes;
 	code->opcodes = tyran_opcodes_new(opcodes_pool, memory, 1024);
 	
@@ -394,6 +396,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* 
 	code->opcodes = old_codes;
 	tyran_reg_index function_object_index = tyran_variable_scopes_define_temporary_variable(code->scope);
 	tyran_opcodes_op_func(code->opcodes, function_object_index, function_constant_index);
+	TYRAN_LOG("Traverse funcxx");
 	return function_object_index;
 }
 
@@ -470,6 +473,8 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran
 		break;
 		case TYRAN_PARSER_NODE_TYPE_FUNCTION: {
 			tyran_parser_node_function* func_node = (tyran_parser_node_function*)node;
+			TYRAN_ASSERT(code->opcodes_pool, "xxx");
+			TYRAN_ASSERT(code->function_pool, "yyy");
 			result = tyran_generator_traverse_function(code, func_node, code->opcodes_pool, code->function_pool, code->variable_info_pool, code->register_pool, code->memory);
 		}
 		break;
@@ -483,7 +488,7 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran
 		}
 			
 	}
-	tyran_parser_node_print("traverse", node, 0);
+	tyran_parser_node_print("traverse", &node, 0);
 	
 	return result;
 }

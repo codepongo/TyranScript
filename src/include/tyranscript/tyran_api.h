@@ -9,6 +9,9 @@
 #include <tyranscript/tyran_object_iterator.h>
 #include <tyranscript/tyran_object_array.h>
 
+#include <tyranscript/parser/common/tyran_code.h>
+
+
 /* Prototypes */
 #include <tyranscript/tyran_object_prototype.h>
 #include <tyranscript/tyran_prototypes.h>
@@ -16,6 +19,7 @@
 /* Runtime */
 #include <tyranscript/tyran_runtime.h>
 #include <tyranscript/tyran_runtime_callbacks.h>
+#include <tyranscript/tyran_runtime_stack.h>
 #include <tyranscript/tyran_opcodes.h>
 
 /* Parser */

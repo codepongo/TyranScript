@@ -102,7 +102,7 @@ char* tyran_str_dup(tyran_memory* pool, const char* str);
 #define tyran_strcmp strcmp
 #define tyran_strlen strlen
 #define tyran_strncmp strncmp
-#define tyran_printf printf
+#define tyran_fprintf fprintf
 #define tyran_fflush fflush
 #define tyran_strdup(pool, str) tyran_str_dup(pool, str)
 
@@ -110,11 +110,12 @@ char* tyran_str_dup(tyran_memory* pool, const char* str);
 #define tyran_pow pow
 
 
-#define TYRAN_LOG(...) { tyran_printf(__VA_ARGS__); tyran_printf("\n"); tyran_fflush(stdout); }
-#define TYRAN_LOG_NO_LF(...) { tyran_printf(__VA_ARGS__); tyran_fflush(stdout); }
+#define TYRAN_LOG(...) { tyran_fprintf(stderr, __VA_ARGS__); tyran_fprintf(stderr, "\n"); tyran_fflush(stderr); }
+#define TYRAN_LOG_NO_LF(...) { tyran_fprintf(stderr, __VA_ARGS__); tyran_fflush(stderr); }
 #define TYRAN_SOFT_ERROR(...) TYRAN_LOG(__VA_ARGS__);
 #define TYRAN_BREAK abort()
 #define TYRAN_ERROR(...) TYRAN_LOG(__VA_ARGS__); TYRAN_BREAK;
 #define TYRAN_ASSERT(expression, ...) if (!(expression)) { TYRAN_LOG(__VA_ARGS__); TYRAN_BREAK; }
+#define TYRAN_OUTPUT(...) { tyran_fprintf(stdout, __VA_ARGS__); tyran_fprintf(stdout, "\n"); tyran_fflush(stdout); }
 
 #endif
