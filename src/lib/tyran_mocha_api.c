@@ -63,9 +63,10 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, const char* buf, size_t length)
 	tyran_memory_pool* register_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, int, 1);
 
 	tyran_memory_pool* function_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_function, 10);
+	tyran_memory_pool* string_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_string, 10);
 
 	TYRAN_LOG("code new!");
-	struct tyran_code_state* code = tyran_code_new(function_pool, code_state_pool, opcodes_pool, constants_pool, constant_values_pool, label_pool,
+	struct tyran_code_state* code = tyran_code_new(string_pool, function_pool, code_state_pool, opcodes_pool, constants_pool, constant_values_pool, label_pool,
 		label_reference_pool, scopes_pool, scope_pool, variable_info_pool, register_pool, api->memory);
 
 	tyran_memory_pool* generator_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_code_state, 1);
