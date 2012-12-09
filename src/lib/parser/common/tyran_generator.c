@@ -44,11 +44,11 @@ void tyran_generator_resolve_labels(tyran_code_state* code)
 tyran_generator* tyran_generator_new(tyran_memory* memory, tyran_memory_pool* generator_pool, tyran_parser_node* tree, tyran_code_state* code) {
 	tyran_generator* generator = TYRAN_CALLOC_TYPE(generator_pool, tyran_generator);
 	tyran_label_id false_label = tyran_generator_prepare_label(code);
-	/* tyran_reg_or_constant_index return_index = */ tyran_generator_traverse(memory, code, tree, TYRAN_OPCODE_REGISTER_ILLEGAL, false_label, 0);
+	tyran_reg_or_constant_index return_index = tyran_generator_traverse(memory, code, tree, TYRAN_OPCODE_REGISTER_ILLEGAL, false_label, 0);
 	
-	// tyran_generator_define_label(code, false_label);
-	// tyran_opcodes_op_ret(code->opcodes, return_index, 1);
-	// tyran_generator_resolve_labels(code);
+	tyran_generator_define_label(code, false_label);
+	tyran_opcodes_op_ret(code->opcodes, return_index, 1);
+	tyran_generator_resolve_labels(code);
 	
 	return generator;
 }

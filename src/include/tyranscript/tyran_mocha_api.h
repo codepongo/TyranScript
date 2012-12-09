@@ -12,11 +12,16 @@ typedef struct tyran_mocha_api {
 	struct tyran_memory_pool* object_pool;
 	struct tyran_memory* memory;
 	struct tyran_runtime* default_runtime;
+
+	struct tyran_memory_pool* default_variable_info_pool;
+	struct tyran_memory_pool* default_register_pool;
+	struct tyran_variable_scopes* default_variable_scopes;
+
 } tyran_mocha_api;
 
 
 void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size);
-void tyran_mocha_api_eval(tyran_mocha_api* api, const char* s, size_t length);
+void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char* s, size_t length);
 tyran_value tyran_mocha_api_create_object(tyran_mocha_api* api);
 void tyran_mocha_api_add_function(tyran_mocha_api* api, tyran_value* target, const char* name, tyran_function_callback callback);
 

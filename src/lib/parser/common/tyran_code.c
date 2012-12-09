@@ -7,23 +7,22 @@
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/tyran_config.h>
 
-tyran_code_state* tyran_code_new(tyran_memory_pool* string_pool, tyran_memory_pool* function_pool, tyran_memory_pool* code_state_pool, tyran_memory_pool* opcodes_pool, tyran_memory_pool* constants_pool, tyran_memory_pool* constant_values_pool, tyran_memory_pool* label_pool, tyran_memory_pool* label_reference_pool, tyran_memory_pool* scopes_pool, tyran_memory_pool* scope_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, tyran_memory* memory)
+tyran_code_state* tyran_code_new(tyran_memory_pool* string_pool, tyran_memory_pool* function_pool, tyran_memory_pool* code_state_pool, tyran_memory_pool* opcodes_pool, tyran_memory_pool* constants_pool, tyran_memory_pool* constant_values_pool, tyran_memory_pool* label_pool, tyran_memory_pool* label_reference_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, tyran_variable_scopes* variable_scopes, tyran_memory* memory)
 {
 	tyran_code_state* state = TYRAN_CALLOC_TYPE(code_state_pool, tyran_code_state);
 
 	state->opcodes_pool = opcodes_pool;
 	state->function_pool = function_pool;
 
-	state->variable_info_pool = variable_info_pool;
-	state->register_pool = register_pool;
-
 	state->string_pool = string_pool;
 	state->memory = memory;
+	state->variable_info_pool = variable_info_pool;
+	state->register_pool = register_pool;
 
 	state->opcodes = tyran_opcodes_new(opcodes_pool, memory, 1024);
 	state->constants = tyran_constants_new(constants_pool, constant_values_pool, 1024);
 	
-	state->scope = tyran_variable_scopes_new(scopes_pool, scope_pool, variable_info_pool, register_pool, 1024);
+	state->scope = variable_scopes;
 	state->labels = TYRAN_CALLOC_TYPE_COUNT(label_pool, 100, tyran_label);
 	state->label_references = TYRAN_CALLOC_TYPE_COUNT(label_reference_pool, 100, tyran_label_reference);
 	return state;

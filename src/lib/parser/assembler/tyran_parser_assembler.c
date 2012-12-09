@@ -343,7 +343,7 @@ void tyran_lexer_assembler_end_of_function(tyran_memory_pool* function_pool, tyr
 	TYRAN_LOG("*** End of function!");
 
 	tyran_code_fixup_label_references(parser_state->code);
-	tyran_print_constants(parser_state->constants);
+	tyran_print_constants(parser_state->constants, 0);
 	tyran_print_opcodes(parser_state->opcodes, 0, parser_state->constants);
 
 	tyran_function* func = tyran_function_new(function_pool, parser_state->opcodes, parser_state->constants);

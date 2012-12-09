@@ -6,6 +6,7 @@ struct tyran_scope_stack;
 struct tyran_value;
 
 #include <tyranscript/tyran_opcodes.h>
+#include <tyranscript/tyran_value.h>
 
 typedef struct tyran_runtime_stack {
 	const struct tyran_opcodes* opcodes;
@@ -17,7 +18,7 @@ typedef struct tyran_runtime_stack {
 	struct tyran_value* r;
 	struct tyran_value* return_register;
 
-	struct tyran_value* _this;
+	struct tyran_value _this;
 } tyran_runtime_stack;
 
 tyran_runtime_stack* tyran_runtime_stack_new();

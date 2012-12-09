@@ -61,7 +61,10 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	// Context
 	const tyran_opcode* pc = sp->pc;
 	tyran_value* registers = runtime->registers;
-	tyran_value_copy(registers[0], *sp->_this);
+	TYRAN_LOG("Registers:%p", registers);
+	TYRAN_LOG("sp:%p", sp);
+	TYRAN_LOG("sp->this:%p", &sp->_this);
+	tyran_value_copy(registers[0], sp->_this);
 
 	tyran_value* r = registers;
 	const tyran_value* c = sp->c;
@@ -233,8 +236,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_STACK_PUSH;
 			TYRAN_REGISTER_A_X;
 			{
-				TYRAN_ASSERT(tyran_value_is_function(&r[a]), "Must reference a function!");
-				const tyran_function* function = r[a].data.object->data.function->static_function;
+				TYRAN_ASSERT(tyran_value_is_function(&r[a+1]), "Must reference a function!");
+				const tyran_function* function = r[a+1].data.object->data.function->static_function;
 				sp->opcodes = function->data.opcodes;
 				pc = sp->opcodes->codes;
 				sp->constants = function->constants;

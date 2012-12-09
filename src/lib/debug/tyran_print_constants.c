@@ -2,7 +2,7 @@
 #include <tyranscript/debug/tyran_print_value.h>
 #include <tyranscript/tyran_value.h>
 
-void tyran_print_constants(tyran_constants* constants)
+void tyran_print_constants(tyran_constants* constants, struct tyran_memory_pool* object_iterator_pool)
 {
 	char buf[255];
 	int i;
@@ -10,7 +10,7 @@ void tyran_print_constants(tyran_constants* constants)
 	for (i=0; i<constants->size; ++i)
 	{
 		tyran_snprintf(buf, 255, "%d", i);
-		tyran_print_value(buf, &constants->values[i], 1);
+		tyran_print_value(buf, &constants->values[i], 1, object_iterator_pool);
 	}
 }
 
