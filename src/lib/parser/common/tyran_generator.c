@@ -115,26 +115,26 @@ void tyran_generator_comparison_operator(tyran_code_state* code, tyran_parser_bi
 	tyran_opcodes* codes = code->opcodes;
 	
 	switch (operator_type) {
-	case TYRAN_PARSER_EQUAL:
-		tyran_opcodes_op_jeq(codes, left, right, invert_logic);
-		break;
-	case TYRAN_PARSER_NOT_EQUAL:
-		tyran_opcodes_op_jeq(codes, left, right, !invert_logic);
-		break;
-	case TYRAN_PARSER_LESS:
-		tyran_opcodes_op_jlt(codes, left, right, invert_logic);
-		break;
-	case TYRAN_PARSER_LESS_EQUAL:
-		tyran_opcodes_op_jle(codes, left, right, invert_logic);
-		break;
-	case TYRAN_PARSER_GREATER_EQUAL:
-		tyran_opcodes_op_jlt(codes, left, right, !invert_logic);
-		break;
-	case TYRAN_PARSER_GREATER:
-		tyran_opcodes_op_jle(codes, left, right, !invert_logic);
-		break;
-	default:
-		TYRAN_ERROR("Unhandled comparison operator");
+		case TYRAN_PARSER_EQUAL:
+			tyran_opcodes_op_jeq(codes, left, right, invert_logic);
+			break;
+		case TYRAN_PARSER_NOT_EQUAL:
+			tyran_opcodes_op_jeq(codes, left, right, !invert_logic);
+			break;
+		case TYRAN_PARSER_LESS:
+			tyran_opcodes_op_jlt(codes, left, right, invert_logic);
+			break;
+		case TYRAN_PARSER_LESS_EQUAL:
+			tyran_opcodes_op_jle(codes, left, right, invert_logic);
+			break;
+		case TYRAN_PARSER_GREATER_EQUAL:
+			tyran_opcodes_op_jlt(codes, left, right, !invert_logic);
+			break;
+		case TYRAN_PARSER_GREATER:
+			tyran_opcodes_op_jle(codes, left, right, !invert_logic);
+			break;
+		default:
+			TYRAN_ERROR("Unhandled comparison operator");
 	}
 	
 	tyran_generator_label_reference(code, false_label);
@@ -175,36 +175,36 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 	tyran_reg_index target = tyran_variable_scopes_define_temporary_variable(code->scope);
 	
 	switch (operator_type) {
-	case TYRAN_PARSER_DIVIDE:
-		tyran_opcodes_op_div(codes, target, left, right);
-		break;
-	case TYRAN_PARSER_MULTIPLY:
-		tyran_opcodes_op_mul(codes, target, left, right);
-		break;
-	case TYRAN_PARSER_MODULUS:
-		tyran_opcodes_op_mod(codes, target, left, right);
-		break;
-	case TYRAN_PARSER_ADD:
-		tyran_opcodes_op_add(codes, target, left, right);
-		break;
-	case TYRAN_PARSER_SUBTRACT:
-		tyran_opcodes_op_sub(codes, target, left, right);
-		break;
-	case TYRAN_PARSER_ASSIGNMENT:
-		tyran_opcodes_op_set(codes, target, left, right);
-		break;
-	case TYRAN_PARSER_EQUAL:
-	case TYRAN_PARSER_NOT_EQUAL:
-	case TYRAN_PARSER_LESS:
-	case TYRAN_PARSER_LESS_EQUAL:
-	case TYRAN_PARSER_GREATER:
-	case TYRAN_PARSER_GREATER_EQUAL:
-		tyran_variable_scopes_undefine_variable(code->scope, target);
-		target = TYRAN_OPCODE_REGISTER_ILLEGAL;
-		tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
-		break;
-	default:
-		TYRAN_ERROR("Unhandled operator");
+		case TYRAN_PARSER_DIVIDE:
+			tyran_opcodes_op_div(codes, target, left, right);
+			break;
+		case TYRAN_PARSER_MULTIPLY:
+			tyran_opcodes_op_mul(codes, target, left, right);
+			break;
+		case TYRAN_PARSER_MODULUS:
+			tyran_opcodes_op_mod(codes, target, left, right);
+			break;
+		case TYRAN_PARSER_ADD:
+			tyran_opcodes_op_add(codes, target, left, right);
+			break;
+		case TYRAN_PARSER_SUBTRACT:
+			tyran_opcodes_op_sub(codes, target, left, right);
+			break;
+		case TYRAN_PARSER_ASSIGNMENT:
+			tyran_opcodes_op_set(codes, target, left, right);
+			break;
+		case TYRAN_PARSER_EQUAL:
+		case TYRAN_PARSER_NOT_EQUAL:
+		case TYRAN_PARSER_LESS:
+		case TYRAN_PARSER_LESS_EQUAL:
+		case TYRAN_PARSER_GREATER:
+		case TYRAN_PARSER_GREATER_EQUAL:
+			tyran_variable_scopes_undefine_variable(code->scope, target);
+			target = TYRAN_OPCODE_REGISTER_ILLEGAL;
+			tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
+			break;
+		default:
+			TYRAN_ERROR("Unhandled operator");
 	}
 	
 	return target;
@@ -354,8 +354,8 @@ tyran_reg_or_constant_index tyran_generator_traverse_case(tyran_memory* memory, 
 {
 	tyran_reg_or_constant_index compare_register = tyran_generator_traverse(memory, code, case_node->expression, 0, 0, 0);
 	tyran_label_id end_of_case_label = tyran_generator_prepare_label(code);
-	int i;
-	for (i = 0; i < case_node->when_count; ++i) {
+
+	for (int i = 0; i < case_node->when_count; ++i) {
 		tyran_generator_traverse_when(memory, code, compare_register, case_node->whens[i], end_of_case_label);
 	}
 	
@@ -367,9 +367,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_case(tyran_memory* memory, 
 
 void tyran_generator_traverse_function_parameters(tyran_memory* memory, tyran_code_state* code, tyran_parser_node_function* func_node)
 {
-	int i;
-	
-	for (i = 0; i < func_node->parameter_count; ++i) {
+	for (int i = 0; i < func_node->parameter_count; ++i) {
 		tyran_parser_node_parameter parameter = func_node->parameters[i];
 		tyran_variable_scopes_define_identifier(memory, code->scope, parameter.identifier->string);
 	}

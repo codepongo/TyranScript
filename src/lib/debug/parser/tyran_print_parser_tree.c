@@ -10,7 +10,7 @@ void tyran_parser_node_print_helper_output(const char* buf, const char* descript
 	tyran_memset_type_n(tabs, '.', octet_count);
 	tabs[octet_count] = 0;
 	
-	TYRAN_LOG("%s%s %s", tabs, description, buf);
+	TYRAN_LOG("%s%s: %s", tabs, description, buf);
 }
 
 
@@ -136,9 +136,9 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node**
 			for (int i=0; i<func_node->parameter_count; ++i) {
 				tyran_parser_node_parameter* param = &parameters[i];
 				tyran_snprintf(buf, buf_size, "(%d) '%s'", i, param->identifier->string);
-				tyran_parser_node_print_helper_output(buf, "parameter", tab_count+1);
+				tyran_parser_node_print_helper_output(buf, "parameter", tab_count+2);
 				if (param->default_value) {
-					tyran_parser_node_print_helper("default", &param->default_value, current_root, next_to_overwrite, tab_count+1);
+					tyran_parser_node_print_helper("default", &param->default_value, current_root, next_to_overwrite, tab_count+3);
 				}
 			}
 			tyran_parser_node_print_helper("func block", &func_node->block, current_root, next_to_overwrite, tab_count+1);

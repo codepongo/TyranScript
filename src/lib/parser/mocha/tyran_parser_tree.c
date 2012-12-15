@@ -231,6 +231,7 @@ NODE tyran_parser_function(tyran_memory* memory, NODE block, tyran_boolean bound
 	node->node.type = TYRAN_PARSER_NODE_TYPE_FUNCTION;
 	node->bound = bound;
 	node->parameters = 0;
+	TYRAN_ASSERT(block, "No block defined!");
 	node->block = block;
 	return (tyran_parser_node*)node;
 }
