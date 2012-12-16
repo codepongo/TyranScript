@@ -204,7 +204,7 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 			tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
 			break;
 		default:
-			TYRAN_ERROR("Unhandled operator");
+			TYRAN_ERROR("Unhandled operator:%d", operator_type);
 	}
 	
 	return target;

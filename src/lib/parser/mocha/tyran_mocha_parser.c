@@ -158,7 +158,9 @@ NODE* tyran_mocha_parser_actual_root(tyran_mocha_parser* parser)
 void tyran_mocha_parser_push_root_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node)
 {
 	NODE* actual_root = tyran_mocha_parser_actual_root(parser);
-	// tyran_parser_node_print("PushRootRight", &node, actual_root);
+	NODE print_node= (NODE) node;
+	tyran_parser_node_print("PUSH ROOT RIGHT NODE:", parser->root, &print_node);
+	tyran_mocha_parser_node_print_tree(parser, "BEFORE PUSH RIGHT", 0);
 	tyran_mocha_parser_push_right(parser, node, actual_root);
 	tyran_mocha_parser_node_print_tree(parser, "AFTER PUSH RIGHT", 0);
 }
@@ -170,50 +172,31 @@ void tyran_mocha_parser_push_last_inserted_right(tyran_mocha_parser* parser, tyr
 	tyran_mocha_parser_node_print_tree(parser, "AFTER PUSH LAST RIGHT", 0);
 }
 
-NODE tyran_mocha_parser_concat_pop_helper(tyran_mocha_parser* parser, NODE* parent, NODE* node, NODE* other, NODE replace_with, int inverse) {
+NODE tyran_mocha_parser_concat_pop_helper(tyran_mocha_parser* parser, NODE* parent, NODE* node, NODE* sibling) {
 	NODE result;
 	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_type_cast(*node, TYRAN_PARSER_CONCAT);
 	if (binary) {
-		tyran_parser_node_operand_binary* next = tyran_parser_binary_operator_type_cast(binary->right, TYRAN_PARSER_CONCAT);
-		if (next) {
-			return tyran_mocha_parser_concat_pop_helper(parser, node, &binary->right, &binary->left, binary->left, inverse);
-		}
-
-		if (inverse) {
-			result = binary->left;
-			*parent = binary->right;
-			TYRAN_ASSERT(result, "binary->left is null!");
-		} else {
-			result = binary->left;
-			*parent = binary->right;
-			TYRAN_ASSERT(result, "binary->right is null!");
-		}
-		parser->next_node_to_overwrite = parent;
-		return result;
+		return tyran_mocha_parser_concat_pop_helper(parser, node, &binary->left, &binary->right);
 	}
 
 	result = *node;
-	TYRAN_ASSERT(result, "node is null!");
-	if (inverse) {
-		TYRAN_LOG("NO CONCAT INVERSE!!!!!!!!!!!!!!!!!!!!");
-		*parent = *other;
+
+	if (sibling) {
+		*parent = *sibling;
+		*sibling = 0;
+		*node = 0;
 	} else {
-		*parent = replace_with;
+		parser->next_node_to_overwrite = parent;
 	}
-	parser->next_node_to_overwrite = parent;
 	return result;
 }
 
 
 
 NODE tyran_mocha_parser_concat_pop(tyran_mocha_parser* parser) {
-	NODE result = tyran_mocha_parser_concat_pop_helper(parser, parser->root, parser->root, 0, 0, 0);
-	return result;
-}
-
-
-NODE tyran_mocha_parser_concat_pop_inverse(tyran_mocha_parser* parser) {
-	NODE result = tyran_mocha_parser_concat_pop_helper(parser, parser->root, parser->root, 0, 0, 1);
+	tyran_mocha_parser_node_print_tree(parser, "BEFORE CONCAT POP", 0);
+	NODE result = tyran_mocha_parser_concat_pop_helper(parser, parser->root, parser->root, 0);
+	tyran_mocha_parser_node_print_tree(parser, "AFTER CONCAT POP", 0);
 	return result;
 }
 
@@ -702,7 +685,7 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_mocha_to
 		NODE node = tyran_mocha_parser_concat_peek_position(parser, 1);
 		if (node && node->type == TYRAN_PARSER_NODE_TYPE_FUNCTION) {
 			TYRAN_LOG("==========> FUNCTION FOUND!");
-			tyran_mocha_parser_concat_pop_inverse(parser);
+			tyran_mocha_parser_concat_pop(parser);
 			tyran_parser_node_function* function = (tyran_parser_node_function*) node;
 			tyran_mocha_parser_define_function_parameters(parser->parser_parameter_pool, function, parentheses->expression);
 		}
