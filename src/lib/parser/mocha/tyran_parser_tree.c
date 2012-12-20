@@ -150,18 +150,6 @@ NODE tyran_parser_class(tyran_memory* memory, NODE name, NODE extends, NODE bloc
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_self()
-{
-	TYRAN_LOG("self");
-	return 0;
-}
-
-NODE tyran_parser_self_identifier(NODE a)
-{
-	TYRAN_LOG("self identifier");
-	return 0;
-}
-
 NODE tyran_parser_array(NODE a)
 {
 	TYRAN_LOG("array");
@@ -297,6 +285,14 @@ NODE tyran_parser_bool(tyran_memory* memory, int boolean)
 	node->boolean = boolean;
 	return (tyran_parser_node*)node;
 }
+
+NODE tyran_parser_self(tyran_memory* memory)
+{
+	tyran_parser_node_self* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_self, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_SELF;
+	return (tyran_parser_node*)node;
+}
+
 
 NODE tyran_parser_undefined(tyran_memory* memory)
 {

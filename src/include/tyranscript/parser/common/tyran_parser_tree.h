@@ -24,6 +24,7 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_BOOLEAN,
 	TYRAN_PARSER_NODE_TYPE_NULL,
 	TYRAN_PARSER_NODE_TYPE_UNDEFINED,
+	TYRAN_PARSER_NODE_TYPE_SELF,
 	TYRAN_PARSER_NODE_TYPE_STRING,
 	TYRAN_PARSER_NODE_TYPE_IDENTIFIER,
 	TYRAN_PARSER_NODE_TYPE_ASSIGNMENT,
@@ -54,7 +55,6 @@ typedef enum tyran_parser_binary_operand_type {
 	TYRAN_PARSER_SUBTRACT,
 	TYRAN_PARSER_INDEX,
 	TYRAN_PARSER_COMMA,
-	TYRAN_PARSER_INVOKE,
 	TYRAN_PARSER_EQUAL,
 	TYRAN_PARSER_NOT_EQUAL,
 	TYRAN_PARSER_GREATER_EQUAL,
@@ -92,6 +92,11 @@ typedef struct tyran_parser_node
 {
 	enum tyran_parser_type type;
 } tyran_parser_node;
+
+typedef struct tyran_parser_node_self
+{
+	tyran_parser_node node;
+} tyran_parser_node_self;
 
 typedef struct tyran_parser_node_value
 {
@@ -292,8 +297,6 @@ NODE tyran_parser_index(NODE a);
 NODE tyran_parser_slice(NODE b);
 NODE tyran_parser_object(tyran_memory* memory, NODE a);
 NODE tyran_parser_class(tyran_memory* memory, NODE name, NODE extends, NODE block);
-NODE tyran_parser_self();
-NODE tyran_parser_self_identifier(NODE a);
 NODE tyran_parser_array(NODE a);
 NODE tyran_parser_range(NODE a, NODE b, NODE c);
 NODE tyran_parser_parens(NODE a);
@@ -311,6 +314,7 @@ tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_memory* memo
 NODE tyran_parser_null(tyran_memory* memory);
 NODE tyran_parser_bool(tyran_memory* memory, int boolean);
 NODE tyran_parser_undefined(tyran_memory* memory);
+NODE tyran_parser_self(tyran_memory* memory);
 NODE tyran_parser_literal_number(tyran_memory* memory, float* a);
 NODE tyran_parser_literal_string(tyran_memory* memory, const char* string);
 NODE tyran_parser_literal_identifier(tyran_memory* memory, const char* string);

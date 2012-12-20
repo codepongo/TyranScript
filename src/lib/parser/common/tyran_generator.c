@@ -10,6 +10,12 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran
 
 tyran_reg_index tyran_generator_traverse_force_register(tyran_memory* memory, tyran_code_state* code, tyran_parser_node* node, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic, tyran_reg_index force_register) {
 	tyran_reg_or_constant_index result = tyran_generator_traverse(memory, code, node, true_label, false_label, invert_logic);
+
+	if (result == TYRAN_OPCODE_REGISTER_ILLEGAL) {
+		TYRAN_LOG("Illegal register");
+		return TYRAN_OPCODE_REGISTER_ILLEGAL;		
+	}
+
 	if (tyran_opcodes_is_constant(result)) {
 		tyran_opcodes_op_ldc(code->opcodes, force_register, result);
 	} else {
@@ -168,6 +174,25 @@ tyran_reg_index tyran_generator_traverse_call(tyran_memory* memory, tyran_code_s
 }
 
 
+/*
+NODE tyran_generator_call(tyran_memory* memory, NODE function, NODE arguments)
+{
+	NODE argument_nodes[100];
+	int argument_count = 0;
+
+	tyran_generator_argument_nodes(argument_nodes, &argument_count, arguments);
+	
+	NODE call_node = tyran_parser_call(memory, function, argument_nodes, argument_count);
+	//tyran_parser_node_print("call", call_node, 0);
+	return call_node;
+}
+*/
+void tyran_generator_call(tyran_opcodes* codes, tyran_reg_index target, tyran_reg_or_constant_index left, tyran_reg_or_constant_index right)
+{
+	
+}
+
+
 tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_parser_binary_operand_type operator_type, tyran_reg_or_constant_index left, tyran_reg_or_constant_index right, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic)
 {
 	tyran_opcodes* codes = code->opcodes;
@@ -193,6 +218,9 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 		case TYRAN_PARSER_ASSIGNMENT:
 			tyran_opcodes_op_set(codes, target, left, right);
 			break;
+		case TYRAN_PARSER_INDEX:
+			tyran_opcodes_op_get(codes, target, left, right);
+			break;
 		case TYRAN_PARSER_EQUAL:
 		case TYRAN_PARSER_NOT_EQUAL:
 		case TYRAN_PARSER_LESS:
@@ -202,6 +230,9 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 			tyran_variable_scopes_undefine_variable(code->scope, target);
 			target = TYRAN_OPCODE_REGISTER_ILLEGAL;
 			tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
+			break;
+		case TYRAN_PARSER_CALL:
+			tyran_generator_call(codes, target, left, right);
 			break;
 		default:
 			TYRAN_ERROR("Unhandled operator:%d", operator_type);
@@ -220,7 +251,7 @@ tyran_reg_or_constant_index tyran_generator_handle_node(tyran_code_state* code, 
 		tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*) node;
 		result = tyran_variable_scopes_get_identifier(code->scope, identifier->string);
 		if (result == TYRAN_OPCODE_REGISTER_ILLEGAL) {
-			TYRAN_SOFT_ERROR("illegal variable: '%s'", identifier->string);
+			TYRAN_SOFT_ERROR("illegal identifier: '%s'", identifier->string);
 		}
 	}
 	
@@ -364,6 +395,19 @@ tyran_reg_or_constant_index tyran_generator_traverse_case(tyran_memory* memory, 
 	return TYRAN_OPCODE_REGISTER_ILLEGAL;
 }
 
+void tyran_generator_argument_nodes(NODE* argument_nodes, int* index, NODE node)
+{
+	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_type_cast(node, TYRAN_PARSER_COMMA);
+	if (binary) {
+		tyran_generator_argument_nodes(argument_nodes, index, binary->left);
+		tyran_generator_argument_nodes(argument_nodes, index, binary->right);
+	} else {
+		argument_nodes[*index] = node;
+		*index = *index + 1;
+	}
+}
+
+
 
 void tyran_generator_traverse_function_parameters(tyran_memory* memory, tyran_code_state* code, tyran_parser_node_function* func_node)
 {
@@ -432,6 +476,10 @@ tyran_reg_or_constant_index tyran_generator_traverse_for(tyran_memory* memory, t
 tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran_code_state* code, tyran_parser_node* node, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic) {
 	tyran_reg_or_constant_index result;
 	
+	if (node->type != TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY && ((tyran_parser_node_operand_binary*)node)->operator_type != TYRAN_PARSER_CONCAT) {
+		tyran_parser_node_print("traverse", &node, 0);
+	}
+
 	switch (node->type) {
 		case TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY: {
 			tyran_parser_node_operand_binary* binary = (tyran_parser_node_operand_binary*)node;
@@ -471,14 +519,11 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran
 		break;
 		case TYRAN_PARSER_NODE_TYPE_FUNCTION: {
 			tyran_parser_node_function* func_node = (tyran_parser_node_function*)node;
-			TYRAN_ASSERT(code->opcodes_pool, "xxx");
-			TYRAN_ASSERT(code->function_pool, "yyy");
 			result = tyran_generator_traverse_function(code, func_node, code->opcodes_pool, code->function_pool, code->variable_info_pool, code->register_pool, code->memory);
 		}
 		break;
-		case TYRAN_PARSER_NODE_TYPE_CALL: {
-			tyran_parser_node_call* call_node = (tyran_parser_node_call*)node;
-			result = tyran_generator_traverse_call(memory, code, call_node);
+		case TYRAN_PARSER_NODE_TYPE_SELF: {
+			result = 0;
 		}
 		break;
 		default: {
@@ -486,7 +531,6 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran
 		}
 			
 	}
-	tyran_parser_node_print("traverse", &node, 0);
 	
 	return result;
 }

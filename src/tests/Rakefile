@@ -30,6 +30,8 @@ test_files.each do |source_file|
 		output_text = output_file.read
 		output_file.close
 
+		p "Output:#{output_text}"
+
 		if expected_output == output_text 
 			puts "OK".bold.green
 		else

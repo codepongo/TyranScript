@@ -133,6 +133,7 @@ tyran_reg_index tyran_variable_scope_define_identifier(tyran_memory* memory, tyr
 {
 	tyran_reg_index current_index = tyran_variable_scope_get_identifier(top_scope, variable_name);
 	if (current_index == TYRAN_OPCODE_REGISTER_ILLEGAL) {
+		TYRAN_LOG("Couldn't find variable '%s', adding it to scope", variable_name);
 		current_index = tyran_variable_scope_find_and_reserve_variable(top_scope, 2);
 		tyran_variable_scope_add_identifier(memory, top_scope, variable_name, current_index);
 	}

@@ -1,5 +1,10 @@
 #include <tyranscript/tyran_mocha_api.h>
 
+int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call) {
+	TYRAN_OUTPUT("PRINT");
+	return 0;
+}
+
 int main(int argc, char* argv[])
 {
 	TYRAN_LOG("Mocha command");
@@ -21,6 +26,8 @@ int main(int argc, char* argv[])
 	
 	tyran_mocha_api_new(&api, 1024);
 	tyran_value global = tyran_mocha_api_create_object(&api);
+	tyran_mocha_api_add_function(&api, &global, "print", mocha_print);
+
 	tyran_mocha_api_eval(&api, &global, buf, tyran_strlen(buf));
 
 	return 0;

@@ -66,6 +66,7 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	"TRUE",
 	"FALSE",
 	"UNDEFINED",
+	"SELF",
 	"CLASS",
 	"EXTENDS",
 	"RETURN",
@@ -80,15 +81,14 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	"NUMBER",
 	"STRING",
 	"IDENTIFIER",
-	"INVOKE",
+	"CALL",
 	"FUNC_GLYPH",
 	"FUNC_GLYPH_BOUND",
 	"BLOCK_START",
 	"BLOCK_END",
 	"LINE_START",
 	"RANGE_INCLUSIVE",
-	"RANGE",
-	"CALL"
+	"RANGE"
 	};
 	
 	TYRAN_LOG_NO_LF("%s ", token_id_to_string[token->token_id]);
