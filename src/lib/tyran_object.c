@@ -12,10 +12,6 @@
 #include <tyranscript/tyran_number.h>
 
 
-typedef struct tyran_rb_tree_key_value_node {
-	const struct tyran_object_key* key;
-	tyran_value value;
-} tyran_rb_tree_key_value_node;
 
 
 void tyran_object_retain(struct tyran_object* o)
@@ -79,16 +75,18 @@ void tyran_object_insert_key(tyran_memory_pool* rb_node_pool, struct tyran_objec
 	rb_tree_insert(object->tree, node);
 }
 
-void tyran_object_insert_c_string_key(tyran_memory_pool* object_key_pool, tyran_memory_pool* rb_node_pool, struct tyran_object* object, const char* key_string, struct tyran_value* value)
+void tyran_object_insert_c_string_key(tyran_memory_pool* string_pool, tyran_memory* memory, tyran_memory_pool* object_key_pool, tyran_memory_pool* rb_node_pool, struct tyran_object* object, const char* key_string, struct tyran_value* value)
 {
-	// const tyran_string* s = tyran_string_from_c_str(key_string);
-	// tyran_object_insert_string_key(object_key_pool, rb_node_pool, object, s, value);
+	const tyran_string* s = tyran_string_from_c_str(string_pool, memory, key_string);
+	TYRAN_ASSERT(s, "couldn't allocate string");
+	tyran_object_insert_string_key(string_pool, memory, object_key_pool, rb_node_pool, object, s, value);
 }
 
-void tyran_object_insert_string_key(tyran_memory_pool* object_key_pool, tyran_memory_pool* rb_node_pool, struct tyran_object* object, const struct tyran_string* key_string, struct tyran_value* value)
+void tyran_object_insert_string_key(tyran_memory_pool* string_pool, tyran_memory* memory, tyran_memory_pool* object_key_pool, tyran_memory_pool* rb_node_pool, struct tyran_object* object, const struct tyran_string* key_string, struct tyran_value* value)
 {
 	tyran_object_key_flag_type flag = tyran_object_key_flag_normal;
-	const struct tyran_object_key* key = tyran_object_key_new(object_key_pool, key_string, flag);
+	const struct tyran_object_key* key = tyran_object_key_new(string_pool, memory, object_key_pool, key_string, flag);
+	TYRAN_ASSERT(key, "must be able to create key");
 	tyran_object_insert_key(rb_node_pool, object, key, value);
 }
 
@@ -106,10 +104,13 @@ void tyran_object_insert_array(struct tyran_object* object, int index, struct ty
 
 tyran_value* tyran_object_lookup(const struct tyran_object* object, const struct tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
+	TYRAN_LOG("Search_rbtree");
 	tyran_rb_tree_key_value_node* node = (tyran_rb_tree_key_value_node*) search_rbtree(*object->tree, (void*)key);
 	if (!node) {
+		TYRAN_LOG("No node");
 		return 0;
 	}
+	TYRAN_LOG("flag");
 	*flag = node->key->flag;
 	return &node->value;
 }
@@ -119,7 +120,7 @@ void tyran_object_delete(struct tyran_object* object, const struct tyran_object_
 	rb_tree_delete(object->tree, (void*)key);
 }
 
-void tyran_object_get_keys(tyran_memory_pool* object_key_pool, const struct tyran_object* target, tyran_object_iterator* target_iterator)
+void tyran_object_get_keys(tyran_memory_pool* string_pool, tyran_memory* memory, tyran_memory_pool* object_key_pool, const struct tyran_object* target, tyran_object_iterator* target_iterator)
 {
 	tree_root* root = target->tree;
 
@@ -127,13 +128,13 @@ void tyran_object_get_keys(tyran_memory_pool* object_key_pool, const struct tyra
 	while (tree_iterator_has_next(iterator)) {
 		tyran_rb_tree_key_value_node* node = (tyran_rb_tree_key_value_node*) tree_iterator_next(iterator);
 		if (tyran_object_key_has_enumerate(node->key)) {
-			tyran_object_iterator_insert(object_key_pool, target_iterator, node->key);
+			tyran_object_iterator_insert(string_pool, memory, object_key_pool, target_iterator, node->key);
 		}
 	}
 	destroy_iterator(iterator);
 
 	if (target->prototype) {
-		tyran_object_get_keys(object_key_pool, target->prototype->data.object, target_iterator);
+		tyran_object_get_keys(string_pool, memory, object_key_pool, target->prototype->data.object, target_iterator);
 	}
 }
 

@@ -104,7 +104,7 @@ tyran_reg_index tyran_variable_scope_find_and_reserve_variable(tyran_variable_sc
 {
 	int i;
 
-	for (i = 0; i < 255; ++i) {
+	for (i = 1; i < 255; ++i) {
 		if (!scope->registers[i]) {
 			tyran_variable_scope_reserve_variable(scope, i, status);
 			return i;

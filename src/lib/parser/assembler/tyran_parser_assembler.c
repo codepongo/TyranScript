@@ -343,7 +343,7 @@ void tyran_lexer_assembler_end_of_function(tyran_memory_pool* function_pool, tyr
 	TYRAN_LOG("*** End of function!");
 
 	tyran_code_fixup_label_references(parser_state->code);
-	tyran_print_constants(parser_state->constants, 0);
+	tyran_print_constants(parser_state->constants, 0, 0, 0);
 	tyran_print_opcodes(parser_state->opcodes, 0, parser_state->constants);
 
 	tyran_function* func = tyran_function_new(function_pool, parser_state->opcodes, parser_state->constants);
@@ -356,7 +356,7 @@ void tyran_lexer_assembler_end_of_function(tyran_memory_pool* function_pool, tyr
 	tyran_object_set_function(obj, func_obj);
 
 	tyran_value_set_object(*func_value_obj, obj);
-	tyran_value_object_insert_c_string_key(&parser_state->context, parser_state->function_name, func_value_obj);
+// tyran_value_object_insert_c_string_key(&parser_state->context, parser_state->function_name, func_value_obj);
 }
 
 int tyran_lexer_assembler_parse_one(tyran_memory* memory, tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* value_pool, tyran_memory_pool* object_pool, tyran_lexer_position_info* lexer_position, tyran_parser_state* parser_state)

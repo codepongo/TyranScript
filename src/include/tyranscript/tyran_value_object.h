@@ -14,7 +14,7 @@ struct tyran_value* tyran_value_object_new(struct tyran_memory_pool* value_pool,
 void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_value* prototype);
 
 /* Insert and Delete */
-void tyran_value_object_insert_c_string_key(struct tyran_value* target, const char* key, struct tyran_value* value);
+void tyran_value_object_insert_c_string_key(tyran_memory_pool* string_pool, tyran_memory* memory, struct tyran_memory_pool* object_key_pool, struct tyran_memory_pool* rb_node_pool, struct tyran_value* target, const char* key, struct tyran_value* value);
 void tyran_value_object_insert_key(struct tyran_value* object, const struct tyran_object_key* key, struct tyran_value* value);
 struct tyran_value* tyran_value_object_insert_key_and_flag(struct tyran_value* object, struct tyran_value* key, const struct tyran_value* value, tyran_object_key_flag_type flag);
 void tyran_value_object_insert_string_key(struct tyran_value* object, const struct tyran_string* key, struct tyran_value* value);

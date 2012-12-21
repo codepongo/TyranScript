@@ -238,13 +238,18 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			{
 				TYRAN_ASSERT(tyran_value_is_function(&r[a]), "Must reference a function!");
 				const tyran_function* function = r[a].data.object->data.function->static_function;
-				sp->opcodes = function->data.opcodes;
-				pc = sp->opcodes->codes;
-				sp->constants = function->constants;
-				c = sp->constants->values;
-				tyran_value* target_register = &r[a];
-				r = target_register + 1;
-				sp->return_register = target_register;
+				if (function->type == tyran_function_type_normal) {
+					sp->opcodes = function->data.opcodes;
+					pc = sp->opcodes->codes;
+					sp->constants = function->constants;
+					c = sp->constants->values;
+					tyran_value* target_register = &r[a];
+					r = target_register;
+					sp->return_register = target_register;
+				} else {
+					TYRAN_LOG("****CALLBACK****")
+					function->data.callback(runtime, &r[a], &r[a+1], &r[a], &r[a], TYRAN_FALSE);
+				}
 			}
 			break;
 		case TYRAN_OPCODE_NEW:
@@ -256,10 +261,15 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A_RCX_RCY;
 			TYRAN_ASSERT(tyran_value_is_string(&rcy), "Must use string to lookup. for now");
 			tyran_object_key_flag_type flag = tyran_object_key_flag_normal;
-			const struct tyran_object_key* key = tyran_object_key_new(runtime->object_key_pool, rcy.data.str, flag);
+			const struct tyran_object_key* key = tyran_object_key_new(runtime->string_pool, runtime->memory, runtime->object_key_pool, rcy.data.str, flag);
 			TYRAN_ASSERT(tyran_value_is_object(&rcx), "Must lookup object");
 			tyran_value* v = tyran_value_object_lookup(&rcx, key, &flag);
-			tyran_value_copy(r[a], *v);
+			TYRAN_LOG("VALUE:%p", v);
+			if (!v) {
+				tyran_value_set_undefined(r[a]);
+			} else {
+				tyran_value_copy(r[a], *v);
+			}
 			TYRAN_ADD_REF(r[a]);
 			}
 			break;

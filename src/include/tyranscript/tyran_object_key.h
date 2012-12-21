@@ -17,9 +17,9 @@ static const tyran_object_key_flag_type tyran_object_key_flag_normal = 1;
 
 #define tyran_object_key_has_enumerate(key) (key->flag & tyran_object_key_flag_enumerate)
 
-const struct tyran_object_key* tyran_object_key_new(tyran_memory_pool* object_key_pool, const struct tyran_string* string_key, tyran_object_key_flag_type flag);
+const struct tyran_object_key* tyran_object_key_new(tyran_memory_pool* string_pool, tyran_memory* memory, tyran_memory_pool* object_key_pool, const struct tyran_string* string_key, tyran_object_key_flag_type flag);
 extern void tyran_object_key_free(const struct tyran_object_key* key);
-const struct tyran_object_key* tyran_object_key_clone(tyran_memory_pool* object_key_pool, const struct tyran_object_key* key);
+const struct tyran_object_key* tyran_object_key_clone(tyran_memory_pool* string_pool, tyran_memory* memory, tyran_memory_pool* object_key_pool, const struct tyran_object_key* key);
 
 extern int tyran_object_key_compare(void* key_a, void* key_b);
 

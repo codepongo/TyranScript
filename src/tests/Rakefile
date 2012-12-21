@@ -16,7 +16,7 @@ test_files.each do |source_file|
 		f = File.new source_file
 		data = f.read
 		f.close
-		array = data.split "\n---\n"
+		array = data.split "---\n"
 		source_text = array[0]
 		expected_output = array[1]
 

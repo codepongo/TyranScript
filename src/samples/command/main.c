@@ -1,7 +1,22 @@
 #include <tyranscript/tyran_mocha_api.h>
 
 int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call) {
-	TYRAN_OUTPUT("PRINT");
+	struct tyran_value* v = &arguments[0];
+	const int buf_len = 100;
+	char buf[buf_len];
+
+	switch (v->type) {
+		case TYRAN_VALUE_TYPE_NUMBER:
+			tyran_snprintf(buf, buf_len, "%f", v->data.number);
+		break;
+
+		default:
+			buf[0] = 0;
+		break;
+	}
+
+	puts(buf);
+
 	return 0;
 }
 

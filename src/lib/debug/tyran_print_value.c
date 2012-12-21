@@ -75,7 +75,7 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 
 }
 
-void tyran_print_value_helper(int tabs, const char* property, const tyran_value* v, int quote, tyran_memory_pool* object_iterator_pool)
+void tyran_print_value_helper(int tabs, const char* property, const tyran_value* v, int quote, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* string_pool, tyran_memory* memory)
 {
 	int t;
 
@@ -155,13 +155,13 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 				if (nv) {
 					tyran_snprintf(desc, max_size_description, "#%d: ", i);
 					// TYRAN_ASSERT(nv != 0, "Must be able to lookup all indexes");
-					tyran_print_value_helper(tabs, desc, nv, 1, object_iterator_pool);
+					tyran_print_value_helper(tabs, desc, nv, 1, object_iterator_pool, string_pool, memory);
 				}
 			}
 		} /*else*/ {
 			tabs++;
 			tyran_object_iterator* target_iterator = tyran_object_iterator_new(object_iterator_pool);
-			tyran_object_get_keys(0, v->data.object, target_iterator);
+			tyran_object_get_keys(string_pool, memory, 0, v->data.object, target_iterator);
 			tyran_object_key_flag_type flag;
 			int i;
 			for (i=0; i<target_iterator->count; ++i) {
@@ -169,7 +169,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 				tyran_value* sub_value = tyran_value_object_lookup(v, key, &flag);
 				if (sub_value) {
 					tyran_string_to_c_str(temp_buffer, temp_buffer_size, key->str);
-					tyran_print_value_helper(tabs, temp_buffer, sub_value, quote, object_iterator_pool);
+					tyran_print_value_helper(tabs, temp_buffer, sub_value, quote, object_iterator_pool, string_pool, memory);
 				}
 			}
 
@@ -177,12 +177,12 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 		}
 
 		if (tyran_object_get_prototype(o)) {
-			tyran_print_value_helper(tabs + 1, "__proto__", tyran_object_get_prototype(o), quote, object_iterator_pool);
+			tyran_print_value_helper(tabs + 1, "__proto__", tyran_object_get_prototype(o), quote, object_iterator_pool, string_pool, memory);
 		}
 	}
 }
 
-void tyran_print_value(const char* property, const tyran_value* v, int quote, tyran_memory_pool* object_iterator_pool)
+void tyran_print_value(const char* property, const tyran_value* v, int quote, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* string_pool, tyran_memory* memory)
 {
-	tyran_print_value_helper(0, property, v, quote, object_iterator_pool);
+	tyran_print_value_helper(0, property, v, quote, object_iterator_pool, string_pool, memory);
 }

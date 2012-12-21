@@ -18,13 +18,13 @@ void tyran_object_iterator_free(tyran_object_iterator* iterator)
 	TYRAN_MALLOC_FREE(iterator);
 }
 
-void tyran_object_iterator_insert(tyran_memory_pool* object_key_pool, tyran_object_iterator* iterator, const struct tyran_object_key* key)
+void tyran_object_iterator_insert(tyran_memory_pool* string_pool, tyran_memory* memory, tyran_memory_pool* object_key_pool, tyran_object_iterator* iterator, const struct tyran_object_key* key)
 {
 	if (iterator->count >= iterator->allocated_size) {
 		iterator->allocated_size++;
 		iterator->allocated_size *= 2;
 		iterator->keys = (const struct tyran_object_key**)tyran_realloc(iterator->keys, iterator->allocated_size * sizeof(tyran_object_key*) );
 	}
-	iterator->keys[iterator->count] = tyran_object_key_clone(object_key_pool, key);
+	iterator->keys[iterator->count] = tyran_object_key_clone(string_pool, memory, object_key_pool, key);
 	iterator->count++;
 }

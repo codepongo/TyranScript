@@ -3,13 +3,20 @@
 
 #include <tyranscript/tyran_object_key.h>
 
-struct tyran_value;
+#include <tyranscript/tyran_value.h>
+
 struct tyran_function_object;
 struct tyran_object_iterator;
 struct tyran_function_object;
 struct tyran_runtime;
 struct tree_root;
 struct tyran_memory_pool;
+
+
+typedef struct tyran_rb_tree_key_value_node {
+	const struct tyran_object_key* key;
+	tyran_value value;
+} tyran_rb_tree_key_value_node;
 
 typedef enum {
 	TYRAN_OBJECT_TYPE_OBJECT,
@@ -54,14 +61,14 @@ int tyran_object_length(const tyran_object* object);
 
 /* Insert and Delete */
 void tyran_object_insert_key(struct tyran_memory_pool* rb_node_pool, struct tyran_object* object, const struct tyran_object_key* key, struct tyran_value* value);
-void tyran_object_insert_c_string_key(struct tyran_memory_pool* object_key_pool, struct tyran_memory_pool* rb_node_pool, struct tyran_object* object, const char* key, struct tyran_value* value);
-void tyran_object_insert_string_key(struct tyran_memory_pool* object_key_pool, struct tyran_memory_pool* rb_node_pool, struct tyran_object* object, const struct tyran_string* key, struct tyran_value* value);
+void tyran_object_insert_c_string_key(tyran_memory_pool* string_pool, tyran_memory* memory, struct tyran_memory_pool* object_key_pool, struct tyran_memory_pool* rb_node_pool, struct tyran_object* object, const char* key, struct tyran_value* value);
+void tyran_object_insert_string_key(tyran_memory_pool* string_pool, tyran_memory* memory, struct tyran_memory_pool* object_key_pool, struct tyran_memory_pool* rb_node_pool, struct tyran_object* object, const struct tyran_string* key, struct tyran_value* value);
 void tyran_object_insert_array(struct tyran_object* object, int index, struct tyran_value* value);
 void tyran_object_delete(struct tyran_object* object, const struct tyran_object_key* key);
 
 /* Find */
 struct tyran_value* tyran_object_lookup(const struct tyran_object* object, const struct tyran_object_key* key, tyran_object_key_flag_type* flag);
 struct tyran_value* tyran_object_lookup_prototype(const struct tyran_object* o, const struct tyran_object_key* key, tyran_object_key_flag_type* flag);
-void tyran_object_get_keys(tyran_memory_pool* object_key_pool, const struct tyran_object* target, struct tyran_object_iterator* target_iterator);
+void tyran_object_get_keys(tyran_memory_pool* string_pool, tyran_memory* memory, tyran_memory_pool* object_key_pool, const struct tyran_object* target, struct tyran_object_iterator* target_iterator);
 
 #endif

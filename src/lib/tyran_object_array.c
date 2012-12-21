@@ -12,16 +12,16 @@ struct tyran_object* tyran_object_new_array(tyran_memory_pool* object_pool, tyra
 {
 	const tyran_string* number_string;
 	int i;
-	const struct tyran_object_key* ok;
+	//const struct tyran_object_key* ok;
 	tyran_value* v;
 	tyran_object* object = tyran_object_new(object_pool, runtime);
 
 	for (i = 0; i < count; ++i) {
 		tyran_number_integer_to_string(string_pool, string_memory, i, &number_string);
-		ok = tyran_object_key_new(object_key_pool, number_string, tyran_object_key_flag_normal);
+		// ok = tyran_object_key_new(object_key_pool, number_string, tyran_object_key_flag_normal);
 		v = tyran_value_new(value_pool);
 		tyran_value_copy(*v, items[i]);
-		tyran_object_insert_key(rb_node_pool, object, ok, v);
+		// tyran_object_insert_key(rb_node_pool, object, ok, v);
 	}
 	
 	// tyran_object_set_length(object, count);

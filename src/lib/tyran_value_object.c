@@ -36,13 +36,16 @@ void tyran_value_object_delete(tyran_value* target, tyran_value* key)
 
 tyran_value* tyran_value_object_lookup(const tyran_value* target, const struct tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
+	TYRAN_LOG("tyran_value");
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
 	return tyran_object_lookup(target->data.object, key, flag);
 }
 
 
-void tyran_value_object_insert_c_string_key(struct tyran_value* target, const char* key, struct tyran_value* value)
+void tyran_value_object_insert_c_string_key(tyran_memory_pool* string_pool, tyran_memory* memory, struct tyran_memory_pool* object_key_pool, struct tyran_memory_pool* rb_node_pool, struct tyran_value* target, const char* key, struct tyran_value* value)
 {
+	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
+	tyran_object_insert_c_string_key(string_pool, memory, object_key_pool, rb_node_pool, target->data.object, key, value);
 }
 
 void tyran_value_object_insert_string_key(struct tyran_value* object, const struct tyran_string* key, struct tyran_value* value)

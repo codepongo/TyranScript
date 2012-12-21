@@ -14,7 +14,7 @@
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_object_key.h>
 
-tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory_pool* object_key_pool, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* runtime_stack_pool, tyran_memory_pool* object_pool, tyran_memory_pool* value_pool)
+tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* memory, tyran_memory_pool* string_pool, tyran_memory_pool* object_key_pool, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* runtime_stack_pool, tyran_memory_pool* object_pool, tyran_memory_pool* value_pool)
 {
 	tyran_runtime* rt = TYRAN_CALLOC_TYPE(runtime_pool, tyran_runtime);
 	rt->stack = TYRAN_MALLOC_TYPE_COUNT(runtime_stack_pool, tyran_runtime_stack, 128);
@@ -24,6 +24,8 @@ tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory_p
 	rt->function_object_pool = function_object_pool;
 	rt->iterator_pool = object_iterator_pool;
 	rt->object_pool = object_pool;
+	rt->string_pool = string_pool;
+	rt->memory = memory;
 	
 	// rt->length_key = tyran_object_key_new(object_pool, tyran_string_from_c_str("length"), tyran_object_key_flag_normal);
 	// rt->prototype_key = tyran_object_key_new(object_pool, tyran_string_from_c_str("prototype"), tyran_object_key_flag_normal);

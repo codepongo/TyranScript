@@ -27,6 +27,7 @@ void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size)
 	api->object_pool = TYRAN_MEMORY_POOL_CONSTRUCT(memory, tyran_object, 10);
 	struct tyran_memory_pool* value_registers_pool = TYRAN_MEMORY_POOL_CONSTRUCT(memory, tyran_value, 10);
 
+	api->value_pool = TYRAN_MEMORY_POOL_CONSTRUCT(memory, tyran_value, 10);
 	api->mocha_function_pool = TYRAN_MEMORY_POOL_CONSTRUCT(memory, tyran_function, 1);
 
 	struct tyran_memory_pool* runtime_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_runtime, 1);
@@ -34,7 +35,13 @@ void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size)
 	struct tyran_memory_pool* function_object_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_function_object, 10);
 	struct tyran_memory_pool* object_key_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_key, 10);
 	struct tyran_memory_pool* object_iterator_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_iterator, 10);
-	api->default_runtime = tyran_runtime_new(runtime_pool, object_key_pool, object_iterator_pool, function_object_pool, runtime_stack_pool, api->object_pool, value_registers_pool);
+	api->string_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_string, 10);
+
+	api->default_runtime = tyran_runtime_new(runtime_pool, api->memory, api->string_pool, object_key_pool, object_iterator_pool, function_object_pool, runtime_stack_pool, api->object_pool, value_registers_pool);
+
+
+	api->rb_node_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_rb_tree_key_value_node, 10);
+	api->object_key_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_key, 10);
 
 	tyran_memory_pool* scopes_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_variable_scopes, 1);
 	tyran_memory_pool* scope_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_variable_scope, 1);
@@ -58,6 +65,9 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char
 
 	
 	struct tyran_parser_node* parser_tree =  tyran_mocha_parser_parse(api->memory, mocha_lexer, mocha_parser_pool, enclosure_stack_pool, enclosure_info_pool, parser_node_parameter_pool, mocha_token_pool);
+
+
+
 
 
 	// tyran_parser_node_print("result", parser_tree, 0);
@@ -89,7 +99,7 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char
 	tyran_runtime_push_call(api->default_runtime, code->opcodes, code->constants, context);
 	tyran_runtime_execute(api->default_runtime, &return_value, 0);
 	struct tyran_memory_pool* object_iterator_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_iterator, 10);
-	tyran_print_value("return", &return_value, 1, object_iterator_pool);
+	tyran_print_value("return", &return_value, 1, object_iterator_pool, api->string_pool, api->memory);
 }
 
 tyran_value tyran_mocha_api_create_object(tyran_mocha_api* api) {
@@ -102,9 +112,7 @@ tyran_value tyran_mocha_api_create_object(tyran_mocha_api* api) {
 }
 
 void tyran_mocha_api_add_function(tyran_mocha_api* api, tyran_value* target, const char* name, tyran_function_callback callback) {
-	tyran_function* func = tyran_function_callback_new(api->mocha_function_pool, callback);
-	tyran_value value;
-	tyran_value_set_static_function(value, func);
-	tyran_value_object_insert_c_string_key(target, name, &value);
+	tyran_value* value = tyran_function_object_new_callback(api->mocha_function_pool, api->default_runtime->function_object_pool, api->object_pool, api->value_pool, api->default_runtime, callback);
+	tyran_value_object_insert_c_string_key(api->string_pool, api->memory, api->object_key_pool, api->rb_node_pool, target, name, value);
 }
 
