@@ -154,12 +154,14 @@ tyran_reg_index tyran_generator_traverse_call(tyran_memory* memory, tyran_code_s
 	int i;
 	
 	start_register = tyran_variable_scopes_top_free(code->scope, return_value_count);
-	tyran_reg_or_constant_index function_register =  tyran_generator_traverse(memory, code, call_node->function_node, 0, 0, 0);
+	TYRAN_LOG("Traversing function node");
+	tyran_reg_or_constant_index function_register = tyran_generator_traverse(memory, code, call_node->function_node, 0, 0, 0);
 	tyran_opcodes_op_ld(code->opcodes, start_register, function_register);
 	
 	for (i = 0; i < call_node->argument_count; ++i) {
 		tyran_reg_index target_index = start_register + i + 1;
 		NODE node = call_node->arguments[i];
+		TYRAN_LOG("Traversing argument:%d", i);
 		tyran_reg_or_constant_index arg_register = tyran_generator_traverse(memory, code, node, 0, 0, 0);
 		if (tyran_opcodes_is_constant(arg_register)) {
 			tyran_opcodes_op_ldc(code->opcodes, target_index, arg_register);
@@ -174,24 +176,43 @@ tyran_reg_index tyran_generator_traverse_call(tyran_memory* memory, tyran_code_s
 }
 
 
-/*
-NODE tyran_generator_call(tyran_memory* memory, NODE function, NODE arguments)
+void tyran_generator_argument_nodes(NODE* argument_nodes, int* index, NODE node)
 {
+	tyran_parser_node_operand_binary* comma = tyran_parser_binary_operator_type_cast(node, TYRAN_PARSER_COMMA);
+	if (comma) {
+		tyran_generator_argument_nodes(argument_nodes, index, comma->left);
+		tyran_generator_argument_nodes(argument_nodes, index, comma->right);
+	} else {
+		tyran_parser_node_operand_unary* parentheses = tyran_parser_unary_operator_type_cast(node, TYRAN_PARSER_UNARY_PARENTHESES);
+		if (parentheses) {
+			tyran_generator_argument_nodes(argument_nodes, index, parentheses->expression);
+		} else {
+			argument_nodes[*index] = node;
+			*index = *index + 1;
+		}
+	}
+}
+
+
+tyran_parser_node_call* tyran_generator_call_node(tyran_memory* memory, NODE function, NODE arguments) {
 	NODE argument_nodes[100];
 	int argument_count = 0;
 
 	tyran_generator_argument_nodes(argument_nodes, &argument_count, arguments);
 	
-	NODE call_node = tyran_parser_call(memory, function, argument_nodes, argument_count);
+	tyran_parser_node_call* call_node = (tyran_parser_node_call*) tyran_parser_call(memory, function, argument_nodes, argument_count);
 	//tyran_parser_node_print("call", call_node, 0);
 	return call_node;
 }
-*/
-void tyran_generator_call(tyran_opcodes* codes, tyran_reg_index target, tyran_reg_or_constant_index left, tyran_reg_or_constant_index right)
-{
-	
-}
 
+
+tyran_reg_or_constant_index tyran_generator_call(tyran_memory* memory, tyran_code_state* code, NODE function, NODE arguments) {
+	tyran_parser_node_call* call_node = tyran_generator_call_node(memory, function, arguments);
+
+	tyran_reg_index reg = tyran_generator_traverse_call(memory, code, call_node);
+
+	return reg;
+}
 
 tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_parser_binary_operand_type operator_type, tyran_reg_or_constant_index left, tyran_reg_or_constant_index right, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic)
 {
@@ -219,6 +240,7 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 			tyran_opcodes_op_set(codes, target, left, right);
 			break;
 		case TYRAN_PARSER_INDEX:
+			TYRAN_LOG("INDEX!!!!");
 			tyran_opcodes_op_get(codes, target, left, right);
 			break;
 		case TYRAN_PARSER_EQUAL:
@@ -230,9 +252,6 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 			tyran_variable_scopes_undefine_variable(code->scope, target);
 			target = TYRAN_OPCODE_REGISTER_ILLEGAL;
 			tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
-			break;
-		case TYRAN_PARSER_CALL:
-			tyran_generator_call(codes, target, left, right);
 			break;
 		default:
 			TYRAN_ERROR("Unhandled operator:%d", operator_type);
@@ -310,6 +329,9 @@ tyran_reg_or_constant_index tyran_generator_traverse_binary(tyran_memory* memory
 		case TYRAN_PARSER_AND:
 		case TYRAN_PARSER_OR:
 			result = tyran_generator_logical_operator(memory, code, binary, true_label, false_label);
+			break;
+		case TYRAN_PARSER_CALL:
+			result = tyran_generator_call(memory, code, binary->left, binary->right);
 			break;
 		default:
 			result = tyran_generator_traverse_default_binary(memory, code, binary, true_label, false_label, invert_logic);
@@ -395,17 +417,6 @@ tyran_reg_or_constant_index tyran_generator_traverse_case(tyran_memory* memory, 
 	return TYRAN_OPCODE_REGISTER_ILLEGAL;
 }
 
-void tyran_generator_argument_nodes(NODE* argument_nodes, int* index, NODE node)
-{
-	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_type_cast(node, TYRAN_PARSER_COMMA);
-	if (binary) {
-		tyran_generator_argument_nodes(argument_nodes, index, binary->left);
-		tyran_generator_argument_nodes(argument_nodes, index, binary->right);
-	} else {
-		argument_nodes[*index] = node;
-		*index = *index + 1;
-	}
-}
 
 
 
