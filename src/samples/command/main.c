@@ -17,6 +17,8 @@ int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, str
 
 	puts(buf);
 
+	tyran_value_set_number(*return_value, 16.0f);
+
 	return 0;
 }
 

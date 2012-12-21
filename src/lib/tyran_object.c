@@ -104,13 +104,10 @@ void tyran_object_insert_array(struct tyran_object* object, int index, struct ty
 
 tyran_value* tyran_object_lookup(const struct tyran_object* object, const struct tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
-	TYRAN_LOG("Search_rbtree");
 	tyran_rb_tree_key_value_node* node = (tyran_rb_tree_key_value_node*) search_rbtree(*object->tree, (void*)key);
 	if (!node) {
-		TYRAN_LOG("No node");
 		return 0;
 	}
-	TYRAN_LOG("flag");
 	*flag = node->key->flag;
 	return &node->value;
 }

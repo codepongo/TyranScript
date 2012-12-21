@@ -36,7 +36,6 @@ void tyran_value_object_delete(tyran_value* target, tyran_value* key)
 
 tyran_value* tyran_value_object_lookup(const tyran_value* target, const struct tyran_object_key* key, tyran_object_key_flag_type* flag)
 {
-	TYRAN_LOG("tyran_value");
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
 	return tyran_object_lookup(target->data.object, key, flag);
 }

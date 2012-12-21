@@ -247,7 +247,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 					r = target_register;
 					sp->return_register = target_register;
 				} else {
-					TYRAN_LOG("****CALLBACK****")
 					function->data.callback(runtime, &r[a], &r[a+1], &r[a], &r[a], TYRAN_FALSE);
 				}
 			}
@@ -264,7 +263,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			const struct tyran_object_key* key = tyran_object_key_new(runtime->string_pool, runtime->memory, runtime->object_key_pool, rcy.data.str, flag);
 			TYRAN_ASSERT(tyran_value_is_object(&rcx), "Must lookup object");
 			tyran_value* v = tyran_value_object_lookup(&rcx, key, &flag);
-			TYRAN_LOG("VALUE:%p", v);
 			if (!v) {
 				tyran_value_set_undefined(r[a]);
 			} else {
