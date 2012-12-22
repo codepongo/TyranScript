@@ -32,6 +32,7 @@ typedef struct tyran_memory_pool
 	u8t* memory;
 	size_t size;
 	u8t* next;
+	const char* type_string;
 } tyran_memory_pool;
 
 
@@ -43,7 +44,7 @@ void* tyran_memory_alloc_debug(tyran_memory* memory, size_t size, const char* so
 
 
 
-tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count);
+tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count, const char* type);
 void* tyran_memory_pool_alloc(tyran_memory_pool*, size_t count);
 void* tyran_memory_pool_calloc(tyran_memory_pool*, size_t count);
 void tyran_memory_pool_free(void*);
@@ -51,7 +52,7 @@ void tyran_memory_pool_free(void*);
 
 char* tyran_str_dup(tyran_memory* pool, const char* str);
 
-#define TYRAN_MEMORY_POOL_CONSTRUCT(memory, T, count) tyran_memory_pool_construct(memory, sizeof(T), count)
+#define TYRAN_MEMORY_POOL_CONSTRUCT(memory, T, count) tyran_memory_pool_construct(memory, sizeof(T), count, #T)
 
 
 #define tyran_malloc malloc

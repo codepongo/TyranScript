@@ -233,12 +233,12 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			}
 			break;
 		case TYRAN_OPCODE_CALL:
-			TYRAN_STACK_PUSH;
 			TYRAN_REGISTER_A_X;
 			{
 				TYRAN_ASSERT(tyran_value_is_function(&r[a]), "Must reference a function!");
 				const tyran_function* function = r[a].data.object->data.function->static_function;
 				if (function->type == tyran_function_type_normal) {
+					TYRAN_STACK_PUSH;
 					sp->opcodes = function->data.opcodes;
 					pc = sp->opcodes->codes;
 					sp->constants = function->constants;

@@ -24,13 +24,15 @@ test_files.each do |source_file|
 		o.write source_text
 		o.close
 
-		`./command test.mocha > output.txt`
+		output_file = "#{test_name}_out.txt"
 
-		output_file = File.new 'output.txt'
+		arguments = "test.mocha > #{output_file} 2> #{test_name}_err.txt"
+		command = "./command #{arguments}"
+		`#{command}`
+
+		output_file = File.new output_file
 		output_text = output_file.read
 		output_file.close
-
-		p "Output:#{output_text}"
 
 		if expected_output == output_text 
 			puts "OK".bold.green
