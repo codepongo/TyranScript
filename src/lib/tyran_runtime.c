@@ -91,7 +91,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			}
 			tyran_snprintf(tmp, 512,  "r%d:", reg_index);
 			tyran_strncat(result, tmp, 512);
-			tyran_value_to_c_string(&r[reg_index], tmp, 512, 1);
+			tyran_value_to_c_string(sp->constants->symbol_table, &r[reg_index], tmp, 512, 1);
 			tyran_strncat(result, tmp, 512);
 		}
 
@@ -250,11 +250,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_GET: {
 			TYRAN_REGISTER_A_RCX_RCY;
-			TYRAN_ASSERT(tyran_value_is_string(&rcy), "Must use string to lookup. for now");
-			tyran_object_key_flag_type flag = tyran_object_key_flag_normal;
-			const struct tyran_object_key* key = tyran_object_key_new(runtime->string_pool, runtime->memory, runtime->object_key_pool, rcy.data.object->data.str, flag);
-			TYRAN_ASSERT(tyran_value_is_object(&rcx), "Must lookup object");
-			tyran_value* v = tyran_value_object_lookup(&rcx, key, &flag);
+			const tyran_value* v = tyran_value_object_lookup(&rcx, &rcy);
 			if (!v) {
 				tyran_value_set_undefined(r[a]);
 			} else {
@@ -265,8 +261,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_SET:
 			TYRAN_REGISTER_A_RCX_RCY;
-			TYRAN_ASSERT(tyran_value_is_string(&rcx), "Must be string");
-			tyran_value_object_insert_string_key(&r[a], rcx.data.object->data.str, &rcy);
+			tyran_value_object_insert(runtime, &r[a], &rcx, &rcy);
 			break;
 		case TYRAN_OPCODE_KEY:
 			TYRAN_REGISTER_A_RCX;

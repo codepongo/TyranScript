@@ -86,7 +86,7 @@ void print_rc(tyran_reg_or_constant_index index, const tyran_constants* constant
 		char tmp[tmp_size];
 		char value_buf[tmp_size];
 		int constant_index = index & TYRAN_OPCODE_REGISTER_MASK;
-		tyran_value_to_c_string(&constants->values[constant_index], value_buf, tmp_size, 1);
+		tyran_value_to_c_string(constants->symbol_table, &constants->values[constant_index], value_buf, tmp_size, 1);
 		tyran_snprintf(tmp, tmp_size, " %s (#%d)", value_buf, constant_index);
 		tyran_strncat(buf, tmp, size);
 	} else {

@@ -13,14 +13,14 @@
 
 int tyran_string_prototype_constructor(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* d, int is_constructor)
 {
-	tyran_value* str;
+	//tyran_value* str;
 
 	if (!is_constructor) {
 		return 0;
 	}
 
-	tyran_object_key_flag_type flag;
-	str = tyran_value_object_lookup_array(args, 0, &flag);
+	//tyran_object_key_flag_type flag;
+	// str = tyran_value_object_lookup_array(args, 0, &flag);
 	// tyran_object_set_length(_this->data.object, str->data.str->len);
 	// tyran_value_object_insert_string_key(_this, tyran_string_from_c_str("str"), str);
 
@@ -46,11 +46,11 @@ int tyran_string_prototype_char_at(tyran_runtime* r, tyran_value* a, tyran_value
 
 int tyran_string_prototype_from_char_code(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* d, tyran_value* return_value, int is_constructor)
 {
-	char buf[100];
-	tyran_object_key_flag_type flag;
-	tyran_value* char_code = tyran_value_object_lookup_array(args, 0, &flag);
-	buf[0] = (char) tyran_value_to_integer(char_code);
-	buf[1] = 0;
+	//char buf[100];
+	// tyran_object_key_flag_type flag;
+	// tyran_value* char_code = tyran_value_object_lookup_array(args, 0, &flag);
+	// buf[0] = (char) tyran_value_to_integer(char_code);
+	// buf[1] = 0;
 
 	// const tyran_string* duplicate = tyran_string_strdup_str(buf);
 	// tyran_value_replace_string(*return_value, duplicate);

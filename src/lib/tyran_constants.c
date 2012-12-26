@@ -4,11 +4,14 @@
 #include <tyranscript/tyran_function.h>
 #include <tyranscript/tyran_string_object.h>
 #include <tyranscript/tyran_object_macros.h>
+#include <tyranscript/tyran_symbol_table.h>
+#include <tyranscript/tyran_runtime.h>
 
-tyran_constants* tyran_constants_new(tyran_memory_pool* constants_pool, tyran_memory_pool* constant_values_pool, size_t size)
+tyran_constants* tyran_constants_new(tyran_memory_pool* constants_pool, tyran_symbol_table* symbol_table, tyran_memory_pool* constant_values_pool, size_t size)
 {
 	tyran_constants* constants = TYRAN_CALLOC_TYPE(constants_pool, tyran_constants);
 	constants->values = TYRAN_MALLOC_TYPE_COUNT(constant_values_pool, tyran_value, size);
+	constants->symbol_table = symbol_table;
 	return constants;
 }
 
@@ -46,6 +49,17 @@ tyran_constant_index tyran_constants_add_string(tyran_constants* constants, stru
 
 	return tyran_constants_reserve_index(constants, value);
 }
+
+tyran_constant_index tyran_constants_add_symbol_from_c_string(tyran_constants* constants, const char* v)
+{
+	tyran_symbol symbol;
+	tyran_symbol_table_add(constants->symbol_table, &symbol, v);
+	tyran_value value;
+	tyran_value_set_symbol(value, symbol);
+
+	return tyran_constants_reserve_index(constants, &value);
+}
+
 
 tyran_constant_index tyran_constants_add_boolean(tyran_constants* constants, tyran_boolean v)
 {

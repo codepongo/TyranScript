@@ -218,8 +218,7 @@ tyran_reg_or_constant_index tyran_generator_call(tyran_memory* memory, tyran_cod
 tyran_reg_or_constant_index tyran_generator_index(tyran_memory* memory, tyran_code_state* code, NODE obj, NODE lookup) {
 	tyran_reg_index obj_register = tyran_generator_traverse(memory, code, obj, -1, -1, TYRAN_FALSE);
 	tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*) lookup;
-	const struct tyran_string* str = tyran_string_from_c_str(code->string_pool, memory, identifier->string);
-	tyran_constant_index lookup_string = tyran_constants_add_string(code->constants, code->runtime, str);
+	tyran_constant_index lookup_string = tyran_constants_add_symbol_from_c_string(code->constants, identifier->string);
 
 	tyran_reg_index target = tyran_variable_scopes_define_temporary_variable(code->scope);
 	tyran_opcodes_op_get(code->opcodes, target, obj_register, lookup_string);

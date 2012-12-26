@@ -10,7 +10,7 @@ void tyran_print_constants(tyran_constants* constants, struct tyran_memory_pool*
 	for (i=0; i<constants->size; ++i)
 	{
 		tyran_snprintf(buf, 255, "%d", i);
-		tyran_print_value(buf, &constants->values[i], 1, object_iterator_pool, string_pool, memory);
+		tyran_print_value(buf, &constants->values[i], 1, constants->symbol_table, object_iterator_pool, string_pool, memory);
 	}
 }
 

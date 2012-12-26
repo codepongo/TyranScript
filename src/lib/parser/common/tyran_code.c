@@ -2,6 +2,7 @@
 #include <tyranscript/parser/tyran_label_reference.h>
 #include <tyranscript/parser/common/tyran_variable_scope.h>
 #include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_runtime.h>
 
 #include <tyranscript/parser/common/tyran_code.h>
 #include <tyranscript/tyran_constants.h>
@@ -22,7 +23,7 @@ tyran_code_state* tyran_code_new(struct tyran_runtime* runtime, tyran_memory_poo
 	state->runtime = runtime;
 
 	state->opcodes = tyran_opcodes_new(opcodes_pool, memory, 1024);
-	state->constants = tyran_constants_new(constants_pool, constant_values_pool, 1024);
+	state->constants = tyran_constants_new(constants_pool, runtime->symbol_table, constant_values_pool, 1024);
 	
 	state->scope = variable_scopes;
 	state->labels = TYRAN_CALLOC_TYPE_COUNT(label_pool, 100, tyran_label);

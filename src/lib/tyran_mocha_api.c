@@ -12,6 +12,7 @@
 #include <tyranscript/parser/tyran_label_reference.h>
 #include <tyranscript/tyran_constants.h>
 
+
 void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size)
 {
 	u8t* start = tyran_malloc(hunk_size);
@@ -37,8 +38,7 @@ void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size)
 	struct tyran_memory_pool* object_iterator_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_iterator, 10);
 	api->string_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_string, 10);
 
-	tyran_memory_pool* rb_node_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_rb_tree_key_value_node, 10);
-	api->default_runtime = tyran_runtime_new(runtime_pool, api->memory, rb_node_pool, api->string_pool, object_key_pool, object_iterator_pool, api->mocha_function_pool, function_object_pool, runtime_stack_pool, api->object_pool, value_registers_pool, api->value_pool);
+	api->default_runtime = tyran_runtime_new(runtime_pool, api->memory, api->string_pool, object_key_pool, object_iterator_pool, api->mocha_function_pool, function_object_pool, runtime_stack_pool, api->object_pool, value_registers_pool, api->value_pool);
 
 	api->object_key_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_key, 10);
 
@@ -98,7 +98,7 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char
 	tyran_runtime_push_call(api->default_runtime, code->opcodes, code->constants, context);
 	tyran_runtime_execute(api->default_runtime, &return_value, 0);
 	struct tyran_memory_pool* object_iterator_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_iterator, 10);
-	tyran_print_value("return", &return_value, 1, object_iterator_pool, api->string_pool, api->memory);
+	tyran_print_value("return", &return_value, 1, code->constants->symbol_table, object_iterator_pool, api->string_pool, api->memory);
 }
 
 tyran_value tyran_mocha_api_create_object(tyran_mocha_api* api) {
@@ -112,6 +112,6 @@ tyran_value tyran_mocha_api_create_object(tyran_mocha_api* api) {
 
 void tyran_mocha_api_add_function(tyran_mocha_api* api, tyran_value* target, const char* name, tyran_function_callback callback) {
 	tyran_value* value = tyran_function_object_new_callback(api->default_runtime, callback);
-	tyran_value_object_insert_c_string_key(api->string_pool, api->memory, api->object_key_pool, api->default_runtime->rb_node_pool, target, name, value);
+	tyran_value_object_insert_c_string_key(api->default_runtime, target, name, value);
 }
 

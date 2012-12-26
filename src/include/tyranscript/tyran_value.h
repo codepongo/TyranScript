@@ -2,6 +2,7 @@
 #define _TYRAN_VALUE_H
 
 #include <tyranscript/tyran_config.h>
+#include <tyranscript/tyran_symbol.h>
 
 struct tyran_string;
 struct tyran_object;
@@ -12,6 +13,7 @@ typedef enum {
 	TYRAN_VALUE_TYPE_NULL,
 	TYRAN_VALUE_TYPE_BOOLEAN,
 	TYRAN_VALUE_TYPE_NUMBER,
+	TYRAN_VALUE_TYPE_SYMBOL,
 	TYRAN_VALUE_TYPE_OBJECT,
 	TYRAN_VALUE_TYPE_STATIC_FUNCTION
 } tyran_value_type;
@@ -21,6 +23,7 @@ typedef struct tyran_value {
 	union {
 		tyran_boolean boolean;
 		tyran_number number;
+		tyran_symbol symbol;
 		struct tyran_object* object;
 		struct tyran_function* static_function;
 		u32t data;
@@ -49,6 +52,11 @@ typedef struct tyran_value {
 #define tyran_value_set_number(v, n) { \
 	(v).type = TYRAN_VALUE_TYPE_NUMBER; \
 	(v).data.number = (n); \
+}
+
+#define tyran_value_set_symbol(v, n) { \
+	(v).type = TYRAN_VALUE_TYPE_SYMBOL; \
+	(v).data.symbol = (n); \
 }
 
 #define tyran_value_set_boolean(v, b) { \

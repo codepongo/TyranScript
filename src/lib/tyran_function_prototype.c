@@ -24,7 +24,7 @@ static int tyran_function_prototype_call(tyran_runtime* runtime,  tyran_value* a
 
 int tyran_function_prototype_apply(tyran_runtime* runtime, tyran_value* function_object_value, tyran_value* function_scope, tyran_value* _this, tyran_value* return_value, int is_constructor)
 {
-	tyran_object_key_flag_type flag;
+	/* tyran_object_key_flag_type flag;
 	
 	tyran_value* this_to_use = tyran_value_object_lookup_array(function_scope, 0, &flag);
 	
@@ -32,7 +32,7 @@ int tyran_function_prototype_apply(tyran_runtime* runtime, tyran_value* function
 	
 	
 	tyran_runtime_push_call(runtime, function_to_call->data.opcodes, 0, this_to_use);
-	
+	*/
 	return -1;
 }
 

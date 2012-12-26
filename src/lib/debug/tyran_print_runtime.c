@@ -5,6 +5,7 @@
 
 #include <tyranscript/debug/tyran_print_opcodes.h>
 #include <tyranscript/debug/tyran_print_value.h>
+#include <tyranscript/tyran_constants.h>
 
 void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _this, const struct tyran_constants* constants, const tyran_opcode* opcode, int ip)
 {
@@ -22,7 +23,7 @@ void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _t
 			stack_info_length_left -= tyran_strlen(seperator);
 		}
 		char some_info[max_size];
-		tyran_value_to_c_string(&stack[i], some_info, max_size, 1);
+		tyran_value_to_c_string(constants->symbol_table, &stack[i], some_info, max_size, 1);
 		stack_info_length_left -= tyran_strlen(some_info);
 		tyran_strncat(stack_info, some_info, stack_info_length_left);
 	}
@@ -32,7 +33,7 @@ void tyran_print_runtime(const tyran_value* stack, int sp, const tyran_value* _t
 	stack_info_length_left -= tyran_strlen(this_seperator);
 
 	char this_info[max_size];
-	tyran_value_to_c_string(_this, this_info, max_size, 1);
+	tyran_value_to_c_string(constants->symbol_table, _this, this_info, max_size, 1);
 	tyran_strncat(stack_info, this_info, stack_info_length_left);
 
 	TYRAN_LOG("%s", stack_info);

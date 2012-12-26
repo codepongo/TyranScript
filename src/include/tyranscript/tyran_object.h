@@ -25,6 +25,11 @@ typedef enum {
 	TYRAN_OBJECT_TYPE_ITERATOR,
 } tyran_object_type;
 
+typedef struct tyran_object_property {
+	tyran_symbol symbol;
+	tyran_value value;
+} tyran_object_property;
+
 typedef struct tyran_object {
 	struct tyran_value* prototype;
 
@@ -37,8 +42,8 @@ typedef struct tyran_object {
 	} data;
 
 	int retain_count;
-
-	struct tree_root* tree;
+	tyran_object_property properties[32];
+	int property_count;
 
 	const struct tyran_runtime* created_in_runtime;
 	void* program_specific;
@@ -48,7 +53,6 @@ typedef struct tyran_object {
 
 /* Create and destroy */
 tyran_object* tyran_object_new(const struct tyran_runtime* runtime);
-tyran_object* tyran_object_new_from_items(const struct tyran_runtime* runtime, const struct tyran_value* items, int count);
 void tyran_object_free(tyran_object* object);
 
 /* Prototype */
@@ -60,15 +64,11 @@ void tyran_object_set_length(tyran_memory_pool* value_pool, tyran_object* object
 int tyran_object_length(const tyran_object* object);
 
 /* Insert and Delete */
-void tyran_object_insert_key(struct tyran_memory_pool* rb_node_pool, struct tyran_object* object, const struct tyran_object_key* key, struct tyran_value* value);
-void tyran_object_insert_c_string_key(tyran_memory_pool* string_pool, tyran_memory* memory, struct tyran_memory_pool* object_key_pool, struct tyran_memory_pool* rb_node_pool, struct tyran_object* object, const char* key, struct tyran_value* value);
-void tyran_object_insert_string_key(tyran_memory_pool* string_pool, tyran_memory* memory, struct tyran_memory_pool* object_key_pool, struct tyran_memory_pool* rb_node_pool, struct tyran_object* object, const struct tyran_string* key, struct tyran_value* value);
-void tyran_object_insert_array(struct tyran_object* object, int index, struct tyran_value* value);
-void tyran_object_delete(struct tyran_object* object, const struct tyran_object_key* key);
+void tyran_object_insert(struct tyran_object* object, const tyran_symbol* symbol, struct tyran_value* value);
+void tyran_object_delete(struct tyran_object* object, const struct tyran_symbol* symbol);
 
 /* Find */
-struct tyran_value* tyran_object_lookup(const struct tyran_object* object, const struct tyran_object_key* key, tyran_object_key_flag_type* flag);
-struct tyran_value* tyran_object_lookup_prototype(const struct tyran_object* o, const struct tyran_object_key* key, tyran_object_key_flag_type* flag);
-void tyran_object_get_keys(tyran_memory_pool* string_pool, tyran_memory* memory, tyran_memory_pool* object_key_pool, const struct tyran_object* target, struct tyran_object_iterator* target_iterator);
+const struct tyran_value* tyran_object_lookup(const struct tyran_object* object, const struct tyran_symbol* key);
+const struct tyran_value* tyran_object_lookup_prototype(const struct tyran_object* o, const struct tyran_symbol* key);
 
 #endif

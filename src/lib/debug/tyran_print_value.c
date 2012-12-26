@@ -10,10 +10,11 @@
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_number.h>
 #include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_symbol_table.h>
 
 #include <tyranscript/debug/tyran_print_value.h>
 
-void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, int quote)
+void tyran_value_to_c_string(const tyran_symbol_table* symbol_table, const tyran_value* v, char* buf, int max_length, int quote)
 {
 	switch (v->type) {
 		case TYRAN_VALUE_TYPE_BOOLEAN:
@@ -41,7 +42,12 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 				}
 			}
 			break;
-
+		case TYRAN_VALUE_TYPE_SYMBOL: {
+			const char* symbol_name;
+			symbol_name = tyran_symbol_table_lookup(symbol_table, &v->data.symbol);
+			tyran_snprintf(buf, max_length, ":%s", symbol_name);
+			}
+			break;
 		case TYRAN_VALUE_TYPE_OBJECT:
 			switch (v->data.object->type)
 			{
@@ -77,7 +83,7 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 
 }
 
-void tyran_print_value_helper(int tabs, const char* property, const tyran_value* v, int quote, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* string_pool, tyran_memory* memory)
+void tyran_print_value_helper(int tabs, const char* property, const tyran_value* v, int quote, const tyran_symbol_table* symbol_table, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* string_pool, tyran_memory* memory)
 {
 	int t;
 
@@ -102,8 +108,8 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 	const int max_size = 200;
 	char value[max_size];
 
-	const int temp_buffer_size = 512;
-	char temp_buffer[temp_buffer_size];
+	//const int temp_buffer_size = 512;
+	// char temp_buffer[temp_buffer_size];
 
 	int max_size_left = max_size;
 	switch(v->type) {
@@ -133,7 +139,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 		}
 		default: {
 			char buf[2048];
-			tyran_value_to_c_string(v, buf, 2048, quote);
+			tyran_value_to_c_string(symbol_table, v, buf, 2048, quote);
 			tyran_strncpy(value, max_size, buf, 2048);
 			}
 			break;
@@ -145,6 +151,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 		tyran_object* o = v->data.object;
 		if (o->prototype == tyran_array_prototype) {
 			TYRAN_LOG("[]");
+			/*
 			int len = tyran_object_length(o);
 			int i;
 			tyran_value* nv;
@@ -160,7 +167,9 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 					tyran_print_value_helper(tabs, desc, nv, 1, object_iterator_pool, string_pool, memory);
 				}
 			}
+			*/
 		} /*else*/ {
+			/*
 			tabs++;
 			tyran_object_iterator* target_iterator = tyran_object_iterator_new(object_iterator_pool);
 			tyran_object_get_keys(string_pool, memory, 0, v->data.object, target_iterator);
@@ -176,15 +185,16 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 			}
 
 			tabs--;
+			*/
 		}
 
 		if (tyran_object_get_prototype(o)) {
-			tyran_print_value_helper(tabs + 1, "__proto__", tyran_object_get_prototype(o), quote, object_iterator_pool, string_pool, memory);
+			tyran_print_value_helper(tabs + 1, "__proto__", tyran_object_get_prototype(o), quote, symbol_table, object_iterator_pool, string_pool, memory);
 		}
 	}
 }
 
-void tyran_print_value(const char* property, const tyran_value* v, int quote, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* string_pool, tyran_memory* memory)
+void tyran_print_value(const char* property, const tyran_value* v, int quote, const tyran_symbol_table* symbol_table, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* string_pool, tyran_memory* memory)
 {
-	tyran_print_value_helper(0, property, v, quote, object_iterator_pool, string_pool, memory);
+	tyran_print_value_helper(0, property, v, quote, symbol_table, object_iterator_pool, string_pool, memory);
 }
