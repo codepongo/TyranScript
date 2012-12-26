@@ -125,7 +125,11 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_ADD:
 			TYRAN_REGISTER_A_RCX_RCY;
-			tyran_value_set_number(r[a], rcx.data.number + rcy.data.number);
+			if (tyran_value_is_number(&rcx)) {
+				tyran_value_set_number(r[a], rcx.data.number + rcy.data.number);
+			} else {
+				// TYRAN_RUNTIME_INVOKE(r[a], rcx, "+", rcy);
+			}
 			break;
 		case TYRAN_OPCODE_DIV:
 			TYRAN_REGISTER_A_RCX_RCY;
@@ -171,11 +175,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_JEQ:
 			TYRAN_REGISTER_A_RCX_RCY;
-			if (rcx.type == TYRAN_VALUE_TYPE_STRING) {
-				test = tyran_string_strcmp(rcx.data.str, rcy.data.str) == 0;
-			} else {
-				test = (rcx.data.data == rcy.data.data);
-			}
+			test = (rcx.data.data == rcy.data.data);
 			if (test != a) {
 				pc++;
 			} else {
@@ -184,11 +184,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_JLT:
 			TYRAN_REGISTER_A_RCX_RCY;
-			if (rcx.type == TYRAN_VALUE_TYPE_STRING) {
-				test = tyran_string_strcmp(rcx.data.str, rcy.data.str) < 0;
-			} else {
-				test = (rcx.data.data < rcy.data.data);
-			}
+			test = (rcx.data.data < rcy.data.data);
 			if (test != a) {
 				pc++;
 			} else {
@@ -197,11 +193,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_JLE:
 			TYRAN_REGISTER_A_RCX_RCY;
-			if (rcx.type == TYRAN_VALUE_TYPE_STRING) {
-				test = tyran_string_strcmp(rcx.data.str, rcy.data.str) <= 0;
-			} else {
-				test = (rcx.data.data <= rcy.data.data);
-			}
+			test = (rcx.data.data <= rcy.data.data);
 			if (test != a) {
 				pc++;
 			} else {
@@ -260,21 +252,21 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A_RCX_RCY;
 			TYRAN_ASSERT(tyran_value_is_string(&rcy), "Must use string to lookup. for now");
 			tyran_object_key_flag_type flag = tyran_object_key_flag_normal;
-			const struct tyran_object_key* key = tyran_object_key_new(runtime->string_pool, runtime->memory, runtime->object_key_pool, rcy.data.str, flag);
+			const struct tyran_object_key* key = tyran_object_key_new(runtime->string_pool, runtime->memory, runtime->object_key_pool, rcy.data.object->data.str, flag);
 			TYRAN_ASSERT(tyran_value_is_object(&rcx), "Must lookup object");
 			tyran_value* v = tyran_value_object_lookup(&rcx, key, &flag);
 			if (!v) {
 				tyran_value_set_undefined(r[a]);
 			} else {
 				tyran_value_copy(r[a], *v);
+				TYRAN_ADD_REF(r[a]);
 			}
-			TYRAN_ADD_REF(r[a]);
 			}
 			break;
 		case TYRAN_OPCODE_SET:
 			TYRAN_REGISTER_A_RCX_RCY;
 			TYRAN_ASSERT(tyran_value_is_string(&rcx), "Must be string");
-			tyran_value_object_insert_string_key(&r[a], rcx.data.str, &rcy);
+			tyran_value_object_insert_string_key(&r[a], rcx.data.object->data.str, &rcy);
 			break;
 		case TYRAN_OPCODE_KEY:
 			TYRAN_REGISTER_A_RCX;
@@ -285,7 +277,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_ASSERT(c[x].type == TYRAN_VALUE_TYPE_STATIC_FUNCTION, "Must be a function");
 			tyran_function* static_function = c[x].data.static_function;
 			tyran_function_object* function_object = tyran_function_object_new(runtime->function_object_pool, static_function);
-			tyran_object* object = tyran_object_new(runtime->object_pool, runtime);
+			tyran_object* object = tyran_object_new(runtime);
 			tyran_object_set_function(object, function_object);
 			tyran_value_set_object(r[a], object);
 			}

@@ -45,8 +45,6 @@ int tyran_value_is_true(const tyran_value* value)
 			if (value->data.number == 0.0 || tyran_number_is_nan(value->data.number))
 				return 0;
 			return 1;
-		case TYRAN_VALUE_TYPE_STRING:
-			return value->data.str->len ? 1 : 0;
 		case TYRAN_VALUE_TYPE_OBJECT:
 			return 1;
 		default:

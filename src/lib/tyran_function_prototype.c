@@ -39,11 +39,11 @@ int tyran_function_prototype_apply(tyran_runtime* runtime, tyran_value* function
 void tyran_function_prototype_init(tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* object_pool, tyran_memory_pool* value_pool, const struct tyran_runtime* runtime, tyran_value* constructor_protoype)
 {
 	tyran_function_prototype = constructor_protoype;
-	tyran_value* function_call = tyran_function_object_new_callback(function_pool, function_object_pool, object_pool, value_pool, runtime, tyran_function_prototype_call);
+	tyran_value* function_call = tyran_function_object_new_callback(runtime, tyran_function_prototype_call);
 	// tyran_value_object_insert_string_key(constructor_protoype, tyran_string_from_c_str("call"), function_call);
 	tyran_value_object_set_prototype(function_call, tyran_object_prototype);
 
-	tyran_value* function_apply = tyran_function_object_new_callback(function_pool, function_object_pool, object_pool, value_pool, runtime, tyran_function_prototype_apply);
+	tyran_value* function_apply = tyran_function_object_new_callback(runtime, tyran_function_prototype_apply);
 	// tyran_value_object_insert_string_key(constructor_protoype, tyran_string_from_c_str("apply"), function_apply);
 	tyran_value_object_set_prototype(function_apply, tyran_object_prototype);
 }

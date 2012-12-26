@@ -7,15 +7,16 @@
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_number.h>
 #include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_runtime.h>
 
 #include "tyran_value_convert.h"
 #include <tyranscript/tyran_object_key.h>
 #include "tyran_number_to_string.h"
 
-tyran_value* tyran_value_object_new(tyran_memory_pool* value_pool, tyran_memory_pool* object_pool, const struct tyran_runtime* runtime)
+tyran_value* tyran_value_object_new(const struct tyran_runtime* runtime)
 {
-	tyran_value* value = tyran_value_new(value_pool);
-	tyran_value_set_object(*value, tyran_object_new(object_pool, runtime));
+	tyran_value* value = tyran_value_new(runtime->value_pool);
+	tyran_value_set_object(*value, tyran_object_new(runtime));
 	return value;
 }
 void tyran_value_object_insert_array(tyran_value* target, int key, tyran_value* value)
@@ -31,7 +32,7 @@ void tyran_value_object_delete(tyran_value* target, tyran_value* key)
 
 	tyran_value_convert_to_string(key);
 
-	tyran_object_delete(target->data.object, (const struct tyran_object_key*)key->data.str);
+	tyran_object_delete(target->data.object, (const struct tyran_object_key*)key->data.object->data.str);
 }
 
 tyran_value* tyran_value_object_lookup(const tyran_value* target, const struct tyran_object_key* key, tyran_object_key_flag_type* flag)

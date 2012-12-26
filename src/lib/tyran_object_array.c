@@ -14,7 +14,7 @@ struct tyran_object* tyran_object_new_array(tyran_memory_pool* object_pool, tyra
 	int i;
 	//const struct tyran_object_key* ok;
 	tyran_value* v;
-	tyran_object* object = tyran_object_new(object_pool, runtime);
+	tyran_object* object = tyran_object_new(runtime);
 
 	for (i = 0; i < count; ++i) {
 		tyran_number_integer_to_string(string_pool, string_memory, i, &number_string);

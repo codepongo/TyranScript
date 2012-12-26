@@ -36,9 +36,9 @@ void* tyran_object_key_get(struct stree_node* node)
 	return (void*) ((tyran_rb_tree_key_value_node*)(node->node))->key;
 }
 
-tyran_object* tyran_object_new(tyran_memory_pool* object_pool, const struct tyran_runtime* runtime)
+tyran_object* tyran_object_new(const struct tyran_runtime* runtime)
 {
-	tyran_object* object = TYRAN_CALLOC_TYPE(object_pool, tyran_object);
+	tyran_object* object = TYRAN_CALLOC_TYPE(runtime->object_pool, tyran_object);
 	object->tree = new_rbtree(tyran_object_key_get, tyran_object_key_compare);
 	object->created_in_runtime = runtime;
 	return object;
@@ -55,6 +55,9 @@ void tyran_object_free(struct tyran_object* object)
 			break;
 		case TYRAN_OBJECT_TYPE_FUNCTION:
 			tyran_function_object_free(object->data.function);
+			break;
+		case TYRAN_OBJECT_TYPE_STRING:
+			tyran_string_free(object->data.str);
 			break;
 		default:
 			break;
@@ -137,9 +140,8 @@ void tyran_object_get_keys(tyran_memory_pool* string_pool, tyran_memory* memory,
 
 void tyran_object_set_prototype(struct tyran_object* target, struct tyran_value* proto)
 {
-	// TYRAN_ASSERT(target->prototype == 0, "Prototype already set, this is a problem");
+	TYRAN_ASSERT(target->prototype == 0, "Prototype already set, this is a problem");
 	TYRAN_OBJECT_RETAIN(proto->data.object);
-	// tyran_object_insert_key(target, target->created_in_runtime->prototype_key, proto);
 	target->prototype = proto;
 }
 

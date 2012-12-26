@@ -15,8 +15,6 @@
 
 void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, int quote)
 {
-	static const int temp_buffer_size = 512;
-	char temp_buffer[temp_buffer_size];
 	switch (v->type) {
 		case TYRAN_VALUE_TYPE_BOOLEAN:
 			tyran_snprintf(buf, max_length, "%s", v->data.boolean ? "true" : "false");
@@ -43,14 +41,7 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 				}
 			}
 			break;
-		case TYRAN_VALUE_TYPE_STRING:
-			tyran_string_to_c_str(temp_buffer, temp_buffer_size, v->data.str);
-			if (quote) {
-				tyran_snprintf(buf, max_length, "'%s'", temp_buffer);
-			} else {
-				tyran_strncpy(buf, max_length, temp_buffer, temp_buffer_size);
-			}
-			break;
+
 		case TYRAN_VALUE_TYPE_OBJECT:
 			switch (v->data.object->type)
 			{
@@ -62,6 +53,17 @@ void tyran_value_to_c_string(const tyran_value* v, char* buf, int max_length, in
 			break;
 			case TYRAN_OBJECT_TYPE_ITERATOR:
 				tyran_snprintf(buf, max_length, "iterator:%p (%d)", (void*)v->data.object, v->data.object->retain_count);
+			break;
+			case TYRAN_OBJECT_TYPE_STRING: {
+				static const int temp_buffer_size = 512;
+				char temp_buffer[temp_buffer_size];
+				tyran_string_to_c_str(temp_buffer, temp_buffer_size, v->data.object->data.str);
+				if (quote) {
+					tyran_snprintf(buf, max_length, "'%s'", temp_buffer);
+				} else {
+					tyran_strncpy(buf, max_length, temp_buffer, temp_buffer_size);
+				}
+			}
 			break;
 			}
 

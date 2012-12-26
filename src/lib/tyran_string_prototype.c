@@ -11,8 +11,6 @@
 
 #include <tyranscript/debug/tyran_print_value.h>
 
-struct tyran_value* tyran_string_prototype;
-
 int tyran_string_prototype_constructor(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* d, int is_constructor)
 {
 	tyran_value* str;
@@ -22,7 +20,7 @@ int tyran_string_prototype_constructor(tyran_runtime* r, tyran_value* a, tyran_v
 	}
 
 	tyran_object_key_flag_type flag;
-	 str = tyran_value_object_lookup_array(args, 0, &flag);
+	str = tyran_value_object_lookup_array(args, 0, &flag);
 	// tyran_object_set_length(_this->data.object, str->data.str->len);
 	// tyran_value_object_insert_string_key(_this, tyran_string_from_c_str("str"), str);
 
@@ -60,9 +58,8 @@ int tyran_string_prototype_from_char_code(tyran_runtime* r, tyran_value* a, tyra
 	return 0;
 }
 
-void tyran_string_prototype_init(tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* object_pool, tyran_memory_pool* value_pool, const struct tyran_runtime* runtime, tyran_value* constructor_prototype)
+void tyran_string_prototype_init(const struct tyran_runtime* runtime, tyran_value* constructor_prototype)
 {
-	tyran_string_prototype = constructor_prototype;
 	/*
 	tyran_value* function_call = tyran_function_object_new_callback(runtime, tyran_string_prototype_char_at);
 	tyran_value_object_insert_string_key(constructor_prototype, tyran_string_from_c_str("charAt"), function_call);

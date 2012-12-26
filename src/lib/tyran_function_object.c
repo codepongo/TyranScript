@@ -6,6 +6,7 @@
 #include <tyranscript/tyran_function_prototype.h>
 #include <tyranscript/tyran_function_object.h>
 #include <tyranscript/tyran_value_object.h>
+#include <tyranscript/tyran_runtime.h>
 
 tyran_function_object* tyran_function_object_new(tyran_memory_pool* function_object_pool, const tyran_function* function)
 {
@@ -26,14 +27,13 @@ tyran_function_object* tyran_function_object_new_callback_helper(tyran_memory_po
 	return tyran_function_object_new(function_object_pool, func);
 }
 
-tyran_value* tyran_function_object_new_callback(tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* object_pool, tyran_memory_pool* value_pool, const struct tyran_runtime* runtime, tyran_function_callback callback)
+tyran_value* tyran_function_object_new_callback(const struct tyran_runtime* runtime, tyran_function_callback callback)
 {
-	tyran_object* object = tyran_object_new(object_pool, runtime);
-	tyran_object_set_function(object, tyran_function_object_new_callback_helper(function_pool, function_object_pool, callback));
+	tyran_object* object = tyran_object_new(runtime);
+	tyran_object_set_function(object, tyran_function_object_new_callback_helper(runtime->function_pool, runtime->function_object_pool, callback));
 
-	tyran_value* value = tyran_value_new(value_pool);
+	tyran_value* value = tyran_value_new(runtime->value_pool);
 	tyran_value_set_object(*value, object);
-	
 
 	return value;
 }

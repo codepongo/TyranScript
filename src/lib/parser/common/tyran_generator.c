@@ -59,7 +59,7 @@ tyran_generator* tyran_generator_new(tyran_memory* memory, tyran_memory_pool* ge
 	return generator;
 }
 
-tyran_constant_index tyran_generator_literal_to_constant_index(tyran_constants* constants, tyran_memory_pool* string_pool, tyran_memory* memory, tyran_parser_node* node)
+tyran_constant_index tyran_generator_literal_to_constant_index(tyran_constants* constants, struct tyran_runtime* runtime, tyran_memory_pool* string_pool, tyran_memory* memory, tyran_parser_node* node)
 {
 	tyran_constant_index result;
 	switch (node->type)
@@ -74,7 +74,8 @@ tyran_constant_index tyran_generator_literal_to_constant_index(tyran_constants* 
 	case TYRAN_PARSER_NODE_TYPE_STRING: {
 		tyran_parser_node_string* string = (tyran_parser_node_string*) node;
 		const struct tyran_string* str = tyran_string_from_c_str(string_pool, memory, string->string);
-		result = tyran_constants_add_string(constants, str);
+		result = tyran_constants_add_string(constants, runtime, str);
+		TYRAN_LOG("String constant %s -> %d", string->string, result);
 		}
 		break;
 	case TYRAN_PARSER_NODE_TYPE_UNDEFINED:
@@ -218,7 +219,7 @@ tyran_reg_or_constant_index tyran_generator_index(tyran_memory* memory, tyran_co
 	tyran_reg_index obj_register = tyran_generator_traverse(memory, code, obj, -1, -1, TYRAN_FALSE);
 	tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*) lookup;
 	const struct tyran_string* str = tyran_string_from_c_str(code->string_pool, memory, identifier->string);
-	tyran_constant_index lookup_string = tyran_constants_add_string(code->constants, str);
+	tyran_constant_index lookup_string = tyran_constants_add_string(code->constants, code->runtime, str);
 
 	tyran_reg_index target = tyran_variable_scopes_define_temporary_variable(code->scope);
 	tyran_opcodes_op_get(code->opcodes, target, obj_register, lookup_string);
@@ -274,7 +275,7 @@ tyran_reg_or_constant_index tyran_generator_handle_node(tyran_code_state* code, 
 	tyran_reg_or_constant_index result;
 	
 	if (tyran_parser_node_is_constant(node)) {
-		result = tyran_generator_literal_to_constant_index(code->constants, string_pool, memory, node);
+		result = tyran_generator_literal_to_constant_index(code->constants, code->runtime, string_pool, memory, node);
 	} else if (node->type == TYRAN_PARSER_NODE_TYPE_IDENTIFIER) {
 		tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*) node;
 		result = tyran_variable_scopes_get_identifier(code->scope, identifier->string);

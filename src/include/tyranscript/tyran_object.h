@@ -20,6 +20,7 @@ typedef struct tyran_rb_tree_key_value_node {
 
 typedef enum {
 	TYRAN_OBJECT_TYPE_OBJECT,
+	TYRAN_OBJECT_TYPE_STRING,
 	TYRAN_OBJECT_TYPE_FUNCTION,
 	TYRAN_OBJECT_TYPE_ITERATOR,
 } tyran_object_type;
@@ -30,8 +31,7 @@ typedef struct tyran_object {
 	tyran_object_type type;
 	union {
 		int value;
-		tyran_number number;
-		struct tyran_string* str;
+		const struct tyran_string* str;
 		struct tyran_function_object* function;
 		struct tyran_object_iterator* iterator;
 	} data;
@@ -47,7 +47,7 @@ typedef struct tyran_object {
 } tyran_object;
 
 /* Create and destroy */
-tyran_object* tyran_object_new(tyran_memory_pool* object_pool, const struct tyran_runtime* runtime);
+tyran_object* tyran_object_new(const struct tyran_runtime* runtime);
 tyran_object* tyran_object_new_from_items(const struct tyran_runtime* runtime, const struct tyran_value* items, int count);
 void tyran_object_free(tyran_object* object);
 

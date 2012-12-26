@@ -18,7 +18,6 @@ typedef struct tyran_mocha_api {
 
 	struct tyran_memory_pool* string_pool;
 	struct tyran_memory_pool* object_key_pool;
-	struct tyran_memory_pool* rb_node_pool;
 
 	struct tyran_memory_pool* default_variable_info_pool;
 	struct tyran_memory_pool* default_register_pool;

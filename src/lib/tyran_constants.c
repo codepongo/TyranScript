@@ -2,6 +2,7 @@
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_function.h>
+#include <tyranscript/tyran_string_object.h>
 #include <tyranscript/tyran_object_macros.h>
 
 tyran_constants* tyran_constants_new(tyran_memory_pool* constants_pool, tyran_memory_pool* constant_values_pool, size_t size)
@@ -39,11 +40,11 @@ tyran_constant_index tyran_constants_add_number(tyran_constants* constants, tyra
 	return tyran_constants_reserve_index(constants, &value);
 }
 
-tyran_constant_index tyran_constants_add_string(tyran_constants* constants, const struct tyran_string* v)
+tyran_constant_index tyran_constants_add_string(tyran_constants* constants, struct tyran_runtime* runtime, const struct tyran_string* v)
 {
-	tyran_value value;
-	tyran_value_set_string(value, v);
-	return tyran_constants_reserve_index(constants, &value);
+	tyran_value* value = tyran_string_object_new(runtime, v);
+
+	return tyran_constants_reserve_index(constants, value);
 }
 
 tyran_constant_index tyran_constants_add_boolean(tyran_constants* constants, tyran_boolean v)

@@ -28,6 +28,9 @@ typedef struct tyran_parser_state {
 
 	char function_name[512];
 
+	struct tyran_memory_pool* object_pool;
+	struct tyran_memory_pool* value_pool;
+
 	int error_count;
 } tyran_parser_state;
 

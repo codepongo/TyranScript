@@ -43,6 +43,7 @@ int main(int argc, char* argv[])
 	
 	tyran_mocha_api_new(&api, 1024);
 	tyran_value global = tyran_mocha_api_create_object(&api);
+
 	tyran_mocha_api_add_function(&api, &global, "print", mocha_print);
 
 	tyran_mocha_api_eval(&api, &global, buf, tyran_strlen(buf));

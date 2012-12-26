@@ -209,7 +209,7 @@ tyran_reg_or_constant_index parse_constant(tyran_parser_state* parser_state, tyr
 			return tyran_constants_add_number(parser_state->constants, parser_state->lexer->number);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_STRING:
-			return tyran_constants_add_string(parser_state->constants, (tyran_string*) parser_state->lexer->string_buffer);
+			return tyran_constants_add_string(parser_state->constants, parser_state->runtime, (tyran_string*) parser_state->lexer->string_buffer);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_TRUE:
 		case TYRAN_TOKEN_ASSEMBLER_FALSE:
@@ -352,7 +352,7 @@ void tyran_lexer_assembler_end_of_function(tyran_memory_pool* function_pool, tyr
 	tyran_function_object* func_obj = tyran_function_object_new(function_object_pool, func);
 	tyran_value* func_value_obj = tyran_value_new(value_pool);
 
-	tyran_object* obj = tyran_object_new(object_pool, parser_state->runtime);
+	tyran_object* obj = tyran_object_new(parser_state->runtime);
 	tyran_object_set_function(obj, func_obj);
 
 	tyran_value_set_object(*func_value_obj, obj);

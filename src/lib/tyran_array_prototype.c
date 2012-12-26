@@ -19,7 +19,7 @@ int tyran_array_prototype_constructor(tyran_memory_pool* object_pool, struct tyr
 		return 0;
 	}
 
-	tyran_object* o = tyran_object_new(object_pool, runtime);
+	tyran_object* o = tyran_object_new(runtime);
 	// tyran_object_set_length(o, 0, 0);
 	tyran_value_set_object(*return_value, o);
 
@@ -64,7 +64,7 @@ void tyran_array_prototype_init(tyran_memory_pool* function_pool, tyran_memory_p
 	tyran_array_prototype = constructor_prototype;
 	size_t i;
 	for (i = 0; i < sizeof(tyran_array_functions) / sizeof(struct tyran_function_info); ++i) {
-		tyran_value* n = tyran_function_object_new_callback(function_pool, function_object_pool, object_pool, value_pool, runtime, tyran_array_functions[i].static_function);
+		tyran_value* n = tyran_function_object_new_callback(runtime, tyran_array_functions[i].static_function);
 		tyran_value_object_set_prototype(n, tyran_function_prototype);
 		// tyran_value_object_insert_string_key(constructor_prototype, tyran_string_from_c_str(tyran_array_functions[i].name), n);
 	}

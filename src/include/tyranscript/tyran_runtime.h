@@ -21,21 +21,31 @@ typedef struct tyran_runtime {
 	const struct tyran_object_key* length_key;
 	const struct tyran_object_key* prototype_key;
 	
+
+	struct tyran_value* _string_class;
+
 	struct tyran_value* registers;
+
+	struct tyran_value* global;
+
 	struct tyran_memory* memory;
 	struct tyran_memory_pool* string_pool;
 	struct tyran_memory_pool* object_key_pool;
+	struct tyran_memory_pool* function_pool;
 	struct tyran_memory_pool* function_object_pool;
 	struct tyran_memory_pool* iterator_pool;
 	struct tyran_memory_pool* object_pool;
+	struct tyran_memory_pool* value_pool;
+	struct tyran_memory_pool* rb_node_pool;
+
 } tyran_runtime;
 
 struct tyran_runtime_callbacks;
 
-tyran_runtime* tyran_runtime_new(struct tyran_memory_pool* runtime_pool, struct tyran_memory* memory, struct tyran_memory_pool* string_pool, struct tyran_memory_pool* object_key_pool, struct tyran_memory_pool* object_iterator_pool, struct tyran_memory_pool* function_object_pool, struct tyran_memory_pool* runtime_stack_pool, struct tyran_memory_pool* object_pool, struct tyran_memory_pool* value_registers_pool);
+tyran_runtime* tyran_runtime_new(struct tyran_memory_pool* runtime_pool, struct tyran_memory* memory, struct tyran_memory_pool* rb_node_pool, struct tyran_memory_pool* string_pool, struct tyran_memory_pool* object_key_pool, struct tyran_memory_pool* object_iterator_pool, struct tyran_memory_pool* function_pool, struct tyran_memory_pool* function_object_pool, struct tyran_memory_pool* runtime_stack_pool, struct tyran_memory_pool* object_pool, struct tyran_memory_pool* value_registers_pool, struct tyran_memory_pool* value_pool);
 void tyran_runtime_free(tyran_runtime* rt);
 void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_value, const struct tyran_runtime_callbacks* callbacks);
 void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opcodes, const struct tyran_constants* constants, const struct tyran_value* _this);
-
+#define tyran_runtime_context(RUNTIME) (RUNTIME->global)
 
 #endif

@@ -1,10 +1,12 @@
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_value_object.h>
+#include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_runtime.h>
 
 #include <tyranscript/tyran_runtime_stack.h>
 #include <tyranscript/tyran_opcodes.h>
 #include <tyranscript/tyran_opcode.h>
+#include <tyranscript/tyran_prototypes.h>
 #include "tyran_value_convert.h"
 
 #include <tyranscript/debug/tyran_print_value.h>
@@ -14,24 +16,34 @@
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_object_key.h>
 
-tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* memory, tyran_memory_pool* string_pool, tyran_memory_pool* object_key_pool, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* runtime_stack_pool, tyran_memory_pool* object_pool, tyran_memory_pool* value_pool)
+tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* memory, struct tyran_memory_pool* rb_node_pool, tyran_memory_pool* string_pool, tyran_memory_pool* object_key_pool, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* runtime_stack_pool, tyran_memory_pool* object_pool, tyran_memory_pool* registers_value_pool, tyran_memory_pool* value_pool)
 {
 	tyran_runtime* rt = TYRAN_CALLOC_TYPE(runtime_pool, tyran_runtime);
 	rt->stack = TYRAN_MALLOC_TYPE_COUNT(runtime_stack_pool, tyran_runtime_stack, 128);
 	
-	rt->registers = TYRAN_MALLOC_TYPE_COUNT(value_pool, tyran_value, 128);
+	rt->registers = TYRAN_MALLOC_TYPE_COUNT(registers_value_pool, tyran_value, 128);
 	rt->object_key_pool = object_key_pool;
+	rt->function_pool = function_pool;
 	rt->function_object_pool = function_object_pool;
 	rt->iterator_pool = object_iterator_pool;
 	rt->object_pool = object_pool;
 	rt->string_pool = string_pool;
 	rt->memory = memory;
+	rt->rb_node_pool = rb_node_pool;
+	rt->value_pool = value_pool;
+	rt->global = TYRAN_CALLOC_TYPE(value_pool, tyran_value);
+
+	tyran_object* global_object = tyran_object_new(rt);
+	tyran_value_set_object(*rt->global, global_object);
+
+	tyran_prototypes_init(rt, rt->global);
 	
 	// rt->length_key = tyran_object_key_new(object_pool, tyran_string_from_c_str("length"), tyran_object_key_flag_normal);
 	// rt->prototype_key = tyran_object_key_new(object_pool, tyran_string_from_c_str("prototype"), tyran_object_key_flag_normal);
 	
 	return rt;
 }
+
 
 void tyran_runtime_free(tyran_runtime* rt)
 {
