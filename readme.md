@@ -18,43 +18,35 @@ All opcodes are coded within a 32-bit instruction.
 * PC. Program Counter.
 
 ### Register (4)
-* **LD A X**. Load register. R(A) = R(X).
-* **LDC A X**. Load constant. R(A) = C(X).
-* **LDB A X**. Load boolean. R(A) = (BOOL)X.
-* **LDN A X.** Load NULL. R(A..A+X) = NULL.
+* 0x01 **LD A X**. Load register. R(A) = R(X).
+* 0x02 **LDC A X**. Load constant. R(A) = C(X).
+* 0x03 **LDB A X**. Load boolean. R(A) = (BOOL)X.
+* 0x04 **LDN A X.** Load NULL. R(A..A+X) = NULL.
 
-### Arithmetic (8)
-* **ADD A X Y**. Add. R(A) = RC(X) + RC(Y).    
-* **DIV A X Y**. Divide. R(A) = RC(X) / RC(Y).
-* **MOD A X Y**. Modulus. R(A) = RC(X) % RC(Y).
-* **MUL A X Y**. Multiply. R(A) = RC(X) * RC(Y).
-* **NEG A X**. Negate. R(A) = -RC(X).
-* **NOT A X**. Logical Not. R(A) = !RC(X).
-* **POW A X Y**. Exponentiation. R(A) = RC(X) ^ RC(Y).
-* **SUB A X Y**. Subtract. R(A) = RC(X) - RC(Y).
+### Operators (10)
+* 0x05 **ADD A X Y**. Add. R(A) = RC(X) + RC(Y).    
+* 0x06 **DIV A X Y**. Divide. R(A) = RC(X) / RC(Y).
+* 0x07 **MOD A X Y**. Modulus. R(A) = RC(X) % RC(Y).
+* 0x08 **MUL A X Y**. Multiply. R(A) = RC(X) * RC(Y).
+* 0x09 **POW A X Y**. Exponentiation. R(A) = RC(X) ^ RC(Y).
+* 0x0A **SUB A X Y**. Subtract. R(A) = RC(X) - RC(Y).
+* 0x0B **SET A X Y**. R(A)[ RC(X) ] = R(Y).
+* 0x0C **GET A X Y**. R(A) = R(X)[ RC(Y) ].
+* 0x0D **NEG A X**. Negate. R(A) = -RC(X).
+* 0x0E **NOT A X**. Logical Not. R(A) = !RC(X).
 
 ### Jumps and calls (8)
-* **JB A X**. Jump boolean. if !(RC(X) != A) then PC++.
-* **JBLD A X Y**. Jump boolean and load. if RC(X) != (BOOL)Y then R(A) = RC(X) else PC++.
-* **JEQ A X Y**. Jump Equal. if (RC(X) == RC(Y)) != (BOOL)A then PC++.
-* **JLT A X Y**. Jump less than. if (RC(X) < RC(Y)) != (BOOL)A then PC++.
-* **JLE A X Y**. Jump less. if (RC(X) <= RC(Y)) != (BOOL)A then PC++.
-* **JMP BR** . Jump. PC += BR.
-* **RET A X**. Return from call. returns R(A .. A + X - 2).
-* **CALL A X Y**. Call a function. R(A) holds the function object. X is number of arguments. Y is number of used return values. R(A+1) = SELF, R(A+2..A+X) are the arguments. Return values are stored in R(A+1..). 
+* 0x0F **JB A X**. Jump boolean. if !(RC(X) != A) then PC++.
+* 0x10 **JBLD A X Y**. Jump boolean and load. if RC(X) != (BOOL)Y then R(A) = RC(X) else PC++.
+* 0x11 **JEQ A X Y**. Jump Equal. if (RC(X) == RC(Y)) != (BOOL)A then PC++.
+* 0x12 **JLT A X Y**. Jump less than. if (RC(X) < RC(Y)) != (BOOL)A then PC++.
+* 0x13 **JLE A X Y**. Jump less. if (RC(X) <= RC(Y)) != (BOOL)A then PC++.
+* 0x14 **JMP BR** . Jump. PC += BR.
+* 0x15 **RET A X**. Return from call. returns R(A .. A + X - 2).
+* 0x16 **CALL A X Y**. Call a function. R(A) holds the function object. X is number of arguments. Y is number of used return values. R(A+1) = SELF, R(A+2..A+X) are the arguments. Return values are stored in R(A+1..). 
 
 ### Function
-* **FUNC A**. Create a function. R(A)=new function.
-
-
-### Object (5)
-* **SET A X Y**. R(A)[ RC(X) ] = R(Y).
-* **GET A X Y**. R(A) = R(X)[ RC(Y) ].
-
-* **LEN A X**. R(A) = length( R(X) ).
-* **KEY A X**. R(A) = new iterator for object R(X).
-* **NEXT A X**. R(A) = next key for iterator R(X).
-
+* 0x17 **FUNC A**. Create a function. R(A)=new function.
 
 ## Syntax
 
@@ -74,18 +66,12 @@ All opcodes are coded within a 32-bit instruction.
 ##### Existential
 * ?
 
-##### Class
-* class
-* extends
-* super
-
 ##### Destructuring assignments
 * [a, b, c] = [1, 2, 3]
 
 ##### Functions
 * =>
 * ->
-
 
 ##### Other
 * Splats ...
