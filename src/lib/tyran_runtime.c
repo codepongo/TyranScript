@@ -19,11 +19,11 @@
 #define TYRAN_RUNTIME_DEBUG
 
 
-#define TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(OPERATOR) \
+#define TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(DESTINATION, OPERATOR) \
 	tyran_value* member = tyran_object_lookup_prototype(rcx.data.object, &runtime->binary_operator_symbols[OPERATOR]); \
-	TYRAN_ASSERT(member, "Couldn't find add operator"); \
+	TYRAN_ASSERT(member, "Couldn't find operator"); \
 	const tyran_function* function = member->data.object->data.function->static_function; \
-	function->data.callback(runtime, member, &rcy, &rcx, &r[a], TYRAN_FALSE);
+	function->data.callback(runtime, member, &rcy, &rcx, DESTINATION, TYRAN_FALSE);
 
 
 void tyran_runtime_number_binary_operator(tyran_value* value, int operator_index, tyran_number a, tyran_number b) {
@@ -172,7 +172,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				if (tyran_value_is_number(&rcx)) {
 					tyran_runtime_number_binary_operator(&r[a], operator_index, rcx.data.number, rcy.data.number);
 				} else {
-					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(operator_index);
+					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], operator_index);
 				}
 			}
 			break;
@@ -184,12 +184,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A_RCX;
 			tyran_value_set_boolean(r[a], !rcx.data.boolean);
 			break;
-		case TYRAN_OPCODE_JB:
-			TYRAN_REGISTER_A_RCX;
-			if (rcx.data.boolean != a) {
-				pc++;
-			}
-			break;
 		case TYRAN_OPCODE_JBLD:
 			TYRAN_REGISTER_A_RCX_Y;
 			if (rcx.data.boolean != y) {
@@ -198,16 +192,34 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				pc++;
 			}
 			break;
-		case TYRAN_OPCODE_JEQ:
-			TYRAN_REGISTER_A_RCX_RCY;
-			test = (rcx.data.data == rcy.data.data);
-			if (test != a) {
+		case TYRAN_OPCODE_JB:
+			TYRAN_REGISTER_A_RCX;
+			if (rcx.data.boolean != a) {
 				pc++;
-			} else {
-				TYRAN_RUNTIME_DO_JMP;
 			}
 			break;
+		case TYRAN_OPCODE_JEQ:
 		case TYRAN_OPCODE_JLT:
+		case TYRAN_OPCODE_JLE:
+			{
+				int comparison_index = (opcode - TYRAN_OPCODE_JEQ) + 6;
+
+				TYRAN_REGISTER_A_RCX_RCY;
+				if (tyran_value_is_object(&rcx)) {
+					tyran_value dest;
+
+					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&dest, comparison_index);
+					test = dest.data.boolean;
+				} else {
+					test = (rcx.data.data == rcy.data.data);
+				}
+				if (test != a) {
+					pc++;
+				} else {
+					TYRAN_RUNTIME_DO_JMP;
+				}
+			}
+			break;
 			TYRAN_REGISTER_A_RCX_RCY;
 			test = (rcx.data.data < rcy.data.data);
 			if (test != a) {
@@ -216,7 +228,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				TYRAN_RUNTIME_DO_JMP;
 			}
 			break;
-		case TYRAN_OPCODE_JLE:
 			TYRAN_REGISTER_A_RCX_RCY;
 			test = (rcx.data.data <= rcy.data.data);
 			if (test != a) {

@@ -1,0 +1,11 @@
+if "a" is "a"
+	print("equal")
+else
+	print("not equal")
+if "b" is "a"
+	print("problem")
+else
+	print("good")
+---
+equal
+good
