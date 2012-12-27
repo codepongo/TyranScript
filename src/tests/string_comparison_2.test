@@ -1,0 +1,11 @@
+if "a" < "b"
+	print("good")
+else
+	print("bad")
+if "b" <= "a"
+	print("bad")
+else
+	print("worked")
+---
+good
+worked
