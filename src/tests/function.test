@@ -1,5 +1,5 @@
-f = (kalle=2) -> 2 + kalle
+f = (kalle) -> 2 + kalle
 answer = f(40)
-self.print(answer) + 2
+print(answer)
 ---
 42

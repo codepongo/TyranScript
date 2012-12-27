@@ -188,6 +188,9 @@ void tyran_generator_argument_nodes(NODE* argument_nodes, int* index, NODE node)
 		if (parentheses) {
 			tyran_generator_argument_nodes(argument_nodes, index, parentheses->expression);
 		} else {
+			if (node == 0) {
+				return;
+			}
 			argument_nodes[*index] = node;
 			*index = *index + 1;
 		}
@@ -213,6 +216,14 @@ tyran_reg_or_constant_index tyran_generator_call(tyran_memory* memory, tyran_cod
 	tyran_reg_index reg = tyran_generator_traverse_call(memory, code, call_node);
 
 	return reg;
+}
+
+tyran_reg_index tyran_generator_self_member(tyran_code_state* code, const char* string) {
+	tyran_constant_index lookup_string = tyran_constants_add_symbol_from_c_string(code->constants, string);
+	tyran_reg_index self = 0;
+	tyran_reg_index target = tyran_variable_scopes_define_temporary_variable(code->scope);
+	tyran_opcodes_op_get(code->opcodes, target, self, lookup_string);
+	return target;
 }
 
 tyran_reg_or_constant_index tyran_generator_index(tyran_memory* memory, tyran_code_state* code, NODE obj, NODE lookup) {
@@ -279,7 +290,8 @@ tyran_reg_or_constant_index tyran_generator_handle_node(tyran_code_state* code, 
 		tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*) node;
 		result = tyran_variable_scopes_get_identifier(code->scope, identifier->string);
 		if (result == TYRAN_OPCODE_REGISTER_ILLEGAL) {
-			TYRAN_SOFT_ERROR("illegal identifier: '%s'", identifier->string);
+			result = tyran_generator_self_member(code, identifier->string);
+			// TYRAN_SOFT_ERROR("illegal identifier: '%s'", identifier->string);
 		}
 	}
 	

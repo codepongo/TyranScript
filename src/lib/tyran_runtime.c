@@ -18,6 +18,43 @@
 
 #define TYRAN_RUNTIME_DEBUG
 
+
+#define TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(OPERATOR) \
+	tyran_value* member = tyran_object_lookup_prototype(rcx.data.object, &runtime->binary_operator_symbols[OPERATOR]); \
+	TYRAN_ASSERT(member, "Couldn't find add operator"); \
+	const tyran_function* function = member->data.object->data.function->static_function; \
+	function->data.callback(runtime, member, &rcy, &rcx, &r[a], TYRAN_FALSE);
+
+
+void tyran_runtime_number_binary_operator(tyran_value* value, int operator_index, tyran_number a, tyran_number b) {
+	tyran_number result;
+
+	switch (operator_index) {
+		case 0:
+			result = a + b;
+			break;
+		case 1:
+			result = a / b;
+			break;
+		case 2:
+			result = tyran_fmod(a, b);
+			break;
+		case 3:
+			result = a * b;
+			break;
+		case 4:
+			result = tyran_pow(a, b);
+			break;
+		case 5:
+			result = a - b;
+			break;
+		default:
+			TYRAN_ERROR("Unknown operator:%d", operator_index);
+	}
+
+	tyran_value_set_number(*value, result);
+}
+
 void tyran_register_copy(tyran_value* target, tyran_value* source, int count)
 {
 	int i;
@@ -124,27 +161,20 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			tyran_memset_type_n(&r[a], 0, x);
 			break;
 		case TYRAN_OPCODE_ADD:
-			TYRAN_REGISTER_A_RCX_RCY;
-			if (tyran_value_is_number(&rcx)) {
-				tyran_value_set_number(r[a], rcx.data.number + rcy.data.number);
-			} else {
-				tyran_value* member = tyran_object_lookup_prototype(rcx.data.object, &runtime->operator_add);
-				TYRAN_ASSERT(member, "Couldn't find add operator");
-				const tyran_function* function = member->data.object->data.function->static_function;
-				function->data.callback(runtime, member, &rcy, &rcx, &r[a], TYRAN_FALSE);
-			}
-			break;
 		case TYRAN_OPCODE_DIV:
-			TYRAN_REGISTER_A_RCX_RCY;
-			tyran_value_set_number(r[a], rcx.data.number / rcy.data.number);
-			break;
 		case TYRAN_OPCODE_MOD:
-			TYRAN_REGISTER_A_RCX_RCY;
-			tyran_value_set_number(r[a], tyran_fmod(rcx.data.number, rcy.data.number));
-			break;
 		case TYRAN_OPCODE_MUL:
+		case TYRAN_OPCODE_POW:
+		case TYRAN_OPCODE_SUB:
 			TYRAN_REGISTER_A_RCX_RCY;
-			tyran_value_set_number(r[a], rcx.data.number * rcy.data.number);
+			{
+				int operator_index = opcode - TYRAN_OPCODE_ADD;
+				if (tyran_value_is_number(&rcx)) {
+					tyran_runtime_number_binary_operator(&r[a], operator_index, rcx.data.number, rcy.data.number);
+				} else {
+					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(operator_index);
+				}
+			}
 			break;
 		case TYRAN_OPCODE_NEG:
 			TYRAN_REGISTER_A_RCX;
@@ -153,14 +183,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 		case TYRAN_OPCODE_NOT:
 			TYRAN_REGISTER_A_RCX;
 			tyran_value_set_boolean(r[a], !rcx.data.boolean);
-			break;
-		case TYRAN_OPCODE_POW:
-			TYRAN_REGISTER_A_RCX_RCY;
-			tyran_value_set_number(r[a], tyran_pow(rcx.data.number, rcy.data.number));
-			break;
-		case TYRAN_OPCODE_SUB:
-			TYRAN_REGISTER_A_RCX_RCY;
-			tyran_value_set_number(r[a], rcx.data.number - rcy.data.number);
 			break;
 		case TYRAN_OPCODE_JB:
 			TYRAN_REGISTER_A_RCX;

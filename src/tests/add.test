@@ -1,5 +1,5 @@
 f = 13
 c = 101
-self.print(c + f + 42)
+print(c + f + 42)
 ---
 156

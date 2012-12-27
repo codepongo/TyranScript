@@ -42,7 +42,7 @@ typedef struct tyran_runtime {
 
 	struct tyran_symbol_table* symbol_table;
 
-	tyran_symbol operator_add;
+	tyran_symbol binary_operator_symbols[10];
 	
 } tyran_runtime;
 
