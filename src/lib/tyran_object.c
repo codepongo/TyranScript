@@ -101,10 +101,10 @@ void tyran_object_delete(struct tyran_object* object, const struct tyran_symbol*
 {
 }
 
-void tyran_object_set_prototype(struct tyran_object* target, struct tyran_value* proto)
+void tyran_object_set_prototype(struct tyran_object* target, struct tyran_object* proto)
 {
 	TYRAN_ASSERT(target->prototype == 0, "Prototype already set, this is a problem");
-	TYRAN_OBJECT_RETAIN(proto->data.object);
+	TYRAN_OBJECT_RETAIN(proto);
 	target->prototype = proto;
 }
 
@@ -114,7 +114,7 @@ tyran_value* tyran_object_lookup_prototype(struct tyran_object* o, const struct 
 	ret_value = tyran_object_lookup(o, symbol);
 	if (!ret_value) {
 		if (o->prototype) {
-			return tyran_object_lookup_prototype(o->prototype->data.object, symbol);
+			return tyran_object_lookup_prototype(o->prototype, symbol);
 		}
 	}
 	

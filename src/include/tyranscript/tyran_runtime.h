@@ -25,8 +25,8 @@ typedef struct tyran_runtime {
 	const struct tyran_object_key* prototype_key;
 	
 
-	struct tyran_value* _string_class;
-	struct tyran_value* _array_class;
+	struct tyran_object* _string_class;
+	struct tyran_object* _array_class;
 
 	struct tyran_value* registers;
 

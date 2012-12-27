@@ -32,7 +32,7 @@ typedef struct tyran_object_property {
 } tyran_object_property;
 
 typedef struct tyran_object {
-	struct tyran_value* prototype;
+	struct tyran_object* prototype;
 
 	tyran_object_type type;
 	union {
@@ -57,7 +57,7 @@ tyran_object* tyran_object_new(const struct tyran_runtime* runtime);
 void tyran_object_free(tyran_object* object);
 
 /* Prototype */
-void tyran_object_set_prototype(tyran_object* target, struct tyran_value* proto);
+void tyran_object_set_prototype(tyran_object* target, struct tyran_object* proto);
 #define tyran_object_get_prototype(__target) __target->prototype
 
 /* Length */

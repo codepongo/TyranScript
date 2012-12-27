@@ -18,7 +18,7 @@
 	tyran_value* klass = tyran_value_object_new(RUNTIME); \
 	tyran_value_object_insert_c_string_key(RUNTIME, global, name, klass); \
 	tyran_ ## TYPE ## _prototype_init(RUNTIME, klass); \
-	RUNTIME->_## TYPE ## _class = klass; \
+	RUNTIME->_## TYPE ## _class = klass->data.object; \
 }
 
 void tyran_prototypes_init(struct tyran_runtime* runtime, tyran_value* global)

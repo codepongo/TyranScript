@@ -286,7 +286,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			{
 				if (opcode == TYRAN_OPCODE_NEW) {
 					object = TYRAN_CALLOC_TYPE(runtime->object_pool, tyran_object);
-					tyran_object_set_prototype(object, &r[a+1]);
+					tyran_object_set_prototype(object, r[a+1].data.object);
 					tyran_value_set_object(r[a+1], object);
 				}
 				TYRAN_ASSERT(tyran_value_is_function(&r[a]), "Must reference a function!");
@@ -303,11 +303,14 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				} else {
 					function->data.callback(runtime, &r[a], &r[a+2], &r[a+1], &r[a], TYRAN_FALSE);
 				}
+				if (opcode == TYRAN_OPCODE_NEW) {
+					tyran_value_copy(r[a], r[a+1]);
+				}
 			}
 			break;
 		case TYRAN_OPCODE_GET: {
 			TYRAN_REGISTER_A_RCX_RCY;
-			const tyran_value* v = tyran_value_object_lookup(&rcx, &rcy);
+			const tyran_value* v = tyran_value_object_lookup_prototype(&rcx, &rcy);
 			if (!v) {
 				tyran_value_set_undefined(r[a]);
 			} else {

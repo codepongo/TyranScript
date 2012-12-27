@@ -1,0 +1,5 @@
+a = Array.new()
+a.push("kalle")
+print(a.length)
+---
+1

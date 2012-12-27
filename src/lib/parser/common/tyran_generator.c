@@ -247,7 +247,7 @@ tyran_reg_or_constant_index tyran_generator_index(tyran_memory* memory, tyran_co
 	tyran_constant_index lookup_string = tyran_constants_add_symbol_from_c_string(code->constants, member_name);
 
 	tyran_reg_index target = tyran_variable_scopes_define_temporary_variable(code->scope);
-	code->last_self_index = target;
+	code->last_self_index = obj_register;
 
 	tyran_opcodes_op_get(code->opcodes, target, obj_register, lookup_string);
 

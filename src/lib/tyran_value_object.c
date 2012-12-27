@@ -62,5 +62,5 @@ void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_v
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only set prototype on objects");
 	TYRAN_ASSERT(prototype->type == TYRAN_VALUE_TYPE_OBJECT, "Can only set prototype to objects");
-	tyran_object_set_prototype(target->data.object, prototype);
+	tyran_object_set_prototype(target->data.object, prototype->data.object);
 }

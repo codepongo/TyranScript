@@ -25,8 +25,6 @@ struct tyran_object* tyran_object_new_array(tyran_memory_pool* object_pool, tyra
 	}
 	
 	// tyran_object_set_length(object, count);
-	
-	tyran_object_set_prototype(object, tyran_array_prototype);
-	
+		
 	return object;
 }

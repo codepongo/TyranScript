@@ -7,6 +7,7 @@
 #include <tyranscript/tyran_function_object.h>
 #include <tyranscript/tyran_object_iterator.h>
 #include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_number.h>
 #include <tyranscript/tyran_string.h>
@@ -124,7 +125,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 
 	if (v->type == TYRAN_VALUE_TYPE_OBJECT) {
 		tyran_object* o = v->data.object;
-		if (o->prototype == tyran_array_prototype) {
+		if (o->prototype == 0) {
 			TYRAN_LOG("[]");
 			/*
 			int len = tyran_object_length(o);
@@ -164,7 +165,9 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 		}
 
 		if (tyran_object_get_prototype(o)) {
-			tyran_print_value_helper(tabs + 1, "__proto__", tyran_object_get_prototype(o), quote, symbol_table, object_iterator_pool, string_pool, memory);
+			tyran_value prototype_value;
+			tyran_value_set_object(prototype_value, tyran_object_get_prototype(o));
+			tyran_print_value_helper(tabs + 1, "__proto__", &prototype_value, quote, symbol_table, object_iterator_pool, string_pool, memory);
 		}
 	}
 }
