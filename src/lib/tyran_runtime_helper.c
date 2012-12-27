@@ -34,6 +34,8 @@ tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* 
 	rt->value_pool = value_pool;
 	rt->global = TYRAN_CALLOC_TYPE(value_pool, tyran_value);
 
+	tyran_symbol_table_add(rt->symbol_table, &rt->operator_add, "+");
+
 	tyran_object* global_object = tyran_object_new(rt);
 	tyran_value_set_object(*rt->global, global_object);
 

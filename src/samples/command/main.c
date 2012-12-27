@@ -5,15 +5,7 @@ int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, str
 	const int buf_len = 100;
 	char buf[buf_len];
 
-	switch (v->type) {
-		case TYRAN_VALUE_TYPE_NUMBER:
-			tyran_snprintf(buf, buf_len, "%f", v->data.number);
-		break;
-
-		default:
-			buf[0] = 0;
-		break;
-	}
+	tyran_value_to_c_string(runtime->symbol_table, v, buf, buf_len, 0);
 
 	puts(buf);
 

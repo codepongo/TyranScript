@@ -87,7 +87,7 @@ void tyran_object_insert(struct tyran_object* object, const tyran_symbol* symbol
 
 }
 
-const tyran_value* tyran_object_lookup(const struct tyran_object* object, const struct tyran_symbol* symbol)
+tyran_value* tyran_object_lookup(struct tyran_object* object, const struct tyran_symbol* symbol)
 {
 	int found = tyran_object_find_property(object, symbol);
 	if (found == -1) {
@@ -110,9 +110,9 @@ void tyran_object_set_prototype(struct tyran_object* target, struct tyran_value*
 	target->prototype = proto;
 }
 
-const tyran_value* tyran_object_lookup_prototype(const struct tyran_object* o, const struct tyran_symbol* symbol)
+tyran_value* tyran_object_lookup_prototype(struct tyran_object* o, const struct tyran_symbol* symbol)
 {
-	const tyran_value* ret_value;
+	tyran_value* ret_value;
 	ret_value = tyran_object_lookup(o, symbol);
 	if (!ret_value) {
 		if (o->prototype) {

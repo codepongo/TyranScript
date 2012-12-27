@@ -1,6 +1,8 @@
 #ifndef _TYRAN_RUNTIME_H
 #define _TYRAN_RUNTIME_H
 
+#include <tyranscript/tyran_symbol.h>
+
 struct tyran_opcodes;
 struct tyran_scope_stack;
 struct tyran_runtime;
@@ -39,6 +41,9 @@ typedef struct tyran_runtime {
 	struct tyran_memory_pool* value_pool;
 
 	struct tyran_symbol_table* symbol_table;
+
+	tyran_symbol operator_add;
+	
 } tyran_runtime;
 
 struct tyran_runtime_callbacks;

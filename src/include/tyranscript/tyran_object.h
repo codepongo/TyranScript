@@ -13,6 +13,7 @@ struct tree_root;
 struct tyran_memory_pool;
 
 
+
 typedef struct tyran_rb_tree_key_value_node {
 	const struct tyran_object_key* key;
 	tyran_value value;
@@ -68,7 +69,7 @@ void tyran_object_insert(struct tyran_object* object, const tyran_symbol* symbol
 void tyran_object_delete(struct tyran_object* object, const struct tyran_symbol* symbol);
 
 /* Find */
-const struct tyran_value* tyran_object_lookup(const struct tyran_object* object, const struct tyran_symbol* key);
-const struct tyran_value* tyran_object_lookup_prototype(const struct tyran_object* o, const struct tyran_symbol* key);
+struct tyran_value* tyran_object_lookup(struct tyran_object* object, const struct tyran_symbol* key);
+struct tyran_value* tyran_object_lookup_prototype(struct tyran_object* o, const struct tyran_symbol* key);
 
 #endif

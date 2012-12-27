@@ -21,7 +21,7 @@ tyran_value* tyran_value_object_new(const struct tyran_runtime* runtime)
 	return value;
 }
 
-void tyran_value_object_insert_c_string_key(struct tyran_runtime* runtime, struct tyran_value* target, const char* key, struct tyran_value* value)
+void tyran_value_object_insert_c_string_key(const struct tyran_runtime* runtime, struct tyran_value* target, const char* key, struct tyran_value* value)
 {
 	tyran_symbol symbol;
 	tyran_symbol_table_add(runtime->symbol_table, &symbol, key);
@@ -29,7 +29,7 @@ void tyran_value_object_insert_c_string_key(struct tyran_runtime* runtime, struc
 	tyran_object_insert(target->data.object, &symbol, value);
 }
 
-void tyran_value_object_insert(struct tyran_runtime* runtime, struct tyran_value* target, const tyran_value* key, struct tyran_value* value) {
+void tyran_value_object_insert(const struct tyran_runtime* runtime, struct tyran_value* target, const tyran_value* key, struct tyran_value* value) {
 	char temp[128];
 
 	tyran_string_to_c_str(temp, 128, key->data.object->data.str);

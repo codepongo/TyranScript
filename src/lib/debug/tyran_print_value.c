@@ -111,32 +111,7 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 	//const int temp_buffer_size = 512;
 	// char temp_buffer[temp_buffer_size];
 
-	int max_size_left = max_size;
 	switch(v->type) {
-		case TYRAN_VALUE_TYPE_OBJECT: {
-			tyran_object* o = v->data.object;
-			switch(o->type) {
-				case TYRAN_OBJECT_TYPE_FUNCTION: {
-					const tyran_function* f = o->data.function->static_function;
-					if (f->type == tyran_function_type_normal) {
-						tyran_snprintf(value, max_size, "function (");
-						tyran_strncat(value, ") {", max_size_left);
-						max_size_left -= 3;
-					} else {
-						tyran_snprintf(value, max_size, "function () { [Native code] }");
-					}
-					break;
-				}
-				case TYRAN_OBJECT_TYPE_OBJECT:
-					tyran_snprintf(value, max_size, "object %p (program:%p)", (void*)o, (void*)o->program_specific);
-					break;
-				default:
-					TYRAN_ERROR("Unexpected object type");
-					break;
-			}
-			tyran_snprintf(value, max_size, "%s (ref:%d) ", value, o->retain_count);
-			break;
-		}
 		default: {
 			char buf[2048];
 			tyran_value_to_c_string(symbol_table, v, buf, 2048, quote);

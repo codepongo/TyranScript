@@ -2,4 +2,4 @@ f = (kalle=2) -> 2 + kalle
 answer = f(40)
 self.print(answer) + 2
 ---
-42.000000
+42
