@@ -91,10 +91,8 @@ tyran_value* tyran_object_lookup(struct tyran_object* object, const struct tyran
 {
 	int found = tyran_object_find_property(object, symbol);
 	if (found == -1) {
-		TYRAN_LOG("Couldn't find symbol: %04X", symbol->hash);
 		return 0;
 	} else {
-		TYRAN_LOG("Found symbol: %04X", object->properties[found].value.data.symbol.hash);
 		return &object->properties[found].value;
 	}
 }

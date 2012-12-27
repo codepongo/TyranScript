@@ -128,8 +128,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			if (tyran_value_is_number(&rcx)) {
 				tyran_value_set_number(r[a], rcx.data.number + rcy.data.number);
 			} else {
-				TYRAN_LOG("INVOKE OBJECT ADD");
 				tyran_value* member = tyran_object_lookup_prototype(rcx.data.object, &runtime->operator_add);
+				TYRAN_ASSERT(member, "Couldn't find add operator");
 				const tyran_function* function = member->data.object->data.function->static_function;
 				function->data.callback(runtime, member, &rcy, &rcx, &r[a], TYRAN_FALSE);
 			}
