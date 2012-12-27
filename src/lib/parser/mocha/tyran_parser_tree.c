@@ -224,22 +224,24 @@ NODE tyran_parser_function(tyran_memory* memory, NODE block, tyran_boolean bound
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_if(tyran_memory* memory, NODE expression, NODE then_block)
+NODE tyran_parser_if(tyran_memory* memory, NODE expression, NODE then_block, tyran_boolean invert)
 {
 	tyran_parser_node_if* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_if, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_IF;
 	node->expression = expression;
 	node->then_block = then_block;
+	node->invert = invert;
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_if_else(tyran_memory* memory, NODE expression, NODE then_block, NODE else_block)
+NODE tyran_parser_if_else(tyran_memory* memory, NODE expression, NODE then_block, NODE else_block, tyran_boolean invert)
 {
 	tyran_parser_node_if_else* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_if_else, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_IF_ELSE;
 	node->expression = expression;
 	node->then_block = then_block;
 	node->else_block = else_block;
+	node->invert = invert;
 	return (tyran_parser_node*)node;
 }
 

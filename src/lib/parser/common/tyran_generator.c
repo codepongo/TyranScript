@@ -369,11 +369,11 @@ tyran_reg_or_constant_index tyran_generator_traverse_unary(tyran_memory* memory,
 	return tyran_generator_traverse(memory, code, unary->expression, true_label, false_label, invert_logic);
 }
 
-tyran_reg_or_constant_index tyran_generator_traverse_if(tyran_memory* memory, tyran_code_state* code, tyran_parser_node* expression, tyran_parser_node* then_node, tyran_parser_node* else_node) {
+tyran_reg_or_constant_index tyran_generator_traverse_if(tyran_memory* memory, tyran_code_state* code, tyran_parser_node* expression, tyran_parser_node* then_node, tyran_parser_node* else_node, tyran_boolean invert) {
 	tyran_label_id if_true_label = tyran_generator_prepare_label(code);
 	tyran_label_id if_false_label = tyran_generator_prepare_label(code);
 	
-	tyran_generator_traverse(memory, code, expression, if_true_label, if_false_label, TYRAN_FALSE);
+	tyran_generator_traverse(memory, code, expression, if_true_label, if_false_label, invert);
 	
 	tyran_reg_or_constant_index result;
 	
@@ -528,12 +528,12 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran
 		break;
 		case TYRAN_PARSER_NODE_TYPE_IF: {
 			tyran_parser_node_if* if_node = (tyran_parser_node_if*)node;
-			result = tyran_generator_traverse_if(memory, code, if_node->expression, if_node->then_block, 0);
+			result = tyran_generator_traverse_if(memory, code, if_node->expression, if_node->then_block, 0, if_node->invert);
 		}
 		break;
 		case TYRAN_PARSER_NODE_TYPE_IF_ELSE: {
 			tyran_parser_node_if_else* if_node = (tyran_parser_node_if_else*)node;
-			result = tyran_generator_traverse_if(memory, code, if_node->expression, if_node->then_block, if_node->else_block);
+			result = tyran_generator_traverse_if(memory, code, if_node->expression, if_node->then_block, if_node->else_block, if_node->invert);
 		}
 		break;
 		case TYRAN_PARSER_NODE_TYPE_WHILE:

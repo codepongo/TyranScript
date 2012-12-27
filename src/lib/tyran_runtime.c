@@ -26,6 +26,26 @@
 	function->data.callback(runtime, member, &rcy, &rcx, DESTINATION, TYRAN_FALSE);
 
 
+tyran_boolean tyran_runtime_number_comparison(int comparison, tyran_number a, tyran_number b) {
+	tyran_boolean result;
+
+	switch (comparison) {
+		case 6:
+			result = (a==b);
+			break;
+		case 7:
+			result = (a<b);
+			break;
+		case 8:
+			result = (a<=b);
+			break;
+		default:
+			TYRAN_ERROR("Unknown comparison:%d", comparison);
+	}
+
+	return result;
+}
+
 void tyran_runtime_number_binary_operator(tyran_value* value, int operator_index, tyran_number a, tyran_number b) {
 	tyran_number result;
 
@@ -211,7 +231,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&dest, comparison_index);
 					test = dest.data.boolean;
 				} else {
-					test = (rcx.data.data == rcy.data.data);
+					test = tyran_runtime_number_comparison(comparison_index, rcx.data.number, rcy.data.number);
 				}
 				if (test != a) {
 					pc++;

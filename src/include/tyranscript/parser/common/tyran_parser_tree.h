@@ -84,6 +84,7 @@ typedef enum tyran_parser_unary_operand_type {
 	TYRAN_PARSER_UNARY_PARENTHESES,
 	TYRAN_PARSER_UNARY_BLOCK,
 	TYRAN_PARSER_UNARY_IF,
+	TYRAN_PARSER_UNARY_UNLESS,
 	TYRAN_PARSER_UNARY_BRACKET,
 	TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX
 } tyran_parser_unary_operand_type;
@@ -165,6 +166,7 @@ typedef struct tyran_parser_node_if
 	tyran_parser_node node;
 	tyran_parser_node* expression;
 	tyran_parser_node* then_block;
+	tyran_boolean invert;
 } tyran_parser_node_if;
 
 
@@ -174,6 +176,7 @@ typedef struct tyran_parser_node_if_else
 	tyran_parser_node* expression;
 	tyran_parser_node* then_block;
 	tyran_parser_node* else_block;
+	tyran_boolean invert;
 } tyran_parser_node_if_else;
 
 typedef struct tyran_parser_node_else
@@ -306,8 +309,8 @@ NODE tyran_parser_case(tyran_memory* memory, NODE expression, tyran_parser_node_
 NODE tyran_parser_when(tyran_memory* memory, NODE a, NODE block);
 NODE tyran_parser_call(tyran_memory* memory, NODE function, NODE* arguments, int argument_count);
 NODE tyran_parser_function(tyran_memory* memory, NODE block, tyran_boolean bound);
-NODE tyran_parser_if(tyran_memory* memory, NODE expression, NODE then_block);
-NODE tyran_parser_if_else(tyran_memory* memory, NODE expression, NODE then_block, NODE else_block);
+NODE tyran_parser_if(tyran_memory* memory, NODE expression, NODE then_block, tyran_boolean invert);
+NODE tyran_parser_if_else(tyran_memory* memory, NODE expression, NODE then_block, NODE else_block, tyran_boolean invert);
 NODE tyran_parser_else(tyran_memory* memory, NODE else_block);
 tyran_parser_node_operand_unary* tyran_parser_operand_unary(tyran_memory* memory, int operator_type, NODE b, tyran_boolean post);
 tyran_parser_node_operand_binary* tyran_parser_operand_binary(tyran_memory* memory, tyran_parser_binary_operand_type operator_type, NODE b, NODE c);

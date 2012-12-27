@@ -198,11 +198,10 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node**
 	break;
 	case TYRAN_PARSER_NODE_TYPE_CASE:
 		{
-			tyran_parser_node_when* operand = (tyran_parser_node_when*)node;
+			tyran_parser_node_case* operand = (tyran_parser_node_case*)node;
 			tyran_snprintf(buf, buf_size, "case ");
 			tyran_parser_node_print_helper_output(buf, description, tab_count);
 			tyran_parser_node_print_helper("case expression", &operand->expression, current_root, next_to_overwrite, tab_count+1);
-			tyran_parser_node_print_helper("case block", &operand->block, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
 	case TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY:
@@ -240,10 +239,6 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node**
 			tyran_parser_node_print_helper("object_assignment source", &object->source, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
-	default:
-		TYRAN_ERROR("UNKNOWN NODE!");
-		break;
-	
 	}
 	}
 }

@@ -1,0 +1,7 @@
+a = 4
+unless a is 3
+	print("good")
+else
+	print("bad")
+---
+good
