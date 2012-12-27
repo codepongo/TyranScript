@@ -15,17 +15,16 @@
 #include <tyranscript/tyran_runtime.h>
 
 #define TYRAN_INITIALIZE_PROTOTYPE(RUNTIME, TYPE, name)  { \
-	tyran_value* constructor_function = tyran_function_object_new_callback(RUNTIME, tyran_ ## TYPE ## _prototype_constructor); \
-	{ tyran_value_object_set_prototype(constructor_function, tyran_value_object_new(RUNTIME)); } \
-	tyran_value_object_insert_c_string_key(RUNTIME, global, name, constructor_function); \
-	tyran_ ## TYPE ## _prototype_init(RUNTIME, tyran_object_get_prototype(constructor_function->data.object)); \
-	RUNTIME->_## TYPE ## _class = constructor_function; \
+	tyran_value* klass = tyran_value_object_new(RUNTIME); \
+	tyran_value_object_insert_c_string_key(RUNTIME, global, name, klass); \
+	tyran_ ## TYPE ## _prototype_init(RUNTIME, klass); \
+	RUNTIME->_## TYPE ## _class = klass; \
 }
 
 void tyran_prototypes_init(struct tyran_runtime* runtime, tyran_value* global)
 {
 	// TYRAN_INITIALIZE_PROTOTYPE(runtime, object, "Object");
 	// TYRAN_INITIALIZE_PROTOTYPE(runtime, function, "Function");
-	// TYRAN_INITIALIZE_PROTOTYPE(runtime, array, "Array");
+	TYRAN_INITIALIZE_PROTOTYPE(runtime, array, "Array");
 	TYRAN_INITIALIZE_PROTOTYPE(runtime, string, "String");
 }

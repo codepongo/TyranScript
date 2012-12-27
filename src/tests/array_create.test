@@ -1,0 +1,4 @@
+a = Array.new()
+print(a.length)
+---
+0

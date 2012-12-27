@@ -26,6 +26,7 @@ typedef struct tyran_runtime {
 	
 
 	struct tyran_value* _string_class;
+	struct tyran_value* _array_class;
 
 	struct tyran_value* registers;
 

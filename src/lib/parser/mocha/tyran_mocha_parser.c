@@ -680,6 +680,8 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_mocha_to
 		}
 	}
 
+	// tyran_parser_node_operand_unary* brackets = tyran_parser_unary_operator_type_cast(node, TYRAN_PARSER_UNARY_BRACKET);
+
 }
 
 

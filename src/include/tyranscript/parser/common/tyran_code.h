@@ -20,6 +20,9 @@ typedef struct tyran_code_state {
 	tyran_memory_pool* variable_info_pool;
 	tyran_memory_pool* register_pool;
 	tyran_memory* memory;
+
+	tyran_reg_index last_self_index;
+	tyran_boolean last_call_was_new;
 } tyran_code_state;
 
 typedef int tyran_label_id;

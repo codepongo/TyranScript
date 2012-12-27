@@ -68,10 +68,6 @@ int tyran_string_prototype_lt(tyran_runtime* r, tyran_value* a, tyran_value* arg
 	return 0;
 }
 
-#define TYRAN_MEMBER(TARGET, NAME, FUNC) { \
-	tyran_value* function_object = tyran_function_object_new_callback(runtime, FUNC); \
-	tyran_value_object_insert_c_string_key(runtime, TARGET, NAME, function_object); \
-	}
 
 void tyran_string_prototype_init(const struct tyran_runtime* runtime, tyran_value* o) {
 	TYRAN_MEMBER(o, "+", tyran_string_prototype_add);

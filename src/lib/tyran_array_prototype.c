@@ -13,15 +13,16 @@
 
 tyran_value* tyran_array_prototype;
 
-int tyran_array_prototype_constructor(tyran_memory_pool* object_pool, struct tyran_runtime* runtime, tyran_value* a, tyran_value* b, tyran_value* c, tyran_value* return_value, int is_constructor)
+int tyran_array_prototype_constructor(struct tyran_runtime* runtime, tyran_value* a, tyran_value* b, tyran_value* c, tyran_value* return_value, int is_constructor)
 {
 	if (is_constructor) {
 		return 0;
 	}
 
-	tyran_object* o = tyran_object_new(runtime);
-	// tyran_object_set_length(o, 0, 0);
-	tyran_value_set_object(*return_value, o);
+	tyran_value length;
+	tyran_value_set_number(length, 0);
+
+	tyran_value_object_insert_c_string_key(runtime, a, "length", &length);
 
 	return 0;
 }
@@ -49,24 +50,8 @@ int tyran_array_prototype_pop(struct tyran_runtime* r, tyran_value* a, tyran_val
 	return 0;
 }
 
-typedef struct tyran_function_info {
-	const char *name;
-	tyran_function_callback static_function;
-} tyran_function_info;
-
-static tyran_function_info tyran_array_functions[] = {
-	{ "push", tyran_array_prototype_push },
-	{ "pop", tyran_array_prototype_pop }
-};
-
-void tyran_array_prototype_init(tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* object_pool, tyran_memory_pool* value_pool, const struct tyran_runtime* runtime, tyran_value* constructor_prototype)
-{
-	tyran_array_prototype = constructor_prototype;
-	size_t i;
-	for (i = 0; i < sizeof(tyran_array_functions) / sizeof(struct tyran_function_info); ++i) {
-		tyran_value* n = tyran_function_object_new_callback(runtime, tyran_array_functions[i].static_function);
-		tyran_value_object_set_prototype(n, tyran_function_prototype);
-		// tyran_value_object_insert_string_key(constructor_prototype, tyran_string_from_c_str(tyran_array_functions[i].name), n);
-	}
+void tyran_array_prototype_init(const struct tyran_runtime* runtime, tyran_value* o) {
+	TYRAN_MEMBER(o, "push", tyran_array_prototype_push);
+	TYRAN_MEMBER(o, "constructor", tyran_array_prototype_constructor);
 }
 

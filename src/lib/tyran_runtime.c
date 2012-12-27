@@ -280,9 +280,15 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_STACK_POP;
 			}
 			break;
+		case TYRAN_OPCODE_NEW:
 		case TYRAN_OPCODE_CALL:
 			TYRAN_REGISTER_A_X;
 			{
+				if (opcode == TYRAN_OPCODE_NEW) {
+					object = TYRAN_CALLOC_TYPE(runtime->object_pool, tyran_object);
+					tyran_object_set_prototype(object, &r[a+1]);
+					tyran_value_set_object(r[a+1], object);
+				}
 				TYRAN_ASSERT(tyran_value_is_function(&r[a]), "Must reference a function!");
 				const tyran_function* function = r[a].data.object->data.function->static_function;
 				if (function->type == tyran_function_type_normal) {
@@ -292,17 +298,12 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 					sp->constants = function->constants;
 					c = sp->constants->values;
 					tyran_value* target_register = &r[a];
-					r = target_register;
+					r = target_register + 1;
 					sp->return_register = target_register;
 				} else {
-					function->data.callback(runtime, &r[a], &r[a+1], &r[a], &r[a], TYRAN_FALSE);
+					function->data.callback(runtime, &r[a], &r[a+2], &r[a+1], &r[a], TYRAN_FALSE);
 				}
 			}
-			break;
-		case TYRAN_OPCODE_NEW:
-			TYRAN_REGISTER_A;
-			object = TYRAN_CALLOC_TYPE(runtime->object_pool, tyran_object);
-			tyran_value_set_object(r[a], object);
 			break;
 		case TYRAN_OPCODE_GET: {
 			TYRAN_REGISTER_A_RCX_RCY;

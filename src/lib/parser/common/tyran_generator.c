@@ -158,9 +158,11 @@ tyran_reg_index tyran_generator_traverse_call(tyran_memory* memory, tyran_code_s
 	TYRAN_LOG("Traversing function node");
 	tyran_reg_or_constant_index function_register = tyran_generator_traverse(memory, code, call_node->function_node, 0, 0, 0);
 	tyran_opcodes_op_ld(code->opcodes, start_register, function_register);
+	tyran_opcodes_op_ld(code->opcodes, start_register + 1, code->last_self_index);
+	code->last_self_index = TYRAN_OPCODE_REGISTER_ILLEGAL;
 	
 	for (i = 0; i < call_node->argument_count; ++i) {
-		tyran_reg_index target_index = start_register + i + 1;
+		tyran_reg_index target_index = start_register + i + 2;
 		NODE node = call_node->arguments[i];
 		TYRAN_LOG("Traversing argument:%d", i);
 		tyran_reg_or_constant_index arg_register = tyran_generator_traverse(memory, code, node, 0, 0, 0);
@@ -171,7 +173,11 @@ tyran_reg_index tyran_generator_traverse_call(tyran_memory* memory, tyran_code_s
 		}
 		
 	}
-	tyran_opcodes_op_call(code->opcodes, start_register, call_node->argument_count, return_value_count);
+	if (code->last_call_was_new) {
+		tyran_opcodes_op_new(code->opcodes, start_register, call_node->argument_count, return_value_count);
+	} else {
+		tyran_opcodes_op_call(code->opcodes, start_register, call_node->argument_count, return_value_count);
+	}
 	
 	return start_register;
 }
@@ -229,9 +235,20 @@ tyran_reg_index tyran_generator_self_member(tyran_code_state* code, const char* 
 tyran_reg_or_constant_index tyran_generator_index(tyran_memory* memory, tyran_code_state* code, NODE obj, NODE lookup) {
 	tyran_reg_index obj_register = tyran_generator_traverse(memory, code, obj, -1, -1, TYRAN_FALSE);
 	tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*) lookup;
-	tyran_constant_index lookup_string = tyran_constants_add_symbol_from_c_string(code->constants, identifier->string);
+	const char* member_name = identifier->string;
+
+	if (tyran_strncmp(member_name, "new", 3) == 0) {
+		member_name = "constructor";
+		code->last_call_was_new = TYRAN_TRUE;
+	} else {
+		code->last_call_was_new = TYRAN_FALSE;
+	}
+
+	tyran_constant_index lookup_string = tyran_constants_add_symbol_from_c_string(code->constants, member_name);
 
 	tyran_reg_index target = tyran_variable_scopes_define_temporary_variable(code->scope);
+	code->last_self_index = target;
+
 	tyran_opcodes_op_get(code->opcodes, target, obj_register, lookup_string);
 
 	return target;

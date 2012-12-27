@@ -483,7 +483,7 @@ int tyran_lexer_assembler_parse_one(tyran_memory* memory, tyran_memory_pool* fun
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_NEW:
 			parse_r(parser_state, &a);
-			tyran_opcodes_op_new(opcodes, a);
+			tyran_opcodes_op_new(opcodes, a, 0, 0);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_RET:
 			parse_r_s(parser_state, &a, &s);
