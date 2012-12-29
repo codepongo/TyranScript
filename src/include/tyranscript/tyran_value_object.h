@@ -1,8 +1,6 @@
 #ifndef _TYRAN_VALUE_OBJECT_H
 #define _TYRAN_VALUE_OBJECT_H
 
-#include <tyranscript/tyran_object_key.h>
-
 struct tyran_string;
 struct tyran_value;
 struct tyran_runtime;

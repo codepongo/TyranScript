@@ -232,7 +232,7 @@ tyran_reg_index tyran_generator_self_member(tyran_code_state* code, const char* 
 	return target;
 }
 
-tyran_reg_or_constant_index tyran_generator_index(tyran_memory* memory, tyran_code_state* code, NODE obj, NODE lookup) {
+tyran_reg_or_constant_index tyran_generator_member(tyran_memory* memory, tyran_code_state* code, NODE obj, NODE lookup) {
 	tyran_reg_index obj_register = tyran_generator_traverse(memory, code, obj, -1, -1, TYRAN_FALSE);
 	tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*) lookup;
 	const char* member_name = identifier->string;
@@ -276,6 +276,9 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 			break;
 		case TYRAN_PARSER_SUBTRACT:
 			tyran_opcodes_op_sub(codes, target, left, right);
+			break;
+		case TYRAN_PARSER_INDEX:
+			tyran_opcodes_op_index(codes, target, left, right);
 			break;
 		case TYRAN_PARSER_ASSIGNMENT:
 			tyran_opcodes_op_set(codes, target, left, right);
@@ -371,8 +374,8 @@ tyran_reg_or_constant_index tyran_generator_traverse_binary(tyran_memory* memory
 		case TYRAN_PARSER_CALL:
 			result = tyran_generator_call(memory, code, binary->left, binary->right);
 			break;
-		case TYRAN_PARSER_INDEX:
-			result = tyran_generator_index(memory, code, binary->left, binary->right);
+		case TYRAN_PARSER_MEMBER:
+			result = tyran_generator_member(memory, code, binary->left, binary->right);
 			break;
 		default:
 			result = tyran_generator_traverse_default_binary(memory, code, binary, true_label, false_label, invert_logic);

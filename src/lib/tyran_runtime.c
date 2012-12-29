@@ -21,7 +21,7 @@
 
 #define TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(DESTINATION, OPERATOR) \
 	tyran_value* member = tyran_object_lookup_prototype(rcx.data.object, &runtime->binary_operator_symbols[OPERATOR]); \
-	TYRAN_ASSERT(member, "Couldn't find operator"); \
+	TYRAN_ASSERT(member, "Couldn't find operator:%d", OPERATOR); \
 	const tyran_function* function = member->data.object->data.function->static_function; \
 	function->data.callback(runtime, member, &rcy, &rcx, DESTINATION, TYRAN_FALSE);
 
@@ -30,13 +30,13 @@ tyran_boolean tyran_runtime_number_comparison(int comparison, tyran_number a, ty
 	tyran_boolean result;
 
 	switch (comparison) {
-		case 6:
+		case 7:
 			result = (a==b);
 			break;
-		case 7:
+		case 8:
 			result = (a<b);
 			break;
-		case 8:
+		case 9:
 			result = (a<=b);
 			break;
 		default:
@@ -186,9 +186,11 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 		case TYRAN_OPCODE_MUL:
 		case TYRAN_OPCODE_POW:
 		case TYRAN_OPCODE_SUB:
+		case TYRAN_OPCODE_INDEX:
 			TYRAN_REGISTER_A_RCX_RCY;
 			{
 				int operator_index = opcode - TYRAN_OPCODE_ADD;
+				TYRAN_LOG("Operator index:%d", operator_index);
 				if (tyran_value_is_number(&rcx)) {
 					tyran_runtime_number_binary_operator(&r[a], operator_index, rcx.data.number, rcy.data.number);
 				} else {
@@ -222,7 +224,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 		case TYRAN_OPCODE_JLT:
 		case TYRAN_OPCODE_JLE:
 			{
-				int comparison_index = (opcode - TYRAN_OPCODE_JEQ) + 6;
+				int comparison_index = (opcode - TYRAN_OPCODE_JEQ) + 7;
 
 				TYRAN_REGISTER_A_RCX_RCY;
 				if (tyran_value_is_object(&rcx)) {

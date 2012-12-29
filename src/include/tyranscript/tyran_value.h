@@ -77,10 +77,6 @@ typedef struct tyran_value {
 	(v).type = TYRAN_VALUE_TYPE_NULL; \
 }
 
-#define tyran_value_set_variable(v, var) { \
-	(v).type = TYRAN_VALUE_TYPE_VARIABLE; \
-	(v).data.variable = var; \
-}
 
 #define tyran_value_replace_object(v, o) { \
 	tyran_value_release(v); \
@@ -101,11 +97,6 @@ typedef struct tyran_value {
 #define tyran_value_replace_undefined(v) { \
 	tyran_value_release(v); \
 	tyran_value_set_undefined(v); \
-}
-
-#define tyran_value_replace_variable(v, var) { \
-	tyran_value_release(v); \
-	tyran_value_set_variable(v, var); \
 }
 
 #define tyran_value_replace(v, b) { \

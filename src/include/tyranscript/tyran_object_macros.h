@@ -10,8 +10,10 @@ void tyran_object_release(struct tyran_object* o);
 
 #define TYRAN_OBJECT_RETAIN(_object_) { tyran_object_retain(_object_);  }
 #define TYRAN_OBJECT_RELEASE(object) { tyran_object_release(object); }
-#define tyran_object_is_array(o) ((o)->type == TYRAN_OBJECT_TYPE_OBJECT && tyran_object_length(o) >= 0)
+#define tyran_object_is_array(o) ((o)->type == TYRAN_OBJECT_TYPE_ARRAY)
+
 #define tyran_object_set_function(o, func) (o)->type = TYRAN_OBJECT_TYPE_FUNCTION; (o)->data.function = func;
 #define tyran_object_set_string(o, string) (o)->type = TYRAN_OBJECT_TYPE_STRING; (o)->data.str = string;
+#define tyran_object_set_array(o, array) (o)->type = TYRAN_OBJECT_TYPE_ARRAY; (o)->data.array = array;
 
 #endif

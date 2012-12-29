@@ -1,13 +1,11 @@
 #include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_object_macros.h>
-#include <tyranscript/tyran_object_iterator.h>
 #include <tyranscript/tyran_function_object.h>
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_object_prototype.h>
 #include <tyranscript/tyran_runtime.h>
 #include "tyran_number_to_string.h"
-#include <tyranscript/tyran_object_key.h>
 #include <tyranscript/tyran_rb_tree.h>
 #include <tyranscript/tyran_number.h>
 
@@ -40,7 +38,7 @@ void tyran_object_free(struct tyran_object* object)
 
 	switch (object->type) {
 		case TYRAN_OBJECT_TYPE_ITERATOR:
-			tyran_object_iterator_free(object->data.iterator);
+			// tyran_object_iterator_free(object->data.iterator);
 			break;
 		case TYRAN_OBJECT_TYPE_FUNCTION:
 			tyran_function_object_free(object->data.function);

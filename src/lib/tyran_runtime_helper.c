@@ -7,19 +7,17 @@
 #include <tyranscript/tyran_opcodes.h>
 #include <tyranscript/tyran_opcode.h>
 #include <tyranscript/tyran_prototypes.h>
-#include "tyran_value_convert.h"
 
 #include <tyranscript/debug/tyran_print_value.h>
 #include <tyranscript/debug/tyran_print_opcodes.h>
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_object_macros.h>
-#include <tyranscript/tyran_object_key.h>
 #include <tyranscript/tyran_symbol_table.h>
 
 
 void tyran_runtime_setup_binary_operators(tyran_runtime* rt) {
-	const char* binary_strings[] = {"+", "-", "%%", "*", "^", "-", "==", "<", "<="};
+	const char* binary_strings[] = {"+", "-", "%", "*", "^", "-", "[]", "==", "<", "<="};
 
 	for (int i=0; i<sizeof(binary_strings) / sizeof(char*); ++i) {
 		tyran_symbol_table_add(rt->symbol_table, &rt->binary_operator_symbols[i], binary_strings[i]);
@@ -27,7 +25,7 @@ void tyran_runtime_setup_binary_operators(tyran_runtime* rt) {
 }
 
 
-tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* memory, tyran_memory_pool* string_pool, tyran_memory_pool* object_key_pool, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* runtime_stack_pool, tyran_memory_pool* object_pool, tyran_memory_pool* registers_value_pool, tyran_memory_pool* value_pool)
+tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* memory, tyran_memory_pool* string_pool, tyran_memory_pool* object_key_pool, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* runtime_stack_pool, tyran_memory_pool* object_pool, tyran_memory_pool* registers_value_pool, tyran_memory_pool* value_pool, tyran_memory_pool* rb_node_pool)
 {
 	tyran_runtime* rt = TYRAN_CALLOC_TYPE(runtime_pool, tyran_runtime);
 	rt->stack = TYRAN_MALLOC_TYPE_COUNT(runtime_stack_pool, tyran_runtime_stack, 128);
@@ -42,6 +40,7 @@ tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* 
 	rt->memory = memory;
 	rt->symbol_table = tyran_symbol_table_new(memory);
 	rt->value_pool = value_pool;
+	rt->rb_node_pool = rb_node_pool;
 	rt->global = TYRAN_CALLOC_TYPE(value_pool, tyran_value);
 
 	tyran_runtime_setup_binary_operators(rt);

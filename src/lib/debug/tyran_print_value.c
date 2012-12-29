@@ -5,7 +5,6 @@
 #include <tyranscript/tyran_function_prototype.h>
 #include <tyranscript/tyran_function.h>
 #include <tyranscript/tyran_function_object.h>
-#include <tyranscript/tyran_object_iterator.h>
 #include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_value_object.h>
@@ -60,6 +59,9 @@ void tyran_value_to_c_string(const tyran_symbol_table* symbol_table, const tyran
 			break;
 			case TYRAN_OBJECT_TYPE_ITERATOR:
 				tyran_snprintf(buf, max_length, "iterator:%p (%d)", (void*)v->data.object, v->data.object->retain_count);
+			break;
+			case TYRAN_OBJECT_TYPE_ARRAY:
+				tyran_snprintf(buf, max_length, "array:%p (%d)", (void*)v->data.object, v->data.object->retain_count);
 			break;
 			case TYRAN_OBJECT_TYPE_STRING: {
 				static const int temp_buffer_size = 512;

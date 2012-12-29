@@ -6,7 +6,6 @@
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_function_object.h>
 #include <tyranscript/tyran_function.h>
-#include <tyranscript/tyran_object_iterator.h>
 #include <tyranscript/tyran_object_array.h>
 
 #include <tyranscript/parser/common/tyran_code.h>

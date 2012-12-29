@@ -45,6 +45,7 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_DIVIDE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_CALL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_MEMBER, 1, 0},
+		{TYRAN_MOCHA_TOKEN_INDEX, 1, 0},
 		{TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_RANGE_INCLUSIVE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_LINE_START, 1, 1},
@@ -347,10 +348,10 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	case TYRAN_MOCHA_TOKEN_SUBTRACT:
 		operand = TYRAN_PARSER_SUBTRACT;
 		break;
-	case TYRAN_MOCHA_TOKEN_BRACKET_LEFT:
-		operand = TYRAN_PARSER_INDEX;
-		break;
 	case TYRAN_MOCHA_TOKEN_MEMBER:
+		operand = TYRAN_PARSER_MEMBER;
+		break;
+	case TYRAN_MOCHA_TOKEN_INDEX:
 		operand = TYRAN_PARSER_INDEX;
 		break;
 	case TYRAN_MOCHA_TOKEN_COMMA:
@@ -510,6 +511,7 @@ NODE tyran_mocha_parser_add_default_operator(tyran_memory* memory, tyran_mocha_p
 		return (NODE)node;
 	}
 }
+
 
 NODE tyran_mocha_parser_if(tyran_memory* memory, tyran_mocha_parser* parser, tyran_boolean invert)
 {
@@ -679,9 +681,6 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_mocha_to
 			tyran_mocha_parser_define_function_parameters(parser->parser_parameter_pool, function, parentheses->expression);
 		}
 	}
-
-	// tyran_parser_node_operand_unary* brackets = tyran_parser_unary_operator_type_cast(node, TYRAN_PARSER_UNARY_BRACKET);
-
 }
 
 
@@ -708,6 +707,11 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 		if (token->token_id == TYRAN_MOCHA_TOKEN_PARENTHESES_LEFT) {
 			last_literal = TYRAN_TRUE;
 		}
+		if (token->token_id == TYRAN_MOCHA_TOKEN_BRACKET_LEFT) {
+			parser->last_was_bracket = TYRAN_TRUE;
+		} else {
+			parser->last_was_bracket = TYRAN_FALSE;
+		}
 	} else {
 		tyran_mocha_operator_info info = tyran_mocha_parser_get_operator_info(token->token_id);
 		if (info.token_id != TYRAN_MOCHA_TOKEN_END) {
@@ -718,7 +722,14 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 			}
 			last_literal = TYRAN_FALSE;
 		} else {
-			if (last_literal) {
+			if (parser->last_was_bracket) {
+				NODE bracket_node = tyran_mocha_parser_concat_pop(parser);
+				tyran_parser_node_operand_unary* bracket = tyran_parser_unary_operator_type_cast(bracket_node, TYRAN_PARSER_UNARY_BRACKET);
+				tyran_mocha_parser_add_to_empty(memory, parser, bracket->expression, -1);
+				tyran_mocha_token* token = TYRAN_CALLOC_TYPE(parser->mocha_token_pool, tyran_mocha_token);
+				token->token_id = TYRAN_MOCHA_TOKEN_INDEX;
+				tyran_mocha_parser_add_token(memory, parser, token);
+			} if (last_literal) {
 				tyran_mocha_token* token = TYRAN_CALLOC_TYPE(parser->mocha_token_pool, tyran_mocha_token);
 				token->token_id = TYRAN_MOCHA_TOKEN_CALL;
 				tyran_mocha_parser_add_token(memory, parser, token);
@@ -727,6 +738,7 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 			tyran_mocha_parser_add_to_empty(memory, parser, literal, -1);
 			last_literal = TYRAN_TRUE;
 		}
+		parser->last_was_bracket = TYRAN_FALSE;
 	}
 //	tyran_mocha_parser_debug("after", parser, 0);
 }

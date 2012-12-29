@@ -8,7 +8,6 @@
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_string_object.h>
-#include "tyran_value_convert.h"
 
 #include <tyranscript/debug/tyran_print_value.h>
 

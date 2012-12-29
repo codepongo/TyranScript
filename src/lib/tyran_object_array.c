@@ -1,7 +1,6 @@
 #include <tyranscript/tyran_object_array.h>
 #include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_object_macros.h>
-#include <tyranscript/tyran_object_key.h>
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_array_prototype.h>

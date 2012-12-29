@@ -31,6 +31,7 @@ typedef struct tyran_mocha_parser {
 	NODE* next_node_to_overwrite;
 	struct tyran_memory_pool* parser_parameter_pool;
 	struct tyran_memory_pool* mocha_token_pool;
+	tyran_boolean last_was_bracket;
 } tyran_mocha_parser;
 
 

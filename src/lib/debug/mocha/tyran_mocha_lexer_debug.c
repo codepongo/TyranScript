@@ -50,6 +50,7 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	"AND",
 	"OR",
 	"MEMBER",
+	"INDEX",
 	"IN",
 	"PARENTHESES_LEFT",
 	"PARENTHESES_RIGHT",

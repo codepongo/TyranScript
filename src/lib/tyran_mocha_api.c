@@ -11,6 +11,7 @@
 #include <tyranscript/parser/tyran_label.h>
 #include <tyranscript/parser/tyran_label_reference.h>
 #include <tyranscript/tyran_constants.h>
+#include <tyranscript/tyran_array.h>
 
 
 void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size)
@@ -34,13 +35,16 @@ void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size)
 	struct tyran_memory_pool* runtime_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_runtime, 1);
 	struct tyran_memory_pool* runtime_stack_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_runtime_stack, 1);
 	struct tyran_memory_pool* function_object_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_function_object, 10);
-	struct tyran_memory_pool* object_key_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_key, 10);
-	struct tyran_memory_pool* object_iterator_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_iterator, 10);
+	struct tyran_memory_pool* object_key_pool = 0; //TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_key, 10);
+
+
+	struct tyran_memory_pool* object_iterator_pool = 0; //TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_iterator, 10);
 	api->string_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_string, 10);
 
-	api->default_runtime = tyran_runtime_new(runtime_pool, api->memory, api->string_pool, object_key_pool, object_iterator_pool, api->mocha_function_pool, function_object_pool, runtime_stack_pool, api->object_pool, value_registers_pool, api->value_pool);
+	struct tyran_memory_pool* rb_node_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_array_key_node, 10);
+	api->default_runtime = tyran_runtime_new(runtime_pool, api->memory, api->string_pool, object_key_pool, object_iterator_pool, api->mocha_function_pool, function_object_pool, runtime_stack_pool, api->object_pool, value_registers_pool, api->value_pool, rb_node_pool);
 
-	api->object_key_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_key, 10);
+	api->object_key_pool = 0; //TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_key, 10);
 
 	tyran_memory_pool* scopes_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_variable_scopes, 1);
 	tyran_memory_pool* scope_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_variable_scope, 1);
@@ -97,7 +101,7 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char
 	tyran_value return_value;
 	tyran_runtime_push_call(api->default_runtime, code->opcodes, code->constants, context);
 	tyran_runtime_execute(api->default_runtime, &return_value, 0);
-	struct tyran_memory_pool* object_iterator_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_iterator, 10);
+	struct tyran_memory_pool* object_iterator_pool = 0; // TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_object_iterator, 10);
 	tyran_print_value("return", &return_value, 1, code->constants->symbol_table, object_iterator_pool, api->string_pool, api->memory);
 }
 

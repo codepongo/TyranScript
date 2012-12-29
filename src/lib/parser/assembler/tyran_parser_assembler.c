@@ -347,7 +347,6 @@ void tyran_lexer_assembler_end_of_function(tyran_memory_pool* function_pool, tyr
 	tyran_print_opcodes(parser_state->opcodes, 0, parser_state->constants);
 
 	tyran_function* func = tyran_function_new(function_pool, parser_state->opcodes, parser_state->constants);
-	tyran_parser_state_reset(parser_state);
 
 	tyran_function_object* func_obj = tyran_function_object_new(function_object_pool, func);
 	tyran_value* func_value_obj = tyran_value_new(value_pool);

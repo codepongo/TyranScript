@@ -1,17 +1,12 @@
 #include <tyranscript/tyran_value_object.h>
-#include <tyranscript/tyran_object_iterator.h>
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_object.h>
-#include <tyranscript/tyran_object_key.h>
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_number.h>
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_runtime.h>
 #include <tyranscript/tyran_symbol_table.h>
-
-#include "tyran_value_convert.h"
-#include <tyranscript/tyran_object_key.h>
 #include "tyran_number_to_string.h"
 
 tyran_value* tyran_value_object_new(const struct tyran_runtime* runtime)

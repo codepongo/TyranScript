@@ -1,29 +1,21 @@
 #ifndef _TYRAN_OBJECT_H
 #define _TYRAN_OBJECT_H
 
-#include <tyranscript/tyran_object_key.h>
-
 #include <tyranscript/tyran_value.h>
 
 struct tyran_function_object;
 struct tyran_object_iterator;
 struct tyran_function_object;
 struct tyran_runtime;
-struct tree_root;
 struct tyran_memory_pool;
-
-
-
-typedef struct tyran_rb_tree_key_value_node {
-	const struct tyran_object_key* key;
-	tyran_value value;
-} tyran_rb_tree_key_value_node;
+struct tyran_array;
 
 typedef enum {
 	TYRAN_OBJECT_TYPE_OBJECT,
 	TYRAN_OBJECT_TYPE_STRING,
 	TYRAN_OBJECT_TYPE_FUNCTION,
 	TYRAN_OBJECT_TYPE_ITERATOR,
+	TYRAN_OBJECT_TYPE_ARRAY
 } tyran_object_type;
 
 typedef struct tyran_object_property {
@@ -40,9 +32,11 @@ typedef struct tyran_object {
 		const struct tyran_string* str;
 		struct tyran_function_object* function;
 		struct tyran_object_iterator* iterator;
+		struct tyran_array* array;
 	} data;
 
 	int retain_count;
+
 	tyran_object_property properties[32];
 	int property_count;
 
