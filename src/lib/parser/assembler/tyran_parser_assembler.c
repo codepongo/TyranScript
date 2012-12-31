@@ -74,8 +74,6 @@ static int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffe
 		{ "not", TYRAN_TOKEN_ASSEMBLER_NOT },
 		{ "pow", TYRAN_TOKEN_ASSEMBLER_POW },
 		{ "sub", TYRAN_TOKEN_ASSEMBLER_SUB },
-		{ "jb", TYRAN_TOKEN_ASSEMBLER_JB },
-		{ "jbld", TYRAN_TOKEN_ASSEMBLER_JBLD },
 		{ "jeq", TYRAN_TOKEN_ASSEMBLER_JEQ },
 		{ "jlt", TYRAN_TOKEN_ASSEMBLER_JLT },
 		{ "jlte", TYRAN_TOKEN_ASSEMBLER_JLE },
@@ -444,14 +442,6 @@ int tyran_lexer_assembler_parse_one(tyran_memory* memory, tyran_memory_pool* fun
 		case TYRAN_TOKEN_ASSEMBLER_SUB:
 			parse_r_rc_rc(parser_state, &a, &x, &y);
 			tyran_opcodes_op_sub(opcodes, a, x, y);
-			break;
-		case TYRAN_TOKEN_ASSEMBLER_JB:
-			parse_b_rc(parser_state, &b, &x);
-			tyran_opcodes_op_jb(opcodes, b, x);
-			break;
-		case TYRAN_TOKEN_ASSEMBLER_JBLD:
-			parse_r_b_rc(parser_state, &a, &b, &y);
-			tyran_opcodes_op_jbld(opcodes, a, b, y);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_JEQ:
 			parse_b_rc_rc(parser_state, &b, &x, &y);

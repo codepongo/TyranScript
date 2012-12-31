@@ -209,20 +209,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A_RCX;
 			tyran_value_set_boolean(r[a], !rcx.data.boolean);
 			break;
-		case TYRAN_OPCODE_JBLD:
-			TYRAN_REGISTER_A_RCX_Y;
-			if (rcx.data.boolean != y) {
-				r[a] = rcx;
-			} else {
-				pc++;
-			}
-			break;
-		case TYRAN_OPCODE_JB:
-			TYRAN_REGISTER_A_RCX;
-			if (rcx.data.boolean != a) {
-				pc++;
-			}
-			break;
 		case TYRAN_OPCODE_JEQ:
 		case TYRAN_OPCODE_JLT:
 		case TYRAN_OPCODE_JLE:
