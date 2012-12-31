@@ -170,20 +170,11 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A_X;
 			tyran_value_replace(r[a], c[x]);
 			break;
-		case TYRAN_OPCODE_LDCN:
+		case TYRAN_OPCODE_LDCU:
 			TYRAN_REGISTER_A_X;
 			if (tyran_value_is_undefined(&r[a])) {
 				tyran_value_replace(r[a], c[x]);
 			}
-			break;
-		case TYRAN_OPCODE_LDB:
-			TYRAN_REGISTER_A_X;
-			tyran_value_set_boolean(r[a], x);
-			break;
-		case TYRAN_OPCODE_LDN:
-			TYRAN_REGISTER_A_X;
-			// TYRAN_DEC_REF_RANGE(&runtime->object_pool, &r[a], x);
-			tyran_memset_type_n(&r[a], 0, x);
 			break;
 		case TYRAN_OPCODE_ADD:
 		case TYRAN_OPCODE_DIV:

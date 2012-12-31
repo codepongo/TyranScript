@@ -68,17 +68,7 @@ void tyran_opcodes_op_ldc(tyran_opcodes* codes, tyran_reg_index a, tyran_constan
 
 void tyran_opcodes_op_ldcn(tyran_opcodes* codes, tyran_reg_index a, tyran_constant_index c)
 {
-	tyran_opcodes_add_code_a_c(codes, TYRAN_OPCODE_LDCN, a, c);
-}
-
-void tyran_opcodes_op_ldb(tyran_opcodes* codes, tyran_reg_index a, tyran_boolean boolean)
-{
-	tyran_opcodes_add_code_a_x(codes, TYRAN_OPCODE_LDB, a, (tyran_reg_or_constant_index) boolean);
-}
-
-void tyran_opcodes_op_ldn(tyran_opcodes* codes, tyran_reg_index a, int count)
-{
-	tyran_opcodes_add_code_a_x(codes, TYRAN_OPCODE_LDN, a, (tyran_reg_or_constant_index) count);
+	tyran_opcodes_add_code_a_c(codes, TYRAN_OPCODE_LDCU, a, c);
 }
 
 /* Arithmetic */

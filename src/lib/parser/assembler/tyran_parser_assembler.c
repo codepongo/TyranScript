@@ -22,9 +22,7 @@ typedef enum {
 	TYRN_TOKEN_NOTHING,
 	TYRAN_TOKEN_ASSEMBLER_LD,
 	TYRAN_TOKEN_ASSEMBLER_LDA,
-	TYRAN_TOKEN_ASSEMBLER_LDB,
 	TYRAN_TOKEN_ASSEMBLER_LDC,
-	TYRAN_TOKEN_ASSEMBLER_LDN,
 	TYRAN_TOKEN_ASSEMBLER_ADD,
 	TYRAN_TOKEN_ASSEMBLER_DIV,
 	TYRAN_TOKEN_ASSEMBLER_MOD,
@@ -68,7 +66,6 @@ static int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffe
 		{ "ld", TYRAN_TOKEN_ASSEMBLER_LD },
 		{ "lda", TYRAN_TOKEN_ASSEMBLER_LDA },
 		{ "ldc", TYRAN_TOKEN_ASSEMBLER_LDC },
-		{ "ldn", TYRAN_TOKEN_ASSEMBLER_LDN },
 		{ "add", TYRAN_TOKEN_ASSEMBLER_ADD },
 		{ "div", TYRAN_TOKEN_ASSEMBLER_DIV },
 		{ "mod", TYRAN_TOKEN_ASSEMBLER_MOD },
@@ -415,14 +412,6 @@ int tyran_lexer_assembler_parse_one(tyran_memory* memory, tyran_memory_pool* fun
 			int c = parse_constant(parser_state, lexer_position, 0);
 			tyran_opcodes_op_ldc(opcodes, a, c);
 			}
-			break;
-		case TYRAN_TOKEN_ASSEMBLER_LDB:
-			parse_r_b(parser_state, &a, &b);
-			tyran_opcodes_op_ldb(opcodes, a, parser_state->lexer->number);
-			break;
-		case TYRAN_TOKEN_ASSEMBLER_LDN:
-			parse_r_s(parser_state, &a, &s);
-			tyran_opcodes_op_ldn(opcodes, a, s);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_ADD:
 			parse_r_rc_rc(parser_state, &a, &x, &y);

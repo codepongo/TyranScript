@@ -17,11 +17,9 @@ All opcodes are coded within a 32-bit instruction.
 * S(). Stack.
 * PC. Program Counter.
 
-### Register (4)
+### Register (2)
 * 0x01 **LD A X**. Load register. R(A) = R(X).
 * 0x02 **LDC A X**. Load constant. R(A) = C(X).
-* 0x03 **LDB A X**. Load boolean. R(A) = (BOOL)X.
-* 0x04 **LDN A X.** Load NULL. R(A..A+X) = NULL.
 
 ### Operators (10)
 * 0x05 **ADD A X Y**. Add. R(A) = RC(X) + RC(Y).    
