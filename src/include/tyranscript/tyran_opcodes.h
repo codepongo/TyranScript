@@ -29,6 +29,7 @@ void tyran_opcodes_free(struct tyran_opcodes* codes);
 /* Load values */
 void tyran_opcodes_op_ld(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index x);
 void tyran_opcodes_op_ldc(tyran_opcodes* codes, tyran_reg_index a, tyran_constant_index c);
+void tyran_opcodes_op_ldcn(tyran_opcodes* codes, tyran_reg_index a, tyran_constant_index c);
 void tyran_opcodes_op_ldb(tyran_opcodes* codes, tyran_reg_index a, int boolean);
 void tyran_opcodes_op_ldn(tyran_opcodes* codes, tyran_reg_index, int count);
 

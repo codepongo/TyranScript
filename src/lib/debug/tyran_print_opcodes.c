@@ -12,6 +12,7 @@ const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
 	"NOP",
 	"LD",
 	"LDC",
+	"LDCN",
 	"LDB",
 	"LDN",
 	"ADD",
@@ -194,6 +195,7 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 			print_r_r(code, buf, size);
 			break;
 		case TYRAN_OPCODE_LDC:
+		case TYRAN_OPCODE_LDCN:
 			print_r_c(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_LDB:

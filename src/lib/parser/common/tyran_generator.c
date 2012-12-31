@@ -485,7 +485,11 @@ void tyran_generator_traverse_function_parameters(tyran_memory* memory, tyran_co
 {
 	for (int i = 0; i < func_node->parameter_count; ++i) {
 		tyran_parser_node_parameter parameter = func_node->parameters[i];
-		tyran_variable_scopes_define_identifier(memory, code->scope, parameter.identifier->string);
+		tyran_reg_index parameter_index = tyran_variable_scopes_define_identifier(memory, code->scope, parameter.identifier->string);
+		if (parameter.default_value) {
+			tyran_constant_index constant_index = tyran_generator_literal_to_constant_index(code->constants, code->runtime, code->string_pool, memory, parameter.default_value);
+			tyran_opcodes_op_ldcn(code->opcodes, parameter_index, constant_index);
+		}
 	}
 }
 
@@ -501,6 +505,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* 
 	tyran_generator_traverse_function_parameters(memory, code, func_node);
 	
 	tyran_reg_index temp_index = tyran_variable_scopes_define_temporary_variable(code->scope);
+
 	temp_index = tyran_generator_traverse_force_register(memory, code, func_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, 0, temp_index);
 	tyran_constant_index function_constant_index = tyran_constants_add_function(function_pool, code->constants, code->opcodes);
 	tyran_opcodes_op_ret(code->opcodes, temp_index, 1);

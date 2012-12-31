@@ -168,8 +168,13 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_LDC:
 			TYRAN_REGISTER_A_X;
-			r[a] = c[x];
-			TYRAN_ADD_REF(r[a]);
+			tyran_value_replace(r[a], c[x]);
+			break;
+		case TYRAN_OPCODE_LDCN:
+			TYRAN_REGISTER_A_X;
+			if (tyran_value_is_undefined(&r[a])) {
+				tyran_value_replace(r[a], c[x]);
+			}
 			break;
 		case TYRAN_OPCODE_LDB:
 			TYRAN_REGISTER_A_X;

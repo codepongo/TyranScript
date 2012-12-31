@@ -1,0 +1,5 @@
+f = (kalle=4) -> 2 + kalle
+answer = f()
+print(answer)
+---
+6
