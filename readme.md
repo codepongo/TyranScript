@@ -20,6 +20,7 @@ All opcodes are coded within a 32-bit instruction.
 ### Register (2)
 * 0x01 **LD A X**. Load register. R(A) = R(X).
 * 0x02 **LDC A X**. Load constant. R(A) = C(X).
+* 0x03 **LDCU A X**. Load constant if target register is undefined. if (R[A] is undefined) R(A) = C(X).
 
 ### Operators (12)
 * 0x05 **ADD A X Y**. Add. R(A) = RC(X) + RC(Y).    
