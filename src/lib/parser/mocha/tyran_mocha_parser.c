@@ -210,33 +210,6 @@ NODE tyran_mocha_parser_concat_pop_helper(tyran_mocha_parser* parser, NODE* pare
 	return result;
 }
 
-NODE tyran_mocha_parser_pop_helper(tyran_mocha_parser* parser, NODE* parent, NODE* node, NODE* sibling) {
-	NODE result;
-	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_cast(*node);
-	if (binary) {
-		return tyran_mocha_parser_concat_pop_helper(parser, node, &binary->left, &binary->right);
-	}
-
-	result = *node;
-
-	if (sibling) {
-		*parent = *sibling;
-		*sibling = 0;
-		*node = 0;
-		parser->next_node_to_overwrite = 0;
-	} else {
-		parser->next_node_to_overwrite = parent;
-	}
-	return result;
-}
-
-NODE tyran_mocha_parser_pop(tyran_mocha_parser* parser) {
-	NODE result = tyran_mocha_parser_pop_helper(parser, parser->root, parser->root, 0);
-
-	return result;
-}
-
-
 NODE tyran_mocha_parser_concat_pop(tyran_mocha_parser* parser) {
 	// tyran_mocha_parser_node_print_tree(parser, "BEFORE CONCAT POP", 0);
 	NODE result = tyran_mocha_parser_concat_pop_helper(parser, parser->root, parser->root, 0);
@@ -758,7 +731,7 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 				parser->last_bracket_node = 0;
 				tyran_mocha_token index_token;
 				index_token.token_id = TYRAN_MOCHA_TOKEN_INDEX;
-				
+
 				tyran_mocha_parser_add_token(memory, parser, &index_token);
 
 			}

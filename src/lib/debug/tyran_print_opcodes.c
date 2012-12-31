@@ -21,6 +21,7 @@ const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
 	"POW",
 	"SUB",
 	"INDEX",
+	"INDEX_SET",
 	"NEG",
 	"NOT",
 	"JB",
@@ -228,6 +229,7 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 			print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
 			break;
 		case TYRAN_OPCODE_SET:
+		case TYRAN_OPCODE_INDEX_SET:
 			print_r_rc_rc(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_GET:

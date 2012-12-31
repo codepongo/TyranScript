@@ -1,6 +1,6 @@
 a = Array.new()
 print(a['hello'])
-c.b.a['hello'] = 'world'
+a['hello'] = 'world'
 print(a['hello'])
 ---
 undefined

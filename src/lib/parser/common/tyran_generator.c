@@ -359,7 +359,22 @@ tyran_reg_or_constant_index tyran_generator_traverse_assignment(tyran_memory* me
 		}
 		
 		return target_index;
+	} else {
+		tyran_parser_node_operand_binary* index = tyran_parser_binary_operator_type_cast(binary->left, TYRAN_PARSER_INDEX);
+		if (index) {
+			TYRAN_LOG("####### INDEX FOUND!");
+			tyran_reg_index object_index = tyran_generator_traverse(memory, code, index->left, true_label, false_label, 0);
+			tyran_reg_or_constant_index lookup_index = tyran_generator_traverse(memory, code, index->right, true_label, false_label, 0);
+			TYRAN_LOG("Lookup:%d", lookup_index);
+			tyran_opcodes_op_index_set(code->opcodes, object_index, lookup_index, source_index);
+
+			return source_index;
+
+		} else {
+			TYRAN_LOG("Unknown type:%d", binary->left->type);
+		}
 	}
+
 	return TYRAN_OPCODE_REGISTER_ILLEGAL;
 }
 
