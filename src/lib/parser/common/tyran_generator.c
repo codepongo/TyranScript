@@ -179,6 +179,8 @@ tyran_reg_index tyran_generator_traverse_call(tyran_memory* memory, tyran_code_s
 		tyran_opcodes_op_call(code->opcodes, start_register, call_node->argument_count, return_value_count);
 	}
 	
+	code->last_call_was_new = TYRAN_FALSE;
+	
 	return start_register;
 }
 

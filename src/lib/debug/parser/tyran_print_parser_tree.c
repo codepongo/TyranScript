@@ -1,7 +1,7 @@
 #include <tyranscript/parser/common/tyran_parser_tree.h>
 
 const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "MEMBER", "INDEX", "COMMA", "EQUAL", "NOT_EQUAL", ">=", ">", "<=", "<", "THEN", "ELSE", "LINE", "WHILE", "CONCAT", "IN", "WHEN", "CASE", "RANGE", "RANGE_INCLUSIVE", "UNTIL", "AND", "OR", "CALL"};
-const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT", "PARENTHESES", "BLOCK", "IF", "BRACKET"};
+const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT", "PARENTHESES", "BLOCK", "IF", "UNLESS", "BRACKET"};
 
 void tyran_parser_node_print_helper_output(const char* buf, const char* description, int tab_count)
 {
@@ -207,7 +207,7 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node**
 	case TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY:
 		{
 			tyran_parser_node_operand_unary* operand = (tyran_parser_node_operand_unary*)node;
-			tyran_snprintf(buf, buf_size, "operand unary '%s' (%d)", tyran_parser_unary_operand_to_string[operand->operator_type], operand->post);
+			tyran_snprintf(buf, buf_size, "operand unary '%s' [%d] (%d)", tyran_parser_unary_operand_to_string[operand->operator_type], operand->operator_type, operand->post);
 			tyran_parser_node_print_helper_output(buf, description, tab_count);
 			tyran_parser_node_print_helper("operand expression", &operand->expression, current_root, next_to_overwrite, tab_count+1);
 		}
