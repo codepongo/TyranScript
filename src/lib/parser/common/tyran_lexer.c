@@ -214,6 +214,7 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_in
 			}
 			decimal_point_detected = 1;
 			buf[string_index++] = (int) c;
+			buf[string_index++] = next;
 		} else if ((c == 'x' || c == 'X') && string_index == 1 && string_index) {
 			if (decimal_point_detected || hex_number_detected) {
 				TYRAN_SOFT_ERROR("Number format error");
@@ -228,6 +229,8 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_in
 	tyran_lexer_set_end(lexer_position_info, lexer);
 
 	buf[string_index] = 0;
+
+	TYRAN_LOG("FOUND NUMBER ######## %s", buf);
 
 	if (hex_number_detected) {
 		unsigned int temp_value;

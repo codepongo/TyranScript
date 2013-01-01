@@ -12,17 +12,17 @@
 
 struct tyran_value* tyran_function_prototype;
 
-int tyran_function_prototype_constructor(tyran_runtime* runtime, tyran_value* a, tyran_value* b, tyran_value* c, tyran_value* d, int is_constructor)
+int tyran_function_prototype_constructor(tyran_runtime* runtime, tyran_value* a, tyran_value* b, int argument_count, tyran_value* c, tyran_value* d, int is_constructor)
 {
 	return 0;
 }
 
-static int tyran_function_prototype_call(tyran_runtime* runtime,  tyran_value* a, tyran_value* b, tyran_value* c, tyran_value* d, int is_constructor)
+static int tyran_function_prototype_call(tyran_runtime* runtime,  tyran_value* a, tyran_value* b, int argument_count, tyran_value* c, tyran_value* d, int is_constructor)
 {
 	return 0;
 }
 
-int tyran_function_prototype_apply(tyran_runtime* runtime, tyran_value* function_object_value, tyran_value* function_scope, tyran_value* _this, tyran_value* return_value, int is_constructor)
+int tyran_function_prototype_apply(tyran_runtime* runtime, tyran_value* function_object_value, tyran_value* function_scope, int argument_count, tyran_value* _this, tyran_value* return_value, int is_constructor)
 {
 	/* tyran_object_key_flag_type flag;
 	

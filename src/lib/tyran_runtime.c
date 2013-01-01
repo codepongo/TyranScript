@@ -19,11 +19,11 @@
 #define TYRAN_RUNTIME_DEBUG
 
 
-#define TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(DESTINATION, OBJECT, PARAMS, OPERATOR) \
+#define TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(DESTINATION, OBJECT, PARAMS, PARAM_COUNT, OPERATOR) \
 	tyran_value* member = tyran_object_lookup_prototype(OBJECT.data.object, &runtime->binary_operator_symbols[OPERATOR]); \
 	TYRAN_ASSERT(member, "Couldn't find operator:%d", OPERATOR); \
 	const tyran_function* function = member->data.object->data.function->static_function; \
-	function->data.callback(runtime, member, PARAMS, &OBJECT, DESTINATION, TYRAN_FALSE);
+	function->data.callback(runtime, member, PARAMS, PARAM_COUNT, &OBJECT, DESTINATION, TYRAN_FALSE);
 
 
 tyran_boolean tyran_runtime_number_comparison(int comparison, tyran_number a, tyran_number b) {
@@ -194,9 +194,9 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 					if (opcode == TYRAN_OPCODE_INDEX_SET) {
 						tyran_value_replace(r[a+1], rcx);
 						tyran_value_replace(r[a+2], rcy);
-						TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], r[a], &r[a+1], operator_index);
+						TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], r[a], &r[a+1], 2, operator_index);
 					} else {
-						TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], rcx, &rcy, operator_index);
+						TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], rcx, &rcy, 1, operator_index);
 					}
 				}
 			}
@@ -219,7 +219,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				if (tyran_value_is_object(&rcx)) {
 					tyran_value dest;
 
-					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&dest, rcx, &rcy, comparison_index);
+					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&dest, rcx, &rcy, 1, comparison_index);
 					test = dest.data.boolean;
 				} else {
 					test = tyran_runtime_number_comparison(comparison_index, rcx.data.number, rcy.data.number);
@@ -292,7 +292,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 					r = target_register + 1;
 					sp->return_register = target_register;
 				} else {
-					function->data.callback(runtime, &r[a], &r[a+2], &r[a+1], &r[a], TYRAN_FALSE);
+					function->data.callback(runtime, &r[a], &r[a+2], x, &r[a+1], &r[a], TYRAN_FALSE);
 				}
 				if (opcode == TYRAN_OPCODE_NEW) {
 					tyran_value_copy(r[a], r[a+1]);

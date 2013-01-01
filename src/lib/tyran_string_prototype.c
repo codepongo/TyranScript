@@ -11,22 +11,22 @@
 
 #include <tyranscript/debug/tyran_print_value.h>
 
-int tyran_string_prototype_constructor(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* d, int is_constructor) {
+int tyran_string_prototype_constructor(tyran_runtime* r, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* d, int is_constructor) {
 	if (!is_constructor) {
 		return 0;
 	}
 	return 0;
 }
 
-int tyran_string_prototype_char_at(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor) {
+int tyran_string_prototype_char_at(tyran_runtime* r, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int is_constructor) {
 	return 0;
 }
 
-int tyran_string_prototype_from_char_code(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* d, tyran_value* return_value, int is_constructor) {
+int tyran_string_prototype_from_char_code(tyran_runtime* r, tyran_value* a, tyran_value* args, int argument_count, tyran_value* d, tyran_value* return_value, int is_constructor) {
 	return 0;
 }
 
-int tyran_string_prototype_add(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor) {
+int tyran_string_prototype_add(tyran_runtime* r, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int is_constructor) {
 	tyran_print_value("ADD (this)", _this, 1, r->symbol_table, 0, 0, 0);
 	tyran_print_value("ADD (param)", args, 1, r->symbol_table, 0, 0, 0);
 
@@ -37,7 +37,7 @@ int tyran_string_prototype_add(tyran_runtime* r, tyran_value* a, tyran_value* ar
 	return 0;
 }
 
-int tyran_string_prototype_equal(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor) {
+int tyran_string_prototype_equal(tyran_runtime* r, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int is_constructor) {
 	tyran_print_value("EQUAL (this)", _this, 1, r->symbol_table, 0, 0, 0);
 	tyran_print_value("EQUAL (param)", args, 1, r->symbol_table, 0, 0, 0);
 
@@ -47,7 +47,7 @@ int tyran_string_prototype_equal(tyran_runtime* r, tyran_value* a, tyran_value* 
 	return 0;
 }
 
-int tyran_string_prototype_lte(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor) {
+int tyran_string_prototype_lte(tyran_runtime* r, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int is_constructor) {
 	tyran_print_value("LTE (this)", _this, 1, r->symbol_table, 0, 0, 0);
 	tyran_print_value("LTE (param)", args, 1, r->symbol_table, 0, 0, 0);
 
@@ -57,7 +57,7 @@ int tyran_string_prototype_lte(tyran_runtime* r, tyran_value* a, tyran_value* ar
 	return 0;
 }
 
-int tyran_string_prototype_lt(tyran_runtime* r, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* return_value, int is_constructor) {
+int tyran_string_prototype_lt(tyran_runtime* r, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int is_constructor) {
 	tyran_print_value("LT (this)", _this, 1, r->symbol_table, 0, 0, 0);
 	tyran_print_value("LT (param)", args, 1, r->symbol_table, 0, 0, 0);
 

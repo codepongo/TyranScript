@@ -13,21 +13,29 @@
 #include <tyranscript/tyran_array.h>
 #include <tyranscript/tyran_runtime.h>
 
-int tyran_array_prototype_constructor(struct tyran_runtime* runtime, tyran_value* a, tyran_value* b, tyran_value* _this, tyran_value* return_value, int is_constructor)
+int tyran_array_prototype_constructor(struct tyran_runtime* runtime, tyran_value* func, tyran_value* arguments, int argument_count, tyran_value* _this, tyran_value* return_value, int is_constructor)
 {
 	tyran_value length;
-	tyran_value_set_number(length, 0);
+	tyran_value_set_number(length, argument_count);
 
 	tyran_array* array = tyran_array_new(runtime->memory);
 
 	tyran_object_set_array(_this->data.object, array);
+
+
+	tyran_value index;
+
+	for (int i=0; i<argument_count; ++i) {
+		tyran_value_set_number(index, i);
+		tyran_array_insert(_this->data.object->data.array, runtime->rb_node_pool, &index, &arguments[i]);
+	}
 
 	tyran_value_object_insert_c_string_key(runtime, _this, "length", &length);
 
 	return 0;
 }
 
-int tyran_array_prototype_push(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* c, int isconstructor)
+int tyran_array_prototype_push(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* c, int isconstructor)
 {
 	tyran_value length;
 
@@ -39,7 +47,7 @@ int tyran_array_prototype_push(struct tyran_runtime* runtime, tyran_value* a, ty
 	return 0;
 }
 
-int tyran_array_prototype_index(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* return_value, int isconstructor)
+int tyran_array_prototype_index(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int isconstructor)
 {
 	int index = (int) args->data.number;
 	TYRAN_LOG("******* INDEX!!:%d", index);
@@ -52,7 +60,7 @@ int tyran_array_prototype_index(struct tyran_runtime* runtime, tyran_value* a, t
 	return 0;
 }
 
-int tyran_array_prototype_index_set(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, tyran_value* _this, tyran_value* return_value, int isconstructor)
+int tyran_array_prototype_index_set(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int isconstructor)
 {
 	int index = (int) args->data.number;
 	TYRAN_LOG("******* INDEX_SET!!:%d", index);
@@ -63,7 +71,7 @@ int tyran_array_prototype_index_set(struct tyran_runtime* runtime, tyran_value* 
 
 
 
-int tyran_array_prototype_pop(struct tyran_runtime* r, tyran_value* a, tyran_value* b, tyran_value* _this, tyran_value* return_value, int isconstructor)
+int tyran_array_prototype_pop(struct tyran_runtime* r, tyran_value* a, tyran_value* b, int argument_count, tyran_value* _this, tyran_value* return_value, int isconstructor)
 {
 	return 0;
 }

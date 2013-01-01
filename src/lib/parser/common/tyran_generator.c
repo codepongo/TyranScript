@@ -147,24 +147,20 @@ void tyran_generator_comparison_operator(tyran_code_state* code, tyran_parser_bi
 	tyran_generator_label_reference(code, false_label);
 }
 
-tyran_reg_index tyran_generator_traverse_call(tyran_memory* memory, tyran_code_state* code, tyran_parser_node_call* call_node)
+
+tyran_reg_index tyran_generator_call_or_new(tyran_memory* memory, tyran_code_state* code, tyran_reg_or_constant_index function_register, tyran_reg_or_constant_index self_index, tyran_boolean is_constructor, NODE* arguments, int argument_count)
 {
-	tyran_reg_index start_register = 0;
-	int return_value_count = 1;
-	
 	int i;
-	
-	start_register = tyran_variable_scopes_top_free(code->scope, return_value_count);
-	TYRAN_LOG("Traversing function node");
-	tyran_reg_or_constant_index function_register = tyran_generator_traverse(memory, code, call_node->function_node, 0, 0, 0);
+	int return_value_count = 1;
+
+	tyran_reg_index start_register = tyran_variable_scopes_top_free(code->scope, return_value_count);
 	tyran_opcodes_op_ld(code->opcodes, start_register, function_register);
-	tyran_opcodes_op_ld(code->opcodes, start_register + 1, code->last_self_index);
+	tyran_opcodes_op_ld(code->opcodes, start_register + 1, self_index);
 	code->last_self_index = TYRAN_OPCODE_REGISTER_ILLEGAL;
 	
-	for (i = 0; i < call_node->argument_count; ++i) {
+	for (i = 0; i < argument_count; ++i) {
 		tyran_reg_index target_index = start_register + i + 2;
-		NODE node = call_node->arguments[i];
-		TYRAN_LOG("Traversing argument:%d", i);
+		NODE node = arguments[i];
 		tyran_reg_or_constant_index arg_register = tyran_generator_traverse(memory, code, node, 0, 0, 0);
 		if (tyran_opcodes_is_constant(arg_register)) {
 			tyran_opcodes_op_ldc(code->opcodes, target_index, arg_register);
@@ -173,15 +169,29 @@ tyran_reg_index tyran_generator_traverse_call(tyran_memory* memory, tyran_code_s
 		}
 		
 	}
-	if (code->last_call_was_new) {
-		tyran_opcodes_op_new(code->opcodes, start_register, call_node->argument_count, return_value_count);
+	if (is_constructor) {
+		tyran_opcodes_op_new(code->opcodes, start_register, argument_count, return_value_count);
 	} else {
-		tyran_opcodes_op_call(code->opcodes, start_register, call_node->argument_count, return_value_count);
+		tyran_opcodes_op_call(code->opcodes, start_register, argument_count, return_value_count);
 	}
 	
-	code->last_call_was_new = TYRAN_FALSE;
 	
 	return start_register;
+}
+
+tyran_reg_index tyran_generator_traverse_call(tyran_memory* memory, tyran_code_state* code, tyran_parser_node_call* call_node)
+{	
+	TYRAN_LOG("Traversing function node");
+
+	int argument_count = call_node->argument_count;
+	NODE* arguments = call_node->arguments;
+
+	tyran_reg_or_constant_index function_register = tyran_generator_traverse(memory, code, call_node->function_node, 0, 0, 0);
+	tyran_reg_index result = tyran_generator_call_or_new(memory, code, function_register, code->last_self_index, code->last_call_was_new, arguments, argument_count);
+	code->last_call_was_new = TYRAN_FALSE;
+	code->last_self_index = TYRAN_OPCODE_REGISTER_ILLEGAL;
+
+	return result;
 }
 
 
@@ -222,8 +232,31 @@ tyran_reg_or_constant_index tyran_generator_call(tyran_memory* memory, tyran_cod
 	tyran_parser_node_call* call_node = tyran_generator_call_node(memory, function, arguments);
 
 	tyran_reg_index reg = tyran_generator_traverse_call(memory, code, call_node);
-
 	return reg;
+}
+
+tyran_reg_or_constant_index tyran_generator_array(tyran_memory* memory, tyran_code_state* code, NODE arguments) {
+	NODE argument_nodes[100];
+	int argument_count = 0;
+
+	TYRAN_LOG("ARRAY");
+	tyran_generator_argument_nodes(argument_nodes, &argument_count, arguments);
+	TYRAN_LOG("ARGUMENTS DONE");
+
+	tyran_constant_index array_symbol = tyran_constants_add_symbol_from_c_string(code->constants, "Array");
+	tyran_constant_index constructor_symbol = tyran_constants_add_symbol_from_c_string(code->constants, "constructor");
+	tyran_reg_index target = tyran_variable_scopes_define_temporary_variable(code->scope);
+	tyran_reg_index self_index = tyran_variable_scopes_define_temporary_variable(code->scope);
+	tyran_opcodes_op_get(code->opcodes, self_index, 0, array_symbol);
+	tyran_opcodes_op_get(code->opcodes, target, self_index, constructor_symbol);
+
+
+	tyran_boolean is_constructor = TYRAN_TRUE;
+
+	tyran_reg_or_constant_index result = tyran_generator_call_or_new(memory, code, target, self_index, is_constructor, argument_nodes, argument_count);
+	
+	TYRAN_LOG("ARRAY DONE");
+	return result;
 }
 
 tyran_reg_index tyran_generator_self_member(tyran_code_state* code, const char* string) {
@@ -403,7 +436,13 @@ tyran_reg_or_constant_index tyran_generator_traverse_binary(tyran_memory* memory
 }
 
 tyran_reg_or_constant_index tyran_generator_traverse_unary(tyran_memory* memory, tyran_code_state* code, tyran_parser_node_operand_unary* unary, tyran_label_id true_label, tyran_label_id false_label, tyran_boolean invert_logic) {
-	return tyran_generator_traverse(memory, code, unary->expression, true_label, false_label, invert_logic);
+	switch (unary->operator_type) {
+		case TYRAN_PARSER_UNARY_ARRAY:
+			return tyran_generator_array(memory, code, unary->expression);
+
+		default:
+			return tyran_generator_traverse(memory, code, unary->expression, true_label, false_label, invert_logic);
+	}
 }
 
 tyran_reg_or_constant_index tyran_generator_traverse_if(tyran_memory* memory, tyran_code_state* code, tyran_parser_node* expression, tyran_parser_node* then_node, tyran_parser_node* else_node, tyran_boolean invert) {

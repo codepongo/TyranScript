@@ -718,16 +718,23 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 	} else {
 		tyran_mocha_operator_info info = tyran_mocha_parser_get_operator_info(token->token_id);
 		if (info.token_id != TYRAN_MOCHA_TOKEN_END) {
+			if (parser->last_bracket_node) {
+				NODE expression = tyran_mocha_parser_concat_pop(parser);
+				tyran_parser_node_operand_unary* bracket = tyran_parser_unary_operator_type_cast(expression, TYRAN_PARSER_UNARY_BRACKET);
+				if (bracket) {
+					NODE array_node = tyran_parser_array(memory, bracket->expression);
+					tyran_mocha_parser_add_to_empty(memory, parser, array_node, 99);
+				}
+			}
 			NODE terminal = tyran_mocha_parser_add_terminal(memory, parser, token->token_id, info.precedence);
 			tyran_mocha_token_id end_closing_token_id = tyran_mocha_enclosing_start_token(token->token_id);
 			if (end_closing_token_id != TYRAN_MOCHA_TOKEN_END) {
 				tyran_mocha_parser_add_enclosure(parser, (tyran_parser_node_operand_unary*)terminal, token->token_id, end_closing_token_id);
 			}
 			last_literal = TYRAN_FALSE;
+			parser->last_bracket_node = 0;
 		} else {
 			if (parser->last_bracket_node) {
-				TYRAN_LOG("#### BRACKET FOUND!");
-
 				parser->last_bracket_node = 0;
 				tyran_mocha_token index_token;
 				index_token.token_id = TYRAN_MOCHA_TOKEN_INDEX;
@@ -735,19 +742,6 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 				tyran_mocha_parser_add_token(memory, parser, &index_token);
 
 			}
-
-		/*
-			if (parser->last_was_bracket) {
-				parser->last_was_bracket = TYRAN_FALSE;
-				NODE bracket_node = tyran_mocha_parser_concat_pop(parser);
-				tyran_parser_node_operand_unary* bracket = tyran_parser_unary_operator_type_cast(bracket_node, TYRAN_PARSER_UNARY_BRACKET);
-				TYRAN_ASSERT(bracket, "It was not a bracket!");
-				tyran_mocha_parser_add_to_empty(memory, parser, bracket->expression, -1);
-				tyran_mocha_token* token = TYRAN_CALLOC_TYPE(parser->mocha_token_pool, tyran_mocha_token);
-				token->token_id = TYRAN_MOCHA_TOKEN_INDEX;
-				tyran_mocha_parser_add_token(memory, parser, token);
-			}
-		*/
 			if (last_literal) {
 				tyran_mocha_token* token = TYRAN_CALLOC_TYPE(parser->mocha_token_pool, tyran_mocha_token);
 				token->token_id = TYRAN_MOCHA_TOKEN_CALL;
@@ -758,6 +752,7 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 			last_literal = TYRAN_TRUE;
 		}
 	}
+
 //	tyran_mocha_parser_debug("after", parser, 0);
 }
 

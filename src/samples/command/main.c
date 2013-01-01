@@ -1,6 +1,6 @@
 #include <tyranscript/tyran_mocha_api.h>
 
-int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call) {
+int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, int argument_count, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call) {
 	struct tyran_value* v = &arguments[0];
 	const int buf_len = 100;
 	char buf[buf_len];
