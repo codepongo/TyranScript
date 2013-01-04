@@ -230,8 +230,6 @@ int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_in
 
 	buf[string_index] = 0;
 
-	TYRAN_LOG("FOUND NUMBER ######## %s", buf);
-
 	if (hex_number_detected) {
 		unsigned int temp_value;
 		tyran_sscanf(buf, "%X", &temp_value);

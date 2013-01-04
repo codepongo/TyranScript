@@ -150,12 +150,6 @@ NODE tyran_parser_class(tyran_memory* memory, NODE name, NODE extends, NODE bloc
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_array(tyran_memory* memory, NODE parameters)
-{
-	tyran_parser_node_operand_unary* array_node = tyran_parser_operand_unary(memory, TYRAN_PARSER_UNARY_ARRAY, parameters, TYRAN_FALSE);
-	return (NODE)array_node;
-}
-
 NODE tyran_parser_range(NODE a, NODE b, NODE c)
 {
 	TYRAN_LOG("range");

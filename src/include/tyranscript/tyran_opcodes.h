@@ -55,14 +55,9 @@ void tyran_opcodes_op_call(tyran_opcodes* codes, tyran_reg_index, int s, int s2)
 void tyran_opcodes_op_new(tyran_opcodes* codes, tyran_reg_index a, int argument_count, int return_value_count);
 
 /* Object */
-
 void tyran_opcodes_op_func(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x);
 
 void tyran_opcodes_op_set(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y);
 void tyran_opcodes_op_get(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index r, tyran_reg_or_constant_index y);
-
-/* Iteration */
-void tyran_opcodes_op_key(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x);
-void tyran_opcodes_op_next(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index x);
 
 #endif

@@ -39,8 +39,7 @@
 	i >>= 8; \
 	yc = i & 0x01; \
 	rcx = xc ? c[x] : r[x]; \
-	rcy = yc ? c[y] : r[y]; \
-//	TYRAN_LOG("a:%d x:%d y:%d", a, x, y);
+	rcy = yc ? c[y] : r[y];
 
 #define TYRAN_REGISTER_BR \
 	br = (instruction & 0xffff) - 0x8000;

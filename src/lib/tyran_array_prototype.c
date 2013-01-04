@@ -49,8 +49,6 @@ int tyran_array_prototype_push(struct tyran_runtime* runtime, tyran_value* a, ty
 
 int tyran_array_prototype_index(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int isconstructor)
 {
-	int index = (int) args->data.number;
-	TYRAN_LOG("******* INDEX!!:%d", index);
 	tyran_value* v = tyran_array_lookup(_this->data.object->data.array, args);
 	if (!v) {
 		tyran_value_set_undefined(*return_value);
@@ -62,14 +60,19 @@ int tyran_array_prototype_index(struct tyran_runtime* runtime, tyran_value* a, t
 
 int tyran_array_prototype_index_set(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int isconstructor)
 {
-	int index = (int) args->data.number;
-	TYRAN_LOG("******* INDEX_SET!!:%d", index);
 	tyran_array_insert(_this->data.object->data.array, runtime->rb_node_pool, &args[0], &args[1]);
 	tyran_value_set_undefined(*return_value);
 	return 0;
 }
 
-
+TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_add) {
+	tyran_array* added_array = tyran_array_add(runtime->memory, runtime->rb_node_pool, self->data.object->data.array, arguments[0].data.object->data.array);
+	tyran_object* obj = tyran_object_new(runtime);
+	tyran_object_set_prototype(obj, runtime->_array_class);
+	tyran_object_set_array(obj, added_array);
+	tyran_value_set_object(*return_value, obj);
+	return 0;
+}
 
 int tyran_array_prototype_pop(struct tyran_runtime* r, tyran_value* a, tyran_value* b, int argument_count, tyran_value* _this, tyran_value* return_value, int isconstructor)
 {
@@ -79,6 +82,7 @@ int tyran_array_prototype_pop(struct tyran_runtime* r, tyran_value* a, tyran_val
 void tyran_array_prototype_init(const struct tyran_runtime* runtime, tyran_value* o) {
 	TYRAN_MEMBER(o, "[]=", tyran_array_prototype_index_set);
 	TYRAN_MEMBER(o, "[]", tyran_array_prototype_index);
+	TYRAN_MEMBER(o, "+", tyran_array_prototype_add);
 	TYRAN_MEMBER(o, "push", tyran_array_prototype_push);
 	TYRAN_MEMBER(o, "constructor", tyran_array_prototype_constructor);
 }

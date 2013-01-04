@@ -76,7 +76,6 @@ void tyran_object_insert(struct tyran_object* object, const tyran_symbol* symbol
 	if (found == -1) {
 		found = object->property_count;
 		object->property_count++;
-		TYRAN_LOG("Inserting property to #%d count:%d", found, object->property_count);
 		tyran_value_copy(object->properties[found].value, *value);
 		object->properties[found].symbol = *symbol;
 	} else {

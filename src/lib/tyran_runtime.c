@@ -90,11 +90,33 @@ void tyran_register_copy(tyran_value* target, tyran_value* source, int count)
 	TYRAN_REGISTER_BR; \
 	pc += br;
 
+void tyran_runtime_show_opcode_and_registers(const tyran_opcode* pc, tyran_runtime_stack* sp, tyran_value* r)
+{
+	long pc_value = pc - sp->opcodes->codes;
+	char tmp[512];
+	char result[512];
+
+	result[0] = 0;
+	int reg_index;
+	for (reg_index=0; reg_index <= 10; reg_index++)
+	{
+		if (reg_index != 0) {
+			tyran_strncat(result, ", ", 512);
+		}
+		tyran_snprintf(tmp, 512,  "r%d:", reg_index);
+		tyran_strncat(result, tmp, 512);
+		tyran_value_to_c_string(sp->constants->symbol_table, &r[reg_index], tmp, 512, 1);
+		tyran_strncat(result, tmp, 512);
+	}
+
+	TYRAN_LOG("%s", result);
+
+	tyran_print_opcode(pc, sp->constants, pc_value, 1);
+}
+
 
 void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_value, const struct tyran_runtime_callbacks* event_callbacks)
 {
-	TYRAN_LOG(" ");
-	TYRAN_LOG("*** EXECUTE");
 	// Parameters
 	u8t a;
 	u8t x;
@@ -135,26 +157,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	while (1)
 	{
 #ifdef TYRAN_RUNTIME_DEBUG
-		long pc_value = pc - sp->opcodes->codes;
-		char tmp[512];
-		char result[512];
-
-		result[0] = 0;
-		int reg_index;
-		for (reg_index=0; reg_index <= 10; reg_index++)
-		{
-			if (reg_index != 0) {
-				tyran_strncat(result, ", ", 512);
-			}
-			tyran_snprintf(tmp, 512,  "r%d:", reg_index);
-			tyran_strncat(result, tmp, 512);
-			tyran_value_to_c_string(sp->constants->symbol_table, &r[reg_index], tmp, 512, 1);
-			tyran_strncat(result, tmp, 512);
-		}
-
-		TYRAN_LOG("%s", result);
-
-		tyran_print_opcode(pc, sp->constants, pc_value, 1);
+		tyran_runtime_show_opcode_and_registers(pc, sp, r);
 #endif
 	u32t instruction = *pc++;
 	u32t opcode = instruction & 0x3f;
@@ -187,7 +190,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A_RCX_RCY;
 			{
 				int operator_index = opcode - TYRAN_OPCODE_ADD;
-				TYRAN_LOG("Operator index:%d", operator_index);
 				if (tyran_value_is_number(&rcx)) {
 					tyran_runtime_number_binary_operator(&r[a], operator_index, rcx.data.number, rcy.data.number);
 				} else {
@@ -242,15 +244,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			TYRAN_REGISTER_A_RCX_RCY;
 			test = (rcx.data.data <= rcy.data.data);
 			if (test != a) {
-				pc++;
-			} else {
-				TYRAN_RUNTIME_DO_JMP;
-			}
-			break;
-		case TYRAN_OPCODE_NEXT:
-			TYRAN_REGISTER_A;
-			/* Insert code */
-			if (0) {
 				pc++;
 			} else {
 				TYRAN_RUNTIME_DO_JMP;
@@ -313,10 +306,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 		case TYRAN_OPCODE_SET:
 			TYRAN_REGISTER_A_RCX_RCY;
 			tyran_value_object_insert(runtime, &r[a], &rcx, &rcy);
-			break;
-		case TYRAN_OPCODE_KEY:
-			TYRAN_REGISTER_A_RCX;
-			tyran_value_set_number(r[a], -1);
 			break;
 		case TYRAN_OPCODE_FUNC: {
 			TYRAN_REGISTER_A_RCX;

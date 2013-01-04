@@ -13,6 +13,8 @@ struct tyran_object;
 struct tyran_memory_pool;
 struct tyran_symbol_table;
 
+#define TYRAN_RUNTIME_CALL_FUNC(NAME) int NAME(struct tyran_runtime* runtime, tyran_value* func, tyran_value* arguments, int argument_count, tyran_value* self, tyran_value* return_value, int is_constructor)
+
 typedef void (*tyran_value_delete_callback)(const struct tyran_runtime* program_specific_context, struct tyran_object* program_specific);
 
 typedef struct tyran_runtime {

@@ -16,6 +16,7 @@ typedef struct tyran_mocha_operator_info {
 tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token_id token_id)
 {
 	tyran_mocha_operator_info operands_to_match[] = {
+		{TYRAN_MOCHA_TOKEN_ASSIGNMENT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_AND, 1, 0},
 		{TYRAN_MOCHA_TOKEN_OR, 1, 0},
 		{TYRAN_MOCHA_TOKEN_EQUAL, 1, 0},
@@ -38,7 +39,6 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_NOT_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_IN, 1, 0},
 		{TYRAN_MOCHA_TOKEN_COMMA, 1, 0},
-		{TYRAN_MOCHA_TOKEN_ASSIGNMENT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_ADD, 1, 0},
 		{TYRAN_MOCHA_TOKEN_SUBTRACT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_MULTIPLY, 1, 0},
@@ -718,13 +718,10 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 	} else {
 		tyran_mocha_operator_info info = tyran_mocha_parser_get_operator_info(token->token_id);
 		if (info.token_id != TYRAN_MOCHA_TOKEN_END) {
-			if (parser->last_bracket_node) {
-				NODE expression = tyran_mocha_parser_concat_pop(parser);
-				tyran_parser_node_operand_unary* bracket = tyran_parser_unary_operator_type_cast(expression, TYRAN_PARSER_UNARY_BRACKET);
-				if (bracket) {
-					NODE array_node = tyran_parser_array(memory, bracket->expression);
-					tyran_mocha_parser_add_to_empty(memory, parser, array_node, 99);
-				}
+			tyran_parser_node_operand_unary* last_bracket = parser->last_bracket_node;
+			parser->last_bracket_node = 0;
+			if (last_bracket) {
+				last_bracket->operator_type = TYRAN_PARSER_UNARY_ARRAY;
 			}
 			NODE terminal = tyran_mocha_parser_add_terminal(memory, parser, token->token_id, info.precedence);
 			tyran_mocha_token_id end_closing_token_id = tyran_mocha_enclosing_start_token(token->token_id);
@@ -732,7 +729,6 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 				tyran_mocha_parser_add_enclosure(parser, (tyran_parser_node_operand_unary*)terminal, token->token_id, end_closing_token_id);
 			}
 			last_literal = TYRAN_FALSE;
-			parser->last_bracket_node = 0;
 		} else {
 			if (parser->last_bracket_node) {
 				parser->last_bracket_node = 0;

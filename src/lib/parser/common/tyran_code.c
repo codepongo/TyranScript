@@ -46,7 +46,6 @@ void tyran_code_define_label(tyran_code_state* state, tyran_label_id label_index
 {
 	struct tyran_label* label = &state->labels[label_index];
 	label->position = state->opcodes->code_len + 1;
-	TYRAN_LOG("defining label at pos:%d", label->position);
 }
 
 

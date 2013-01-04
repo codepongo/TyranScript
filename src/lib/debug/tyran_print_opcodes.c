@@ -32,8 +32,6 @@ const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
 	"NEW",
 	"SET",
 	"GET",
-	"KEY",
-	"NEXT",
 	"FUNC",
 	"DEBUG"
 };
@@ -221,10 +219,6 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 		case TYRAN_OPCODE_GET:
 		case TYRAN_OPCODE_INDEX:
 			print_r_r_rc(code, constants, buf, size);
-			break;
-		case TYRAN_OPCODE_KEY:
-		case TYRAN_OPCODE_NEXT:
-			print_r_r(code, buf, size);
 			break;
 		case TYRAN_OPCODE_DEBUG:
 			break;

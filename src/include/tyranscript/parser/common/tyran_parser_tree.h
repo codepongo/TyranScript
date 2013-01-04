@@ -302,7 +302,6 @@ NODE tyran_parser_index(NODE a);
 NODE tyran_parser_slice(NODE b);
 NODE tyran_parser_object(tyran_memory* memory, NODE a);
 NODE tyran_parser_class(tyran_memory* memory, NODE name, NODE extends, NODE block);
-NODE tyran_parser_array(tyran_memory* memory, NODE parameters);
 NODE tyran_parser_range(NODE a, NODE b, NODE c);
 NODE tyran_parser_parens(NODE a);
 NODE tyran_parser_while(tyran_memory* memory, NODE condition, NODE block);

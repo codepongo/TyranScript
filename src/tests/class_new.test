@@ -1,0 +1,6 @@
+object_creator = (klass) -> klass.new()
+a = object_creator(Array)
+a['test'] = 3
+print(a['test'])
+---
+3
