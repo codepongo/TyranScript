@@ -1,7 +1,7 @@
 #include <tyranscript/parser/common/tyran_parser_tree.h>
 
-const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "MEMBER", "INDEX", "COMMA", "EQUAL", "NOT_EQUAL", ">=", ">", "<=", "<", "THEN", "ELSE", "LINE", "WHILE", "CONCAT", "IN", "WHEN", "CASE", "RANGE", "RANGE_INCLUSIVE", "UNTIL", "AND", "OR", "CALL"};
-const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT", "PARENTHESES", "BLOCK", "IF", "UNLESS", "BRACKET", "ARRAY"};
+const char* tyran_parser_binary_operand_to_string[TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX] = { "DIVIDE", "MULTIPLY", "MODULUS", "ASSIGNMENT", "ADD", "SUBTRACT", "MEMBER", "INDEX", "COMMA", "EQUAL", "NOT_EQUAL", ">=", ">", "<=", "<", "THEN", "ELSE", "LINE", "WHILE", "CONCAT", "IN", "WHEN", "CASE", "RANGE", "RANGE_INCLUSIVE", "UNTIL", "AND", "OR", "CALL", "COLON"};
+const char* tyran_parser_unary_operand_to_string[TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX] = { "ADD", "SUBTRACT", "PARENTHESES", "BLOCK", "IF", "UNLESS", "BRACKET", "ARRAY", "OBJECT"};
 
 void tyran_parser_node_print_helper_output(const char* buf, const char* description, int tab_count)
 {
@@ -239,6 +239,18 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node**
 			tyran_parser_node_print_helper("object_assignment source", &object->source, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
+	case TYRAN_PARSER_NODE_TYPE_MEMBER_ASSIGN:
+	{
+			tyran_parser_node_member_assign* object = (tyran_parser_node_member_assign*)node;
+			tyran_snprintf(buf, buf_size, "member_assign");
+			tyran_parser_node_print_helper_output(buf, description, tab_count);
+			tyran_parser_node_print_helper("member_assign identifier", &object->identifier, current_root, next_to_overwrite, tab_count+1);
+			tyran_parser_node_print_helper("member_assign expression", &object->expression, current_root, next_to_overwrite, tab_count+1);
+
+	}
+	break;
+	default:
+		TYRAN_ERROR("unknown parser node type:%d", node->type);
 	}
 	}
 }

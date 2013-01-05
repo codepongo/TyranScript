@@ -39,9 +39,11 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_NOT_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_IN, 1, 0},
 		{TYRAN_MOCHA_TOKEN_COMMA, 1, 0},
+		{TYRAN_MOCHA_TOKEN_COLON, 1, 0},
 		{TYRAN_MOCHA_TOKEN_ADD, 1, 0},
 		{TYRAN_MOCHA_TOKEN_SUBTRACT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_MULTIPLY, 1, 0},
+		{TYRAN_MOCHA_TOKEN_MODULUS, 1, 0},
 		{TYRAN_MOCHA_TOKEN_DIVIDE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_CALL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_INDEX, 1, 0},
@@ -53,6 +55,7 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND, 1, 0},
 		{TYRAN_MOCHA_TOKEN_BRACKET_RIGHT, 1, 1},
 		{TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT, 1, 1},
+		{TYRAN_MOCHA_TOKEN_OBJECT_END, 1, 1},
 	};
 
 	size_t i;
@@ -124,21 +127,28 @@ NODE tyran_mocha_parser_concat_peek(tyran_mocha_parser* parser) {
 	return tyran_mocha_parser_concat_peek_position(parser, 0);
 }
 
-NODE* tyran_mocha_parser_last_node_helper(NODE* node)
+NODE* tyran_mocha_parser_last_node_helper(NODE* parent, NODE* node, tyran_boolean use_operator)
 {
 	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_cast(*node);
 	if (binary) {
-		return tyran_mocha_parser_last_node_helper(&binary->left);
+		return tyran_mocha_parser_last_node_helper(node, &binary->left, use_operator);
 	}
-
-	return node;
+	if (use_operator) {
+		return parent;
+	} else {
+		return node;
+	}
 }
 
 NODE* tyran_mocha_parser_last_node(tyran_mocha_parser* parser)
 {
-	return tyran_mocha_parser_last_node_helper(parser->root);
+	return tyran_mocha_parser_last_node_helper(parser->root, parser->root, TYRAN_FALSE);
 }
 
+NODE* tyran_mocha_parser_last_operator_node(tyran_mocha_parser* parser)
+{
+	return tyran_mocha_parser_last_node_helper(parser->root, parser->root, TYRAN_TRUE);
+}
 
 tyran_mocha_parser_enclosure_info tyran_mocha_parser_enclosure_stack_pop(tyran_mocha_parser_enclosure_stack* stack)
 {
@@ -171,24 +181,34 @@ NODE* tyran_mocha_parser_actual_root(tyran_mocha_parser* parser)
 	return actual_root;
 }
 
-void tyran_mocha_parser_push_root_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node)
+void tyran_mocha_parser_push_root_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node, int precedence)
 {
 	NODE* actual_root = tyran_mocha_parser_actual_root(parser);
 	NODE print_node= (NODE) node;
-	tyran_parser_node_print("PUSH ROOT RIGHT NODE:", parser->root, &print_node);
-	// tyran_mocha_parser_node_print_tree(parser, "BEFORE PUSH RIGHT", 0);
+	tyran_parser_node_print("PUSH ROOT DOWN:", parser->root, &print_node);
+	parser->root_precedence = precedence;
+	parser->last_precedence = -1;
 	tyran_mocha_parser_push_right(parser, node, actual_root);
-	// tyran_mocha_parser_node_print_tree(parser, "AFTER PUSH RIGHT", 0);
 }
 
-void tyran_mocha_parser_push_last_inserted_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node)
+void tyran_mocha_parser_push_last_inserted_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node, int precedence)
 {
-	//tyran_parser_node_print("PushLastRight", (NODE)node, parser->root);
-	// tyran_mocha_parser_node_print_tree(parser, "BEFORE PUSH LAST RIGHT", 0);
+	NODE print_node= (NODE) node;
+	tyran_parser_node_print("PUSH LAST DOWN:", parser->root, &print_node);
 	NODE* last_node = tyran_mocha_parser_last_node(parser);
+	parser->last_precedence = precedence;
 	tyran_mocha_parser_push_right(parser, node, last_node);
-	//tyran_mocha_parser_node_print_tree(parser, "AFTER PUSH LAST RIGHT", 0);
 }
+
+void tyran_mocha_parser_push_last_operator_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node, int precedence)
+{
+	NODE print_node= (NODE) node;
+	tyran_parser_node_print("PUSH LAST OPERATOR DOWN:", parser->root, &print_node);
+	NODE* last_node = tyran_mocha_parser_last_operator_node(parser);
+	tyran_mocha_parser_push_right(parser, node, last_node);
+	parser->last_precedence = precedence;
+}
+
 
 NODE tyran_mocha_parser_concat_pop_helper(tyran_mocha_parser* parser, NODE* parent, NODE* node, NODE* sibling) {
 	NODE result;
@@ -273,7 +293,7 @@ void tyran_mocha_parser_add_to_empty(tyran_memory* memory, tyran_mocha_parser* p
 		NODE* actual_root = tyran_mocha_parser_actual_root(parser);
 		tyran_mocha_parser_new_node_on_stack(parser);
 		tyran_parser_node_operand_binary* binary = tyran_parser_concat(memory, 0, *actual_root);
-		tyran_mocha_parser_push_root_right(parser, binary);
+		tyran_mocha_parser_push_root_right(parser, binary, -1);
 		// tyran_mocha_parser_node_print_tree(parser, "AFTER ADD TO EMPTY (before insert)", 0);
 		tyran_mocha_parser_add_to_empty(memory, parser, node, precedence);
 		// tyran_mocha_parser_node_print_tree(parser, "AFTER ADD TO EMPTY (after insert)", 0);
@@ -306,9 +326,10 @@ tyran_mocha_parser* tyran_mocha_parser_new(tyran_memory_pool* mocha_parser_pool,
 	parser->original_root = (NODE)unary;
 	parser->root = &unary->expression;
 	parser->next_node_to_overwrite = &unary->expression;
-	parser->overwrite_precedence = -1;
 	parser->parser_parameter_pool = parser_parameter_pool;
 	parser->mocha_token_pool = mocha_token_pool;
+	parser->last_precedence = -1;
+	parser->root_precedence = -1;
 	return parser;
 }
 
@@ -413,8 +434,11 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	case TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE:
 		operand = TYRAN_PARSER_RANGE;
 		break;
+	case TYRAN_MOCHA_TOKEN_COLON:
+		operand = TYRAN_PARSER_COLON;
+		break;
 	default:
-		TYRAN_ERROR("unknown token to convert");
+		TYRAN_ERROR("unknown binary token to convert:%d", token_id);
 	}
 	
 	return operand;
@@ -427,17 +451,14 @@ tyran_parser_unary_operand_type tyran_mocha_parser_convert_unary_operand(tyran_m
 	
 	switch (token_id)
 	{
-	case TYRAN_MOCHA_TOKEN_ADD:
-		operand = TYRAN_PARSER_UNARY_OPERAND_ADD;
-		break;
-	case TYRAN_MOCHA_TOKEN_SUBTRACT:
-		operand = TYRAN_PARSER_UNARY_OPERAND_SUBTRACT;
-		break;
 	case TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT:
 		operand = TYRAN_PARSER_UNARY_PARENTHESES;
 		break;
 	case TYRAN_MOCHA_TOKEN_BLOCK_END:
 		operand = TYRAN_PARSER_UNARY_BLOCK;
+		break;
+	case TYRAN_MOCHA_TOKEN_OBJECT_END:
+		operand = TYRAN_PARSER_UNARY_OBJECT;
 		break;
 	case TYRAN_MOCHA_TOKEN_BRACKET_RIGHT:
 		operand = TYRAN_PARSER_UNARY_BRACKET;
@@ -449,7 +470,7 @@ tyran_parser_unary_operand_type tyran_mocha_parser_convert_unary_operand(tyran_m
 		operand = TYRAN_PARSER_UNARY_UNLESS;
 		break;
 	default:
-		TYRAN_ERROR("unknown token to convert");
+		TYRAN_ERROR("unknown unary token to convert:%d", token_id);
 	}
 	
 	return operand;
@@ -500,13 +521,20 @@ NODE tyran_mocha_parser_add_default_operator(tyran_memory* memory, tyran_mocha_p
 		return (NODE)node;
 	} else {
 		tyran_parser_node_operand_binary* node = tyran_parser_operand_binary(memory, tyran_mocha_parser_convert_binary_operand(token_id), 0, 0);
-		TYRAN_LOG("Compare precedence %d  %d token:%d, %d", precedence, parser->overwrite_precedence, token_id, parser->last_overwrite_operator_token);
-		if (precedence < parser->overwrite_precedence) {
-			tyran_mocha_parser_push_root_right(parser, node);
+		TYRAN_LOG("Compare precedence %d %d token:%d, %d", precedence, parser->root_precedence, token_id, parser->last_overwrite_operator_token);
+		if (precedence < parser->root_precedence) {
+			tyran_mocha_parser_push_root_right(parser, node, precedence);
+		} else if (parser->next_node_to_overwrite == 0 && (precedence < parser->last_precedence)) {
+			tyran_mocha_parser_push_last_operator_right(parser, node, precedence);
 		} else {
-			tyran_mocha_parser_push_last_inserted_right(parser, node);
+			tyran_mocha_parser_push_last_inserted_right(parser, node, precedence);
 		}
-		parser->overwrite_precedence = precedence;
+		if (parser->last_precedence == -1) {
+			parser->last_precedence = precedence;
+		}
+		if (parser->root_precedence == -1) {
+			parser->root_precedence = precedence;
+		}
 		parser->last_overwrite_operator_token = token_id;
 		return (NODE)node;
 	}
@@ -663,8 +691,6 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_mocha_to
 	tyran_mocha_token end_token;
 	end_token.token_id = start_closure;
 
-	TYRAN_LOG("ENDING ENCLOSURE!");
-
 	tyran_mocha_parser_enclosure_info info = tyran_mocha_parser_enclosure_stack_pop(parser->enclosure_stack);
 	parser->waiting_for_start_enclosure_id = info.start_token_id;
 	parser->next_node_to_overwrite = 0;
@@ -734,9 +760,7 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 				parser->last_bracket_node = 0;
 				tyran_mocha_token index_token;
 				index_token.token_id = TYRAN_MOCHA_TOKEN_INDEX;
-
 				tyran_mocha_parser_add_token(memory, parser, &index_token);
-
 			}
 			if (last_literal) {
 				tyran_mocha_token* token = TYRAN_CALLOC_TYPE(parser->mocha_token_pool, tyran_mocha_token);
@@ -744,7 +768,8 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 				tyran_mocha_parser_add_token(memory, parser, token);
 			}
 			NODE literal = tyran_mocha_parser_token_to_literal(memory, token);
-			tyran_mocha_parser_add_to_empty(memory, parser, literal, -1);
+			tyran_mocha_parser_add_to_empty(memory, parser, literal, 99);
+			parser->last_was_colon = TYRAN_FALSE;
 			last_literal = TYRAN_TRUE;
 		}
 	}

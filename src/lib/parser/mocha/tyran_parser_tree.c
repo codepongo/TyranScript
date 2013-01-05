@@ -340,3 +340,12 @@ int tyran_parser_node_is_literal(NODE node)
 	enum tyran_parser_type type = node->type;
 	return (tyran_parser_node_is_constant(node) || type == TYRAN_PARSER_NODE_TYPE_IDENTIFIER);
 }
+
+NODE tyran_parser_member_assign(tyran_memory* memory, NODE target, NODE expression) {
+	tyran_parser_node_member_assign* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_member_assign, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_MEMBER_ASSIGN;
+	node->identifier = target;
+	node->expression = expression;
+	return (NODE)node;
+}
+

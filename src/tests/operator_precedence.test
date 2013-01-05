@@ -1,0 +1,5 @@
+hello = 2
+world = 3
+print(hello*19%2 + world*24%33)
+---
+74

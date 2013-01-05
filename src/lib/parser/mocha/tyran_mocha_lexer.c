@@ -303,7 +303,7 @@ tyran_mocha_token* tyran_mocha_lexer_last(tyran_mocha_lexer* lexer)
 
 int tyran_mocha_lexer_is_unary_operator(tyran_mocha_token_id token_id)
 {
-	return (token_id == TYRAN_MOCHA_TOKEN_IF || token_id == TYRAN_MOCHA_TOKEN_UNLESS || token_id == TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT || token_id == TYRAN_MOCHA_TOKEN_BLOCK_END || token_id == TYRAN_MOCHA_TOKEN_BRACKET_RIGHT);
+	return (token_id == TYRAN_MOCHA_TOKEN_IF || token_id == TYRAN_MOCHA_TOKEN_UNLESS || token_id == TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT || token_id == TYRAN_MOCHA_TOKEN_BLOCK_END || token_id == TYRAN_MOCHA_TOKEN_BRACKET_RIGHT || token_id == TYRAN_MOCHA_TOKEN_OBJECT_END);
 }
 
 tyran_mocha_token_id tyran_mocha_enclosing_start_token(tyran_mocha_token_id token_id)
@@ -316,6 +316,7 @@ tyran_mocha_token_id tyran_mocha_enclosing_start_token(tyran_mocha_token_id toke
 	tyran_mocha_matching_tokens enclosing_tokens[] = {
 		{TYRAN_MOCHA_TOKEN_BRACKET_LEFT, TYRAN_MOCHA_TOKEN_BRACKET_RIGHT},
 		{TYRAN_MOCHA_TOKEN_PARENTHESES_LEFT, TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT},
+		{TYRAN_MOCHA_TOKEN_OBJECT_START, TYRAN_MOCHA_TOKEN_OBJECT_END},
 		{TYRAN_MOCHA_TOKEN_BLOCK_START, TYRAN_MOCHA_TOKEN_BLOCK_END},
 	};
 

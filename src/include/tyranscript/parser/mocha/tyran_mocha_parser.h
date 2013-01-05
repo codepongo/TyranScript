@@ -26,7 +26,6 @@ typedef struct tyran_mocha_parser_enclosure_stack {
 typedef struct tyran_mocha_parser {
 	struct tyran_mocha_parser_enclosure_stack* enclosure_stack;
 	tyran_mocha_token_id waiting_for_start_enclosure_id;
-	int overwrite_precedence;
 	tyran_mocha_token_id last_overwrite_operator_token;
 	NODE original_root;
 	NODE* root;
@@ -34,6 +33,9 @@ typedef struct tyran_mocha_parser {
 	struct tyran_memory_pool* parser_parameter_pool;
 	struct tyran_memory_pool* mocha_token_pool;
 	tyran_parser_node_operand_unary* last_bracket_node;
+	tyran_boolean last_was_colon;
+	int root_precedence;
+	int last_precedence;
 } tyran_mocha_parser;
 
 
