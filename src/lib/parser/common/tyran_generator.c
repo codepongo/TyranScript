@@ -225,6 +225,15 @@ tyran_parser_node_call* tyran_generator_call_node(tyran_memory* memory, NODE fun
 	return call_node;
 }
 
+tyran_reg_or_constant_index tyran_generator_colon(tyran_memory* memory, tyran_code_state* code, NODE identifier_node, NODE expression) {
+	tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*) identifier_node;
+	tyran_constant_index member_constant = tyran_constants_add_symbol_from_c_string(code->constants, identifier->string); 
+	tyran_reg_or_constant_index expression_index = tyran_generator_traverse(memory, code, expression, -1, -1, TYRAN_FALSE);
+	tyran_reg_index self_index = 0;
+	tyran_opcodes_op_set(code->opcodes, self_index, member_constant, expression_index);
+	return expression_index;	
+}
+
 
 tyran_reg_or_constant_index tyran_generator_call(tyran_memory* memory, tyran_code_state* code, NODE function, NODE arguments) {
 	tyran_parser_node_call* call_node = tyran_generator_call_node(memory, function, arguments);
@@ -323,6 +332,8 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 			target = TYRAN_OPCODE_REGISTER_ILLEGAL;
 			tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
 			break;
+		case TYRAN_PARSER_COMMA:
+			break;
 		default:
 			TYRAN_ERROR("Unhandled operator:%d", operator_type);
 	}
@@ -373,6 +384,8 @@ tyran_reg_index tyran_generator_traverse_default_binary(tyran_memory* memory, ty
 	return target_index;
 }
 
+
+
 tyran_reg_or_constant_index tyran_generator_traverse_assignment(tyran_memory* memory, tyran_code_state* code, tyran_parser_node_operand_binary* binary, tyran_label_id true_label, tyran_label_id false_label)
 {
 	tyran_reg_or_constant_index source_index = tyran_generator_traverse(memory, code, binary->right, true_label, false_label, 0);
@@ -419,6 +432,9 @@ tyran_reg_or_constant_index tyran_generator_traverse_binary(tyran_memory* memory
 			break;
 		case TYRAN_PARSER_MEMBER:
 			result = tyran_generator_member(memory, code, binary->left, binary->right);
+			break;
+		case TYRAN_PARSER_COLON:
+			result = tyran_generator_colon(memory, code, binary->left, binary->right);
 			break;
 		default:
 			result = tyran_generator_traverse_default_binary(memory, code, binary, true_label, false_label, invert_logic);

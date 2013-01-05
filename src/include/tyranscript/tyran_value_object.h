@@ -7,6 +7,8 @@ struct tyran_runtime;
 struct tyran_object_key;
 struct tyran_memory_pool;
 
+/*
+
 #define tyran_value_object_replace_string(RUNTIME, v, s) { \
 	tyran_value_release(v); \
 	tyran_object* o = tyran_object_new(RUNTIME); \
@@ -14,6 +16,8 @@ struct tyran_memory_pool;
 	o->data.str = s; \
 	tyran_value_set_object(v, o); \
 }
+
+*/
 
 
 /* Create and Destroy */

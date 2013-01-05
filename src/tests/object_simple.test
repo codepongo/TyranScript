@@ -1,0 +1,9 @@
+hello:19+2.0
+world:24+33
+print(hello)
+print(empty)
+print(world)
+---
+21
+undefined
+57
