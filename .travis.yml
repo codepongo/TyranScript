@@ -6,5 +6,6 @@ compiler:
 before_script:
   - "gem install rake"
   - "cd ./src/samples/command"
+  - "mkdir build"
 
 script: "rake"
