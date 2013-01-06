@@ -81,15 +81,6 @@ All opcodes are coded within a 32-bit instruction.
 
 ## Licenses
 
-#### stringencoders
-Fast number to string conversion using stringencoders:
-
-Copyright (c) 2007, Nick Galbreath -- nickg [at] modp [dot] com
-
-  * All rights reserved.
-  * [stringencoders](http://code.google.com/p/stringencoders/)
-  * Released under the MIT license.
-
 #### Generic-Red-Black-Tree
  
 Red Black Tree implementation by Frederico Gonçalves [Generic-Red-Black-Tree](https://github.com/fgoncalves/Generic-Red-Black-Tree)
