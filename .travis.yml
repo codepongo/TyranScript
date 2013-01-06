@@ -1,6 +1,4 @@
 language: c
-rvm:
-  - 1.9.3
 
 before_script:
 	- "gem install rake"
