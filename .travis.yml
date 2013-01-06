@@ -8,4 +8,7 @@ before_script:
   - "cd ./src/samples/command"
   - "mkdir build"
 
-script: "rake"
+script:
+  - "rake"
+  - "cd ./src/tests"
+  - "rake"
