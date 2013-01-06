@@ -5,6 +5,7 @@ compiler:
 
 before_script:
   - "gem install rake"
+  - "gem install colored"
   - "cd ./src/samples/command"
   - "mkdir build"
 
