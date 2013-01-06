@@ -47,12 +47,12 @@ class Builder
 
 	def link object_files, application
 		puts "* Link #{application}"
-		sh "#{@c_compiler} #{object_files.join(' ')} -o #{application}"
+		sh "#{@c_compiler} #{object_files.join(' ')} -lm -o #{application}"
 	end
 
 	def compile source, target
 		p "compile #{source.inspect}"
-		sh "#{@c_compiler} -c #{source} -g -Wall -pedantic -Werror #{parameter_string('I', @includes)} -std=c99 -o #{target}"
+		sh "#{@c_compiler} -c #{source} -g -O0 -Wall -pedantic -Werror #{parameter_string('I', @includes)} -std=c99 -o #{target}"
 	end
 end
 
