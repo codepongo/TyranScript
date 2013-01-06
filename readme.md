@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Piot/TyranScript.png?branch=v0.2)](https://travis-ci.org/Piot/TyranScript)
+
 # TyranScript
 TyranScript is a tiny, embeddable scripting language written in C. Aimed to compile fast, have a small footprint, as few opcodes as possible, minimal dependencies and very portable. It uses reference counting to avoid costly garbage collections.
 
