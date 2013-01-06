@@ -10,5 +10,5 @@ before_script:
 
 script:
   - "rake"
-  - "cd ./src/tests"
+  - "cd ../../tests"
   - "rake"
