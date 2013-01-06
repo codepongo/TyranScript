@@ -2,7 +2,7 @@
 
 tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count, const char* type)
 {
-	TYRAN_LOG("Allocating '%s' (%lu x %lu)", type, struct_size, count);
+	TYRAN_LOG("Allocating '%s' (%zu x %zu)", type, struct_size, count);
 	tyran_memory_pool* pool = TYRAN_MEMORY_ALLOC(memory, struct_size * count, "Memory pool");
 	pool->size = struct_size;
 	pool->type_string = type;
