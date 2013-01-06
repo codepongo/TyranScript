@@ -90,10 +90,6 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 {
 	int t;
 
-	if (v == tyran_object_prototype) {
-		return;
-	}
-
 	char tab_string[100];
 
 	for (t = 0; t < tabs; ++t) {

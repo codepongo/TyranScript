@@ -1,7 +1,7 @@
-hello:19+2.0, world:24+33
+o = {hello:19+2.0, world:24+33}
+print(o.hello)
 print(hello)
-print(empty)
-print(world)
+print(o.world)
 ---
 21
 undefined

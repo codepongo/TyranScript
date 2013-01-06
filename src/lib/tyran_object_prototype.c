@@ -1,16 +1,28 @@
 #include <tyranscript/tyran_object_prototype.h>
-#include <tyranscript/tyran_value_object.h>
+#include <tyranscript/tyran_function_object.h>
+#include <tyranscript/tyran_runtime.h>
 #include <tyranscript/tyran_value.h>
+#include <tyranscript/tyran_value_object.h>
+/*
 
-tyran_value* tyran_object_prototype;
-struct tyran_runtime;
+#include <tyranscript/parser/tyran_parser_state.h>
+#include <tyranscript/tyran_value.h>
+#include <tyranscript/tyran_string.h>
+#include <tyranscript/tyran_function.h>
 
-void tyran_object_prototype_init(const struct tyran_runtime* runtime, tyran_value* constructor_prototype)
-{
-	tyran_object_prototype = constructor_prototype;
+#include <tyranscript/tyran_object_prototype.h>
+#include <tyranscript/tyran_function_prototype.h>
+
+#include <tyranscript/tyran_value_object.h>
+#include <tyranscript/tyran_object.h>
+#include <tyranscript/tyran_object_macros.h>
+#include <tyranscript/tyran_array.h>
+*/
+
+TYRAN_RUNTIME_CALL_FUNC(tyran_object_prototype_constructor) {
+	return 0;
 }
 
-int tyran_object_prototype_constructor(struct tyran_runtime* runtime, tyran_value* a, tyran_value* b, tyran_value* c, tyran_value* d, int is_constructor)
-{
-	return 0;
+void tyran_object_prototype_init(const struct tyran_runtime* runtime, tyran_value* o) {
+	TYRAN_MEMBER(o, "constructor", tyran_object_prototype_constructor);
 }
