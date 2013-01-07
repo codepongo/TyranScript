@@ -44,6 +44,7 @@ typedef struct tyran_runtime {
 	struct tyran_memory_pool* object_pool;
 	struct tyran_memory_pool* value_pool;
 	struct tyran_memory_pool* rb_node_pool;
+	struct tyran_memory_pool* runtime_stack_pool;
 
 	struct tyran_symbol_table* symbol_table;
 

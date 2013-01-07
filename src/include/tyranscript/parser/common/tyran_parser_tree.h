@@ -39,6 +39,7 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_FOR,
 	TYRAN_PARSER_NODE_TYPE_CLASS,
 	TYRAN_PARSER_NODE_TYPE_WHEN,
+	TYRAN_PARSER_NODE_TYPE_RETURN,
 	TYRAN_PARSER_NODE_TYPE_FUNCTION,
 	TYRAN_PARSER_NODE_TYPE_CASE,
 	TYRAN_PARSER_NODE_TYPE_OBJECT_ASSIGNMENT,
@@ -198,6 +199,12 @@ typedef struct tyran_parser_node_while
 	tyran_parser_node* block;
 } tyran_parser_node_while;
 
+typedef struct tyran_parser_node_return
+{
+	tyran_parser_node node;
+	tyran_parser_node* expression;
+} tyran_parser_node_return;
+
 typedef struct tyran_parser_node_for
 {
 	tyran_parser_node node;
@@ -297,7 +304,7 @@ NODE tyran_parser_assignment(tyran_memory* memory, NODE target, NODE source);
 NODE tyran_parser_object_assignment(tyran_memory* memory, NODE a, NODE b);
 NODE tyran_parser_compound_assignment(tyran_memory* memory, int type, NODE b, NODE c);
 NODE tyran_parser_value(NODE a);
-NODE tyran_parser_return(NODE expression);
+NODE tyran_parser_return(tyran_memory* memory, NODE expression);
 NODE tyran_parser_comment(NODE comment);
 NODE tyran_parser_code(NODE a, NODE b, NODE c);
 tyran_parser_node_operand_binary* tyran_parser_concat(tyran_memory* memory, NODE a, NODE b);

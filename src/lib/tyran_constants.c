@@ -7,10 +7,10 @@
 #include <tyranscript/tyran_symbol_table.h>
 #include <tyranscript/tyran_runtime.h>
 
-tyran_constants* tyran_constants_new(tyran_memory_pool* constants_pool, tyran_symbol_table* symbol_table, tyran_memory_pool* constant_values_pool, size_t size)
+tyran_constants* tyran_constants_new(tyran_memory_pool* constants_pool, tyran_symbol_table* symbol_table, tyran_memory* memory, size_t size)
 {
 	tyran_constants* constants = TYRAN_CALLOC_TYPE(constants_pool, tyran_constants);
-	constants->values = TYRAN_MALLOC_TYPE_COUNT(constant_values_pool, tyran_value, size);
+	constants->values = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_value, size);
 	constants->symbol_table = symbol_table;
 	return constants;
 }

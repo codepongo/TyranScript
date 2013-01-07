@@ -1,11 +1,11 @@
 #include <tyranscript/parser/mocha/tyran_mocha_lexer.h>
 #include <tyranscript/parser/tyran_lexer.h>
 
-tyran_mocha_lexer* tyran_mocha_lexer_new(tyran_memory_pool* mocha_lexer_pool, tyran_memory_pool* mocha_token_pool, const tyran_mocha_token* tokens, int token_count)
+tyran_mocha_lexer* tyran_mocha_lexer_new(tyran_memory_pool* mocha_lexer_pool, tyran_memory* memory, tyran_memory_pool* mocha_token_pool, const tyran_mocha_token* tokens, int token_count)
 {
 	tyran_mocha_lexer* lexer = TYRAN_MALLOC_TYPE(mocha_lexer_pool, tyran_mocha_lexer);
 
-	lexer->tokens = TYRAN_MALLOC_TYPE_COUNT(mocha_token_pool, tyran_mocha_token, token_count);
+	lexer->tokens = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_mocha_token, token_count);
 	tyran_memcpy_type(tyran_mocha_token, lexer->tokens, tokens, token_count);
 	lexer->token_count = token_count;
 	return lexer;
@@ -152,6 +152,8 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 	static tyran_mocha_token token;
 	static int target_indentation = 0;
 	static int current_indentation = 0;
+	int error;
+
 	token.token_id = TYRAN_MOCHA_TOKEN_END;
 	
 	tyran_lexer_set_begin(lexer_position_info, lexer);
@@ -211,7 +213,7 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		tyran_memcpy_type(tyran_number, token.token_data, &lexer->number, 1);
 		token.token_id = TYRAN_MOCHA_TOKEN_NUMBER;
 	} else if (c == '"' || c == '\'') {
-		tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, lexer->string_buffer, lexer->string_buffer_max_size);
+		error = tyran_lexer_parse_whole_string(lexer, c, lexer_position_info, lexer->string_buffer, lexer->string_buffer_max_size);
 		token.token_data = tyran_strdup(lexer->memory, lexer->string_buffer);
 		token.token_id = TYRAN_MOCHA_TOKEN_STRING;
 	} else if (c == '#') {
@@ -227,14 +229,14 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 	}
 
 	tyran_lexer_set_end(lexer_position_info, lexer);
- 
+
 	return token;
 }
 
 tyran_mocha_lexer* tyran_mocha_lexer_lex(tyran_memory_pool* mocha_lexer_pool, tyran_memory_pool* mocha_token_pool, tyran_memory_pool* lexer_pool, tyran_memory* memory, const char* buf, int length)
 {
 	tyran_lexer_position_info position_info;
-	tyran_mocha_token* temp_buffer = TYRAN_MALLOC_TYPE_COUNT(mocha_token_pool, tyran_mocha_token, 8192);
+	tyran_mocha_token* temp_buffer = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_mocha_token, 8192);
 	int count = 0;
 
 	tyran_lexer* lexer = tyran_lexer_new(lexer_pool, memory, buf);
@@ -251,7 +253,7 @@ tyran_mocha_lexer* tyran_mocha_lexer_lex(tyran_memory_pool* mocha_lexer_pool, ty
 		}
 	}
 	
-	tyran_mocha_lexer* mocha_lexer = tyran_mocha_lexer_new(mocha_lexer_pool, mocha_token_pool, temp_buffer, count);
+	tyran_mocha_lexer* mocha_lexer = tyran_mocha_lexer_new(mocha_lexer_pool, memory, mocha_token_pool, temp_buffer, count);
 	tyran_free(temp_buffer);
 	
 	return mocha_lexer;
@@ -299,7 +301,7 @@ tyran_mocha_token* tyran_mocha_lexer_last(tyran_mocha_lexer* lexer)
 
 int tyran_mocha_lexer_is_unary_operator(tyran_mocha_token_id token_id)
 {
-	return (token_id == TYRAN_MOCHA_TOKEN_IF || token_id == TYRAN_MOCHA_TOKEN_UNLESS || token_id == TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT || token_id == TYRAN_MOCHA_TOKEN_BLOCK_END || token_id == TYRAN_MOCHA_TOKEN_BRACKET_RIGHT || token_id == TYRAN_MOCHA_TOKEN_OBJECT_END);
+	return (token_id == TYRAN_MOCHA_TOKEN_RETURN || token_id == TYRAN_MOCHA_TOKEN_IF || token_id == TYRAN_MOCHA_TOKEN_UNLESS || token_id == TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT || token_id == TYRAN_MOCHA_TOKEN_BLOCK_END || token_id == TYRAN_MOCHA_TOKEN_BRACKET_RIGHT || token_id == TYRAN_MOCHA_TOKEN_OBJECT_END);
 }
 
 tyran_mocha_token_id tyran_mocha_enclosing_start_token(tyran_mocha_token_id token_id)

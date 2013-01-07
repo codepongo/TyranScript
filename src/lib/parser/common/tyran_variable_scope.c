@@ -1,14 +1,14 @@
 #include <tyranscript/parser/common/tyran_variable_scope.h>
 #include <tyranscript/tyran_config.h>
 
-void tyran_variable_scopes_push_scope(tyran_variable_scopes* scopes, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool)
+void tyran_variable_scopes_push_scope(tyran_variable_scopes* scopes, tyran_memory* memory, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool)
 {
 	TYRAN_ASSERT(scopes->scope_count < scopes->allocated_scope_count, "Out of memory adding a scope");
 	tyran_variable_scope* scope = &scopes->scopes[scopes->scope_count++];
 	scope->allocated_variable_count = 1024;
-	scope->variables = TYRAN_CALLOC_TYPE_COUNT(variable_info_pool, scope->allocated_variable_count, tyran_variable_info);
+	scope->variables = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_variable_info, scope->allocated_variable_count);
 	scope->register_count = 255;
-	scope->registers = TYRAN_CALLOC_TYPE_COUNT(register_pool, scope->register_count, int);
+	scope->registers = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, int, scope->register_count);
 }
 
 void tyran_variable_scopes_pop_scope(tyran_variable_scopes* scopes)
@@ -17,13 +17,13 @@ void tyran_variable_scopes_pop_scope(tyran_variable_scopes* scopes)
 	scopes->scope_count --;
 }
 
-tyran_variable_scopes* tyran_variable_scopes_new(tyran_memory_pool* scopes_pool, tyran_memory_pool* scope_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, int max_count)
+tyran_variable_scopes* tyran_variable_scopes_new(tyran_memory_pool* scopes_pool, tyran_memory* memory, tyran_memory_pool* scope_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, int max_count)
 {
 	tyran_variable_scopes* scopes = TYRAN_CALLOC_TYPE(scopes_pool, tyran_variable_scopes);
 	scopes->allocated_scope_count = max_count;
-	scopes->scopes = TYRAN_CALLOC_TYPE_COUNT(scope_pool, scopes->allocated_scope_count, tyran_variable_scope);
+	scopes->scopes = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_variable_scope, scopes->allocated_scope_count);
 	
-	tyran_variable_scopes_push_scope(scopes, variable_info_pool, register_pool);
+	tyran_variable_scopes_push_scope(scopes, memory, variable_info_pool, register_pool);
 	return scopes;
 }
 

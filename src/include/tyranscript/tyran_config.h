@@ -27,13 +27,7 @@ typedef struct tyran_memory
 	u8t* next;
 } tyran_memory;
 
-typedef struct tyran_memory_pool
-{
-	u8t* memory;
-	size_t size;
-	u8t* next;
-	const char* type_string;
-} tyran_memory_pool;
+#include <tyranscript/tyran_memory_pool.h>
 
 
 void tyran_memory_construct(tyran_memory* memory, u8t* start, size_t size);
@@ -44,26 +38,22 @@ void* tyran_memory_alloc_debug(tyran_memory* memory, size_t size, const char* so
 
 
 tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count, const char* type);
-void* tyran_memory_pool_alloc(tyran_memory_pool*, size_t count);
-void* tyran_memory_pool_calloc(tyran_memory_pool*, size_t count);
+void* tyran_memory_pool_alloc(tyran_memory_pool*);
+void* tyran_memory_pool_calloc(tyran_memory_pool*);
 void tyran_memory_pool_free(void*);
 
 
 char* tyran_str_dup(tyran_memory* pool, const char* str);
 
-#define TYRAN_MEMORY_POOL_CONSTRUCT(memory, T, count) tyran_memory_pool_construct(memory, sizeof(T), count, #T)
-
+#define TYRAN_MEMORY_POOL_CONSTRUCT(memory, T, count) tyran_memory_pool_construct(memory, sizeof(T), 200, #T)
 
 #define tyran_malloc malloc
 #define tyran_realloc realloc
-#define tyran_free tyran_memory_pool_free
+#define tyran_free free
 
 
-#define TYRAN_CALLOC_TYPE(pool, T) (T*) tyran_memory_pool_calloc(pool, 1);
-#define TYRAN_CALLOC_TYPE_COUNT(pool, cnt, T) (T*) tyran_memory_pool_calloc(pool, cnt);
-
-#define TYRAN_MALLOC_TYPE(pool, type) (type*) tyran_memory_pool_alloc(pool, 1);
-#define TYRAN_MALLOC_TYPE_COUNT(pool, type, count) (type*) tyran_memory_pool_alloc(pool, count);
+#define TYRAN_CALLOC_TYPE(pool, T) (T*) tyran_memory_pool_calloc(pool);
+#define TYRAN_MALLOC_TYPE(pool, type) (type*) tyran_memory_pool_alloc(pool);
 #define TYRAN_MALLOC_FREE(p) tyran_memory_pool_free(p);
 
 #define TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, type, count) (type*) TYRAN_MEMORY_ALLOC(memory, count * sizeof(type), #type);

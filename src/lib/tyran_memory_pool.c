@@ -1,32 +1,72 @@
 #include <tyranscript/tyran_config.h>
 
+void tyran_memory_pool_initialize_entries(tyran_memory_pool* pool) {
+	u8t* m = pool->memory;
+	int total_size = pool->struct_size + sizeof(tyran_memory_pool_entry);
+	tyran_memory_pool_entry* previous = 0;
+	for (int i=0; i<pool->max_count; ++i) {
+		tyran_memory_pool_entry* e = (tyran_memory_pool_entry*) m;
+		if (i==0) {
+			pool->first_free = e;
+		}
+		e->allocated = TYRAN_FALSE;
+		e->line = -1;
+		e->file = 0;
+		e->next_free = 0;
+		e->pool = pool;
+		if (previous) {
+			previous->next_free = e;
+		}
+		previous = e;
+		m += total_size;
+	}
+}
+
 tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count, const char* type)
 {
 	TYRAN_LOG("Allocating pool of type '%s' (%zu x %zu)", type, struct_size, count);
 	tyran_memory_pool* pool = TYRAN_MEMORY_ALLOC(memory, sizeof(tyran_memory_pool), "Memory pool");
-	pool->size = struct_size;
+	pool->memory = TYRAN_MEMORY_ALLOC(memory, (sizeof(tyran_memory_pool_entry) + struct_size) * count, "Memory pool entries");
+	pool->struct_size = struct_size;
 	pool->type_string = type;
+	pool->max_count = count;
+	pool->count = 0;
+	tyran_memory_pool_initialize_entries(pool);
 	return pool;
 }
 
-void* tyran_memory_pool_alloc(tyran_memory_pool* pool, size_t count)
+
+void* tyran_memory_pool_alloc(tyran_memory_pool* pool)
 {
-	TYRAN_LOG("Allocating from memory pool '%s' (%zu x %zu)", pool->type_string, pool->size, count);
-	return tyran_malloc(pool->size * count);
+	TYRAN_ASSERT(pool->count < pool->max_count, "Out of memory in pool (%zu)", pool->count);
+	tyran_memory_pool_entry* e = pool->first_free;
+	TYRAN_ASSERT(e, "first free is null");
+	pool->first_free = e->next_free;
+	pool->count++;
+	u8t* m = (u8t*) e;
+	u8t* p = m + sizeof(tyran_memory_pool_entry);
+	TYRAN_LOG("Allocating from memory pool '%s' (%zu) -> %p", pool->type_string, pool->struct_size, m);
+	return p;
 }
 
-void* tyran_memory_pool_calloc(tyran_memory_pool* pool, size_t count)
+void* tyran_memory_pool_calloc(tyran_memory_pool* pool)
 {
-	void* p = tyran_memory_pool_alloc(pool, count);
+	void* p = tyran_memory_pool_alloc(pool);
+	TYRAN_ASSERT(p, "not null");
 	TYRAN_LOG("Clearing memory");
-	tyran_mem_clear(p, pool->size, count);
+	tyran_mem_clear(p, pool->struct_size, 1);
 	return p;
 }
 
 
 void tyran_memory_pool_free(void* p)
 {
-	free(p);
+	TYRAN_LOG("free memory:%p", p);
+	u8t* m = p;
+	tyran_memory_pool_entry* e = (tyran_memory_pool_entry*)(m - sizeof(tyran_memory_pool_entry));
+
+	e->next_free = e->pool->first_free;
+	e->pool->first_free = e;
 }
 
 char* tyran_str_dup(tyran_memory* memory, const char* str)

@@ -3,6 +3,8 @@
 
 #include <tyranscript/tyran_string.h>
 
+struct tyran_errors;
+
 typedef struct tyran_lexer {
 	char* buffer;
 	int size;
@@ -19,6 +21,7 @@ typedef struct tyran_lexer {
 	tyran_number number;
 	
 	tyran_memory* memory;
+	struct tyran_errors* errors;
 
 } tyran_lexer;
 

@@ -26,7 +26,7 @@ test_files.each do |source_file|
 
 		output_file = "#{test_name}_out.txt"
 
-		arguments = "#{test_name}.mocha > #{output_file}"
+		arguments = "#{test_name}.mocha > #{output_file} 2> #{test_name}_err.txt"
 		command = "../samples/command/command #{arguments}"
 		`#{command}`
 

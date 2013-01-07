@@ -21,6 +21,6 @@ typedef struct tyran_runtime_stack {
 	struct tyran_value _this;
 } tyran_runtime_stack;
 
-tyran_runtime_stack* tyran_runtime_stack_new();
+tyran_runtime_stack* tyran_runtime_stack_new(tyran_memory_pool* runtime_stack_pool);
 
 #endif

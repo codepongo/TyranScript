@@ -168,6 +168,14 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node**
 			tyran_parser_node_print_helper("while block", &operand->block, current_root, next_to_overwrite, tab_count+1);
 		}
 	break;
+	case TYRAN_PARSER_NODE_TYPE_RETURN:
+		{
+			tyran_parser_node_return* operand = (tyran_parser_node_return*)node;
+			tyran_snprintf(buf, buf_size, "return ");
+			tyran_parser_node_print_helper_output(buf, description, tab_count);
+			tyran_parser_node_print_helper("return expression", &operand->expression, current_root, next_to_overwrite, tab_count+1);
+		}
+	break;
 	case TYRAN_PARSER_NODE_TYPE_FOR:
 		{
 			tyran_parser_node_for* operand = (tyran_parser_node_for*)node;

@@ -50,7 +50,7 @@ void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size)
 	tyran_memory_pool* scope_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_variable_scope, 1);
 	api->default_variable_info_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_variable_info, 1);
 	api->default_register_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, int, 1);
-	api->default_variable_scopes = tyran_variable_scopes_new(scopes_pool, scope_pool, api->default_variable_info_pool, api->default_register_pool, 1024);
+	api->default_variable_scopes = tyran_variable_scopes_new(scopes_pool, api->memory, scope_pool, api->default_variable_info_pool, api->default_register_pool, 1024);
 
 }
 

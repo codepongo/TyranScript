@@ -2,6 +2,7 @@
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/parser/common/tyran_parser_tree.h>
 #include <tyranscript/parser/tyran_parser_state.h>
+#include <tyranscript/parser/common/tyran_errors.h>
 
 #include <tyranscript/tyran_config.h>
 #include <tyranscript/tyran_number.h>
@@ -17,8 +18,9 @@ tyran_lexer* tyran_lexer_new(tyran_memory_pool* lexer_pool, tyran_memory* memory
 	tyran_lexer* lexer = TYRAN_CALLOC_TYPE(lexer_pool, tyran_lexer);
 	lexer->size = length + 1;
 	lexer->buffer = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, lexer->size);
-	lexer->string_buffer_max_size = 512;
+	lexer->string_buffer_max_size = 4096;
 	lexer->string_buffer = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, lexer->string_buffer_max_size);
+	lexer->errors = tyran_errors_new(memory);
 	lexer->memory = memory;
 	
 	tyran_memcpy_type(char, lexer->buffer, buf, lexer->size);
@@ -92,8 +94,7 @@ int tyran_lexer_parse_string(tyran_lexer* lexer, char* buf, int* length)
 	while (index < *length) {
 		c = tyran_lexer_pop_character(lexer);
 		if (c == 0) {
-			TYRAN_SOFT_ERROR("Unexpected End of File");
-			return 0;
+			return tyran_errors_add(lexer->errors, TYRAN_ERROR_NO_END_STRING, lexer);
 		}
 		if (c == '\\') {
 			char n = tyran_lexer_pop_character(lexer);
@@ -119,6 +120,9 @@ int tyran_lexer_parse_string(tyran_lexer* lexer, char* buf, int* length)
 					buf[index++] = n;
 			}
 		} else {
+			if (c == '\n') {
+				c = tyran_lexer_next_character_skip_whitespace(lexer);
+			}
 			buf[index++] = c;
 		}
 		if (c == endchar) {
@@ -255,7 +259,10 @@ int tyran_lexer_parse_to_eol(tyran_lexer* lexer)
 int tyran_lexer_parse_whole_string(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, char* buf, int length)
 {
 	tyran_lexer_push_character(c, lexer);
-	tyran_lexer_parse_string(lexer, buf, &length);
+	int error = tyran_lexer_parse_string(lexer, buf, &length);
+	if (error) {
+		return error;
+	}
 	tyran_lexer_set_end(lexer_position_info, lexer);
-	return 1;
+	return 0;
 }

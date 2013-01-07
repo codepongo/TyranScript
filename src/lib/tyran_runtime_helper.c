@@ -21,6 +21,7 @@ void tyran_runtime_setup_binary_operators(tyran_runtime* rt) {
 
 	for (int i=0; i<sizeof(binary_strings) / sizeof(char*); ++i) {
 		tyran_symbol_table_add(rt->symbol_table, &rt->binary_operator_symbols[i], binary_strings[i]);
+		TYRAN_LOG("Symbol:%d %d", i, rt->binary_operator_symbols[i].hash);
 	}
 }
 
@@ -28,9 +29,9 @@ void tyran_runtime_setup_binary_operators(tyran_runtime* rt) {
 tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* memory, tyran_memory_pool* string_pool, tyran_memory_pool* object_key_pool, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* runtime_stack_pool, tyran_memory_pool* object_pool, tyran_memory_pool* registers_value_pool, tyran_memory_pool* value_pool, tyran_memory_pool* rb_node_pool)
 {
 	tyran_runtime* rt = TYRAN_CALLOC_TYPE(runtime_pool, tyran_runtime);
-	rt->stack = TYRAN_MALLOC_TYPE_COUNT(runtime_stack_pool, tyran_runtime_stack, 128);
+	rt->stack = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_runtime_stack, 128);
 	
-	rt->registers = TYRAN_MALLOC_TYPE_COUNT(registers_value_pool, tyran_value, 128);
+	rt->registers = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_value, 128);
 	rt->object_key_pool = object_key_pool;
 	rt->function_pool = function_pool;
 	rt->function_object_pool = function_object_pool;
@@ -41,11 +42,13 @@ tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* 
 	rt->symbol_table = tyran_symbol_table_new(memory);
 	rt->value_pool = value_pool;
 	rt->rb_node_pool = rb_node_pool;
+	rt->runtime_stack_pool = runtime_stack_pool;
 	rt->global = TYRAN_CALLOC_TYPE(value_pool, tyran_value);
 
 	tyran_runtime_setup_binary_operators(rt);
 
 	tyran_object* global_object = tyran_object_new(rt);
+	TYRAN_ASSERT(rt->global, "must not be null");
 	tyran_value_set_object(*rt->global, global_object);
 
 	tyran_prototypes_init(rt, rt->global);
@@ -66,7 +69,7 @@ void tyran_runtime_free(tyran_runtime* rt)
 void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opcodes, const struct tyran_constants* constants, const struct tyran_value* _this)
 {
 	/* Save return state */
-	tyran_runtime_stack* runtime_info = tyran_runtime_stack_new();
+	tyran_runtime_stack* runtime_info = tyran_runtime_stack_new(rt->runtime_stack_pool);
 	tyran_value_copy(runtime_info->_this, *_this);
 	// tyran_value_copy(runtime_info->function_scope, *function_scope);
 	// runtime_info->scope = scope;

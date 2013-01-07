@@ -131,13 +131,6 @@ NODE tyran_parser_slice(NODE b)
 	return 0;
 }
 
-NODE tyran_parser_object(tyran_memory* memory, NODE assignment_list)
-{
-	tyran_parser_node_object* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_object, 1);
-	node->node.type = TYRAN_PARSER_NODE_TYPE_OBJECT;
-	node->assignment_list = assignment_list;
-	return (tyran_parser_node*)node;
-}
 
 NODE tyran_parser_class(tyran_memory* memory, NODE name, NODE extends, NODE block)
 {
@@ -195,6 +188,14 @@ NODE tyran_parser_when(tyran_memory* memory, NODE expression, NODE block)
 	node->block = block;
 	return (tyran_parser_node*)node;
 }
+
+NODE tyran_parser_return(tyran_memory* memory, NODE expression) {
+	tyran_parser_node_return* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_return, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_RETURN;
+	node->expression = expression;
+	return (NODE)node;
+}
+
 
 NODE tyran_parser_call(tyran_memory* memory, NODE function, NODE* arguments, int argument_count)
 {

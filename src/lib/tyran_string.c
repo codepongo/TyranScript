@@ -3,7 +3,7 @@
 
 const tyran_string* tyran_string_new(tyran_memory_pool* string_pool, tyran_memory* memory, int len)
 { 
-	tyran_string* str = TYRAN_MALLOC_TYPE_COUNT(string_pool, tyran_string, 1);
+	tyran_string* str = TYRAN_MALLOC_TYPE(string_pool, tyran_string);
 	str->buf = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_string_char, len);
 	str->len = len;
 	
