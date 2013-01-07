@@ -37,7 +37,6 @@ typedef struct tyran_memory_pool
 
 
 void tyran_memory_construct(tyran_memory* memory, u8t* start, size_t size);
-void* tyran_memory_alloc(tyran_memory* memory, size_t size);
 void* tyran_memory_alloc_debug(tyran_memory* memory, size_t size, const char* source_file, int line, const char* description);
 
 #define TYRAN_MEMORY_ALLOC(memory, size, description) tyran_memory_alloc_debug(memory, size, __FILE__, __LINE__, description);
@@ -67,8 +66,8 @@ char* tyran_str_dup(tyran_memory* pool, const char* str);
 #define TYRAN_MALLOC_TYPE_COUNT(pool, type, count) (type*) tyran_memory_pool_alloc(pool, count);
 #define TYRAN_MALLOC_FREE(p) tyran_memory_pool_free(p);
 
-#define TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, type, count) (type*) tyran_memory_alloc(memory, count * sizeof(type));
-#define TYRAN_MALLOC_NO_POOL_TYPE(memory, type) (type*) tyran_memory_alloc(memory, sizeof(type));
+#define TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, type, count) (type*) TYRAN_MEMORY_ALLOC(memory, count * sizeof(type), #type);
+#define TYRAN_MALLOC_NO_POOL_TYPE(memory, type) (type*) TYRAN_MEMORY_ALLOC(memory, sizeof(type), #type);
 
 #define tyran_memcpy_type(T, dest, source, N) memcpy(dest, source, (N) * sizeof(T))
 

@@ -2,8 +2,8 @@
 
 tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count, const char* type)
 {
-	TYRAN_LOG("Allocating '%s' (%zu x %zu)", type, struct_size, count);
-	tyran_memory_pool* pool = TYRAN_MEMORY_ALLOC(memory, struct_size * count, "Memory pool");
+	TYRAN_LOG("Allocating pool of type '%s' (%zu x %zu)", type, struct_size, count);
+	tyran_memory_pool* pool = TYRAN_MEMORY_ALLOC(memory, sizeof(tyran_memory_pool), "Memory pool");
 	pool->size = struct_size;
 	pool->type_string = type;
 	return pool;
@@ -18,6 +18,7 @@ void* tyran_memory_pool_alloc(tyran_memory_pool* pool, size_t count)
 void* tyran_memory_pool_calloc(tyran_memory_pool* pool, size_t count)
 {
 	void* p = tyran_memory_pool_alloc(pool, count);
+	TYRAN_LOG("Clearing memory");
 	tyran_mem_clear(p, pool->size, count);
 	return p;
 }
