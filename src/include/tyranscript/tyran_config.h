@@ -28,17 +28,12 @@ typedef struct tyran_memory
 } tyran_memory;
 
 #include <tyranscript/tyran_memory_pool.h>
-
-
-void tyran_memory_construct(tyran_memory* memory, u8t* start, size_t size);
-void* tyran_memory_alloc_debug(tyran_memory* memory, size_t size, const char* source_file, int line, const char* description);
+#include <tyranscript/tyran_memory.h>
 
 #define TYRAN_MEMORY_ALLOC(memory, size, description) tyran_memory_alloc_debug(memory, size, __FILE__, __LINE__, description);
-
-
+#define TYRAN_MEMORY_CALLOC(memory, size, description) tyran_memory_calloc_debug(memory, size, __FILE__, __LINE__, description);
 
 tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count, const char* type);
-
 
 char* tyran_str_dup(tyran_memory* pool, const char* str);
 
