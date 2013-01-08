@@ -189,7 +189,8 @@ NODE tyran_parser_when(tyran_memory* memory, NODE expression, NODE block)
 	return (tyran_parser_node*)node;
 }
 
-NODE tyran_parser_return(tyran_memory* memory, NODE expression) {
+NODE tyran_parser_return(tyran_memory* memory, NODE expression)
+{
 	tyran_parser_node_return* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_return, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_RETURN;
 	node->expression = expression;
@@ -342,7 +343,8 @@ int tyran_parser_node_is_literal(NODE node)
 	return (tyran_parser_node_is_constant(node) || type == TYRAN_PARSER_NODE_TYPE_IDENTIFIER);
 }
 
-NODE tyran_parser_member_assign(tyran_memory* memory, NODE target, NODE expression) {
+NODE tyran_parser_member_assign(tyran_memory* memory, NODE target, NODE expression)
+{
 	tyran_parser_node_member_assign* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_member_assign, 1);
 	node->node.type = TYRAN_PARSER_NODE_TYPE_MEMBER_ASSIGN;
 	node->identifier = target;

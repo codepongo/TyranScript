@@ -7,8 +7,7 @@ int tyran_opcodes_is_constant(tyran_reg_or_constant_index index)
 }
 
 /* Opcodes */
-struct tyran_opcodes* tyran_opcodes_new(tyran_memory_pool* opcodes_pool, tyran_memory* memory, int size)
-{
+struct tyran_opcodes* tyran_opcodes_new(tyran_memory_pool* opcodes_pool, tyran_memory* memory, int size) {
 	tyran_opcodes* codes = TYRAN_CALLOC_TYPE(opcodes_pool, tyran_opcodes);
 	codes->codes = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_opcode, size);
 	return codes;
@@ -124,7 +123,8 @@ void tyran_opcodes_op_index(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_o
 	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_INDEX, a, x, y);
 }
 
-void tyran_opcodes_op_index_set(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y) {
+void tyran_opcodes_op_index_set(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y)
+{
 	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_INDEX_SET, a, x, y);
 }
 

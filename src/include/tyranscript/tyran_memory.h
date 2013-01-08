@@ -1,8 +1,7 @@
 #ifndef TYRAN_MEMORY_H
 #define TYRAN_MEMORY_H
 
-typedef struct tyran_memory
-{
+typedef struct tyran_memory {
 	u8t* memory;
 	size_t size;
 	u8t* next;

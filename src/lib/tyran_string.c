@@ -2,11 +2,11 @@
 #include <tyranscript/tyran_config.h>
 
 const tyran_string* tyran_string_new(tyran_memory_pool* string_pool, tyran_memory* memory, int len)
-{ 
+{
 	tyran_string* str = TYRAN_MALLOC_TYPE(string_pool, tyran_string);
 	str->buf = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_string_char, len);
 	str->len = len;
-	
+
 	return str;
 }
 
@@ -25,7 +25,7 @@ const tyran_string* tyran_string_strdup(tyran_memory_pool* string_pool, tyran_me
 	return duplicate;
 }
 
-const tyran_string* tyran_string_strdup_str(tyran_memory_pool* string_pool, tyran_memory* memory, const char *str)
+const tyran_string* tyran_string_strdup_str(tyran_memory_pool* string_pool, tyran_memory* memory, const char* str)
 {
 	int len = tyran_strlen(str);
 	int i;
@@ -42,7 +42,7 @@ const tyran_string* tyran_string_strdup_str(tyran_memory_pool* string_pool, tyra
 const tyran_string* tyran_string_substr(tyran_memory_pool* string_pool, tyran_memory* memory, const tyran_string* str, int start, int len)
 {
 	int source_string_length = str->len;
-	
+
 	if (start < 0) {
 		start += source_string_length;
 	} else if (start >= source_string_length) {
@@ -54,7 +54,7 @@ const tyran_string* tyran_string_substr(tyran_memory_pool* string_pool, tyran_me
 	const tyran_string* rr = tyran_string_new(string_pool, memory, characters_to_copy);
 
 	tyran_memcpy_type(tyran_string_char, rr->buf, str->buf + start, characters_to_copy);
-	
+
 	return rr;
 }
 
@@ -72,7 +72,7 @@ void tyran_string_to_c_str(char* buf, int tyran_string_max_length, const tyran_s
 	int i;
 	int len = str->len;
 
-	for (i = 0; i < len && i < tyran_string_max_length - 1; ++i) buf[i] = (char)str->buf[i];
+	for (i = 0; i < len && i < tyran_string_max_length - 1; ++i) { buf[i] = (char)str->buf[i]; }
 	buf[i] = 0;
 }
 
@@ -105,7 +105,7 @@ int tyran_string_strcmp(const tyran_string* str1, const tyran_string* str2)
 	int len2 = str2->len;
 
 	int i, r;
-	
+
 	if (len1 != len2) {
 		return len1 - len2;
 	}

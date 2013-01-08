@@ -7,23 +7,23 @@ typedef enum tyran_rb_tree_color {
 } tyran_rb_tree_color;
 
 typedef struct stree_node {
-  void* node;
+	void* node;
 
-  tyran_rb_tree_color color;
-  
-  struct stree_node* parent;
-  struct stree_node* left;
-  struct stree_node* right;
+	tyran_rb_tree_color color;
+
+	struct stree_node* parent;
+	struct stree_node* left;
+	struct stree_node* right;
 } tree_node;
 
 typedef struct tree_root {
-  struct stree_node* root;
-  void* (*key)(struct stree_node* node);
-  int (*compare)(void* keyA, void* keyB);
+	struct stree_node* root;
+	void* (*key)(struct stree_node* node);
+	int (*compare)(void* keyA, void* keyB);
 } tree_root;
 
-typedef struct siterator{
-  struct stree_node* current;
+typedef struct siterator {
+	struct stree_node* current;
 } tree_iterator;
 
 extern tree_root* new_simple_rbtree();

@@ -7,8 +7,7 @@ void tyran_print_constants(tyran_constants* constants, struct tyran_memory_pool*
 	char buf[255];
 	int i;
 
-	for (i=0; i<constants->size; ++i)
-	{
+	for (i=0; i<constants->size; ++i) {
 		tyran_snprintf(buf, 255, "%d", i);
 		tyran_print_value(buf, &constants->values[i], 1, constants->symbol_table, object_iterator_pool, string_pool, memory);
 	}

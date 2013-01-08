@@ -1,6 +1,6 @@
 #define TYRAN_REGISTER_A \
 	a = instruction;
-	
+
 #define TYRAN_REGISTER_A_X \
 	i = instruction; \
 	a = i; \
@@ -77,5 +77,5 @@
 		TYRAN_DEC_REF(memory_pool, v[i].data.object); \
 	}
 
-#define TYRAN_CALC_HASH(a) 
+#define TYRAN_CALC_HASH(a)
 

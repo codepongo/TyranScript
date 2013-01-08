@@ -14,12 +14,12 @@ typedef struct tyran_lexer {
 	int indentation;
 	int tab_count;
 	int last_token;
-	
-	
+
+
 	char* string_buffer;
 	int string_buffer_max_size;
 	tyran_number number;
-	
+
 	tyran_memory* memory;
 	struct tyran_errors* errors;
 

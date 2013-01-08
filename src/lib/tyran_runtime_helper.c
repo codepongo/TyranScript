@@ -16,7 +16,8 @@
 #include <tyranscript/tyran_symbol_table.h>
 
 
-void tyran_runtime_setup_binary_operators(tyran_runtime* rt) {
+void tyran_runtime_setup_binary_operators(tyran_runtime* rt)
+{
 	const char* binary_strings[] = {"+", "-", "%", "*", "^", "-", "[]", "[]=", "==", "<", "<="};
 
 	for (int i=0; i<sizeof(binary_strings) / sizeof(char*); ++i) {
@@ -53,10 +54,10 @@ tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* 
 	tyran_value_set_object(*rt->global, global_object);
 
 	tyran_prototypes_init(rt, rt->global);
-	
+
 	// rt->length_key = tyran_object_key_new(object_pool, tyran_string_from_c_str("length"), tyran_object_key_flag_normal);
 	// rt->prototype_key = tyran_object_key_new(object_pool, tyran_string_from_c_str("prototype"), tyran_object_key_flag_normal);
-	
+
 	return rt;
 }
 

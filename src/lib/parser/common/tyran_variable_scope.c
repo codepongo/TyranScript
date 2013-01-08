@@ -22,7 +22,7 @@ tyran_variable_scopes* tyran_variable_scopes_new(tyran_memory_pool* scopes_pool,
 	tyran_variable_scopes* scopes = TYRAN_CALLOC_TYPE(scopes_pool, tyran_variable_scopes);
 	scopes->allocated_scope_count = max_count;
 	scopes->scopes = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_variable_scope, scopes->allocated_scope_count);
-	
+
 	tyran_variable_scopes_push_scope(scopes, memory, variable_info_pool, register_pool);
 	return scopes;
 }
@@ -30,13 +30,13 @@ tyran_variable_scopes* tyran_variable_scopes_new(tyran_memory_pool* scopes_pool,
 tyran_reg_index tyran_variable_scope_get_identifier(tyran_variable_scope* scope, const char* variable_name)
 {
 	int i;
-	
+
 	for (i=0; i<scope->variable_count; ++i) {
 		if (tyran_strcmp(scope->variables[i].name, variable_name) == 0) {
 			return scope->variables[i].register_index;
 		}
 	}
-	
+
 	return TYRAN_OPCODE_REGISTER_ILLEGAL;
 }
 
@@ -90,7 +90,7 @@ tyran_reg_index tyran_variable_scope_top_free(tyran_variable_scope* scope, int r
 	for (i = highest; i < highest + return_count; ++i) {
 		tyran_variable_scope_reserve_variable(scope, i, 1);
 	}
-	
+
 	return highest;
 }
 
@@ -137,6 +137,6 @@ tyran_reg_index tyran_variable_scope_define_identifier(tyran_memory* memory, tyr
 		current_index = tyran_variable_scope_find_and_reserve_variable(top_scope, 2);
 		tyran_variable_scope_add_identifier(memory, top_scope, variable_name, current_index);
 	}
-	
+
 	return current_index;
 }

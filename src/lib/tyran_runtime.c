@@ -26,50 +26,52 @@
 	function->data.callback(runtime, member, PARAMS, PARAM_COUNT, &OBJECT, DESTINATION, TYRAN_FALSE);
 
 
-tyran_boolean tyran_runtime_number_comparison(int comparison, tyran_number a, tyran_number b) {
+tyran_boolean tyran_runtime_number_comparison(int comparison, tyran_number a, tyran_number b)
+{
 	tyran_boolean result;
 
 	switch (comparison) {
-		case 8:
-			result = (a==b);
-			break;
-		case 9:
-			result = (a<b);
-			break;
-		case 10:
-			result = (a<=b);
-			break;
-		default:
-			TYRAN_ERROR("Unknown comparison:%d", comparison);
+	case 8:
+		result = (a==b);
+		break;
+	case 9:
+		result = (a<b);
+		break;
+	case 10:
+		result = (a<=b);
+		break;
+	default:
+		TYRAN_ERROR("Unknown comparison:%d", comparison);
 	}
 
 	return result;
 }
 
-void tyran_runtime_number_binary_operator(tyran_value* value, int operator_index, tyran_number a, tyran_number b) {
+void tyran_runtime_number_binary_operator(tyran_value* value, int operator_index, tyran_number a, tyran_number b)
+{
 	tyran_number result;
 
 	switch (operator_index) {
-		case 0:
-			result = a + b;
-			break;
-		case 1:
-			result = a / b;
-			break;
-		case 2:
-			result = tyran_fmod(a, b);
-			break;
-		case 3:
-			result = a * b;
-			break;
-		case 4:
-			result = tyran_pow(a, b);
-			break;
-		case 5:
-			result = a - b;
-			break;
-		default:
-			TYRAN_ERROR("Unknown operator:%d", operator_index);
+	case 0:
+		result = a + b;
+		break;
+	case 1:
+		result = a / b;
+		break;
+	case 2:
+		result = tyran_fmod(a, b);
+		break;
+	case 3:
+		result = a * b;
+		break;
+	case 4:
+		result = tyran_pow(a, b);
+		break;
+	case 5:
+		result = a - b;
+		break;
+	default:
+		TYRAN_ERROR("Unknown operator:%d", operator_index);
 	}
 
 	tyran_value_set_number(*value, result);
@@ -78,8 +80,7 @@ void tyran_runtime_number_binary_operator(tyran_value* value, int operator_index
 void tyran_register_copy(tyran_value* target, tyran_value* source, int count)
 {
 	int i;
-	for (i=0; i<count; ++i)
-	{
+	for (i=0; i<count; ++i) {
 		tyran_value_copy(target[i], source[i]);
 	}
 }
@@ -99,8 +100,7 @@ void tyran_runtime_show_opcode_and_registers(const tyran_opcode* pc, tyran_runti
 	result[0] = 0;
 	int reg_index;
 	TYRAN_LOG("");
-	for (reg_index=0; reg_index <= 10; reg_index++)
-	{
+	for (reg_index=0; reg_index <= 10; reg_index++) {
 		if (reg_index != 0) {
 			tyran_strncat(result, ", ", 512);
 		}
@@ -145,23 +145,22 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 
 	tyran_value* r = registers;
 	const tyran_value* c = sp->c;
-	
+
 	tyran_object* object;
 
 
 	u32t i;
 	int test;
 
-	while (1)
-	{
+	while (1) {
 #ifdef TYRAN_RUNTIME_DEBUG
 		tyran_runtime_show_opcode_and_registers(pc, sp, r);
 #endif
-	u32t instruction = *pc++;
-	u32t opcode = instruction & 0x3f;
-	instruction >>= 6;
+		u32t instruction = *pc++;
+		u32t opcode = instruction & 0x3f;
+		instruction >>= 6;
 
-	switch (opcode) {
+		switch (opcode) {
 		case TYRAN_OPCODE_LD:
 			TYRAN_REGISTER_A_X;
 			TYRAN_SET_REGISTER(a, x);
@@ -211,42 +210,41 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_JEQ:
 		case TYRAN_OPCODE_JLT:
-		case TYRAN_OPCODE_JLE:
-			{
-				int comparison_index = (opcode - TYRAN_OPCODE_JEQ) + 8;
+		case TYRAN_OPCODE_JLE: {
+			int comparison_index = (opcode - TYRAN_OPCODE_JEQ) + 8;
 
-				TYRAN_REGISTER_A_RCX_RCY;
-				if (tyran_value_is_object(&rcx)) {
-					tyran_value dest;
-
-					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&dest, rcx, &rcy, 1, comparison_index);
-					test = dest.data.boolean;
-				} else {
-					test = tyran_runtime_number_comparison(comparison_index, rcx.data.number, rcy.data.number);
-				}
-				if (test != a) {
-					pc++;
-				} else {
-					TYRAN_RUNTIME_DO_JMP;
-				}
-			}
-			break;
 			TYRAN_REGISTER_A_RCX_RCY;
-			test = (rcx.data.data < rcy.data.data);
+			if (tyran_value_is_object(&rcx)) {
+				tyran_value dest;
+
+				TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&dest, rcx, &rcy, 1, comparison_index);
+				test = dest.data.boolean;
+			} else {
+				test = tyran_runtime_number_comparison(comparison_index, rcx.data.number, rcy.data.number);
+			}
 			if (test != a) {
 				pc++;
 			} else {
 				TYRAN_RUNTIME_DO_JMP;
 			}
-			break;
-			TYRAN_REGISTER_A_RCX_RCY;
-			test = (rcx.data.data <= rcy.data.data);
-			if (test != a) {
-				pc++;
-			} else {
-				TYRAN_RUNTIME_DO_JMP;
-			}
-			break;
+		}
+		break;
+		TYRAN_REGISTER_A_RCX_RCY;
+		test = (rcx.data.data < rcy.data.data);
+		if (test != a) {
+			pc++;
+		} else {
+			TYRAN_RUNTIME_DO_JMP;
+		}
+		break;
+		TYRAN_REGISTER_A_RCX_RCY;
+		test = (rcx.data.data <= rcy.data.data);
+		if (test != a) {
+			pc++;
+		} else {
+			TYRAN_RUNTIME_DO_JMP;
+		}
+		break;
 		case TYRAN_OPCODE_JMP:
 			TYRAN_REGISTER_BR;
 			pc += br;
@@ -260,8 +258,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			}
 			tyran_register_copy(sp->return_register, from, x);
 			TYRAN_STACK_POP;
-			}
-			break;
+		}
+		break;
 		case TYRAN_OPCODE_NEW:
 		case TYRAN_OPCODE_CALL:
 			TYRAN_REGISTER_A_X;
@@ -299,8 +297,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				tyran_value_copy(r[a], *v);
 				TYRAN_ADD_REF(r[a]);
 			}
-			}
-			break;
+		}
+		break;
 		case TYRAN_OPCODE_SET:
 			TYRAN_REGISTER_A_RCX_RCY;
 			tyran_value_object_insert(runtime, &r[a], &rcx, &rcy);
@@ -313,8 +311,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			tyran_object* object = tyran_object_new(runtime);
 			tyran_object_set_function(object, function_object);
 			tyran_value_set_object(r[a], object);
-			}
-			break;
+		}
+		break;
 		case TYRAN_OPCODE_DEBUG:
 			return;
 			break;

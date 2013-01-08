@@ -171,57 +171,56 @@ void print_r_s_s(tyran_opcode code, char* buf, int size)
 void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* constants, char* buf, int size)
 {
 	int instruction = TYRAN_OPCODE_INSTRUCTION(code);
-	switch (instruction)
-	{
-		case TYRAN_OPCODE_ADD:
-		case TYRAN_OPCODE_DIV:
-		case TYRAN_OPCODE_MOD:
-		case TYRAN_OPCODE_MUL:
-		case TYRAN_OPCODE_POW:
-		case TYRAN_OPCODE_SUB:
-			print_r_rc_rc(code, constants, buf, size);
-			break;
-		case TYRAN_OPCODE_NEG:
-		case TYRAN_OPCODE_NOT:
-			print_r_rc(code, constants, buf, size);
-			break;
-		case TYRAN_OPCODE_LD:
-			print_r_r(code, buf, size);
-			break;
-		case TYRAN_OPCODE_LDC:
-		case TYRAN_OPCODE_LDCU:
-			print_r_c(code, constants, buf, size);
-			break;
-		case TYRAN_OPCODE_JEQ:
-		case TYRAN_OPCODE_JLT:
-		case TYRAN_OPCODE_JLE:
-			print_b_rc_rc(code, constants, buf, size);
-			break;
-		case TYRAN_OPCODE_JMP:
-			print_br(code, ip, buf, size);
-			break;
-		case TYRAN_OPCODE_RET:
-			print_r_s(code, buf, size);
-			break;
-		case TYRAN_OPCODE_CALL:
-			print_r_s_s(code, buf, size);
-			break;
-		case TYRAN_OPCODE_FUNC:
-			print_r_rc(code, constants, buf, size);
-			break;
-		case TYRAN_OPCODE_NEW:
-			print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
-			break;
-		case TYRAN_OPCODE_SET:
-		case TYRAN_OPCODE_INDEX_SET:
-			print_r_rc_rc(code, constants, buf, size);
-			break;
-		case TYRAN_OPCODE_GET:
-		case TYRAN_OPCODE_INDEX:
-			print_r_r_rc(code, constants, buf, size);
-			break;
-		case TYRAN_OPCODE_DEBUG:
-			break;
+	switch (instruction) {
+	case TYRAN_OPCODE_ADD:
+	case TYRAN_OPCODE_DIV:
+	case TYRAN_OPCODE_MOD:
+	case TYRAN_OPCODE_MUL:
+	case TYRAN_OPCODE_POW:
+	case TYRAN_OPCODE_SUB:
+		print_r_rc_rc(code, constants, buf, size);
+		break;
+	case TYRAN_OPCODE_NEG:
+	case TYRAN_OPCODE_NOT:
+		print_r_rc(code, constants, buf, size);
+		break;
+	case TYRAN_OPCODE_LD:
+		print_r_r(code, buf, size);
+		break;
+	case TYRAN_OPCODE_LDC:
+	case TYRAN_OPCODE_LDCU:
+		print_r_c(code, constants, buf, size);
+		break;
+	case TYRAN_OPCODE_JEQ:
+	case TYRAN_OPCODE_JLT:
+	case TYRAN_OPCODE_JLE:
+		print_b_rc_rc(code, constants, buf, size);
+		break;
+	case TYRAN_OPCODE_JMP:
+		print_br(code, ip, buf, size);
+		break;
+	case TYRAN_OPCODE_RET:
+		print_r_s(code, buf, size);
+		break;
+	case TYRAN_OPCODE_CALL:
+		print_r_s_s(code, buf, size);
+		break;
+	case TYRAN_OPCODE_FUNC:
+		print_r_rc(code, constants, buf, size);
+		break;
+	case TYRAN_OPCODE_NEW:
+		print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
+		break;
+	case TYRAN_OPCODE_SET:
+	case TYRAN_OPCODE_INDEX_SET:
+		print_r_rc_rc(code, constants, buf, size);
+		break;
+	case TYRAN_OPCODE_GET:
+	case TYRAN_OPCODE_INDEX:
+		print_r_r_rc(code, constants, buf, size);
+		break;
+	case TYRAN_OPCODE_DEBUG:
+		break;
 	}
 }
 
@@ -233,7 +232,7 @@ void tyran_print_opcode(const tyran_opcode* opcode, const tyran_constants* const
 	char args[512];
 	args[0] = 0;
 	tyran_print_arguments(code, ip, constants, args, 512);
-	
+
 	TYRAN_LOG("%d %s%s", ip, tyran_opcode_names[instruction], args);
 }
 

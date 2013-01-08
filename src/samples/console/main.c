@@ -1,6 +1,7 @@
 #include <tyranscript/tyran_mocha_api.h>
 
-int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call) {
+int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call)
+{
 	TYRAN_OUTPUT("PRINT");
 	return 0;
 }
@@ -17,16 +18,15 @@ int main(int argc, char* argv[])
 	tyran_mocha_api_add_function(&api, &global, "print", mocha_print);
 
 	char buf[512];
-	while (1)
-	{
+	while (1) {
 		TYRAN_LOG_NO_LF("> ");
 		char* p = fgets(buf, 512, stdin);
 		if (!p) {
 			break;
 		}
 
-		tyran_mocha_api_eval(&api, &global, buf, tyran_strlen(buf));		
-		
+		tyran_mocha_api_eval(&api, &global, buf, tyran_strlen(buf));
+
 //		tyran_parser_node_print("result", mocha_parser_tree, 0);
 	}
 

@@ -9,13 +9,13 @@
 #define tyran_number_is_normal(a) (EXP(a) != MAXEXP)
 
 #if defined _MSC_VER
-	#include <float.h>
-	#define tyran_number_is_nan(x) _isnan(x)
-	#define tyran_number_is_infinity(x) !_finite(x)
+#include <float.h>
+#define tyran_number_is_nan(x) _isnan(x)
+#define tyran_number_is_infinity(x) !_finite(x)
 #else
-	#include <math.h>
-	#define tyran_number_is_nan(a)		isnan(a)
-	#define tyran_number_is_infinity(a)	isinf(a)
+#include <math.h>
+#define tyran_number_is_nan(a)		isnan(a)
+#define tyran_number_is_infinity(a)	isinf(a)
 #endif
 
 #endif

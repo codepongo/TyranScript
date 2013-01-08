@@ -11,8 +11,7 @@ typedef struct tyran_memory_pool_entry {
 	struct tyran_memory_pool* pool;
 } tyran_memory_pool_entry;
 
-typedef struct tyran_memory_pool
-{
+typedef struct tyran_memory_pool {
 	u8t* memory;
 	size_t struct_size;
 	size_t count;
@@ -22,7 +21,7 @@ typedef struct tyran_memory_pool
 	tyran_memory_pool_entry* first_free;
 } tyran_memory_pool;
 
-tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count, const char* type);
+tyran_memory_pool* tyran_memory_pool_construct(struct tyran_memory* memory, size_t struct_size, size_t count, const char* type);
 void* tyran_memory_pool_alloc_debug(tyran_memory_pool* pool, const char* type_name, size_t struct_size);
 void* tyran_memory_pool_calloc_debug(tyran_memory_pool* pool, const char* type_name, size_t struct_size);
 void tyran_memory_pool_free(void*);

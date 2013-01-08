@@ -24,7 +24,7 @@ tyran_code_state* tyran_code_new(struct tyran_runtime* runtime, tyran_memory_poo
 
 	state->opcodes = tyran_opcodes_new(opcodes_pool, memory, 1024);
 	state->constants = tyran_constants_new(constants_pool, runtime->symbol_table, memory, 1024);
-	
+
 	state->scope = variable_scopes;
 	state->labels = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_label, 100);
 	state->label_references = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_label_reference, 100);
@@ -71,8 +71,7 @@ void tyran_code_add_label_index_reference(tyran_code_state* state, tyran_label_i
 int tyran_code_get_label(struct tyran_label* labels, int count, const char* name)
 {
 	int i;
-	for (i=0; i<count; ++i)
-	{
+	for (i=0; i<count; ++i) {
 		if (tyran_strcmp(labels[i].name, name) == 0) {
 			return i;
 		}
@@ -90,8 +89,7 @@ void tyran_code_change_opcode_branch(tyran_opcode* code, int position)
 void tyran_code_fixup_label_references(tyran_code_state* state)
 {
 	int i;
-	for (i=0; i<state->label_reference_count;++i)
-	{
+	for (i=0; i<state->label_reference_count; ++i) {
 		tyran_label_reference* ref = &state->label_references[i];
 		if (ref->label_index != -1) {
 			tyran_label* label = &state->labels[ref->label_index];
@@ -101,7 +99,7 @@ void tyran_code_fixup_label_references(tyran_code_state* state)
 			TYRAN_SOFT_ERROR("Couldn't find label");
 		}
 	}
-	
+
 	state->label_reference_count = 0;
 }
 

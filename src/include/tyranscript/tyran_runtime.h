@@ -22,10 +22,10 @@ typedef struct tyran_runtime {
 	tyran_value_delete_callback delete_callback;
 	int stack_pointer;
 	void* program_specific_context;
-	
+
 	const struct tyran_object_key* length_key;
 	const struct tyran_object_key* prototype_key;
-	
+
 
 	struct tyran_object* _string_class;
 	struct tyran_object* _array_class;
@@ -49,7 +49,7 @@ typedef struct tyran_runtime {
 	struct tyran_symbol_table* symbol_table;
 
 	tyran_symbol binary_operator_symbols[16];
-	
+
 } tyran_runtime;
 
 struct tyran_runtime_callbacks;

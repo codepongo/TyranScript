@@ -19,13 +19,11 @@ typedef int tyran_boolean;
 
 typedef unsigned short tyran_uint16;
 
-#include <tyranscript/tyran_memory_pool.h>
 #include <tyranscript/tyran_memory.h>
+#include <tyranscript/tyran_memory_pool.h>
 
 #define TYRAN_MEMORY_ALLOC(memory, size, description) tyran_memory_alloc_debug(memory, size, __FILE__, __LINE__, description);
 #define TYRAN_MEMORY_CALLOC(memory, size, description) tyran_memory_calloc_debug(memory, size, __FILE__, __LINE__, description);
-
-tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count, const char* type);
 
 char* tyran_str_dup(tyran_memory* pool, const char* str);
 
@@ -53,24 +51,24 @@ char* tyran_str_dup(tyran_memory* pool, const char* str);
 
 
 #if defined WIN32
-	#pragma warning( disable : 4100 )
+#pragma warning( disable : 4100 )
 
-	#define tyran_sscanf sscanf_s
-	#define tyran_snprintf sprintf_s
-	#define tyran_strncpy(dest, dest_size, source, source_size) strncpy_s(dest, dest_size, source, source_size)
-	#define tyran_fopen fopen_s
-	#define tyran_fread fread
-	#define tyran_fclose fclose
-	#define tyran_strncat strncat_s
+#define tyran_sscanf sscanf_s
+#define tyran_snprintf sprintf_s
+#define tyran_strncpy(dest, dest_size, source, source_size) strncpy_s(dest, dest_size, source, source_size)
+#define tyran_fopen fopen_s
+#define tyran_fread fread
+#define tyran_fclose fclose
+#define tyran_strncat strncat_s
 #else
-	#define tyran_sscanf sscanf
-	#define tyran_snprintf snprintf
-	#define tyran_strncpy(dest, dest_size, source, source_size) strncpy(dest, source, dest_size)
-	#define tyran_strncat strncat
-	#define tyran_fopen(F, N, M) *F = fopen(N, M)
-	#define tyran_fread fread
-	#define tyran_fclose fclose
-	#define tyran_strncat strncat
+#define tyran_sscanf sscanf
+#define tyran_snprintf snprintf
+#define tyran_strncpy(dest, dest_size, source, source_size) strncpy(dest, source, dest_size)
+#define tyran_strncat strncat
+#define tyran_fopen(F, N, M) *F = fopen(N, M)
+#define tyran_fread fread
+#define tyran_fclose fclose
+#define tyran_strncat strncat
 #endif
 
 #define tyran_strcmp strcmp

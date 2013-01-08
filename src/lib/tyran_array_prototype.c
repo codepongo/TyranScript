@@ -65,7 +65,8 @@ int tyran_array_prototype_index_set(struct tyran_runtime* runtime, tyran_value* 
 	return 0;
 }
 
-TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_add) {
+TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_add)
+{
 	tyran_array* added_array = tyran_array_add(runtime->memory, runtime->rb_node_pool, self->data.object->data.array, arguments[0].data.object->data.array);
 	tyran_object* obj = tyran_object_new(runtime);
 	tyran_object_set_prototype(obj, runtime->_array_class);
@@ -79,7 +80,8 @@ int tyran_array_prototype_pop(struct tyran_runtime* r, tyran_value* a, tyran_val
 	return 0;
 }
 
-void tyran_array_prototype_init(const struct tyran_runtime* runtime, tyran_value* o) {
+void tyran_array_prototype_init(const struct tyran_runtime* runtime, tyran_value* o)
+{
 	TYRAN_MEMBER(o, "[]=", tyran_array_prototype_index_set);
 	TYRAN_MEMBER(o, "[]", tyran_array_prototype_index);
 	TYRAN_MEMBER(o, "+", tyran_array_prototype_add);

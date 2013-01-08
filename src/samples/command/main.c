@@ -1,6 +1,7 @@
 #include <tyranscript/tyran_mocha_api.h>
 
-int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, int argument_count, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call) {
+int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, int argument_count, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call)
+{
 	struct tyran_value* v = &arguments[0];
 	const int buf_len = 100;
 	char buf[buf_len];
@@ -29,10 +30,10 @@ int main(int argc, char* argv[])
 	int octets_read = fread(buf, 1, max_size, file);
 	buf[octets_read] = 0;
 	fclose(file);
-	
-	
+
+
 	tyran_mocha_api api;
-	
+
 	tyran_mocha_api_new(&api, 1024);
 	tyran_value* global = tyran_runtime_context(api.default_runtime);// tyran_mocha_api_create_object(&api);
 

@@ -23,7 +23,7 @@ typedef struct tyran_parser_state {
 	int label_count;
 	struct tyran_label_reference* label_references;
 	int label_reference_count;
-	
+
 	int inside_function;
 
 	char function_name[512];
@@ -34,7 +34,7 @@ typedef struct tyran_parser_state {
 	int error_count;
 } tyran_parser_state;
 
-tyran_parser_state* tyran_parser_state_new(tyran_memory_pool* parser_state_pool,  struct tyran_runtime* runtime, struct tyran_value* context, const char *str, int length);
+tyran_parser_state* tyran_parser_state_new(tyran_memory_pool* parser_state_pool,  struct tyran_runtime* runtime, struct tyran_value* context, const char* str, int length);
 void tyran_parser_state_free(tyran_parser_state* parser_state);
 void tyran_parser_state_reset(tyran_parser_state* parser_state);
 #endif

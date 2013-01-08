@@ -58,7 +58,7 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char
 {
 	tyran_mocha_lexer* mocha_lexer = tyran_mocha_lexer_lex(api->mocha_lexer_pool, api->mocha_token_pool, api->lexer_pool, api->memory, buf, length);
 	tyran_mocha_lexer_debug(mocha_lexer);
-	
+
 
 	tyran_memory_pool* mocha_parser_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_mocha_parser, 1);
 	tyran_memory_pool* enclosure_stack_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_mocha_parser_enclosure_stack, 1);
@@ -66,7 +66,7 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char
 	tyran_memory_pool* parser_node_parameter_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_parser_node_parameter, 1);
 	tyran_memory_pool* mocha_token_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_mocha_token, 1);
 
-	
+
 	struct tyran_parser_node* parser_tree =  tyran_mocha_parser_parse(api->memory, mocha_lexer, mocha_parser_pool, enclosure_stack_pool, enclosure_info_pool, parser_node_parameter_pool, mocha_token_pool);
 
 
@@ -86,7 +86,7 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char
 
 
 	struct tyran_code_state* code = tyran_code_new(api->default_runtime, string_pool, function_pool, code_state_pool, opcodes_pool, constants_pool, constant_values_pool, label_pool,
-		label_reference_pool, api->default_variable_info_pool, api->default_register_pool, api->default_variable_scopes, api->memory);
+									label_reference_pool, api->default_variable_info_pool, api->default_register_pool, api->default_variable_scopes, api->memory);
 
 	tyran_memory_pool* generator_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_generator, 1);
 	tyran_generator_new(api->memory, generator_pool, parser_tree, code);
@@ -100,7 +100,8 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char
 	tyran_print_value("return", &return_value, 1, code->constants->symbol_table, object_iterator_pool, api->string_pool, api->memory);
 }
 
-tyran_value tyran_mocha_api_create_object(tyran_mocha_api* api) {
+tyran_value tyran_mocha_api_create_object(tyran_mocha_api* api)
+{
 	tyran_value value;
 
 	tyran_object* object = tyran_object_new(api->default_runtime);
@@ -109,7 +110,8 @@ tyran_value tyran_mocha_api_create_object(tyran_mocha_api* api) {
 	return value;
 }
 
-void tyran_mocha_api_add_function(tyran_mocha_api* api, tyran_value* target, const char* name, tyran_function_callback callback) {
+void tyran_mocha_api_add_function(tyran_mocha_api* api, tyran_value* target, const char* name, tyran_function_callback callback)
+{
 	tyran_value* value = tyran_function_object_new_callback(api->default_runtime, callback);
 	tyran_value_object_insert_c_string_key(api->default_runtime, target, name, value);
 }

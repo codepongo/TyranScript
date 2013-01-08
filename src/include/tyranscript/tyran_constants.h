@@ -9,8 +9,7 @@ struct tyran_string;
 struct tyran_runtime;
 struct tyran_symbol_table;
 
-typedef struct tyran_constants
-{
+typedef struct tyran_constants {
 	struct tyran_value* values;
 	tyran_constant_index size;
 	struct tyran_symbol_table* symbol_table;

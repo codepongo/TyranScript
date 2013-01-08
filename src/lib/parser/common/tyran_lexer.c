@@ -22,7 +22,7 @@ tyran_lexer* tyran_lexer_new(tyran_memory_pool* lexer_pool, tyran_memory* memory
 	lexer->string_buffer = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, lexer->string_buffer_max_size);
 	lexer->errors = tyran_errors_new(memory);
 	lexer->memory = memory;
-	
+
 	tyran_memcpy_type(char, lexer->buffer, buf, lexer->size);
 	return lexer;
 }
@@ -99,25 +99,25 @@ int tyran_lexer_parse_string(tyran_lexer* lexer, char* buf, int* length)
 		if (c == '\\') {
 			char n = tyran_lexer_pop_character(lexer);
 			switch(n) {
-				case 'b':
-					buf[index++] = '\b';
-					break;
-				case 'f':
-					buf[index++] = '\f';
-					break;
-				case 'n':
-					buf[index++] = '\n';
-					break;
-				case 'r':
-					buf[index++] = '\r';
-					break;
-				case 't':
-					buf[index++] = '\t';
-					break;
-				case 0:
-					TYRAN_SOFT_ERROR("Unexpected EOF parsing string.");
-				default:
-					buf[index++] = n;
+			case 'b':
+				buf[index++] = '\b';
+				break;
+			case 'f':
+				buf[index++] = '\f';
+				break;
+			case 'n':
+				buf[index++] = '\n';
+				break;
+			case 'r':
+				buf[index++] = '\r';
+				break;
+			case 't':
+				buf[index++] = '\t';
+				break;
+			case 0:
+				TYRAN_SOFT_ERROR("Unexpected EOF parsing string.");
+			default:
+				buf[index++] = n;
 			}
 		} else {
 			if (c == '\n') {
@@ -139,7 +139,7 @@ int tyran_lexer_parse_string(tyran_lexer* lexer, char* buf, int* length)
 char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
 {
 	char c;
-	
+
 	while ((c = tyran_lexer_pop_character(lexer)) == ' ' || c == '\t' || c == '\n' || c == '\r')
 		;
 
@@ -149,7 +149,7 @@ char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
 char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexer)
 {
 	char c;
-	
+
 	while ((c = tyran_lexer_pop_character(lexer)) == ' ' || c == '\t' || c == '\r') {
 
 
@@ -159,7 +159,7 @@ char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexe
 }
 
 
-void tyran_lexer_set_begin(tyran_lexer_position_info* lexer_position_info, const tyran_lexer* lexer)	
+void tyran_lexer_set_begin(tyran_lexer_position_info* lexer_position_info, const tyran_lexer* lexer)
 {
 	lexer_position_info->first_line = lexer->line;
 	lexer_position_info->first_column = lexer->column;
@@ -187,7 +187,7 @@ int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max
 
 	buf[string_index] = 0;
 	*max_length = string_index;
-	
+
 	return 0;
 }
 
