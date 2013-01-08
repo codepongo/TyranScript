@@ -1,7 +1,5 @@
 language: c
-compiler:
-  - clang
-  - gcc
+compiler: clang
 
 before_script:
   - "gem install rake"
