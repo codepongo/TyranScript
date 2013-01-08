@@ -50,8 +50,8 @@ void tyran_generator_resolve_labels(tyran_code_state* code)
 tyran_generator* tyran_generator_new(tyran_memory* memory, tyran_memory_pool* generator_pool, tyran_parser_node* tree, tyran_code_state* code) {
 	tyran_generator* generator = TYRAN_CALLOC_TYPE(generator_pool, tyran_generator);
 	tyran_label_id false_label = tyran_generator_prepare_label(code);
-	tyran_reg_or_constant_index return_index = tyran_generator_traverse(memory, code, tree, TYRAN_OPCODE_REGISTER_ILLEGAL, false_label, 0, TYRAN_FALSE);
-	
+	tyran_reg_or_constant_index return_index = tyran_generator_traverse(memory, code, tree, 0, false_label, 0, TYRAN_FALSE);
+
 	tyran_generator_define_label(code, false_label);
 	tyran_opcodes_op_ret(code->opcodes, return_index, 1);
 	tyran_generator_resolve_labels(code);
@@ -155,7 +155,6 @@ tyran_reg_index tyran_generator_call_or_new(tyran_memory* memory, tyran_code_sta
 	tyran_reg_index start_register = tyran_variable_scopes_top_free(code->scope, return_value_count);
 	tyran_opcodes_op_ld(code->opcodes, start_register, function_register);
 	tyran_opcodes_op_ld(code->opcodes, start_register + 1, self_index);
-	code->last_self_index = TYRAN_OPCODE_REGISTER_ILLEGAL;
 	
 	for (i = 0; i < argument_count; ++i) {
 		tyran_reg_index target_index = start_register + i + 2;
@@ -186,7 +185,7 @@ tyran_reg_index tyran_generator_traverse_call(tyran_memory* memory, tyran_code_s
 	tyran_reg_or_constant_index function_register = tyran_generator_traverse(memory, code, call_node->function_node, 0, 0, 0, TYRAN_FALSE);
 	tyran_reg_index result = tyran_generator_call_or_new(memory, code, function_register, code->last_self_index, code->last_call_was_new, arguments, argument_count);
 	code->last_call_was_new = TYRAN_FALSE;
-	code->last_self_index = TYRAN_OPCODE_REGISTER_ILLEGAL;
+	code->last_self_index = 0;
 
 	return result;
 }
@@ -543,7 +542,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_case(tyran_memory* memory, 
 	
 	tyran_generator_define_label(code, end_of_case_label);
 	tyran_generator_resolve_labels(code);
-	return TYRAN_OPCODE_REGISTER_ILLEGAL;
+	return compare_register;
 }
 
 

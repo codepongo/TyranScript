@@ -1,7 +1,7 @@
 #include <tyranscript/tyran_config.h>
 
 void tyran_memory_pool_initialize_entries(tyran_memory_pool* pool) {
-	u8t* m = pool->memory;
+	u8t* m = pool->memory + 1;
 	int total_size = pool->struct_size + sizeof(tyran_memory_pool_entry);
 	tyran_memory_pool_entry* previous = 0;
 	for (int i=0; i<pool->max_count; ++i) {
@@ -26,7 +26,7 @@ tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t stru
 {
 	TYRAN_LOG("Allocating pool of type '%s' (%zu x %zu)", type, struct_size, count);
 	tyran_memory_pool* pool = TYRAN_MEMORY_ALLOC(memory, sizeof(tyran_memory_pool), "Memory pool");
-	pool->memory = TYRAN_MEMORY_ALLOC(memory, (sizeof(tyran_memory_pool_entry) + struct_size) * count, "Memory pool entries");
+	pool->memory = TYRAN_MEMORY_ALLOC(memory, (sizeof(tyran_memory_pool_entry) + struct_size) * count + 1, "Memory pool entries");
 	pool->struct_size = struct_size;
 	pool->type_string = type;
 	pool->max_count = count;
@@ -49,6 +49,14 @@ void* tyran_memory_pool_alloc(tyran_memory_pool* pool)
 	return p;
 }
 
+void* tyran_memory_pool_alloc_debug(tyran_memory_pool* pool, const char* type_name, size_t struct_size) {
+	TYRAN_ASSERT(tyran_strcmp(pool->type_string, type_name) == 0, "Type name mismatch. Expected:%s received %s", pool->type_string, type_name);
+	TYRAN_ASSERT(pool->struct_size == struct_size, "Struct size mismatch. Expected %zu, received %zu", pool->struct_size, struct_size);
+
+	return tyran_memory_pool_alloc(pool);
+}
+
+
 void* tyran_memory_pool_calloc(tyran_memory_pool* pool)
 {
 	void* p = tyran_memory_pool_alloc(pool);
@@ -58,6 +66,12 @@ void* tyran_memory_pool_calloc(tyran_memory_pool* pool)
 	return p;
 }
 
+void* tyran_memory_pool_calloc_debug(tyran_memory_pool* pool, const char* type_name, size_t struct_size) {
+	TYRAN_ASSERT(tyran_strcmp(pool->type_string, type_name) == 0, "Type name mismatch. Expected:%s received %s", pool->type_string, type_name);
+	TYRAN_ASSERT(pool->struct_size == struct_size, "Struct size mismatch. Expected %zu, received %zu", pool->struct_size, struct_size);
+
+	return tyran_memory_pool_calloc(pool);
+}
 
 void tyran_memory_pool_free(void* p)
 {
@@ -72,9 +86,9 @@ void tyran_memory_pool_free(void* p)
 char* tyran_str_dup(tyran_memory* memory, const char* str)
 {
 	int size = tyran_strlen(str);
-	char* mem = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, size);
+	char* mem = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, size + 1);
 	
-	tyran_strncpy(mem, size, str, size);
+	tyran_strncpy(mem, size + 1, str, size);
 	
 	return mem;
 }

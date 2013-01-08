@@ -42,16 +42,23 @@ void tyran_opcodes_add_code(tyran_opcodes* codes, int code, int a, tyran_reg_or_
 
 void tyran_opcodes_add_code_a_c(tyran_opcodes* codes, int code, tyran_reg_index a, tyran_constant_index c)
 {
+	TYRAN_ASSERT(a != TYRAN_OPCODE_REGISTER_ILLEGAL, "Illegal register in a");
+	TYRAN_ASSERT(c != TYRAN_OPCODE_REGISTER_ILLEGAL, "Illegal register in a");
 	tyran_opcodes_add_code(codes, code, a, c, 0);
 }
 
 void tyran_opcodes_add_code_a_x(tyran_opcodes* codes, int code, tyran_reg_index a, tyran_reg_index x)
 {
+	TYRAN_ASSERT(a != TYRAN_OPCODE_REGISTER_ILLEGAL, "Illegal register in a");
+	TYRAN_ASSERT(x != TYRAN_OPCODE_REGISTER_ILLEGAL, "Illegal register in x");
 	tyran_opcodes_add_code(codes, code, a, (tyran_reg_or_constant_index)x, (tyran_reg_or_constant_index)0);
 }
 
 void tyran_opcodes_add_code_a_x_y(tyran_opcodes* codes, int code, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y)
 {
+	TYRAN_ASSERT(a != TYRAN_OPCODE_REGISTER_ILLEGAL, "Illegal register in a");
+	TYRAN_ASSERT(x != TYRAN_OPCODE_REGISTER_ILLEGAL, "Illegal register in x");
+	TYRAN_ASSERT(x != TYRAN_OPCODE_REGISTER_ILLEGAL, "Illegal register in y");
 	tyran_opcodes_add_code(codes, code, a, x, y);
 }
 

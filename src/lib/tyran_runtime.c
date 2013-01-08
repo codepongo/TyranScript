@@ -20,8 +20,8 @@
 
 
 #define TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(DESTINATION, OBJECT, PARAMS, PARAM_COUNT, OPERATOR) \
-	tyran_value* member = tyran_object_lookup_prototype(OBJECT.data.object, &runtime->binary_operator_symbols[OPERATOR]); \
-	TYRAN_ASSERT(member, "Couldn't find operator:%d", OPERATOR); \
+	tyran_value* member = tyran_object_lookup_prototype((OBJECT).data.object, &runtime->binary_operator_symbols[OPERATOR]); \
+	TYRAN_ASSERT(member, "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
 	const tyran_function* function = member->data.object->data.function->static_function; \
 	function->data.callback(runtime, member, PARAMS, PARAM_COUNT, &OBJECT, DESTINATION, TYRAN_FALSE);
 

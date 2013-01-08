@@ -88,7 +88,7 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char
 	struct tyran_code_state* code = tyran_code_new(api->default_runtime, string_pool, function_pool, code_state_pool, opcodes_pool, constants_pool, constant_values_pool, label_pool,
 		label_reference_pool, api->default_variable_info_pool, api->default_register_pool, api->default_variable_scopes, api->memory);
 
-	tyran_memory_pool* generator_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_code_state, 1);
+	tyran_memory_pool* generator_pool = TYRAN_MEMORY_POOL_CONSTRUCT(api->memory, tyran_generator, 1);
 	tyran_generator_new(api->memory, generator_pool, parser_tree, code);
 
 	tyran_print_opcodes(code->opcodes, 0, code->constants);

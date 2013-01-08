@@ -25,9 +25,11 @@ void tyran_value_object_insert(const struct tyran_runtime* runtime, struct tyran
 void tyran_value_object_insert_c_string_key(const struct tyran_runtime* runtime, struct tyran_value* target, const char* key, struct tyran_value* value) {
 	tyran_symbol symbol;
 	tyran_symbol_table_add(runtime->symbol_table, &symbol, key);
-	tyran_value symbol_value;
+	TYRAN_LOG("Insert Symbol '%s' -> %d", key, symbol.hash);
 
+	tyran_value symbol_value;
 	tyran_value_set_symbol(symbol_value, symbol);
+
 	tyran_value_object_insert(runtime, target, &symbol_value, value);
 }
 
@@ -42,14 +44,14 @@ void tyran_value_object_delete(tyran_value* target, tyran_value* key)
 const tyran_value* tyran_value_object_lookup(const tyran_value* target, const struct tyran_value* key)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
-	TYRAN_ASSERT(key->type == TYRAN_VALUE_TYPE_SYMBOL, "Can only delete symbols");
+	TYRAN_ASSERT(key->type == TYRAN_VALUE_TYPE_SYMBOL, "Can only lookup symbols");
 	return tyran_object_lookup(target->data.object, &key->data.symbol);
 }
 
 const tyran_value* tyran_value_object_lookup_prototype(const tyran_value* target, const struct tyran_value* key)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
-	TYRAN_ASSERT(key->type == TYRAN_VALUE_TYPE_SYMBOL, "Can only delete symbols");
+	TYRAN_ASSERT(key->type == TYRAN_VALUE_TYPE_SYMBOL, "Can only lookup symbols");
 	return tyran_object_lookup_prototype(target->data.object, &key->data.symbol);
 }
 
