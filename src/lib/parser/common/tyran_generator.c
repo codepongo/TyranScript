@@ -5,6 +5,7 @@
 #include <tyranscript/tyran_constants.h>
 
 #include <tyranscript/debug/parser/tyran_print_parser_tree.h>
+#include <tyranscript/debug/tyran_print_opcodes.h>
 
 tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran_code_state* code, tyran_parser_node* tree, tyran_label_id true_label, tyran_label_id false_label, tyran_reg_index self_index, tyran_boolean invert_logic);
 
@@ -577,6 +578,8 @@ tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* 
 	tyran_opcodes_op_ret(code->opcodes, temp_index, 1);
 
 	tyran_variable_scopes_pop_scope(code->scope);
+
+	tyran_print_opcodes(code->opcodes, 0, code->constants);
 
 	code->opcodes = old_codes;
 	tyran_reg_index function_object_index = tyran_variable_scopes_define_temporary_variable(code->scope);

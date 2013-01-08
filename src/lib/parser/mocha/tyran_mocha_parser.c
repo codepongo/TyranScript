@@ -696,7 +696,6 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_memory* 
 	if (parentheses) {
 		NODE node = tyran_mocha_parser_concat_peek_position(parser, 1);
 		if (node && node->type == TYRAN_PARSER_NODE_TYPE_FUNCTION) {
-			TYRAN_LOG("==========> FUNCTION FOUND!");
 			tyran_mocha_parser_concat_pop(parser);
 			tyran_parser_node_function* function = (tyran_parser_node_function*) node;
 			tyran_mocha_parser_define_function_parameters(memory, function, parentheses->expression);
