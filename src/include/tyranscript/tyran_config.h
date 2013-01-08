@@ -17,15 +17,7 @@ typedef int tyran_boolean;
 #define TYRAN_TRUE (1)
 #define TYRAN_FALSE (0)
 
-
 typedef unsigned short tyran_uint16;
-
-typedef struct tyran_memory
-{
-	u8t* memory;
-	size_t size;
-	u8t* next;
-} tyran_memory;
 
 #include <tyranscript/tyran_memory_pool.h>
 #include <tyranscript/tyran_memory.h>
