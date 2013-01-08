@@ -92,7 +92,7 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	"RANGE"
 	};
 	
-	TYRAN_LOG_NO_LF("%s ", token_id_to_string[token->token_id]);
+	TYRAN_LOG_NO_LF(" %s", token_id_to_string[token->token_id]);
 
 	if (token->token_id == TYRAN_MOCHA_TOKEN_IDENTIFIER || token->token_id == TYRAN_MOCHA_TOKEN_STRING) {
 		TYRAN_LOG_NO_LF("(%s)", (const char*) token->token_data);

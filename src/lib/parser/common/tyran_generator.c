@@ -621,10 +621,6 @@ tyran_reg_or_constant_index tyran_generator_traverse_for(tyran_memory* memory, t
 tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran_code_state* code, tyran_parser_node* node, tyran_label_id true_label, tyran_label_id false_label, tyran_reg_index self_index, tyran_boolean invert_logic) {
 	tyran_reg_or_constant_index result;
 	
-	if (node->type != TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY || ((tyran_parser_node_operand_binary*)node)->operator_type != TYRAN_PARSER_CONCAT) {
-		tyran_parser_node_print("traverse", &node, 0);
-	}
-
 	switch (node->type) {
 		case TYRAN_PARSER_NODE_TYPE_OPERAND_BINARY: {
 			tyran_parser_node_operand_binary* binary = (tyran_parser_node_operand_binary*)node;

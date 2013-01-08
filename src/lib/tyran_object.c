@@ -61,7 +61,6 @@ int tyran_object_find_property(const struct tyran_object* object, const tyran_sy
 	int found = -1;
 
 	for (int i=0; i<object->property_count; ++i) {
-		TYRAN_LOG("Comparing:%d with %d", object->properties[i].symbol.hash, symbol->hash);
 		if (object->properties[i].symbol.hash == symbol->hash) {
 			found = i;
 			break;

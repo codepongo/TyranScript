@@ -61,7 +61,6 @@ void* tyran_memory_pool_calloc(tyran_memory_pool* pool)
 {
 	void* p = tyran_memory_pool_alloc(pool);
 	TYRAN_ASSERT(p, "not null");
-	TYRAN_LOG("Clearing memory");
 	tyran_mem_clear(p, pool->struct_size, 1);
 	return p;
 }

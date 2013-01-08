@@ -25,7 +25,6 @@ void tyran_value_object_insert(const struct tyran_runtime* runtime, struct tyran
 void tyran_value_object_insert_c_string_key(const struct tyran_runtime* runtime, struct tyran_value* target, const char* key, struct tyran_value* value) {
 	tyran_symbol symbol;
 	tyran_symbol_table_add(runtime->symbol_table, &symbol, key);
-	TYRAN_LOG("Insert Symbol '%s' -> %d", key, symbol.hash);
 
 	tyran_value symbol_value;
 	tyran_value_set_symbol(symbol_value, symbol);

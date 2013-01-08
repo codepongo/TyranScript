@@ -81,7 +81,7 @@ void tyran_value_to_c_string(const tyran_symbol_table* symbol_table, const tyran
 			tyran_snprintf(buf, max_length, "static func");
 			break;
 		default:
-			TYRAN_ERROR("Unknown value type");
+			TYRAN_ERROR("Unknown value type:%d", v->type);
 	}
 
 }

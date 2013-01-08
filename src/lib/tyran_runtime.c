@@ -98,6 +98,7 @@ void tyran_runtime_show_opcode_and_registers(const tyran_opcode* pc, tyran_runti
 
 	result[0] = 0;
 	int reg_index;
+	TYRAN_LOG("");
 	for (reg_index=0; reg_index <= 10; reg_index++)
 	{
 		if (reg_index != 0) {
@@ -140,9 +141,6 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	// Context
 	const tyran_opcode* pc = sp->pc;
 	tyran_value* registers = runtime->registers;
-	TYRAN_LOG("Registers:%p", registers);
-	TYRAN_LOG("sp:%p", sp);
-	TYRAN_LOG("sp->this:%p", &sp->_this);
 	tyran_value_copy(registers[0], sp->_this);
 
 	tyran_value* r = registers;

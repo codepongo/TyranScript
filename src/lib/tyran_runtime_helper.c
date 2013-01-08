@@ -21,7 +21,6 @@ void tyran_runtime_setup_binary_operators(tyran_runtime* rt) {
 
 	for (int i=0; i<sizeof(binary_strings) / sizeof(char*); ++i) {
 		tyran_symbol_table_add(rt->symbol_table, &rt->binary_operator_symbols[i], binary_strings[i]);
-		TYRAN_LOG("RUNTIME Symbol:%d %d", i, rt->binary_operator_symbols[i].hash);
 	}
 }
 
