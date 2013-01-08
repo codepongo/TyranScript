@@ -3,6 +3,7 @@ require 'colored'
 test_files = FileList['./**/*.test']
 
 o_files = []
+success = true
 test_files.each do |source_file|
 	object_file = File.basename(source_file).ext('output')
 	o_files << object_file
@@ -26,7 +27,7 @@ test_files.each do |source_file|
 
 		output_file = "#{test_name}_out.txt"
 
-		arguments = "#{test_name}.mocha > #{output_file} 2> #{test_name}_err.txt"
+		arguments = "#{test_name}.mocha > #{output_file}"
 		command = "../samples/command/command #{arguments}"
 		`#{command}`
 
@@ -38,13 +39,16 @@ test_files.each do |source_file|
 			puts "OK".bold.green
 		else
 			puts "Failed!".red
+			success = false
 		end
 		STDOUT.flush
 	end
 end
 
 file 'tests' => o_files do
-	
+	if not success
+		abort "Tasks failed!"
+	end
 end
 
 task :default => 'tests'
