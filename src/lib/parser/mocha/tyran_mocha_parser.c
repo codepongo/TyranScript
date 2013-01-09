@@ -325,6 +325,7 @@ tyran_mocha_parser* tyran_mocha_parser_new(tyran_memory_pool* mocha_parser_pool,
 	parser->mocha_token_pool = mocha_token_pool;
 	parser->last_precedence = -1;
 	parser->root_precedence = -1;
+	parser->last_bracket_node = 0;
 	return parser;
 }
 
