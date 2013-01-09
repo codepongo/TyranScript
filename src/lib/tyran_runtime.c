@@ -99,7 +99,7 @@ void tyran_runtime_show_opcode_and_registers(const tyran_opcode* pc, tyran_runti
 
 	result[0] = 0;
 	int reg_index;
-	TYRAN_LOG("");
+	TYRAN_LOG("---");
 	for (reg_index=0; reg_index <= 10; reg_index++) {
 		if (reg_index != 0) {
 			tyran_strncat(result, ", ", 512);
