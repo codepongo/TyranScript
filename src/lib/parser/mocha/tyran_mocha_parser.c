@@ -665,12 +665,6 @@ NODE tyran_mocha_parser_add_terminal(tyran_memory* memory, tyran_mocha_parser* p
 
 void tyran_mocha_parser_add_enclosure(tyran_mocha_parser* parser, tyran_parser_node_operand_unary* enclosure_node, tyran_mocha_token_id end_closure, tyran_mocha_token_id start_closure)
 {
-	tyran_mocha_token end_token;
-	end_token.token_id = end_closure;
-	// TYRAN_LOG_NO_LF("Add enclosure:");
-	// tyran_mocha_lexer_debug_token(&end_token);
-	// TYRAN_LOG(" ");
-
 	tyran_mocha_parser_enclosure_stack_push(parser->enclosure_stack, parser->root, enclosure_node, parser->waiting_for_start_enclosure_id);
 	parser->waiting_for_start_enclosure_id = start_closure;
 	parser->root = &enclosure_node->expression;
@@ -678,9 +672,6 @@ void tyran_mocha_parser_add_enclosure(tyran_mocha_parser* parser, tyran_parser_n
 
 void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_memory* memory, tyran_mocha_token_id start_closure)
 {
-	tyran_mocha_token end_token;
-	end_token.token_id = start_closure;
-
 	tyran_mocha_parser_enclosure_info info = tyran_mocha_parser_enclosure_stack_pop(parser->enclosure_stack);
 	parser->waiting_for_start_enclosure_id = info.start_token_id;
 	parser->next_node_to_overwrite = 0;
