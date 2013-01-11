@@ -53,7 +53,7 @@ typedef enum {
 } tyran_assembler_token;
 
 
-static int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffer)
+ int tyran_lexer_assembler_get_keyword_token(const char* temp_string_buffer)
 {
 	typedef struct tyran_lexer_keyword {
 		const char* name;
@@ -121,7 +121,7 @@ int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c
 }
 
 
-static int tyran_lexer_assembler_next_token(tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
+ int tyran_lexer_assembler_next_token(tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
 	tyran_lexer_set_begin(lexer_position_info, lexer);
 
