@@ -1,0 +1,11 @@
+array = [2, 4, 6, 8, 10]
+
+for i in array
+	if i is 6
+		continue
+	print(i)
+---
+2
+4
+8
+10
