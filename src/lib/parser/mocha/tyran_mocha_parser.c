@@ -775,6 +775,7 @@ NODE tyran_mocha_parser_parse(tyran_memory* memory, tyran_mocha_lexer* lexer, ty
 
 	tyran_mocha_parser* parser = tyran_mocha_parser_new(mocha_parser_pool, enclosure_pool, enclosure_info_pool, parser_parameter_pool, mocha_token_pool, memory);
 	tyran_mocha_parser_add_all(memory, parser, first, last);
+	tyran_parser_node_print("Parsed", &parser->original_root, parser->root);
 
 	return parser->original_root;
 }

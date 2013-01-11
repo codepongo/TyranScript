@@ -56,11 +56,17 @@ void tyran_value_to_c_string(const tyran_symbol_table* symbol_table, const tyran
 		case TYRAN_OBJECT_TYPE_FUNCTION:
 			tyran_snprintf(buf, max_length, "function:%p (%d)", (void*) v->data.object, v->data.object->retain_count);
 			break;
-		case TYRAN_OBJECT_TYPE_ITERATOR:
+		case TYRAN_OBJECT_TYPE_ARRAY_ITERATOR:
 			tyran_snprintf(buf, max_length, "iterator:%p (%d)", (void*)v->data.object, v->data.object->retain_count);
 			break;
 		case TYRAN_OBJECT_TYPE_ARRAY:
 			tyran_snprintf(buf, max_length, "array:%p (%d)", (void*)v->data.object, v->data.object->retain_count);
+			break;
+		case TYRAN_OBJECT_TYPE_RANGE:
+			tyran_snprintf(buf, max_length, "range:%p (%d)", (void*)v->data.object, v->data.object->retain_count);
+			break;
+		case TYRAN_OBJECT_TYPE_RANGE_ITERATOR:
+			tyran_snprintf(buf, max_length, "range_iterator:%p (%d)", (void*)v->data.object, v->data.object->retain_count);
 			break;
 		case TYRAN_OBJECT_TYPE_STRING: {
 			static const int temp_buffer_size = 512;

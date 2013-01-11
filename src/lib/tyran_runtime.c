@@ -15,9 +15,7 @@
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_constants.h>
-#include <tyranscript/tyran_rb_tree.h>
 #include <tyranscript/tyran_array.h>
-#include <tyranscript/tyran_iterator_object.h>
 
 #define TYRAN_RUNTIME_DEBUG
 
@@ -27,6 +25,12 @@
 	TYRAN_ASSERT(member, "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
 	const tyran_function* function = member->data.object->data.function->static_function; \
 	function->data.callback(runtime, member, PARAMS, PARAM_COUNT, &OBJECT, DESTINATION, TYRAN_FALSE);
+
+#define TYRAN_RUNTIME_INVOKE_UNARY_OPERATOR(DESTINATION, OBJECT, OPERATOR) \
+	tyran_value* member = tyran_object_lookup_prototype((OBJECT).data.object, &runtime->binary_operator_symbols[OPERATOR]); \
+	TYRAN_ASSERT(member, "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
+	const tyran_function* function = member->data.object->data.function->static_function; \
+	function->data.callback(runtime, member, 0, 0, &OBJECT, DESTINATION, TYRAN_FALSE);
 
 
 tyran_boolean tyran_runtime_number_comparison(int comparison, tyran_number a, tyran_number b)
@@ -205,21 +209,14 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 		case TYRAN_OPCODE_ITER: {
 			TYRAN_REGISTER_A_RCX;
-			struct tree_root* root = rcx.data.object->data.array->tree;
-			tree_iterator* iterator = new_tree_iterator(root);
-			tyran_value* iterator_value = tyran_iterator_object_new(runtime, iterator);
-			tyran_value_replace(r[a], *iterator_value);
+			TYRAN_RUNTIME_INVOKE_UNARY_OPERATOR(&r[a], rcx, 11);
 		}
 		break;
 		case TYRAN_OPCODE_NEXT: {
 			TYRAN_REGISTER_A_RCX;
-			tree_iterator* iterator = rcx.data.object->data.iterator;
-			tyran_array_node* node = tree_iterator_next(iterator);
-			if (node) {
-				tyran_value_replace(r[a], node->value);
+			TYRAN_RUNTIME_INVOKE_UNARY_OPERATOR(&r[a], rcx, 12);
+			if (!tyran_value_is_undefined(&r[a])) {
 				pc++;
-			} else {
-				destroy_iterator(iterator);
 			}
 		}
 		break;

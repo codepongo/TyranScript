@@ -30,6 +30,9 @@ typedef struct tyran_runtime {
 	struct tyran_object* _string_class;
 	struct tyran_object* _array_class;
 	struct tyran_object* _object_class;
+	struct tyran_object* _range_class;
+	struct tyran_object* _range_iterator_class;
+	struct tyran_object* _array_iterator_class;
 
 	struct tyran_value* registers;
 
@@ -48,7 +51,7 @@ typedef struct tyran_runtime {
 
 	struct tyran_symbol_table* symbol_table;
 
-	tyran_symbol binary_operator_symbols[16];
+	tyran_symbol binary_operator_symbols[32];
 
 } tyran_runtime;
 

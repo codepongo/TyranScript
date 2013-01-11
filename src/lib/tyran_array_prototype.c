@@ -12,6 +12,9 @@
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_array.h>
 #include <tyranscript/tyran_runtime.h>
+#include <tyranscript/tyran_iterator_object.h>
+#include <tyranscript/tyran_rb_tree.h>
+
 
 int tyran_array_prototype_constructor(struct tyran_runtime* runtime, tyran_value* func, tyran_value* arguments, int argument_count, tyran_value* _this, tyran_value* return_value, int is_constructor)
 {
@@ -75,6 +78,15 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_add)
 	return 0;
 }
 
+TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_iter)
+{
+	struct tree_root* root = self->data.object->data.array->tree;
+	struct tree_iterator* iterator = new_tree_iterator(root);
+	tyran_value* iterator_value = tyran_iterator_object_new(runtime, iterator);
+	tyran_value_replace(*return_value, *iterator_value);
+	return 0;
+}
+
 int tyran_array_prototype_pop(struct tyran_runtime* r, tyran_value* a, tyran_value* b, int argument_count, tyran_value* _this, tyran_value* return_value, int isconstructor)
 {
 	return 0;
@@ -82,9 +94,10 @@ int tyran_array_prototype_pop(struct tyran_runtime* r, tyran_value* a, tyran_val
 
 void tyran_array_prototype_init(const struct tyran_runtime* runtime, tyran_value* o)
 {
+	TYRAN_MEMBER(o, "constructor", tyran_array_prototype_constructor);
+	TYRAN_MEMBER(o, "iter", tyran_array_prototype_iter);
 	TYRAN_MEMBER(o, "[]=", tyran_array_prototype_index_set);
 	TYRAN_MEMBER(o, "[]", tyran_array_prototype_index);
 	TYRAN_MEMBER(o, "+", tyran_array_prototype_add);
 	TYRAN_MEMBER(o, "push", tyran_array_prototype_push);
-	TYRAN_MEMBER(o, "constructor", tyran_array_prototype_constructor);
 }

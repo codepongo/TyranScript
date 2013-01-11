@@ -119,6 +119,12 @@ typedef struct tyran_value {
 #define tyran_value_is_variable(pv) ((pv)->type == TYRAN_VALUE_TYPE_VARIABLE)
 
 
+tyran_number tyran_value_number(tyran_value* v);
+tyran_boolean tyran_value_boolean(tyran_value* v);
+struct tyran_object* tyran_value_object(tyran_value* v);
+
+
+
 tyran_value* tyran_value_new(tyran_memory_pool* pool);
 tyran_value* tyran_value_duplicate(const tyran_value* v);
 void tyran_value_free(tyran_value* data);

@@ -244,13 +244,8 @@ tyran_reg_or_constant_index tyran_generator_call(tyran_memory* memory, tyran_cod
 	return reg;
 }
 
-tyran_reg_or_constant_index tyran_generator_create_object(const char* klass, tyran_memory* memory, tyran_code_state* code, NODE arguments)
+tyran_reg_or_constant_index tyran_generator_create_object_with_arguments(const char* klass, tyran_memory* memory, tyran_code_state* code, int argument_count, NODE* argument_nodes) 
 {
-	NODE argument_nodes[100];
-	int argument_count = 0;
-
-	tyran_generator_argument_nodes(argument_nodes, &argument_count, arguments);
-
 	tyran_constant_index array_symbol = tyran_constants_add_symbol_from_c_string(code->constants, klass);
 	tyran_constant_index constructor_symbol = tyran_constants_add_symbol_from_c_string(code->constants, "constructor");
 	tyran_reg_index target = tyran_variable_scopes_define_temporary_variable(code->scope);
@@ -265,6 +260,27 @@ tyran_reg_or_constant_index tyran_generator_create_object(const char* klass, tyr
 
 	return result;
 }
+
+tyran_reg_or_constant_index tyran_generator_create_object(const char* klass, tyran_memory* memory, tyran_code_state* code, NODE arguments)
+{
+	NODE argument_nodes[100];
+	int argument_count = 0;
+
+	tyran_generator_argument_nodes(argument_nodes, &argument_count, arguments);
+	return tyran_generator_create_object_with_arguments(klass, memory, code, argument_count, argument_nodes);
+}
+
+tyran_reg_or_constant_index tyran_generator_range(tyran_memory* memory, tyran_code_state* code, NODE left, NODE right, tyran_boolean inclusive)
+{
+	NODE arguments[3];
+
+	arguments[0] = left;
+	arguments[1] = right;
+	arguments[2] = tyran_parser_bool(memory, inclusive);
+
+	return tyran_generator_create_object_with_arguments("Range", memory, code, 3, arguments);
+}
+
 
 tyran_reg_or_constant_index tyran_generator_array(tyran_memory* memory, tyran_code_state* code, NODE arguments)
 {
@@ -350,10 +366,6 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 		tyran_generator_comparison_operator(code, operator_type, left, right, true_label, false_label, invert_logic);
 		break;
 	case TYRAN_PARSER_COMMA:
-		break;
-	case TYRAN_PARSER_RANGE:
-		// tyran_generator_range(codes, target, left, right);
-		target = TYRAN_OPCODE_REGISTER_ILLEGAL;
 		break;
 	default:
 		TYRAN_ERROR("Unhandled operator:%d", operator_type);
@@ -458,6 +470,12 @@ tyran_reg_or_constant_index tyran_generator_traverse_binary(tyran_memory* memory
 		break;
 	case TYRAN_PARSER_COLON:
 		result = tyran_generator_colon(memory, code, binary->left, binary->right, self_index);
+		break;
+	case TYRAN_PARSER_RANGE_INCLUSIVE:
+		result = tyran_generator_range(memory, code, binary->left, binary->right, TYRAN_TRUE);
+		break;
+	case TYRAN_PARSER_RANGE:
+		result = tyran_generator_range(memory, code, binary->left, binary->right, TYRAN_FALSE);
 		break;
 	default:
 		result = tyran_generator_traverse_default_binary(memory, code, binary, true_label, false_label, loop_start, loop_end, self_index, invert_logic);

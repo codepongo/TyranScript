@@ -18,7 +18,7 @@
 
 void tyran_runtime_setup_binary_operators(tyran_runtime* rt)
 {
-	const char* binary_strings[] = {"+", "-", "%", "*", "^", "-", "[]", "[]=", "==", "<", "<="};
+	const char* binary_strings[] = {"+", "-", "%", "*", "^", "-", "[]", "[]=", "==", "<", "<=", "iter", "++"};
 
 	for (int i=0; i<sizeof(binary_strings) / sizeof(char*); ++i) {
 		tyran_symbol_table_add(rt->symbol_table, &rt->binary_operator_symbols[i], binary_strings[i]);

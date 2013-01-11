@@ -63,9 +63,14 @@ All opcodes are coded within a 32-bit instruction.
 * while (with postfix)
 * until (while not)
 * for in/of (with postfix) [when EXPRESSION]
+* continue
+* break
 
 ##### Array
 * slicing [0..2]
+
+##### Range
+* [0..3]
 
 ##### Existential
 * ?
