@@ -481,6 +481,10 @@ NODE tyran_mocha_parser_token_to_literal(tyran_memory* memory, tyran_mocha_token
 		return tyran_parser_undefined(memory);
 	case TYRAN_MOCHA_TOKEN_SELF:
 		return tyran_parser_self(memory);
+	case TYRAN_MOCHA_TOKEN_BREAK:
+		return tyran_parser_break(memory);
+	case TYRAN_MOCHA_TOKEN_CONTINUE:
+		return tyran_parser_continue(memory);
 	default:
 		TYRAN_ERROR("Illegal literal token:%d", first->token_id);
 		return 0;

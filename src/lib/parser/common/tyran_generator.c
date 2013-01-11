@@ -14,7 +14,7 @@ tyran_reg_index tyran_generator_traverse_force_register(tyran_memory* memory, ty
 	tyran_reg_or_constant_index result = tyran_generator_traverse(memory, code, node, true_label, false_label, 0, invert_logic);
 
 	if (result == TYRAN_OPCODE_REGISTER_ILLEGAL) {
-		TYRAN_ERROR("Illegal register");
+		TYRAN_SOFT_ERROR("Illegal register");
 		return TYRAN_OPCODE_REGISTER_ILLEGAL;
 	}
 
@@ -504,7 +504,6 @@ tyran_reg_or_constant_index tyran_generator_traverse_if(tyran_memory* memory, ty
 	} else {
 		tyran_generator_define_label(code, if_false_label);
 	}
-	tyran_generator_resolve_labels(code);
 	return result;
 }
 
@@ -524,7 +523,6 @@ tyran_reg_or_constant_index tyran_generator_traverse_while(tyran_memory* memory,
 	result = tyran_generator_traverse(memory, code, while_node->block, 0, 0, self_index, TYRAN_TRUE);
 	tyran_generator_label_reference(code, while_loop_label);
 	tyran_generator_define_label(code, while_false_label);
-	tyran_generator_resolve_labels(code);
 	return result;
 }
 
@@ -557,7 +555,6 @@ tyran_reg_or_constant_index tyran_generator_traverse_case(tyran_memory* memory, 
 	}
 
 	tyran_generator_define_label(code, end_of_case_label);
-	tyran_generator_resolve_labels(code);
 	return compare_register;
 }
 
@@ -625,7 +622,6 @@ tyran_reg_or_constant_index tyran_generator_traverse_for(tyran_memory* memory, t
 	tyran_generator_traverse(memory, code, for_node->block, start_of_for_loop, end_of_for_loop, self_index, TYRAN_FALSE);
 	tyran_generator_label_reference(code, start_of_for_loop);
 	tyran_generator_define_label(code, end_of_for_loop);
-	tyran_generator_resolve_labels(code);
 
 	tyran_variable_scopes_undefine_variable(code->scope, iterator_register);
 	tyran_variable_scopes_undefine_variable(code->scope, key_register);
@@ -686,6 +682,12 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran
 	break;
 	case TYRAN_PARSER_NODE_TYPE_SELF: {
 		result = self_index;
+	}
+	break;
+	case TYRAN_PARSER_NODE_TYPE_BREAK: {
+		result = TYRAN_OPCODE_REGISTER_ILLEGAL;
+		TYRAN_LOG("BREAKING LABEL:%d", false_label);
+		tyran_generator_label_reference(code, false_label);
 	}
 	break;
 	default: {

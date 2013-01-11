@@ -291,6 +291,19 @@ NODE tyran_parser_self(tyran_memory* memory)
 	return (tyran_parser_node*)node;
 }
 
+NODE tyran_parser_break(tyran_memory* memory)
+{
+	tyran_parser_node_break* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_break, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_BREAK;
+	return (NODE)node;
+}
+
+NODE tyran_parser_continue(tyran_memory* memory)
+{
+	tyran_parser_node_continue* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_continue, 1);
+	node->node.type = TYRAN_PARSER_NODE_TYPE_CONTINUE;
+	return (NODE)node;
+}
 
 NODE tyran_parser_undefined(tyran_memory* memory)
 {

@@ -25,6 +25,8 @@ enum tyran_parser_type {
 	TYRAN_PARSER_NODE_TYPE_NULL,
 	TYRAN_PARSER_NODE_TYPE_UNDEFINED,
 	TYRAN_PARSER_NODE_TYPE_SELF,
+	TYRAN_PARSER_NODE_TYPE_BREAK,
+	TYRAN_PARSER_NODE_TYPE_CONTINUE,
 	TYRAN_PARSER_NODE_TYPE_STRING,
 	TYRAN_PARSER_NODE_TYPE_IDENTIFIER,
 	TYRAN_PARSER_NODE_TYPE_ASSIGNMENT,
@@ -102,6 +104,14 @@ typedef struct tyran_parser_node {
 typedef struct tyran_parser_node_self {
 	tyran_parser_node node;
 } tyran_parser_node_self;
+
+typedef struct tyran_parser_node_break {
+	tyran_parser_node node;
+} tyran_parser_node_break;
+
+typedef struct tyran_parser_node_continue {
+	tyran_parser_node node;
+} tyran_parser_node_continue;
 
 typedef struct tyran_parser_node_value {
 	tyran_parser_node node;
@@ -305,6 +315,8 @@ NODE tyran_parser_null(tyran_memory* memory);
 NODE tyran_parser_bool(tyran_memory* memory, int boolean);
 NODE tyran_parser_undefined(tyran_memory* memory);
 NODE tyran_parser_self(tyran_memory* memory);
+NODE tyran_parser_break(tyran_memory* memory);
+NODE tyran_parser_continue(tyran_memory* memory);
 NODE tyran_parser_literal_number(tyran_memory* memory, float* a);
 NODE tyran_parser_literal_string(tyran_memory* memory, const char* string);
 NODE tyran_parser_literal_identifier(tyran_memory* memory, const char* string);

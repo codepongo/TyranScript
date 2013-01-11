@@ -27,7 +27,7 @@ typedef unsigned short tyran_uint16;
 
 char* tyran_str_dup(tyran_memory* pool, const char* str);
 
-#define TYRAN_MEMORY_POOL_CONSTRUCT(memory, T, count) tyran_memory_pool_construct(memory, sizeof(T), 200, #T)
+#define TYRAN_MEMORY_POOL_CONSTRUCT(memory, T, count) tyran_memory_pool_construct(memory, sizeof(T), 400, #T)
 
 #define tyran_malloc malloc
 #define tyran_realloc realloc

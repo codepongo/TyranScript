@@ -1,0 +1,11 @@
+array = [2, 4, 6, 8, 10]
+count = 0
+
+for i in array
+	if count is 2
+		break
+	print(i)
+	count = count + 1
+---
+2
+4

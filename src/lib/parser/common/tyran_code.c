@@ -56,15 +56,16 @@ void tyran_code_add_label(tyran_memory* memory, tyran_code_state* state, const c
 	tyran_code_define_label(state, label_index);
 
 	struct tyran_label* label = &state->labels[label_index];
+	label->position = -1;
 	label->name = tyran_strdup(memory, name);
 }
 
 void tyran_code_add_label_index_reference(tyran_code_state* state, tyran_label_id label_index)
 {
-	TYRAN_LOG("Adding label reference");
 	struct tyran_label_reference* label_reference = &state->label_references[state->label_reference_count++];
 	label_reference->label_index = label_index;
 	label_reference->opcode = &state->opcodes->codes[state->opcodes->code_len];
+	TYRAN_LOG("Adding label reference:%d code_position:%d", label_index, state->opcodes->code_len);
 }
 
 
@@ -91,12 +92,15 @@ void tyran_code_fixup_label_references(tyran_code_state* state)
 	int i;
 	for (i=0; i<state->label_reference_count; ++i) {
 		tyran_label_reference* ref = &state->label_references[i];
-		if (ref->label_index != -1) {
-			tyran_label* label = &state->labels[ref->label_index];
-			int delta = label->position - (ref->opcode - state->opcodes->codes) - 2;
-			tyran_code_change_opcode_branch(ref->opcode, delta);
+		TYRAN_ASSERT(state->label_count > ref->label_index, "Wrong label index:%d", ref->label_index);
+		tyran_label* label = &state->labels[ref->label_index];
+		if (label->position == -1) {
+			TYRAN_SOFT_ERROR("Label:%d is not defined", i);
 		} else {
-			TYRAN_SOFT_ERROR("Couldn't find label");
+			int absolute_position = (ref->opcode - state->opcodes->codes);
+			int delta = label->position - absolute_position - 2;
+			TYRAN_LOG("label pos:%d reference:DELTA:%d", absolute_position, delta);
+			tyran_code_change_opcode_branch(ref->opcode, delta);
 		}
 	}
 
