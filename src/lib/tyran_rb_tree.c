@@ -38,17 +38,19 @@ tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), in
 	tree_node* y = rbrotate_on->right;
 	rbrotate_on->right = y->left;
 
-	if(y->left != 0)
-	{ y->left->parent = rbrotate_on; }
+	if (y->left) {
+		y->left->parent = rbrotate_on;
+	}
 
 	y->parent = rbrotate_on->parent;
 
-	if(rbrotate_on->parent == 0)
-	{ root->root = y; }
-	else if(rbrotate_on == rbrotate_on->parent->left)
-	{ rbrotate_on->parent->left = y; }
-	else
-	{ rbrotate_on->parent->right = y; }
+	if (!rbrotate_on->parent) {
+		root->root = y;
+	} else if (rbrotate_on == rbrotate_on->parent->left) {
+		rbrotate_on->parent->left = y;
+	} else {
+		rbrotate_on->parent->right = y;
+	}
 
 	y->left = rbrotate_on;
 	rbrotate_on->parent = y;
@@ -60,17 +62,19 @@ tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), in
 	tree_node* y = rbrotate_on->left;
 	rbrotate_on->left = y->right;
 
-	if(y->right != 0)
-	{ y->right->parent = rbrotate_on; }
+	if (y->right) {
+		y->right->parent = rbrotate_on;
+	}
 
 	y->parent = rbrotate_on->parent;
 
-	if(rbrotate_on->parent == 0)
-	{ root->root = y; }
-	else if(rbrotate_on == rbrotate_on->parent->right)
-	{ rbrotate_on->parent->right = y; }
-	else
-	{ rbrotate_on->parent->left = y; }
+	if (!rbrotate_on->parent) {
+		root->root = y;
+	} else if (rbrotate_on == rbrotate_on->parent->right) {
+		rbrotate_on->parent->right = y;
+	} else {
+		rbrotate_on->parent->left = y;
+	}
 
 	y->right = rbrotate_on;
 	rbrotate_on->parent = y;
@@ -80,17 +84,17 @@ tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), in
 {
 	tree_node* y;
 
-	while(z->parent && z->parent->color == tyran_rb_tree_color_red) {
-		if(z->parent == z->parent->parent->left) {
+	while (z->parent && z->parent->color == tyran_rb_tree_color_red) {
+		if (z->parent == z->parent->parent->left) {
 			y = z->parent->parent->right;
 
-			if(y->color == tyran_rb_tree_color_red) {
+			if (y->color == tyran_rb_tree_color_red) {
 				z->parent->color = tyran_rb_tree_color_black;
 				y->color = tyran_rb_tree_color_black;
 				z->parent->parent->color = tyran_rb_tree_color_red;
 				z = z->parent->parent;
 			} else {
-				if(z == z->parent->right) {
+				if (z == z->parent->right) {
 					z = z->parent;
 					left_rbrotate(root, z);
 				}
@@ -101,13 +105,13 @@ tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), in
 		} else {
 			y = z->parent->parent->left;
 
-			if(y && y->color == tyran_rb_tree_color_red) {
+			if (y && y->color == tyran_rb_tree_color_red) {
 				z->parent->color = tyran_rb_tree_color_black;
 				y->color = tyran_rb_tree_color_black;
 				z->parent->parent->color = tyran_rb_tree_color_red;
 				z = z->parent->parent;
 			} else {
-				if(z == z->parent->left) {
+				if (z == z->parent->left) {
 					z = z->parent;
 					right_rbrotate(root, z);
 				}
@@ -128,31 +132,33 @@ void* rb_tree_insert(tree_root* root, void* node)
 
 	tree_node* z = new_rbtree_node(node);
 
-	while(x != 0) {
+	while (x) {
 		y = x;
 
-		if(root->compare(root->key(z), root->key(x)) == 0) {
+		if (root->compare(root->key(z), root->key(x)) == 0) {
 			void* holder = x->node;
 			free(z);
 			x->node = node;
 			return holder;
 		}
 
-		if(root->compare(root->key(z), root->key(x)) < 0)
-		{ x = x->left; }
-		else
-		{ x = x->right; }
+		if (root->compare(root->key(z), root->key(x)) < 0) {
+			x = x->left;
+		} else {
+			x = x->right;
+		}
 	}
 
 	z->parent = y;
 
-	if (y == 0)
-	{ root->root = z; }
-	else {
-		if(root->compare(root->key(z),root->key(y)) < 0)
-		{ y->left = z; }
-		else
-		{ y->right = z; }
+	if (!y) {
+		root->root = z;
+	} else {
+		if (root->compare(root->key(z),root->key(y)) < 0) {
+			y->left = z;
+		} else {
+			y->right = z;
+		}
 	}
 
 	rb_tree_insert_fixup(root, z);
@@ -163,14 +169,16 @@ void* rb_tree_insert(tree_root* root, void* node)
 {
 	tree_node* z = root.root;
 
-	while (z != 0) {
-		if (root.compare(root.key(z), key) == 0)
-		{ return z; }
+	while (z) {
+		if (root.compare(root.key(z), key) == 0) {
+			return z;
+		}
 
-		if (root.compare(root.key(z), key) < 0)
-		{ z = z->right; }
-		else
-		{ z = z->left; }
+		if (root.compare(root.key(z), key) < 0) {
+			z = z->right;
+		} else {
+			z = z->left;
+		}
 	}
 
 	return 0;
@@ -179,8 +187,9 @@ void* rb_tree_insert(tree_root* root, void* node)
 void* search_rbtree(tree_root root, void* key)
 {
 	tree_node* z = __search_rbtree_node(root, key);
-	if(z)
-	{ return z->node; }
+	if (z) {
+		return z->node;
+	}
 
 	return 0;
 }
@@ -189,8 +198,9 @@ void* search_rbtree(tree_root root, void* key)
 {
 	tree_node* l, *r;
 
-	if(root == 0)
-	{ return; }
+	if (!root) {
+		return;
+	}
 
 	l = root->left;
 	r = root->right;
@@ -209,40 +219,42 @@ void destroy_rbtree(tree_root* root)
 
  void __rb_transplant(tree_root* root, tree_node* u, tree_node* v)
 {
-	if(u->parent == 0)
-	{ root->root = v; }
-	else if(u == u->parent->left)
-	{ u->parent->left = v; }
-	else
-	{ u->parent->right = v; }
+	if (!u->parent) {
+		root->root = v;
+	} else if (u == u->parent->left) {
+		u->parent->left = v;
+	} else {
+		u->parent->right = v;
+	}
 
 	v->parent = u->parent;
 }
 
- tree_node* __rb_tree_minimum(tree_node* z)
+tree_node* __rb_tree_minimum(tree_node* z)
 {
-	for(; z->left != 0; z = z->left)
+	for(; z->left; z = z->left)
 		;
 	return z;
 }
 
- void __rb_tree_delete_fixup(tree_root* root, tree_node* x)
+void __rb_tree_delete_fixup(tree_root* root, tree_node* x)
 {
 	tree_node* w;
+	
 	while (x != root->root && x->color == tyran_rb_tree_color_black) {
-		if(x == x->parent->left) {
+		if (x == x->parent->left) {
 			w = x->parent->right;
-			if(w->color == tyran_rb_tree_color_red) {
+			if (w->color == tyran_rb_tree_color_red) {
 				w->color = tyran_rb_tree_color_black;
 				x->parent->color = tyran_rb_tree_color_red;
 				left_rbrotate(root, x->parent);
 				w = x->parent->right;
 			}
-			if(w->left->color == tyran_rb_tree_color_black && w->right->color == tyran_rb_tree_color_black) {
+			if (w->left->color == tyran_rb_tree_color_black && w->right->color == tyran_rb_tree_color_black) {
 				w->color = tyran_rb_tree_color_red;
 				x = x->parent;
 			} else {
-				if(w->right->color == tyran_rb_tree_color_black) {
+				if (w->right->color == tyran_rb_tree_color_black) {
 					w->left->color = tyran_rb_tree_color_black;
 					w->color = tyran_rb_tree_color_red;
 					right_rbrotate(root, w);
@@ -256,13 +268,13 @@ void destroy_rbtree(tree_root* root)
 			}
 		} else {
 			w = x->parent->left;
-			if(w->color == tyran_rb_tree_color_red) {
+			if (w->color == tyran_rb_tree_color_red) {
 				w->color = tyran_rb_tree_color_black;
 				x->parent->color = tyran_rb_tree_color_red;
 				right_rbrotate(root, x->parent);
 				w = x->parent->left;
 			}
-			if(w->right->color == tyran_rb_tree_color_black && w->left->color == tyran_rb_tree_color_black) {
+			if (w->right->color == tyran_rb_tree_color_black && w->left->color == tyran_rb_tree_color_black) {
 				w->color = tyran_rb_tree_color_red;
 				x = x->parent;
 			} else {
@@ -294,19 +306,19 @@ void* rb_tree_delete(tree_root* root, void* key)
 	node_to_return = y->node;
 
 	y_original_color = y->color;
-	if(z->left == 0) {
+	if (!z->left) {
 		x = z->right;
 		__rb_transplant(root, z, z->right);
-	} else if(z->right == 0) {
+	} else if (!z->right) {
 		x = z->left;
 		__rb_transplant(root, z, z->left);
 	} else {
 		y = __rb_tree_minimum(z->right);
 		y_original_color = y->color;
 		x = y->right;
-		if(y->parent == z)
-		{ x->parent = y; }
-		else {
+		if (y->parent == z) {
+			x->parent = y;
+		} else {
 			__rb_transplant(root, y, y->right);
 			y->right = z->right;
 			y->right->parent = y;
@@ -318,7 +330,7 @@ void* rb_tree_delete(tree_root* root, void* key)
 		y->color = z->color;
 	}
 
-	if(y_original_color == tyran_rb_tree_color_black) {
+	if (y_original_color == tyran_rb_tree_color_black) {
 		__rb_tree_delete_fixup(root, x);
 	}
 
@@ -344,21 +356,21 @@ void* tree_iterator_next(tree_iterator* it)
 	struct stree_node* previous = it->previous;
 	struct stree_node* current = it->current;
 
-	if (current == 0) {
+	if (!current) {
 		return 0;
 	}
 
 	it->previous = current;
 
 	if (previous == current->parent) {
-		if (current->left != 0) {
+		if (current->left) {
 			TYRAN_LOG("$$$ GOING LEFT");
 			it->current = current->left;
-			if (it->current != 0) {
+			if (it->current) {
 				return tree_iterator_next(it);
 			}
 		} else {
-			if (current->right != 0) {
+			if (current->right) {
 				TYRAN_LOG("$$$ GOING RIGHT1");
 				it->current = current->right;
 			} else {
@@ -367,7 +379,7 @@ void* tree_iterator_next(tree_iterator* it)
 			}
 		}
 	} else if (previous == current->left) {
-		if (current->right != 0) {
+		if (current->right) {
 				TYRAN_LOG("$$$ GOING RIGHT2");
 			it->current = current->right;
 		} else {
