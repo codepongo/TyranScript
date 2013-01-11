@@ -7,6 +7,7 @@
 struct tyran_string;
 struct tyran_object;
 struct tyran_runtime_stack;
+struct tree_iterator;
 
 typedef enum {
 	TYRAN_VALUE_TYPE_UNDEFINED,
@@ -68,6 +69,7 @@ typedef struct tyran_value {
 	(v).type = TYRAN_VALUE_TYPE_STATIC_FUNCTION; \
 	(v).data.static_function = (f); \
 }
+
 
 #define tyran_value_set_undefined(v) { \
 	(v).type = TYRAN_VALUE_TYPE_UNDEFINED; \

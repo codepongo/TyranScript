@@ -604,36 +604,33 @@ tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* 
 
 tyran_reg_or_constant_index tyran_generator_traverse_for(tyran_memory* memory, tyran_code_state* code, tyran_parser_node_for* for_node, tyran_reg_index self_index)
 {
-	TYRAN_LOG("Not implemented yet");
-	return TYRAN_OPCODE_REGISTER_ILLEGAL;
-	/*
-		tyran_reg_or_constant_index collection_register = tyran_generator_traverse(memory, code, for_node->collection, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, self_index, TYRAN_FALSE);
-		tyran_reg_index value = tyran_variable_scopes_define_identifier(memory, code->scope, for_node->value_variable->string);
-		tyran_reg_or_constant_index key;
-		if (for_node->key_variable) {
-			key = tyran_variable_scopes_define_identifier(memory, code->scope, for_node->key_variable->string);
-		} else {
-			key = tyran_variable_scopes_define_temporary_variable(code->scope);
-		}
+	tyran_reg_or_constant_index collection_register = tyran_generator_traverse(memory, code, for_node->collection, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, self_index, TYRAN_FALSE);
 
-		// tyran_reg_index iterator_register = tyran_variable_scopes_define_temporary_variable(code->scope);
-		// tyran_opcodes_op_key(code->opcodes, iterator_register, collection_register);
 
-		tyran_label_id start_of_for_loop = tyran_generator_prepare_label(code);
-		tyran_generator_define_label(code, start_of_for_loop);
+	const char* key_variable_name = for_node->value_variable->string;
+	tyran_reg_index key_register = tyran_variable_scopes_define_identifier(memory, code->scope, key_variable_name);
+	tyran_reg_or_constant_index key = tyran_variable_scopes_define_identifier(memory, code->scope, key_variable_name);
 
-		tyran_label_id end_of_for_loop = tyran_generator_prepare_label(code);
-		// tyran_opcodes_op_next(code->opcodes, key, iterator_register);
-		tyran_generator_label_reference(code, end_of_for_loop);
+	
+	tyran_reg_index iterator_register = tyran_variable_scopes_define_temporary_variable(code->scope);
+	tyran_opcodes_op_iter(code->opcodes, iterator_register, collection_register);
 
-		tyran_opcodes_op_get(code->opcodes, value, collection_register, key);
+	tyran_label_id start_of_for_loop = tyran_generator_prepare_label(code);
+	tyran_generator_define_label(code, start_of_for_loop);
 
-		tyran_generator_traverse(memory, code, for_node->block, start_of_for_loop, end_of_for_loop, self_index, TYRAN_FALSE);
-		tyran_generator_label_reference(code, start_of_for_loop);
-		tyran_generator_define_label(code, end_of_for_loop);
-		tyran_generator_resolve_labels(code);
+	tyran_label_id end_of_for_loop = tyran_generator_prepare_label(code);
+	tyran_opcodes_op_next(code->opcodes, key, iterator_register);
+	tyran_generator_label_reference(code, end_of_for_loop);
 
-		return TYRAN_OPCODE_REGISTER_ILLEGAL;*/
+	tyran_generator_traverse(memory, code, for_node->block, start_of_for_loop, end_of_for_loop, self_index, TYRAN_FALSE);
+	tyran_generator_label_reference(code, start_of_for_loop);
+	tyran_generator_define_label(code, end_of_for_loop);
+	tyran_generator_resolve_labels(code);
+
+	tyran_variable_scopes_undefine_variable(code->scope, iterator_register);
+	tyran_variable_scopes_undefine_variable(code->scope, key_register);
+
+	return key_register;
 }
 
 tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran_code_state* code, tyran_parser_node* node, tyran_label_id true_label, tyran_label_id false_label, tyran_reg_index self_index, tyran_boolean invert_logic)

@@ -1,0 +1,7 @@
+array = [2, 4, 5]
+for i in array
+	print(i)
+---
+2
+4
+5

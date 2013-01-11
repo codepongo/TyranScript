@@ -128,6 +128,16 @@ void tyran_opcodes_op_index_set(tyran_opcodes* codes, tyran_reg_index a, tyran_r
 	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_INDEX_SET, a, x, y);
 }
 
+void tyran_opcodes_op_iter(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x)
+{
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_ITER, a, x, 0);
+}
+
+void tyran_opcodes_op_next(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x)
+{
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_NEXT, a, x, 0);
+}
+
 /* Branch */
 void tyran_opcodes_op_jeq(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, tyran_boolean boolean)
 {

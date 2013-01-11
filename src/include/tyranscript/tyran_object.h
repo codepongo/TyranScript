@@ -9,6 +9,7 @@ struct tyran_function_object;
 struct tyran_runtime;
 struct tyran_memory_pool;
 struct tyran_array;
+struct tree_iterator;
 
 typedef enum {
 	TYRAN_OBJECT_TYPE_OBJECT,
@@ -31,7 +32,7 @@ typedef struct tyran_object {
 		int value;
 		const struct tyran_string* str;
 		struct tyran_function_object* function;
-		struct tyran_object_iterator* iterator;
+		struct tree_iterator* iterator;
 		struct tyran_array* array;
 	} data;
 

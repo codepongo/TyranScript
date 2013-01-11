@@ -15,5 +15,5 @@ void tyran_object_release(struct tyran_object* o);
 #define tyran_object_set_function(o, func) (o)->type = TYRAN_OBJECT_TYPE_FUNCTION; (o)->data.function = func;
 #define tyran_object_set_string(o, string) (o)->type = TYRAN_OBJECT_TYPE_STRING; (o)->data.str = string;
 #define tyran_object_set_array(o, NEWARRAY) (o)->type = TYRAN_OBJECT_TYPE_ARRAY; (o)->data.array = NEWARRAY;
-
+#define tyran_object_set_iterator(o, ITERATOR) (o)->type = TYRAN_OBJECT_TYPE_ITERATOR; (o)->data.iterator = ITERATOR;
 #endif

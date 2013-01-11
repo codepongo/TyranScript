@@ -54,8 +54,8 @@ tyran_array* tyran_array_new(struct tyran_memory* memory)
 void tyran_array_copy(tyran_memory_pool* rb_node_pool, tyran_array* target, tree_root* source, int offset)
 {
 	tree_iterator* iterator = new_tree_iterator(source);
-	while (tree_iterator_has_next(iterator)) {
-		tyran_array_node* node = (tyran_array_node*) tree_iterator_next(iterator);
+	tyran_array_node* node;
+	while ((node = (tyran_array_node*) tree_iterator_next(iterator))) {
 		tyran_value key = node->key.key_value;
 		if (offset != 0) {
 			key.data.number += offset;

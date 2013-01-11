@@ -15,6 +15,9 @@
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_constants.h>
+#include <tyranscript/tyran_rb_tree.h>
+#include <tyranscript/tyran_array.h>
+#include <tyranscript/tyran_iterator_object.h>
 
 #define TYRAN_RUNTIME_DEBUG
 
@@ -200,6 +203,26 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				}
 			}
 			break;
+		case TYRAN_OPCODE_ITER: {
+			TYRAN_REGISTER_A_RCX;
+			struct tree_root* root = rcx.data.object->data.array->tree;
+			tree_iterator* iterator = new_tree_iterator(root);
+			tyran_value* iterator_value = tyran_iterator_object_new(runtime, iterator);
+			tyran_value_replace(r[a], *iterator_value);
+		}
+		break;
+		case TYRAN_OPCODE_NEXT: {
+			TYRAN_REGISTER_A_RCX;
+			tree_iterator* iterator = rcx.data.object->data.iterator;
+			tyran_array_node* node = tree_iterator_next(iterator);
+			if (node) {
+				tyran_value_replace(r[a], node->value);
+				pc++;
+			} else {
+				destroy_iterator(iterator);
+			}
+		}
+		break;
 		case TYRAN_OPCODE_NEG:
 			TYRAN_REGISTER_A_RCX;
 			tyran_value_set_number(r[a], -rcx.data.number);

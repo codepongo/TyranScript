@@ -131,6 +131,7 @@ static void rb_tree_insert_fixup(tree_root* root, tree_node* z)
 
 void* rb_tree_insert(tree_root* root, void* node)
 {
+	TYRAN_LOG("$$$ Insert:%p", node);
 	tree_node* y = &RBNIL, *x = root->root;
 
 	tree_node* z = new_rbtree_node(node);
@@ -336,49 +337,59 @@ void* rb_tree_delete(tree_root* root, void* key)
 
 tree_iterator* new_tree_iterator(tree_root* root)
 {
-	tree_node* aux = root->root;
 	tree_iterator* it = tyran_rb_tree_alloc(tree_iterator, 1);
 
-	while(aux->left != &RBNIL || aux->right != &RBNIL) {
-		while(aux->left != &RBNIL)
-		{ aux = aux->left; }
-
-		if(aux->right != &RBNIL)
-		{ aux = aux->right; }
-	}
-
-	it->current = aux;
+	it->current = root->root;
+	it->previous = &RBNIL;
+	TYRAN_ASSERT(it->current->parent == &RBNIL, "BAD TREE");
 
 	return it;
 }
 
-int tree_iterator_has_next(tree_iterator* it)
-{
-	if(it->current != &RBNIL)
-	{ return 1; }
-	return 0;
-}
 
 void* tree_iterator_next(tree_iterator* it)
 {
-	tree_node* aux;
-	tree_node* tn = it->current;
+	struct stree_node* previous = it->previous;
+	struct stree_node* current = it->current;
 
-	if(tn->parent != &RBNIL && tn->parent->right != &RBNIL && tn->parent->right != tn) {
-		aux = tn->parent->right;
-		while(aux->left != &RBNIL || aux->right != &RBNIL) {
-			while(aux->left != &RBNIL)
-			{ aux = aux->left; }
-
-			if(aux->right != &RBNIL)
-			{ aux = aux->right; }
-		}
-		it->current = aux;
-	} else {
-		it->current = it->current->parent;
+	if (current == &RBNIL) {
+		return 0;
 	}
 
-	return tn->node;
+	it->previous = current;
+
+	if (previous == current->parent) {
+		if (current->left != &RBNIL) {
+			TYRAN_LOG("$$$ GOING LEFT");
+			it->current = current->left;
+			if (it->current != &RBNIL) {
+				return tree_iterator_next(it);
+			}
+		} else {
+			if (current->right != &RBNIL) {
+				TYRAN_LOG("$$$ GOING RIGHT1");
+				it->current = current->right;
+			} else {
+				TYRAN_LOG("$$$ GOING UP1");
+				it->current = current->parent;
+			}
+		}
+	} else if (previous == current->left) {
+		if (current->right != &RBNIL) {
+				TYRAN_LOG("$$$ GOING RIGHT2");
+			it->current = current->right;
+		} else {
+				TYRAN_LOG("$$$ GOING UP3");
+			it->current = current->parent;
+		}
+	} else {
+				TYRAN_LOG("$$$ GOING UP2");
+		it->current = current->parent;
+		return tree_iterator_next(it);
+	}
+
+	TYRAN_LOG("$$$ pointer:%p", current->node);
+	return current->node;
 }
 
 void destroy_iterator(tree_iterator* it)
