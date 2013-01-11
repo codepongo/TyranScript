@@ -123,19 +123,16 @@ int tyran_object_length(const struct tyran_object* object)
 	return -1;
 }
 
-struct tyran_range_iterator* tyran_object_range_iterator(struct tyran_object* o)
-{
+struct tyran_range_iterator* tyran_object_range_iterator(struct tyran_object* o) {
 	TYRAN_ASSERT(o->type == TYRAN_OBJECT_TYPE_RANGE_ITERATOR, "Must be range iterator");
 	return o->data.range_iterator;
 }
-struct tyran_range* tyran_object_range(struct tyran_object* o)
-{
+struct tyran_range* tyran_object_range(struct tyran_object* o) {
 	TYRAN_ASSERT(o->type == TYRAN_OBJECT_TYPE_RANGE, "Must be range");
 	return o->data.range;
 }
 
-struct tree_iterator* tyran_object_array_iterator(struct tyran_object* o)
-{
+struct tree_iterator* tyran_object_array_iterator(struct tyran_object* o) {
 	TYRAN_ASSERT(o->type == TYRAN_OBJECT_TYPE_ARRAY_ITERATOR, "must be array iterator");
 	return o->data.array_iterator;
 }

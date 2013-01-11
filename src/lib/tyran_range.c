@@ -1,5 +1,5 @@
- #include <tyranscript/tyran_config.h>
- #include <tyranscript/tyran_range.h>
+#include <tyranscript/tyran_config.h>
+#include <tyranscript/tyran_range.h>
 
 tyran_range* tyran_range_new(tyran_memory* memory, int start, int end)
 {

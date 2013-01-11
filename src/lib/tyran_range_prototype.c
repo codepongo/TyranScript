@@ -39,7 +39,7 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_range_prototype_iter)
 		return -1;
 	}
 	tyran_range_iterator* iterator = tyran_range_iterator_new(runtime->memory, range->start, range->end);
-	
+
 	tyran_object* iterator_object = tyran_object_new(runtime);
 	tyran_object_set_prototype(iterator_object, runtime->_range_iterator_class);
 	tyran_object_set_range_iterator(iterator_object, iterator);

@@ -27,15 +27,15 @@ typedef struct tree_iterator {
 	struct stree_node* current;
 } tree_iterator;
 
- tree_root* new_simple_rbtree();
- tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), int (*compare_function_pointer)(void* keyA, void* keyB));
- void* rb_tree_insert(tree_root* root, void* node);
- void* rb_tree_delete(tree_root* root, void* key);
- void* search_rbtree(tree_root root, void* key);
- void destroy_rbtree(tree_root* root);
+tree_root* new_simple_rbtree();
+tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), int (*compare_function_pointer)(void* keyA, void* keyB));
+void* rb_tree_insert(tree_root* root, void* node);
+void* rb_tree_delete(tree_root* root, void* key);
+void* search_rbtree(tree_root root, void* key);
+void destroy_rbtree(tree_root* root);
 
- tree_iterator* new_tree_iterator(tree_root* root);
- void* tree_iterator_next(tree_iterator* it);
- void destroy_iterator(tree_iterator* it);
+tree_iterator* new_tree_iterator(tree_root* root);
+void* tree_iterator_next(tree_iterator* it);
+void destroy_iterator(tree_iterator* it);
 
 #endif

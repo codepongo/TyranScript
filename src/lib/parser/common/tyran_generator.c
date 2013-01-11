@@ -244,7 +244,7 @@ tyran_reg_or_constant_index tyran_generator_call(tyran_memory* memory, tyran_cod
 	return reg;
 }
 
-tyran_reg_or_constant_index tyran_generator_create_object_with_arguments(const char* klass, tyran_memory* memory, tyran_code_state* code, int argument_count, NODE* argument_nodes) 
+tyran_reg_or_constant_index tyran_generator_create_object_with_arguments(const char* klass, tyran_memory* memory, tyran_code_state* code, int argument_count, NODE* argument_nodes)
 {
 	tyran_constant_index array_symbol = tyran_constants_add_symbol_from_c_string(code->constants, klass);
 	tyran_constant_index constructor_symbol = tyran_constants_add_symbol_from_c_string(code->constants, "constructor");
@@ -626,7 +626,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_for(tyran_memory* memory, t
 	tyran_reg_index key_register = tyran_variable_scopes_define_identifier(memory, code->scope, key_variable_name);
 	tyran_reg_or_constant_index key = tyran_variable_scopes_define_identifier(memory, code->scope, key_variable_name);
 
-	
+
 	tyran_reg_index iterator_register = tyran_variable_scopes_define_temporary_variable(code->scope);
 	tyran_opcodes_op_iter(code->opcodes, iterator_register, collection_register);
 

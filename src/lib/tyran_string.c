@@ -72,7 +72,9 @@ void tyran_string_to_c_str(char* buf, int tyran_string_max_length, const tyran_s
 	int i;
 	int len = str->len;
 
-	for (i = 0; i < len && i < tyran_string_max_length - 1; ++i) { buf[i] = (char)str->buf[i]; }
+	for (i = 0; i < len && i < tyran_string_max_length - 1; ++i) {
+		buf[i] = (char)str->buf[i];
+	}
 	buf[i] = 0;
 }
 

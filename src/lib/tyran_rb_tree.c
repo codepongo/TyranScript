@@ -5,7 +5,7 @@
 #include <tyranscript/tyran_rb_tree_macros.h>
 #include <tyranscript/tyran_config.h>
 
- tree_node* new_rbtree_node(void* node)
+tree_node* new_rbtree_node(void* node)
 {
 	tree_node* z = tyran_rb_tree_alloc(tree_node, 1);
 
@@ -33,7 +33,7 @@ tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), in
 }
 
 /*WARNNING left_rbrotate assumes that rbrotate_on->right is NOT 0 and that root->parent IS 0*/
- void left_rbrotate(tree_root* root, tree_node* rbrotate_on)
+void left_rbrotate(tree_root* root, tree_node* rbrotate_on)
 {
 	tree_node* y = rbrotate_on->right;
 	rbrotate_on->right = y->left;
@@ -57,7 +57,7 @@ tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), in
 }
 
 /*WARNNING right_rbrotate assumes that rbrotate_on->left is NOT 0 and that root->parent IS 0*/
- void right_rbrotate(tree_root* root, tree_node* rbrotate_on)
+void right_rbrotate(tree_root* root, tree_node* rbrotate_on)
 {
 	tree_node* y = rbrotate_on->left;
 	rbrotate_on->left = y->right;
@@ -80,7 +80,7 @@ tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), in
 	rbrotate_on->parent = y;
 }
 
- void rb_tree_insert_fixup(tree_root* root, tree_node* z)
+void rb_tree_insert_fixup(tree_root* root, tree_node* z)
 {
 	tree_node* y;
 
@@ -165,7 +165,7 @@ void* rb_tree_insert(tree_root* root, void* node)
 	return 0;
 }
 
- tree_node* __search_rbtree_node(tree_root root, void* key)
+tree_node* __search_rbtree_node(tree_root root, void* key)
 {
 	tree_node* z = root.root;
 
@@ -194,7 +194,7 @@ void* search_rbtree(tree_root root, void* key)
 	return 0;
 }
 
- void __destroy_rbtree(tree_node* root)
+void __destroy_rbtree(tree_node* root)
 {
 	tree_node* l, *r;
 
@@ -217,7 +217,7 @@ void destroy_rbtree(tree_root* root)
 	tyran_free(root);
 }
 
- void __rb_transplant(tree_root* root, tree_node* u, tree_node* v)
+void __rb_transplant(tree_root* root, tree_node* u, tree_node* v)
 {
 	if (!u->parent) {
 		root->root = v;
@@ -240,7 +240,7 @@ tree_node* __rb_tree_minimum(tree_node* z)
 void __rb_tree_delete_fixup(tree_root* root, tree_node* x)
 {
 	tree_node* w;
-	
+
 	while (x != root->root && x->color == tyran_rb_tree_color_black) {
 		if (x == x->parent->left) {
 			w = x->parent->right;
@@ -380,14 +380,14 @@ void* tree_iterator_next(tree_iterator* it)
 		}
 	} else if (previous == current->left) {
 		if (current->right) {
-				TYRAN_LOG("$$$ GOING RIGHT2");
+			TYRAN_LOG("$$$ GOING RIGHT2");
 			it->current = current->right;
 		} else {
-				TYRAN_LOG("$$$ GOING UP3");
+			TYRAN_LOG("$$$ GOING UP3");
 			it->current = current->parent;
 		}
 	} else {
-				TYRAN_LOG("$$$ GOING UP2");
+		TYRAN_LOG("$$$ GOING UP2");
 		it->current = current->parent;
 		return tree_iterator_next(it);
 	}

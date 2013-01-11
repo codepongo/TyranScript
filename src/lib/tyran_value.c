@@ -61,8 +61,9 @@ int tyran_value_is_true(const tyran_value* value)
 	case TYRAN_VALUE_TYPE_BOOLEAN:
 		return value->data.boolean ? 1 : 0;
 	case TYRAN_VALUE_TYPE_NUMBER:
-		if (value->data.number == 0.0 || tyran_number_is_nan(value->data.number))
-		{ return 0; }
+		if (value->data.number == 0.0 || tyran_number_is_nan(value->data.number)) {
+			return 0;
+		}
 		return 1;
 	case TYRAN_VALUE_TYPE_OBJECT:
 		return 1;
