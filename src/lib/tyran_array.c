@@ -41,8 +41,6 @@ int tyran_array_key_compare(void* key_a, void* key_b)
 	return 0;
 }
 
-
-
 tyran_array* tyran_array_new(struct tyran_memory* memory)
 {
 	tyran_array* array = TYRAN_MALLOC_NO_POOL_TYPE(memory, tyran_array);
@@ -94,7 +92,6 @@ void tyran_array_insert(tyran_array* array, tyran_memory_pool* rb_node_pool, con
 {
 	tyran_array_key object_key;
 
-	//TYRAN_OBJECT_RETAIN(key->data.object);
 	object_key.key_value = *key;
 	object_key.flag = 0;
 	if (tyran_value_is_number(key)) {
@@ -113,7 +110,7 @@ tyran_value* tyran_array_lookup_helper(const tyran_array* array, const tyran_arr
 	if (!node) {
 		return 0;
 	}
-	*flag = 0; //TYRAN_OBJECT_KEY_FLAG(node->key);
+	*flag = 0;
 	return &node->value;
 }
 

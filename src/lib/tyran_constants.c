@@ -59,7 +59,6 @@ tyran_constant_index tyran_constants_add_symbol_from_c_string(tyran_constants* c
 	return tyran_constants_reserve_index(constants, &value);
 }
 
-
 tyran_constant_index tyran_constants_add_boolean(tyran_constants* constants, tyran_boolean v)
 {
 	tyran_value value;

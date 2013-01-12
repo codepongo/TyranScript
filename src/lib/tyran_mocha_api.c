@@ -13,7 +13,6 @@
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/tyran_array.h>
 
-
 void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size)
 {
 	u8t* start = tyran_malloc(hunk_size);
@@ -68,9 +67,6 @@ void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, const char
 
 
 	struct tyran_parser_node* parser_tree =  tyran_mocha_parser_parse(api->memory, mocha_lexer, mocha_parser_pool, enclosure_stack_pool, enclosure_info_pool, parser_node_parameter_pool, mocha_token_pool);
-
-
-
 
 
 	// tyran_parser_node_print("result", parser_tree, 0);

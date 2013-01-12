@@ -16,43 +16,43 @@
 #include <tyranscript/tyran_red_black_tree.h>
 
 
-int tyran_array_prototype_constructor(struct tyran_runtime* runtime, tyran_value* func, tyran_value* arguments, int argument_count, tyran_value* _this, tyran_value* return_value, int is_constructor)
+TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_constructor)
 {
 	tyran_value length;
 	tyran_value_set_number(length, argument_count);
 
 	tyran_array* array = tyran_array_new(runtime->memory);
 
-	tyran_object_set_array(_this->data.object, array);
+	tyran_object_set_array(self->data.object, array);
 
 
 	tyran_value index;
 
 	for (int i=0; i<argument_count; ++i) {
 		tyran_value_set_number(index, i);
-		tyran_array_insert(_this->data.object->data.array, runtime->rb_node_pool, &index, &arguments[i]);
+		tyran_array_insert(self->data.object->data.array, runtime->rb_node_pool, &index, &arguments[i]);
 	}
 
-	tyran_value_object_insert_c_string_key(runtime, _this, "length", &length);
+	tyran_value_object_insert_c_string_key(runtime, self, "length", &length);
 
 	return 0;
 }
 
-int tyran_array_prototype_push(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* c, int isconstructor)
+TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_push)
 {
 	tyran_value length;
 
 	tyran_value_set_number(length, 0);
-	tyran_array_insert(_this->data.object->data.array, runtime->rb_node_pool, &length, args);
+	tyran_array_insert(self->data.object->data.array, runtime->rb_node_pool, &length, arguments);
 
 	tyran_value_set_number(length, 1);
-	tyran_value_object_insert_c_string_key(runtime, _this, "length", &length);
+	tyran_value_object_insert_c_string_key(runtime, self, "length", &length);
 	return 0;
 }
 
-int tyran_array_prototype_index(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int isconstructor)
+TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_index)
 {
-	tyran_value* v = tyran_array_lookup(_this->data.object->data.array, args);
+	tyran_value* v = tyran_array_lookup(self->data.object->data.array, arguments);
 	if (!v) {
 		tyran_value_set_undefined(*return_value);
 	} else {
@@ -61,9 +61,9 @@ int tyran_array_prototype_index(struct tyran_runtime* runtime, tyran_value* a, t
 	return 0;
 }
 
-int tyran_array_prototype_index_set(struct tyran_runtime* runtime, tyran_value* a, tyran_value* args, int argument_count, tyran_value* _this, tyran_value* return_value, int isconstructor)
+TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_index_set)
 {
-	tyran_array_insert(_this->data.object->data.array, runtime->rb_node_pool, &args[0], &args[1]);
+	tyran_array_insert(self->data.object->data.array, runtime->rb_node_pool, &arguments[0], &arguments[1]);
 	tyran_value_set_undefined(*return_value);
 	return 0;
 }
@@ -84,11 +84,6 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_iter)
 	struct tyran_red_black_tree_iterator* iterator = tyran_red_black_tree_iterator_new(root);
 	tyran_value* iterator_value = tyran_iterator_object_new(runtime, iterator);
 	tyran_value_replace(*return_value, *iterator_value);
-	return 0;
-}
-
-int tyran_array_prototype_pop(struct tyran_runtime* r, tyran_value* a, tyran_value* b, int argument_count, tyran_value* _this, tyran_value* return_value, int isconstructor)
-{
 	return 0;
 }
 

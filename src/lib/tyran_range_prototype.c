@@ -49,7 +49,6 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_range_prototype_iter)
 	return 0;
 }
 
-
 void tyran_range_prototype_init(const struct tyran_runtime* runtime, tyran_value* o)
 {
 	TYRAN_MEMBER(o, "constructor", tyran_range_prototype_constructor);

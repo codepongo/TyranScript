@@ -37,8 +37,6 @@ typedef struct tyran_value {
 	(v).data.object = 0; \
 }
 
-/* if ((to).type == TYRAN_VALUE_TYPE_STRING) (to).data.str = tyran_string_strdup((to).data.str); */
-
 #define tyran_value_copy(to, from) { \
 	(to) = (from); \
 	if ((to).type == TYRAN_VALUE_TYPE_OBJECT) TYRAN_OBJECT_RETAIN((to).data.object);			\
@@ -122,8 +120,6 @@ typedef struct tyran_value {
 tyran_number tyran_value_number(tyran_value* v);
 tyran_boolean tyran_value_boolean(tyran_value* v);
 struct tyran_object* tyran_value_object(tyran_value* v);
-
-
 
 tyran_value* tyran_value_new(tyran_memory_pool* pool);
 tyran_value* tyran_value_duplicate(const tyran_value* v);

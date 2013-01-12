@@ -41,13 +41,3 @@ tyran_object* tyran_value_object(tyran_value* v)
 	TYRAN_ASSERT(tyran_value_is_object(v), "Must be object");
 	return v->data.object;
 }
-
-
-int tyran_value_length(const tyran_value* value)
-{
-	if (value->type != TYRAN_VALUE_TYPE_OBJECT) {
-		return -1;
-	}
-
-	return tyran_object_length(value->data.object);
-}

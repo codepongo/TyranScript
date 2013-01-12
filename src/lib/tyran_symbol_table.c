@@ -2,7 +2,6 @@
 #include <tyranscript/tyran_config.h>
 #include <tyranscript/tyran_symbol.h>
 
-
 tyran_symbol_table* tyran_symbol_table_new(tyran_memory* memory)
 {
 	tyran_symbol_table* table = TYRAN_MALLOC_NO_POOL_TYPE(memory, tyran_symbol_table);

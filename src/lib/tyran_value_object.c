@@ -33,7 +33,6 @@ void tyran_value_object_insert_c_string_key(const struct tyran_runtime* runtime,
 	tyran_value_object_insert(runtime, target, &symbol_value, value);
 }
 
-
 void tyran_value_object_delete(tyran_value* target, tyran_value* key)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only delete objects");

@@ -77,7 +77,6 @@ void* tyran_memory_pool_calloc_debug(tyran_memory_pool* pool, const char* type_n
 
 void tyran_memory_pool_free(void* p)
 {
-	TYRAN_LOG("free memory:%p", p);
 	u8t* m = p;
 	tyran_memory_pool_entry* e = (tyran_memory_pool_entry*)(m - sizeof(tyran_memory_pool_entry));
 
