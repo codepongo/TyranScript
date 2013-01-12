@@ -22,6 +22,8 @@ tyran_lexer* tyran_lexer_new(tyran_memory_pool* lexer_pool, tyran_memory* memory
 	lexer->string_buffer = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, char, lexer->string_buffer_max_size);
 	lexer->errors = tyran_errors_new(memory);
 	lexer->memory = memory;
+	lexer->target_indentation = 0;
+	lexer->current_indentation = 0;
 
 	tyran_memcpy_type(char, lexer->buffer, buf, lexer->size);
 	return lexer;

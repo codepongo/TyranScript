@@ -150,21 +150,19 @@ tyran_mocha_token_id tyran_mocha_lexer_keyword(const char* identifier)
 
 tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
-	static tyran_mocha_token token;
-	static int target_indentation = 0;
-	static int current_indentation = 0;
+	tyran_mocha_token token;
 
 	token.token_id = TYRAN_MOCHA_TOKEN_END;
 
 	tyran_lexer_set_begin(lexer_position_info, lexer);
 
-	if (current_indentation < target_indentation) {
+	if (lexer->current_indentation < lexer->target_indentation) {
 		token.token_id = TYRAN_MOCHA_TOKEN_BLOCK_START;
-		current_indentation++;
+		lexer->current_indentation++;
 		return token;
-	} else if (current_indentation > target_indentation) {
+	} else if (lexer->current_indentation > lexer->target_indentation) {
 		token.token_id = TYRAN_MOCHA_TOKEN_BLOCK_END;
-		current_indentation--;
+		lexer->current_indentation--;
 		return token;
 	}
 
@@ -173,8 +171,8 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		if (token.token_id != TYRAN_MOCHA_TOKEN_LINE_START && token.token_id != TYRAN_MOCHA_TOKEN_BLOCK_END) {
 			c = tyran_lexer_next_character_skip_whitespace_except_newline(lexer);
 			tyran_lexer_push_character(c, lexer);
-			target_indentation = lexer->indentation;
-			if (lexer->indentation != current_indentation) {
+			lexer->target_indentation = lexer->indentation;
+			if (lexer->indentation != lexer->current_indentation) {
 				return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
 			} else {
 				token.token_id = TYRAN_MOCHA_TOKEN_LINE_START;
@@ -183,9 +181,9 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 			return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
 		}
 	} else if (!c) {
-		if (current_indentation > 0) {
+		if (lexer->current_indentation > 0) {
 			tyran_lexer_push_character(c, lexer);
-			target_indentation = 0;
+			lexer->target_indentation = 0;
 			return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
 		} else {
 			token.token_id = TYRAN_MOCHA_TOKEN_END;

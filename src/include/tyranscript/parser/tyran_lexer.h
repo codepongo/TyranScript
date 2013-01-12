@@ -15,6 +15,8 @@ typedef struct tyran_lexer {
 	int tab_count;
 	int last_token;
 
+	int target_indentation;
+	int current_indentation;
 
 	char* string_buffer;
 	int string_buffer_max_size;
