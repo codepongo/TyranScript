@@ -24,6 +24,7 @@ typedef struct tyran_lexer {
 
 	tyran_memory* memory;
 	struct tyran_errors* errors;
+	tyran_boolean last_was_whitespace;
 
 } tyran_lexer;
 
@@ -38,10 +39,10 @@ typedef void* tyran_lexer_token_data;
 
 tyran_lexer* tyran_lexer_new(tyran_memory_pool* lexer_pool, tyran_memory* memory, const char* buf);
 int tyran_lexer_is_alpha(int c);
-int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max_length);
+int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max_length, tyran_boolean* last_was_whitespace);
 void tyran_lexer_set_begin(tyran_lexer_position_info* lexer_position_info, const tyran_lexer* lexer);
 char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer);
-char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexer);
+char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexer, tyran_boolean* last_was_whitespace);
 void tyran_lexer_set_end(tyran_lexer_position_info* lexer_position_info, const tyran_lexer* lexer);
 int tyran_lexer_is_digit(int c);
 int tyran_lexer_parse_number(tyran_lexer* lexer, char c, tyran_lexer_position_info* lexer_position_info, tyran_number* token);

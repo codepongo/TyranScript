@@ -24,6 +24,7 @@ tyran_lexer* tyran_lexer_new(tyran_memory_pool* lexer_pool, tyran_memory* memory
 	lexer->memory = memory;
 	lexer->target_indentation = 0;
 	lexer->current_indentation = 0;
+	lexer->last_was_whitespace = TYRAN_TRUE;
 
 	tyran_memcpy_type(char, lexer->buffer, buf, lexer->size);
 	return lexer;
@@ -84,6 +85,11 @@ int tyran_lexer_is_alpha(int c)
 int tyran_lexer_is_alpha_numeric(int c)
 {
 	return tyran_lexer_is_alpha(c) || tyran_lexer_is_digit(c);
+}
+
+tyran_boolean tyran_lexer_is_whitespace(int c)
+{
+	return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
 
 int tyran_lexer_parse_string(tyran_lexer* lexer, char* buf, int* length)
@@ -148,7 +154,7 @@ char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
 	return c;
 }
 
-char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexer)
+char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexer, tyran_boolean* last_was_whitespace)
 {
 	char c;
 
@@ -156,6 +162,8 @@ char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexe
 
 
 	}
+
+	*last_was_whitespace = tyran_lexer_is_whitespace(c);
 
 	return c;
 }
@@ -173,7 +181,7 @@ void tyran_lexer_set_end(tyran_lexer_position_info* lexer_position_info, const t
 	lexer_position_info->last_column = lexer->column;
 }
 
-int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max_length)
+int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max_length, tyran_boolean* last_was_whitespace)
 {
 	int string_index = 0;
 
@@ -188,6 +196,7 @@ int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max
 	}
 
 	buf[string_index] = 0;
+	*last_was_whitespace = tyran_lexer_is_whitespace(c);
 	*max_length = string_index;
 
 	return 0;

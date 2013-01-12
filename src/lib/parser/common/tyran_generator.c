@@ -222,7 +222,6 @@ tyran_parser_node_call* tyran_generator_call_node(tyran_memory* memory, NODE fun
 	tyran_generator_argument_nodes(argument_nodes, &argument_count, arguments);
 
 	tyran_parser_node_call* call_node = (tyran_parser_node_call*) tyran_parser_call(memory, function, argument_nodes, argument_count);
-	//tyran_parser_node_print("call", call_node, 0);
 	return call_node;
 }
 
@@ -444,6 +443,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_assignment(tyran_memory* me
 			return source_index;
 
 		} else {
+			tyran_parser_node_print("Unknown", &binary->left, 0);
 			TYRAN_ERROR("Unknown type:%d", binary->left->type);
 		}
 	}

@@ -98,8 +98,9 @@ int tyran_lexer_assembler_parse_identifier_or_keyword(tyran_lexer* lexer, char c
 {
 	char buf[512];
 	int len = 512;
+	tyran_boolean last_was_whitespace;
 
-	tyran_lexer_parse_identifier(lexer, c, buf, &len);
+	tyran_lexer_parse_identifier(lexer, c, buf, &len, &last_was_whitespace);
 	int r = tyran_lexer_assembler_get_keyword_token(buf);
 	if (r) {
 		return r;

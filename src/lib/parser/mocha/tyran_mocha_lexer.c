@@ -104,42 +104,43 @@ tyran_mocha_token_id tyran_mocha_lexer_keyword(const char* identifier)
 {
 	typedef struct tyran_mocha_keyword_info {
 		const char* name;
-		int len;
 		tyran_mocha_token_id value;
 	} tyran_mocha_keyword_info;
 
+	TYRAN_LOG("Trying to find match for '%s'", identifier);
+
 	static tyran_mocha_keyword_info keywords[] = {
-		{ "if", 2, TYRAN_MOCHA_TOKEN_IF },
-		{ "unless", 6, TYRAN_MOCHA_TOKEN_UNLESS },
-		{ "then", 4, TYRAN_MOCHA_TOKEN_THEN },
-		{ "else", 4, TYRAN_MOCHA_TOKEN_ELSE },
-		{ "true", 4, TYRAN_MOCHA_TOKEN_TRUE },
-		{ "false", 5, TYRAN_MOCHA_TOKEN_FALSE },
-		{ "undefined", 9, TYRAN_MOCHA_TOKEN_UNDEFINED },
-		{ "self", 4, TYRAN_MOCHA_TOKEN_SELF },
-		{ "class", 5, TYRAN_MOCHA_TOKEN_CLASS },
-		{ "extends", 7, TYRAN_MOCHA_TOKEN_EXTENDS },
-		{ "return", 6, TYRAN_MOCHA_TOKEN_RETURN },
-		{ "while", 5, TYRAN_MOCHA_TOKEN_WHILE },
-		{ "until", 5, TYRAN_MOCHA_TOKEN_UNTIL },
-		{ "switch", 6, TYRAN_MOCHA_TOKEN_SWITCH },
-		{ "case", 4, TYRAN_MOCHA_TOKEN_CASE },
-		{ "when", 4, TYRAN_MOCHA_TOKEN_WHEN },
-		{ "for", 3, TYRAN_MOCHA_TOKEN_FOR },
-		{ "break", 5, TYRAN_MOCHA_TOKEN_BREAK },
-		{ "continue", 8, TYRAN_MOCHA_TOKEN_CONTINUE },
-		{ "super", 5, TYRAN_MOCHA_TOKEN_SUPER },
-		{ "isnt", 4, TYRAN_MOCHA_TOKEN_NOT_EQUAL },
-		{ "is", 2, TYRAN_MOCHA_TOKEN_EQUAL },
-		{ "in", 2, TYRAN_MOCHA_TOKEN_IN },
-		{ "and", 3, TYRAN_MOCHA_TOKEN_AND },
-		{ "or", 3, TYRAN_MOCHA_TOKEN_OR },
-		{ "not", 3, TYRAN_MOCHA_TOKEN_NOT },
+		{ "if", TYRAN_MOCHA_TOKEN_IF },
+		{ "unless", TYRAN_MOCHA_TOKEN_UNLESS },
+		{ "then", TYRAN_MOCHA_TOKEN_THEN },
+		{ "else", TYRAN_MOCHA_TOKEN_ELSE },
+		{ "true", TYRAN_MOCHA_TOKEN_TRUE },
+		{ "false", TYRAN_MOCHA_TOKEN_FALSE },
+		{ "undefined", TYRAN_MOCHA_TOKEN_UNDEFINED },
+		{ "self", TYRAN_MOCHA_TOKEN_SELF },
+		{ "class", TYRAN_MOCHA_TOKEN_CLASS },
+		{ "extends", TYRAN_MOCHA_TOKEN_EXTENDS },
+		{ "return", TYRAN_MOCHA_TOKEN_RETURN },
+		{ "while", TYRAN_MOCHA_TOKEN_WHILE },
+		{ "until", TYRAN_MOCHA_TOKEN_UNTIL },
+		{ "switch", TYRAN_MOCHA_TOKEN_SWITCH },
+		{ "case", TYRAN_MOCHA_TOKEN_CASE },
+		{ "when", TYRAN_MOCHA_TOKEN_WHEN },
+		{ "for", TYRAN_MOCHA_TOKEN_FOR },
+		{ "break", TYRAN_MOCHA_TOKEN_BREAK },
+		{ "continue", TYRAN_MOCHA_TOKEN_CONTINUE },
+		{ "super", TYRAN_MOCHA_TOKEN_SUPER },
+		{ "isnt", TYRAN_MOCHA_TOKEN_NOT_EQUAL },
+		{ "is", TYRAN_MOCHA_TOKEN_EQUAL },
+		{ "in", TYRAN_MOCHA_TOKEN_IN },
+		{ "and", TYRAN_MOCHA_TOKEN_AND },
+		{ "or", TYRAN_MOCHA_TOKEN_OR },
+		{ "not", TYRAN_MOCHA_TOKEN_NOT },
 	};
 
 	size_t i;
 	for (i = 0; i < sizeof(keywords) / sizeof(tyran_mocha_keyword_info); ++i) {
-		if (tyran_strncmp(identifier, keywords[i].name, keywords[i].len) == 0) {
+		if (tyran_strcmp(identifier, keywords[i].name) == 0) {
 			return keywords[i].value;
 		}
 	}
@@ -165,11 +166,13 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		lexer->current_indentation--;
 		return token;
 	}
+	tyran_boolean last_was_whitespace;
+	char c = tyran_lexer_next_character_skip_whitespace_except_newline(lexer, &last_was_whitespace);
+	lexer->last_was_whitespace |= last_was_whitespace;
 
-	char c = tyran_lexer_next_character_skip_whitespace_except_newline(lexer);
 	if (c == '\n') {
 		if (token.token_id != TYRAN_MOCHA_TOKEN_LINE_START && token.token_id != TYRAN_MOCHA_TOKEN_BLOCK_END) {
-			c = tyran_lexer_next_character_skip_whitespace_except_newline(lexer);
+			c = tyran_lexer_next_character_skip_whitespace_except_newline(lexer, &last_was_whitespace);
 			tyran_lexer_push_character(c, lexer);
 			lexer->target_indentation = lexer->indentation;
 			if (lexer->indentation != lexer->current_indentation) {
@@ -191,16 +194,27 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 	} else if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
 		int len = 100;
 		char identifier[100];
+		tyran_boolean ended_with_whitespace;
 
-		tyran_lexer_parse_identifier(lexer, c, identifier, &len);
+		tyran_lexer_parse_identifier(lexer, c, identifier, &len, &ended_with_whitespace);
+		tyran_mocha_token_id token_id = TYRAN_MOCHA_TOKEN_IDENTIFIER;
 
-		tyran_mocha_token_id token_id = tyran_mocha_lexer_keyword(identifier);
-		token.token_data = tyran_strdup(lexer->memory, identifier);
-		if (token_id) {
-			token.token_id = token_id;
-		} else {
-			token.token_id = TYRAN_MOCHA_TOKEN_IDENTIFIER;
+		TYRAN_LOG("$$$ Started:%d ended:%d (%s)", lexer->last_was_whitespace, ended_with_whitespace, identifier);
+		if (lexer->last_was_whitespace && ended_with_whitespace) {
+			tyran_mocha_token_id found_id = tyran_mocha_lexer_keyword(identifier);
+			if (found_id != TYRAN_MOCHA_TOKEN_END) {
+				token_id = found_id;
+			}
 		}
+
+		token.token_id = token_id;
+
+		if (token_id != TYRAN_MOCHA_TOKEN_IDENTIFIER) {
+			token.token_data = 0;
+		} else {
+			token.token_data = tyran_strdup(lexer->memory, identifier);
+		}
+		lexer->last_was_whitespace = ended_with_whitespace;
 	} else if (tyran_lexer_is_digit(c)) {
 		int worked = tyran_lexer_parse_number(lexer, c, lexer_position_info, &lexer->number);
 		if (!worked) {
