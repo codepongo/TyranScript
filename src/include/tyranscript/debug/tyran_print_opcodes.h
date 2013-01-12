@@ -1,7 +1,7 @@
 #ifndef _TYRAN_OPCODES_PRINT_H
 #define _TYRAN_OPCODES_PRINT_H
 
-#include "tyranscript/tyran_opcodes.h"
+#include <tyranscript/tyran_opcodes.h>
 
 struct tyran_opcodes;
 struct tyran_constants;

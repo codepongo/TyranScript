@@ -8,7 +8,7 @@ struct tyran_memory;
 
 struct tyran_memory_pool;
 
-typedef tyran_uint16 tyran_array_key_flag_type;
+typedef u16t tyran_array_key_flag_type;
 
 typedef struct tyran_array_key {
 	tyran_value key_value;

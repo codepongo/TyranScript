@@ -3,9 +3,9 @@
 
 #include <tyranscript/tyran_config.h>
 
-typedef tyran_uint16 tyran_string_length_type;
+typedef u16t tyran_string_length_type;
 
-typedef tyran_uint16 tyran_string_char;
+typedef u16t tyran_string_char;
 
 typedef struct tyran_string {
 	tyran_string_length_type len;

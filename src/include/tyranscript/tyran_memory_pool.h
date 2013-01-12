@@ -26,4 +26,14 @@ void* tyran_memory_pool_alloc_debug(tyran_memory_pool* pool, const char* type_na
 void* tyran_memory_pool_calloc_debug(tyran_memory_pool* pool, const char* type_name, size_t struct_size);
 void tyran_memory_pool_free(void*);
 
+#define TYRAN_MEMORY_POOL_CONSTRUCT(memory, T, count) tyran_memory_pool_construct(memory, sizeof(T), 400, #T)
+
+#define TYRAN_CALLOC_TYPE(pool, T) (T*) tyran_memory_pool_calloc_debug(pool, #T, sizeof(T));
+#define TYRAN_MALLOC_TYPE(pool, type) (type*) tyran_memory_pool_alloc_debug(pool, #type, sizeof(type));
+#define TYRAN_MALLOC_FREE(p) tyran_memory_pool_free(p);
+
+#define TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, type, count) (type*) TYRAN_MEMORY_CALLOC(memory, count * sizeof(type), #type);
+#define TYRAN_MALLOC_NO_POOL_TYPE(memory, type) (type*) TYRAN_MEMORY_CALLOC(memory, sizeof(type), #type);
+
+
 #endif

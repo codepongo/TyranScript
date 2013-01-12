@@ -65,7 +65,7 @@ typedef enum tyran_mocha_token_id {
 	TYRAN_MOCHA_TOKEN_LINE_START,
 	TYRAN_MOCHA_TOKEN_RANGE_INCLUSIVE,
 	TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE,
-	TYRAN_MOCHA_TOKEN_MAX,
+	TYRAN_MOCHA_TOKEN_MAX
 } tyran_mocha_token_id;
 
 typedef struct tyran_mocha_token {

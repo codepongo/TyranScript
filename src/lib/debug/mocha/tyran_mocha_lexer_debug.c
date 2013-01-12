@@ -14,8 +14,8 @@ void tyran_mocha_lexer_debug(tyran_mocha_lexer* lexer)
 
 void tyran_mocha_lexer_debug_tokens(const char* description, tyran_mocha_token* first, tyran_mocha_token* last)
 {
-	TYRAN_LOG("== %s ==", description);
 	tyran_mocha_token* token = first;
+	TYRAN_LOG("== %s ==", description);
 
 	for (token = first; token; token = tyran_mocha_lexer_next(token, last)) {
 		tyran_mocha_lexer_debug_token(token);

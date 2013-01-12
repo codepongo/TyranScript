@@ -51,24 +51,3 @@ int tyran_value_length(const tyran_value* value)
 
 	return tyran_object_length(value->data.object);
 }
-
-int tyran_value_is_true(const tyran_value* value)
-{
-	switch(value->type) {
-	case TYRAN_VALUE_TYPE_UNDEFINED:
-	case TYRAN_VALUE_TYPE_NULL:
-		return 0;
-	case TYRAN_VALUE_TYPE_BOOLEAN:
-		return value->data.boolean ? 1 : 0;
-	case TYRAN_VALUE_TYPE_NUMBER:
-		if (value->data.number == 0.0 || tyran_number_is_nan(value->data.number)) {
-			return 0;
-		}
-		return 1;
-	case TYRAN_VALUE_TYPE_OBJECT:
-		return 1;
-	default:
-		TYRAN_ERROR("Can not convert value to true");
-		break;
-	}
-}
