@@ -5,26 +5,21 @@
 #include <tyranscript/tyran_rb_tree_macros.h>
 #include <tyranscript/tyran_config.h>
 
-tree_node* new_rbtree_node(void* node)
+tyran_red_black_tree_node* tyran_red_black_tree_node_new(void* node)
 {
-	tree_node* z = tyran_rb_tree_alloc(tree_node, 1);
+	tyran_red_black_tree_node* z = tyran_red_black_tree_alloc(tyran_red_black_tree_node, 1);
 
 	z->node = node;
 	z->parent = 0;
 	z->left = 0;
 	z->right = 0;
-	z->color = tyran_rb_tree_color_red;
+	z->color = tyran_red_black_tree_color_red;
 	return z;
 }
 
-tree_root* new_simple_rbtree()
+tyran_red_black_tree* tyran_red_black_tree_new(void* (*key_function_pointer)(struct tyran_red_black_tree_node* node), int (*compare_function_pointer)(void* keyA, void* keyB))
 {
-	return new_rbtree(0, 0);
-}
-
-tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), int (*compare_function_pointer)(void* keyA, void* keyB))
-{
-	tree_root* r = tyran_rb_tree_alloc(tree_root, 1);
+	tyran_red_black_tree* r = tyran_red_black_tree_alloc(tyran_red_black_tree, 1);
 	r->root = 0;
 	r->key = key_function_pointer;
 	r->compare = compare_function_pointer;
@@ -33,9 +28,9 @@ tree_root* new_rbtree(void* (*key_function_pointer)(struct stree_node* node), in
 }
 
 /*WARNNING left_rbrotate assumes that rbrotate_on->right is NOT 0 and that root->parent IS 0*/
-void left_rbrotate(tree_root* root, tree_node* rbrotate_on)
+void tyran_red_black_tree_left_rotate(tyran_red_black_tree* root, tyran_red_black_tree_node* rbrotate_on)
 {
-	tree_node* y = rbrotate_on->right;
+	tyran_red_black_tree_node* y = rbrotate_on->right;
 	rbrotate_on->right = y->left;
 
 	if (y->left) {
@@ -57,9 +52,9 @@ void left_rbrotate(tree_root* root, tree_node* rbrotate_on)
 }
 
 /*WARNNING right_rbrotate assumes that rbrotate_on->left is NOT 0 and that root->parent IS 0*/
-void right_rbrotate(tree_root* root, tree_node* rbrotate_on)
+void tyran_red_black_tree_right_rotate(tyran_red_black_tree* root, tyran_red_black_tree_node* rbrotate_on)
 {
-	tree_node* y = rbrotate_on->left;
+	tyran_red_black_tree_node* y = rbrotate_on->left;
 	rbrotate_on->left = y->right;
 
 	if (y->right) {
@@ -80,57 +75,56 @@ void right_rbrotate(tree_root* root, tree_node* rbrotate_on)
 	rbrotate_on->parent = y;
 }
 
-void rb_tree_insert_fixup(tree_root* root, tree_node* z)
+void tyran_red_black_tree_insert_fixup(tyran_red_black_tree* root, tyran_red_black_tree_node* z)
 {
-	tree_node* y;
+	tyran_red_black_tree_node* y;
 
-	while (z->parent && z->parent->color == tyran_rb_tree_color_red) {
+	while (z->parent && z->parent->color == tyran_red_black_tree_color_red) {
 		if (z->parent == z->parent->parent->left) {
 			y = z->parent->parent->right;
 
-			if (y->color == tyran_rb_tree_color_red) {
-				z->parent->color = tyran_rb_tree_color_black;
-				y->color = tyran_rb_tree_color_black;
-				z->parent->parent->color = tyran_rb_tree_color_red;
+			if (y->color == tyran_red_black_tree_color_red) {
+				z->parent->color = tyran_red_black_tree_color_black;
+				y->color = tyran_red_black_tree_color_black;
+				z->parent->parent->color = tyran_red_black_tree_color_red;
 				z = z->parent->parent;
 			} else {
 				if (z == z->parent->right) {
 					z = z->parent;
-					left_rbrotate(root, z);
+					tyran_red_black_tree_left_rotate(root, z);
 				}
-				z->parent->color = tyran_rb_tree_color_black;
-				z->parent->parent->color = tyran_rb_tree_color_red;
-				right_rbrotate(root, z->parent->parent);
+				z->parent->color = tyran_red_black_tree_color_black;
+				z->parent->parent->color = tyran_red_black_tree_color_red;
+				tyran_red_black_tree_right_rotate(root, z->parent->parent);
 			}
 		} else {
 			y = z->parent->parent->left;
 
-			if (y && y->color == tyran_rb_tree_color_red) {
-				z->parent->color = tyran_rb_tree_color_black;
-				y->color = tyran_rb_tree_color_black;
-				z->parent->parent->color = tyran_rb_tree_color_red;
+			if (y && y->color == tyran_red_black_tree_color_red) {
+				z->parent->color = tyran_red_black_tree_color_black;
+				y->color = tyran_red_black_tree_color_black;
+				z->parent->parent->color = tyran_red_black_tree_color_red;
 				z = z->parent->parent;
 			} else {
 				if (z == z->parent->left) {
 					z = z->parent;
-					right_rbrotate(root, z);
+					tyran_red_black_tree_right_rotate(root, z);
 				}
-				z->parent->color = tyran_rb_tree_color_black;
-				z->parent->parent->color = tyran_rb_tree_color_red;
-				left_rbrotate(root, z->parent->parent);
+				z->parent->color = tyran_red_black_tree_color_black;
+				z->parent->parent->color = tyran_red_black_tree_color_red;
+				tyran_red_black_tree_left_rotate(root, z->parent->parent);
 			}
 		}
 	}
 
-	root->root->color = tyran_rb_tree_color_black;
+	root->root->color = tyran_red_black_tree_color_black;
 }
 
-void* rb_tree_insert(tree_root* root, void* node)
+void* tyran_red_black_tree_insert(tyran_red_black_tree* root, void* node)
 {
-	TYRAN_LOG("$$$ Insert:%p", node);
-	tree_node* y = 0, *x = root->root;
+	tyran_red_black_tree_node* y = 0, *x = root->root;
 
-	tree_node* z = new_rbtree_node(node);
+	tyran_red_black_tree_node* z = tyran_red_black_tree_node_new(node);
 
 	while (x) {
 		y = x;
@@ -161,13 +155,13 @@ void* rb_tree_insert(tree_root* root, void* node)
 		}
 	}
 
-	rb_tree_insert_fixup(root, z);
+	tyran_red_black_tree_insert_fixup(root, z);
 	return 0;
 }
 
-tree_node* __search_rbtree_node(tree_root root, void* key)
+tyran_red_black_tree_node* tyran_red_black_tree_search_node(tyran_red_black_tree root, void* key)
 {
-	tree_node* z = root.root;
+	tyran_red_black_tree_node* z = root.root;
 
 	while (z) {
 		if (root.compare(root.key(z), key) == 0) {
@@ -184,9 +178,9 @@ tree_node* __search_rbtree_node(tree_root root, void* key)
 	return 0;
 }
 
-void* search_rbtree(tree_root root, void* key)
+void* tyran_red_black_tree_search(tyran_red_black_tree root, void* key)
 {
-	tree_node* z = __search_rbtree_node(root, key);
+	tyran_red_black_tree_node* z = tyran_red_black_tree_search_node(root, key);
 	if (z) {
 		return z->node;
 	}
@@ -194,9 +188,9 @@ void* search_rbtree(tree_root root, void* key)
 	return 0;
 }
 
-void __destroy_rbtree(tree_node* root)
+void tyran_red_black_tree_destroy_fixup(tyran_red_black_tree_node* root)
 {
-	tree_node* l, *r;
+	tyran_red_black_tree_node* l, *r;
 
 	if (!root) {
 		return;
@@ -207,17 +201,17 @@ void __destroy_rbtree(tree_node* root)
 
 	tyran_free(root);
 
-	__destroy_rbtree(l);
-	__destroy_rbtree(r);
+	tyran_red_black_tree_destroy_fixup(l);
+	tyran_red_black_tree_destroy_fixup(r);
 }
 
-void destroy_rbtree(tree_root* root)
+void tyran_red_black_tree_destroy(tyran_red_black_tree* root)
 {
-	__destroy_rbtree(root->root);
+	tyran_red_black_tree_destroy_fixup(root->root);
 	tyran_free(root);
 }
 
-void __rb_transplant(tree_root* root, tree_node* u, tree_node* v)
+void tyran_red_black_tree_transplant(tyran_red_black_tree* root, tyran_red_black_tree_node* u, tyran_red_black_tree_node* v)
 {
 	if (!u->parent) {
 		root->root = v;
@@ -230,108 +224,108 @@ void __rb_transplant(tree_root* root, tree_node* u, tree_node* v)
 	v->parent = u->parent;
 }
 
-tree_node* __rb_tree_minimum(tree_node* z)
+tyran_red_black_tree_node* tyran_red_black_tree_minimum(tyran_red_black_tree_node* z)
 {
 	for(; z->left; z = z->left)
 		;
 	return z;
 }
 
-void __rb_tree_delete_fixup(tree_root* root, tree_node* x)
+void tyran_red_black_tree_delete_fixup(tyran_red_black_tree* root, tyran_red_black_tree_node* x)
 {
-	tree_node* w;
+	tyran_red_black_tree_node* w;
 
-	while (x != root->root && x->color == tyran_rb_tree_color_black) {
+	while (x != root->root && x->color == tyran_red_black_tree_color_black) {
 		if (x == x->parent->left) {
 			w = x->parent->right;
-			if (w->color == tyran_rb_tree_color_red) {
-				w->color = tyran_rb_tree_color_black;
-				x->parent->color = tyran_rb_tree_color_red;
-				left_rbrotate(root, x->parent);
+			if (w->color == tyran_red_black_tree_color_red) {
+				w->color = tyran_red_black_tree_color_black;
+				x->parent->color = tyran_red_black_tree_color_red;
+				tyran_red_black_tree_left_rotate(root, x->parent);
 				w = x->parent->right;
 			}
-			if (w->left->color == tyran_rb_tree_color_black && w->right->color == tyran_rb_tree_color_black) {
-				w->color = tyran_rb_tree_color_red;
+			if (w->left->color == tyran_red_black_tree_color_black && w->right->color == tyran_red_black_tree_color_black) {
+				w->color = tyran_red_black_tree_color_red;
 				x = x->parent;
 			} else {
-				if (w->right->color == tyran_rb_tree_color_black) {
-					w->left->color = tyran_rb_tree_color_black;
-					w->color = tyran_rb_tree_color_red;
-					right_rbrotate(root, w);
+				if (w->right->color == tyran_red_black_tree_color_black) {
+					w->left->color = tyran_red_black_tree_color_black;
+					w->color = tyran_red_black_tree_color_red;
+					tyran_red_black_tree_right_rotate(root, w);
 					w = w->parent->right;
 				}
 				w->color = x->parent->color;
-				x->parent->color = tyran_rb_tree_color_black;
-				w->right->color = tyran_rb_tree_color_black;
-				left_rbrotate(root, x->parent);
+				x->parent->color = tyran_red_black_tree_color_black;
+				w->right->color = tyran_red_black_tree_color_black;
+				tyran_red_black_tree_left_rotate(root, x->parent);
 				x = root->root;
 			}
 		} else {
 			w = x->parent->left;
-			if (w->color == tyran_rb_tree_color_red) {
-				w->color = tyran_rb_tree_color_black;
-				x->parent->color = tyran_rb_tree_color_red;
-				right_rbrotate(root, x->parent);
+			if (w->color == tyran_red_black_tree_color_red) {
+				w->color = tyran_red_black_tree_color_black;
+				x->parent->color = tyran_red_black_tree_color_red;
+				tyran_red_black_tree_right_rotate(root, x->parent);
 				w = x->parent->left;
 			}
-			if (w->right->color == tyran_rb_tree_color_black && w->left->color == tyran_rb_tree_color_black) {
-				w->color = tyran_rb_tree_color_red;
+			if (w->right->color == tyran_red_black_tree_color_black && w->left->color == tyran_red_black_tree_color_black) {
+				w->color = tyran_red_black_tree_color_red;
 				x = x->parent;
 			} else {
-				if (w->left->color == tyran_rb_tree_color_black) {
-					w->right->color = tyran_rb_tree_color_black;
-					w->color = tyran_rb_tree_color_red;
-					left_rbrotate(root, w);
+				if (w->left->color == tyran_red_black_tree_color_black) {
+					w->right->color = tyran_red_black_tree_color_black;
+					w->color = tyran_red_black_tree_color_red;
+					tyran_red_black_tree_left_rotate(root, w);
 					w = w->parent->left;
 				}
 				w->color = x->parent->color;
-				x->parent->color = tyran_rb_tree_color_black;
-				w->left->color = tyran_rb_tree_color_black;
-				right_rbrotate(root, x->parent);
+				x->parent->color = tyran_red_black_tree_color_black;
+				w->left->color = tyran_red_black_tree_color_black;
+				tyran_red_black_tree_right_rotate(root, x->parent);
 				x = root->root;
 			}
 		}
 	}
-	x->color = tyran_rb_tree_color_black;
+	x->color = tyran_red_black_tree_color_black;
 }
 
-void* rb_tree_delete(tree_root* root, void* key)
+void* rb_tree_delete(tyran_red_black_tree* root, void* key)
 {
-	tree_node* y, *z, *x, *hold_node_to_delete;
-	tyran_rb_tree_color y_original_color;
+	tyran_red_black_tree_node* y, *z, *x, *hold_node_to_delete;
+	tyran_red_black_tree_color y_original_color;
 	void* node_to_return;
 
-	hold_node_to_delete = y = z = __search_rbtree_node(*root, key);
+	hold_node_to_delete = y = z = tyran_red_black_tree_search_node(*root, key);
 
 	node_to_return = y->node;
 
 	y_original_color = y->color;
 	if (!z->left) {
 		x = z->right;
-		__rb_transplant(root, z, z->right);
+		tyran_red_black_tree_transplant(root, z, z->right);
 	} else if (!z->right) {
 		x = z->left;
-		__rb_transplant(root, z, z->left);
+		tyran_red_black_tree_transplant(root, z, z->left);
 	} else {
-		y = __rb_tree_minimum(z->right);
+		y = tyran_red_black_tree_minimum(z->right);
 		y_original_color = y->color;
 		x = y->right;
 		if (y->parent == z) {
 			x->parent = y;
 		} else {
-			__rb_transplant(root, y, y->right);
+			tyran_red_black_tree_transplant(root, y, y->right);
 			y->right = z->right;
 			y->right->parent = y;
 		}
 
-		__rb_transplant(root, z, y);
+		tyran_red_black_tree_transplant(root, z, y);
 		y->left = z->left;
 		y->left->parent = y;
 		y->color = z->color;
 	}
 
-	if (y_original_color == tyran_rb_tree_color_black) {
-		__rb_tree_delete_fixup(root, x);
+	if (y_original_color == tyran_red_black_tree_color_black) {
+		tyran_red_black_tree_delete_fixup(root, x);
 	}
 
 	tyran_free(hold_node_to_delete);
@@ -339,22 +333,20 @@ void* rb_tree_delete(tree_root* root, void* key)
 	return node_to_return;
 }
 
-tree_iterator* new_tree_iterator(tree_root* root)
+tyran_red_black_tree_iterator* tyran_red_black_tree_iterator_new(tyran_red_black_tree* root)
 {
-	tree_iterator* it = tyran_rb_tree_alloc(tree_iterator, 1);
+	tyran_red_black_tree_iterator* it = tyran_red_black_tree_alloc(tyran_red_black_tree_iterator, 1);
 
 	it->current = root->root;
 	it->previous = 0;
-	TYRAN_ASSERT(it->current->parent == 0, "BAD TREE");
 
 	return it;
 }
 
-
-void* tree_iterator_next(tree_iterator* it)
+void* tyran_red_black_tree_iterator_next(tyran_red_black_tree_iterator* it)
 {
-	struct stree_node* previous = it->previous;
-	struct stree_node* current = it->current;
+	struct tyran_red_black_tree_node* previous = it->previous;
+	struct tyran_red_black_tree_node* current = it->current;
 
 	if (!current) {
 		return 0;
@@ -364,39 +356,32 @@ void* tree_iterator_next(tree_iterator* it)
 
 	if (previous == current->parent) {
 		if (current->left) {
-			TYRAN_LOG("$$$ GOING LEFT");
 			it->current = current->left;
 			if (it->current) {
-				return tree_iterator_next(it);
+				return tyran_red_black_tree_iterator_next(it);
 			}
 		} else {
 			if (current->right) {
-				TYRAN_LOG("$$$ GOING RIGHT1");
 				it->current = current->right;
 			} else {
-				TYRAN_LOG("$$$ GOING UP1");
 				it->current = current->parent;
 			}
 		}
 	} else if (previous == current->left) {
 		if (current->right) {
-			TYRAN_LOG("$$$ GOING RIGHT2");
 			it->current = current->right;
 		} else {
-			TYRAN_LOG("$$$ GOING UP3");
 			it->current = current->parent;
 		}
 	} else {
-		TYRAN_LOG("$$$ GOING UP2");
 		it->current = current->parent;
-		return tree_iterator_next(it);
+		return tyran_red_black_tree_iterator_next(it);
 	}
 
-	TYRAN_LOG("$$$ pointer:%p", current->node);
 	return current->node;
 }
 
-void destroy_iterator(tree_iterator* it)
+void tyran_red_black_tree_iterator_destroy(tyran_red_black_tree_iterator* it)
 {
 	tyran_free(it);
 }

@@ -9,7 +9,7 @@ struct tyran_function_object;
 struct tyran_runtime;
 struct tyran_memory_pool;
 struct tyran_array;
-struct tree_iterator;
+struct tyran_red_black_tree_iterator;
 struct tyran_range;
 struct tyran_range_iterator;
 
@@ -36,7 +36,7 @@ typedef struct tyran_object {
 		int value;
 		const struct tyran_string* str;
 		struct tyran_function_object* function;
-		struct tree_iterator* array_iterator;
+		struct tyran_red_black_tree_iterator* array_iterator;
 		struct tyran_array* array;
 		struct tyran_range_iterator* range_iterator;
 		struct tyran_range* range;
@@ -76,6 +76,6 @@ struct tyran_value* tyran_object_lookup_prototype(struct tyran_object* o, const 
 
 struct tyran_range_iterator* tyran_object_range_iterator(struct tyran_object* o);
 struct tyran_range* tyran_object_range(struct tyran_object* o);
-struct tree_iterator* tyran_object_array_iterator(struct tyran_object* o);
+struct tyran_red_black_tree_iterator* tyran_object_array_iterator(struct tyran_object* o);
 
 #endif

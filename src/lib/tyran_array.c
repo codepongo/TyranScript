@@ -5,7 +5,7 @@
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_string.h>
 
-void* tyran_array_key_get(struct stree_node* node)
+void* tyran_array_key_get(struct tyran_red_black_tree_node* node)
 {
 	return (void*) (&((tyran_array_node*)(node->node))->key);
 }
@@ -46,23 +46,23 @@ int tyran_array_key_compare(void* key_a, void* key_b)
 tyran_array* tyran_array_new(struct tyran_memory* memory)
 {
 	tyran_array* array = TYRAN_MALLOC_NO_POOL_TYPE(memory, tyran_array);
-	array->tree = new_rbtree(tyran_array_key_get, tyran_array_key_compare);
+	array->tree = tyran_red_black_tree_new(tyran_array_key_get, tyran_array_key_compare);
 	array->max_index = 0;
 	return array;
 }
 
-void tyran_array_copy(tyran_memory_pool* rb_node_pool, tyran_array* target, tree_root* source, int offset)
+void tyran_array_copy(tyran_memory_pool* rb_node_pool, tyran_array* target, tyran_red_black_tree* source, int offset)
 {
-	tree_iterator* iterator = new_tree_iterator(source);
+	tyran_red_black_tree_iterator* iterator = tyran_red_black_tree_iterator_new(source);
 	tyran_array_node* node;
-	while ((node = (tyran_array_node*) tree_iterator_next(iterator))) {
+	while ((node = (tyran_array_node*) tyran_red_black_tree_iterator_next(iterator))) {
 		tyran_value key = node->key.key_value;
 		if (offset != 0) {
 			key.data.number += offset;
 		}
 		tyran_array_insert(target, rb_node_pool, &key, &node->value);
 	}
-	destroy_iterator(iterator);
+	tyran_red_black_tree_iterator_destroy(iterator);
 }
 
 tyran_array* tyran_array_dup(struct tyran_memory* memory, tyran_memory_pool* rb_node_pool, const tyran_array* a1)
@@ -87,7 +87,7 @@ void tyran_array_insert_helper(tyran_array* array, tyran_memory_pool* rb_node_po
 	tyran_array_node* node = TYRAN_MALLOC_TYPE(rb_node_pool, tyran_array_node);
 	node->key = *key;
 	node->value = *value;
-	rb_tree_insert(array->tree, node);
+	tyran_red_black_tree_insert(array->tree, node);
 }
 
 void tyran_array_insert(tyran_array* array, tyran_memory_pool* rb_node_pool, const tyran_value* key, tyran_value* value)
@@ -109,7 +109,7 @@ void tyran_array_insert(tyran_array* array, tyran_memory_pool* rb_node_pool, con
 
 tyran_value* tyran_array_lookup_helper(const tyran_array* array, const tyran_array_key* key, tyran_array_key_flag_type* flag)
 {
-	tyran_array_node* node = (tyran_array_node*) search_rbtree(*array->tree, (void*)key);
+	tyran_array_node* node = (tyran_array_node*) tyran_red_black_tree_search(*array->tree, (void*)key);
 	if (!node) {
 		return 0;
 	}

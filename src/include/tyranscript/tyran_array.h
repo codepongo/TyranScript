@@ -3,7 +3,7 @@
 
 #include <tyranscript/tyran_value.h>
 
-struct tree_root;
+struct tyran_red_black_tree;
 struct tyran_memory;
 
 struct tyran_memory_pool;
@@ -16,7 +16,7 @@ typedef struct tyran_array_key {
 } tyran_array_key;
 
 typedef struct tyran_array {
-	struct tree_root* tree;
+	struct tyran_red_black_tree* tree;
 	int max_index;
 } tyran_array;
 

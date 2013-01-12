@@ -80,8 +80,8 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_add)
 
 TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_iter)
 {
-	struct tree_root* root = self->data.object->data.array->tree;
-	struct tree_iterator* iterator = new_tree_iterator(root);
+	struct tyran_red_black_tree* root = self->data.object->data.array->tree;
+	struct tyran_red_black_tree_iterator* iterator = tyran_red_black_tree_iterator_new(root);
 	tyran_value* iterator_value = tyran_iterator_object_new(runtime, iterator);
 	tyran_value_replace(*return_value, *iterator_value);
 	return 0;

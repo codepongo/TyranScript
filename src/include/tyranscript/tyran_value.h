@@ -7,7 +7,7 @@
 struct tyran_string;
 struct tyran_object;
 struct tyran_runtime_stack;
-struct tree_iterator;
+struct tyran_red_black_tree_iterator;
 
 typedef enum {
 	TYRAN_VALUE_TYPE_UNDEFINED,
