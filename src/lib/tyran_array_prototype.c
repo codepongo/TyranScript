@@ -13,7 +13,7 @@
 #include <tyranscript/tyran_array.h>
 #include <tyranscript/tyran_runtime.h>
 #include <tyranscript/tyran_iterator_object.h>
-#include <tyranscript/tyran_rb_tree.h>
+#include <tyranscript/tyran_red_black_tree.h>
 
 
 int tyran_array_prototype_constructor(struct tyran_runtime* runtime, tyran_value* func, tyran_value* arguments, int argument_count, tyran_value* _this, tyran_value* return_value, int is_constructor)

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <tyranscript/tyran_rb_tree.h>
-#include <tyranscript/tyran_rb_tree_macros.h>
+#include <tyranscript/tyran_red_black_tree.h>
+#include <tyranscript/tyran_red_black_tree_macros.h>
 #include <tyranscript/tyran_config.h>
 
 tyran_red_black_tree_node* tyran_red_black_tree_node_new(void* node)

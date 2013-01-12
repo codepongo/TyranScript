@@ -5,9 +5,9 @@
 #include <tyranscript/tyran_value_object.h>
 #include <tyranscript/tyran_object_prototype.h>
 #include <tyranscript/tyran_runtime.h>
-#include "tyran_number_to_string.h"
-#include <tyranscript/tyran_rb_tree.h>
+#include <tyranscript/tyran_red_black_tree.h>
 #include <tyranscript/tyran_number.h>
+#include <tyranscript/tyran_string.h>
 
 void tyran_object_retain(struct tyran_object* o)
 {

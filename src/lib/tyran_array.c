@@ -1,5 +1,5 @@
 #include <tyranscript/tyran_array.h>
-#include <tyranscript/tyran_rb_tree.h>
+#include <tyranscript/tyran_red_black_tree.h>
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_object.h>
 #include <tyranscript/tyran_object_macros.h>

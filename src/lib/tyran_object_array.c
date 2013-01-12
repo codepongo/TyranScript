@@ -5,8 +5,6 @@
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_array_prototype.h>
 
-#include "tyran_number_to_string.h"
-
 struct tyran_object* tyran_object_new_array(tyran_memory_pool* object_pool, tyran_memory_pool* object_key_pool, tyran_memory_pool* value_pool, tyran_memory_pool* rb_node_pool, tyran_memory_pool* string_pool, tyran_memory* string_memory, const struct tyran_runtime* runtime, const tyran_value* items, int count) {
 	int i;
 	//const struct tyran_object_key* ok;

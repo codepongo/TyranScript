@@ -7,7 +7,6 @@
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_runtime.h>
 #include <tyranscript/tyran_symbol_table.h>
-#include "tyran_number_to_string.h"
 
 tyran_value* tyran_value_object_new(const struct tyran_runtime* runtime)
 {

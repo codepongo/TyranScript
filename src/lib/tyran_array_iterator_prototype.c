@@ -14,7 +14,7 @@
 #include <tyranscript/tyran_runtime.h>
 
 #include <tyranscript/tyran_range_iterator.h>
-#include <tyranscript/tyran_rb_tree.h>
+#include <tyranscript/tyran_red_black_tree.h>
 
 
 TYRAN_RUNTIME_CALL_FUNC(tyran_array_iterator_prototype_constructor)

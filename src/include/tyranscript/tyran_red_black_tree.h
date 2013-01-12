@@ -1,5 +1,5 @@
-#ifndef _TYRAN_RB_TREE_H
-#define _TYRAN_RB_TREE_H
+#ifndef _TYRAN_RED_BLACK_TREE_H
+#define _TYRAN_RED_BLACK_TREE_H
 
 typedef enum tyran_red_black_tree_color {
 	tyran_red_black_tree_color_red = 1,

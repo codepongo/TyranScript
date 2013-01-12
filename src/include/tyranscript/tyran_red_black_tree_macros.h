@@ -1,5 +1,5 @@
-#ifndef _TYRAN_RB_TREE_MACROS_H
-#define _TYRAN_RB_TREE_MACROS_H
+#ifndef _TYRAN_RED_BLACK_TREE_MACROS_H
+#define _TYRAN_RED_BLACK_TREE_MACROS_H
 
 /*
  * Simple macro to malloc data and check if the allocation was successfull.
