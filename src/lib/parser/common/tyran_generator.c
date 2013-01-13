@@ -482,8 +482,25 @@ tyran_reg_or_constant_index tyran_generator_traverse_assignment(tyran_memory* me
 			return source_index;
 
 		} else {
-			tyran_parser_node_print("Unknown", &binary->left, 0);
-			TYRAN_ERROR("Unknown type:%d", binary->left->type);
+			tyran_parser_node_operand_binary* member = tyran_parser_binary_operator_type_cast(binary->left, TYRAN_PARSER_MEMBER);
+			if (member) {
+				tyran_reg_index object_index = tyran_generator_traverse(memory, code, member->left, true_label, false_label, loop_start, loop_end, self_index, TYRAN_FALSE);
+				tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*) member->right;
+
+				tyran_constant_index lookup_index = tyran_constants_add_symbol_from_c_string(code->constants, identifier->string);
+				if (binary->operator_type != TYRAN_PARSER_ASSIGNMENT) {
+					tyran_reg_index target_index = tyran_variable_scopes_define_temporary_variable(code->scope);
+					tyran_opcodes_op_get(code->opcodes, target_index, object_index, lookup_index);
+					tyran_generator_assignment_opcode(code->opcodes, binary->operator_type, target_index, source_index);
+					tyran_opcodes_op_set(code->opcodes, object_index, lookup_index, target_index);
+					tyran_variable_scopes_undefine_variable(code->scope, target_index);
+				} else {
+					tyran_opcodes_op_set(code->opcodes, object_index, lookup_index, source_index);
+				}
+			} else {
+				tyran_parser_node_print("Unknown", &binary->left, 0);
+				TYRAN_ERROR("Unknown type:%d", binary->left->type);
+			}
 		}
 	}
 
