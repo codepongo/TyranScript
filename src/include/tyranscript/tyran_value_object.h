@@ -20,4 +20,8 @@ void tyran_value_object_delete(struct tyran_value* object, struct tyran_value* k
 const struct tyran_value* tyran_value_object_lookup(const struct tyran_value* object, const struct tyran_value* key);
 const struct tyran_value* tyran_value_object_lookup_prototype(const struct tyran_value* object, const struct tyran_value* key);
 
+
+const struct tyran_string* tyran_value_object_string(struct tyran_value* v);
+
+
 #endif

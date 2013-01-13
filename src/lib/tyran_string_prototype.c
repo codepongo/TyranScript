@@ -74,10 +74,32 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_lt)
 	return 0;
 }
 
+int tyran_string_prototype_string_index(const tyran_string* s, tyran_value* v)
+{
+	int index = (int) tyran_value_number(v);
+	index %= s->len;
+	return index;
+}
+
+TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_index)
+{
+	const tyran_string* str = tyran_value_object_string(self);
+	int index = tyran_string_prototype_string_index(str, arguments);
+
+	const tyran_string* copy = tyran_string_substr(runtime->string_pool, runtime->memory, str, index, 1);
+
+	tyran_value* copy_value = tyran_string_object_new(runtime, copy);
+
+	tyran_value_replace(*return_value, *copy_value);
+
+	return 0;
+}
+
 void tyran_string_prototype_init(const struct tyran_runtime* runtime, tyran_value* o)
 {
 	TYRAN_MEMBER(o, "+", tyran_string_prototype_add);
 	TYRAN_MEMBER(o, "==", tyran_string_prototype_equal);
 	TYRAN_MEMBER(o, "<=", tyran_string_prototype_lte);
 	TYRAN_MEMBER(o, "<", tyran_string_prototype_lt);
+	TYRAN_MEMBER(o, "[]", tyran_string_prototype_index);
 }

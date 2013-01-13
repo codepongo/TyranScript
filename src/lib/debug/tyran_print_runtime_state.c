@@ -24,7 +24,7 @@ void tyran_print_runtime_state(const tyran_opcode* pc, const struct tyran_runtim
 		}
 		tyran_snprintf(tmp, 512,  "r%d:", reg_index);
 		tyran_strncat(result, tmp, 512);
-		tyran_value_to_c_string(sp->constants->symbol_table, &r[reg_index], tmp, 512, 1);
+		tyran_value_to_c_string(sp->constants->symbol_table, &r[reg_index], tmp, 128, 1);
 		tyran_strncat(result, tmp, 512);
 	}
 

@@ -93,7 +93,6 @@ typedef struct tyran_value {
 	tyran_value_set_boolean(v, b); \
 }
 
-
 #define tyran_value_replace_undefined(v) { \
 	tyran_value_release(v); \
 	tyran_value_set_undefined(v); \

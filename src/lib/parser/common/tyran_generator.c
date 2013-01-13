@@ -346,7 +346,11 @@ tyran_reg_index tyran_generator_emit_operator(tyran_code_state* code, tyran_pars
 			tyran_opcodes_op_add(codes, target, left, right);
 			break;
 		case TYRAN_PARSER_SUBTRACT:
-			tyran_opcodes_op_sub(codes, target, left, right);
+			if (left == TYRAN_OPCODE_REGISTER_ILLEGAL) {
+				tyran_opcodes_op_neg(codes, target, right);
+			} else {
+				tyran_opcodes_op_sub(codes, target, left, right);
+			}
 			break;
 		case TYRAN_PARSER_INDEX:
 			tyran_opcodes_op_index(codes, target, left, right);
@@ -399,7 +403,10 @@ tyran_reg_index tyran_generator_handle_operator(tyran_code_state* code, tyran_pa
 
 tyran_reg_index tyran_generator_traverse_default_binary(tyran_memory* memory, tyran_code_state* code, tyran_parser_node_operand_binary* binary, tyran_label_id true_label, tyran_label_id false_label, tyran_label_id loop_start, tyran_label_id loop_end, tyran_reg_index self_index, tyran_boolean invert_logic)
 {
-	tyran_reg_or_constant_index left_index = tyran_generator_traverse(memory, code, binary->left, true_label, false_label, loop_start, loop_end, self_index, invert_logic);
+	tyran_reg_or_constant_index left_index = TYRAN_OPCODE_REGISTER_ILLEGAL;
+	if (binary->left) {
+		left_index = tyran_generator_traverse(memory, code, binary->left, true_label, false_label, loop_start, loop_end, self_index, invert_logic);
+	}
 	tyran_reg_or_constant_index right_index = tyran_generator_traverse(memory, code, binary->right, true_label, false_label, loop_start, loop_end, self_index, invert_logic);
 
 	tyran_reg_index target_index;
