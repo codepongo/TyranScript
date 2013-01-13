@@ -1,0 +1,9 @@
+name = "mocha"
+
+case name
+	when 'wrong'
+		print("wrong")
+	when 'mocha'
+		print("good")
+---
+good
