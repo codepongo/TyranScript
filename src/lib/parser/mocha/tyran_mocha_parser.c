@@ -17,6 +17,11 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 {
 	tyran_mocha_operator_info operands_to_match[] = {
 		{TYRAN_MOCHA_TOKEN_ASSIGNMENT, 1, 0},
+		{TYRAN_MOCHA_TOKEN_ASSIGNMENT_ADD, 1, 0},
+		{TYRAN_MOCHA_TOKEN_ASSIGNMENT_SUBTRACT, 1, 0},
+		{TYRAN_MOCHA_TOKEN_ASSIGNMENT_MULTIPLY, 1, 0},
+		{TYRAN_MOCHA_TOKEN_ASSIGNMENT_DIVIDE, 1, 0},
+		{TYRAN_MOCHA_TOKEN_ASSIGNMENT_MODULUS, 1, 0},
 		{TYRAN_MOCHA_TOKEN_AND, 1, 0},
 		{TYRAN_MOCHA_TOKEN_OR, 1, 0},
 		{TYRAN_MOCHA_TOKEN_EQUAL, 1, 0},
@@ -342,92 +347,107 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 	tyran_parser_binary_operand_type operand;
 
 	switch (token_id) {
-	case TYRAN_MOCHA_TOKEN_DIVIDE:
-		operand = TYRAN_PARSER_DIVIDE;
-		break;
-	case TYRAN_MOCHA_TOKEN_MULTIPLY:
-		operand = TYRAN_PARSER_MULTIPLY;
-		break;
-	case TYRAN_MOCHA_TOKEN_MODULUS:
-		operand = TYRAN_PARSER_MODULUS;
-		break;
-	case TYRAN_MOCHA_TOKEN_ADD:
-		operand = TYRAN_PARSER_ADD;
-		break;
-	case TYRAN_MOCHA_TOKEN_SUBTRACT:
-		operand = TYRAN_PARSER_SUBTRACT;
-		break;
-	case TYRAN_MOCHA_TOKEN_MEMBER:
-		operand = TYRAN_PARSER_MEMBER;
-		break;
-	case TYRAN_MOCHA_TOKEN_INDEX:
-		operand = TYRAN_PARSER_INDEX;
-		break;
-	case TYRAN_MOCHA_TOKEN_COMMA:
-		operand = TYRAN_PARSER_COMMA;
-		break;
-	case TYRAN_MOCHA_TOKEN_ASSIGNMENT:
-		operand = TYRAN_PARSER_ASSIGNMENT;
-		break;
-	case TYRAN_MOCHA_TOKEN_CALL:
-		operand = TYRAN_PARSER_CALL;
-		break;
-	case TYRAN_MOCHA_TOKEN_EQUAL:
-		operand = TYRAN_PARSER_EQUAL;
-		break;
-	case TYRAN_MOCHA_TOKEN_NOT_EQUAL:
-		operand = TYRAN_PARSER_NOT_EQUAL;
-		break;
-	case TYRAN_MOCHA_TOKEN_LESS:
-		operand = TYRAN_PARSER_LESS;
-		break;
-	case TYRAN_MOCHA_TOKEN_LESS_EQUAL:
-		operand = TYRAN_PARSER_LESS_EQUAL;
-		break;
-	case TYRAN_MOCHA_TOKEN_GREATER:
-		operand = TYRAN_PARSER_GREATER;
-		break;
-	case TYRAN_MOCHA_TOKEN_GREATER_EQUAL:
-		operand = TYRAN_PARSER_GREATER_EQUAL;
-		break;
-	case TYRAN_MOCHA_TOKEN_AND:
-		operand = TYRAN_PARSER_AND;
-		break;
-	case TYRAN_MOCHA_TOKEN_OR:
-		operand = TYRAN_PARSER_OR;
-		break;
-	case TYRAN_MOCHA_TOKEN_THEN:
-		operand = TYRAN_PARSER_THEN;
-		break;
-	case TYRAN_MOCHA_TOKEN_WHILE:
-		operand = TYRAN_PARSER_WHILE;
-		break;
-	case TYRAN_MOCHA_TOKEN_UNTIL:
-		operand = TYRAN_PARSER_UNTIL;
-		break;
-	case TYRAN_MOCHA_TOKEN_WHEN:
-		operand = TYRAN_PARSER_WHEN;
-		break;
-	case TYRAN_MOCHA_TOKEN_CASE:
-		operand = TYRAN_PARSER_CASE;
-		break;
-	case TYRAN_MOCHA_TOKEN_ELSE:
-		operand = TYRAN_PARSER_ELSE;
-		break;
-	case TYRAN_MOCHA_TOKEN_IN:
-		operand = TYRAN_PARSER_IN;
-		break;
-	case TYRAN_MOCHA_TOKEN_RANGE_INCLUSIVE:
-		operand = TYRAN_PARSER_RANGE_INCLUSIVE;
-		break;
-	case TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE:
-		operand = TYRAN_PARSER_RANGE;
-		break;
-	case TYRAN_MOCHA_TOKEN_COLON:
-		operand = TYRAN_PARSER_COLON;
-		break;
-	default:
-		TYRAN_ERROR("unknown binary token to convert:%d", token_id);
+		case TYRAN_MOCHA_TOKEN_DIVIDE:
+			operand = TYRAN_PARSER_DIVIDE;
+			break;
+		case TYRAN_MOCHA_TOKEN_MULTIPLY:
+			operand = TYRAN_PARSER_MULTIPLY;
+			break;
+		case TYRAN_MOCHA_TOKEN_MODULUS:
+			operand = TYRAN_PARSER_MODULUS;
+			break;
+		case TYRAN_MOCHA_TOKEN_ADD:
+			operand = TYRAN_PARSER_ADD;
+			break;
+		case TYRAN_MOCHA_TOKEN_SUBTRACT:
+			operand = TYRAN_PARSER_SUBTRACT;
+			break;
+		case TYRAN_MOCHA_TOKEN_MEMBER:
+			operand = TYRAN_PARSER_MEMBER;
+			break;
+		case TYRAN_MOCHA_TOKEN_INDEX:
+			operand = TYRAN_PARSER_INDEX;
+			break;
+		case TYRAN_MOCHA_TOKEN_COMMA:
+			operand = TYRAN_PARSER_COMMA;
+			break;
+		case TYRAN_MOCHA_TOKEN_ASSIGNMENT:
+			operand = TYRAN_PARSER_ASSIGNMENT;
+			break;
+		case TYRAN_MOCHA_TOKEN_ASSIGNMENT_ADD:
+			operand = TYRAN_PARSER_ASSIGNMENT_ADD;
+			break;
+		case TYRAN_MOCHA_TOKEN_ASSIGNMENT_SUBTRACT:
+			operand = TYRAN_PARSER_ASSIGNMENT_SUBTRACT;
+			break;
+		case TYRAN_MOCHA_TOKEN_ASSIGNMENT_MULTIPLY:
+			operand = TYRAN_PARSER_ASSIGNMENT_MULTIPLY;
+			break;
+		case TYRAN_MOCHA_TOKEN_ASSIGNMENT_DIVIDE:
+			operand = TYRAN_PARSER_ASSIGNMENT_DIVIDE;
+			break;
+		case TYRAN_MOCHA_TOKEN_ASSIGNMENT_MODULUS:
+			operand = TYRAN_PARSER_ASSIGNMENT_MODULUS;
+			break;
+		case TYRAN_MOCHA_TOKEN_CALL:
+			operand = TYRAN_PARSER_CALL;
+			break;
+		case TYRAN_MOCHA_TOKEN_EQUAL:
+			operand = TYRAN_PARSER_EQUAL;
+			break;
+		case TYRAN_MOCHA_TOKEN_NOT_EQUAL:
+			operand = TYRAN_PARSER_NOT_EQUAL;
+			break;
+		case TYRAN_MOCHA_TOKEN_LESS:
+			operand = TYRAN_PARSER_LESS;
+			break;
+		case TYRAN_MOCHA_TOKEN_LESS_EQUAL:
+			operand = TYRAN_PARSER_LESS_EQUAL;
+			break;
+		case TYRAN_MOCHA_TOKEN_GREATER:
+			operand = TYRAN_PARSER_GREATER;
+			break;
+		case TYRAN_MOCHA_TOKEN_GREATER_EQUAL:
+			operand = TYRAN_PARSER_GREATER_EQUAL;
+			break;
+		case TYRAN_MOCHA_TOKEN_AND:
+			operand = TYRAN_PARSER_AND;
+			break;
+		case TYRAN_MOCHA_TOKEN_OR:
+			operand = TYRAN_PARSER_OR;
+			break;
+		case TYRAN_MOCHA_TOKEN_THEN:
+			operand = TYRAN_PARSER_THEN;
+			break;
+		case TYRAN_MOCHA_TOKEN_WHILE:
+			operand = TYRAN_PARSER_WHILE;
+			break;
+		case TYRAN_MOCHA_TOKEN_UNTIL:
+			operand = TYRAN_PARSER_UNTIL;
+			break;
+		case TYRAN_MOCHA_TOKEN_WHEN:
+			operand = TYRAN_PARSER_WHEN;
+			break;
+		case TYRAN_MOCHA_TOKEN_CASE:
+			operand = TYRAN_PARSER_CASE;
+			break;
+		case TYRAN_MOCHA_TOKEN_ELSE:
+			operand = TYRAN_PARSER_ELSE;
+			break;
+		case TYRAN_MOCHA_TOKEN_IN:
+			operand = TYRAN_PARSER_IN;
+			break;
+		case TYRAN_MOCHA_TOKEN_RANGE_INCLUSIVE:
+			operand = TYRAN_PARSER_RANGE_INCLUSIVE;
+			break;
+		case TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE:
+			operand = TYRAN_PARSER_RANGE;
+			break;
+		case TYRAN_MOCHA_TOKEN_COLON:
+			operand = TYRAN_PARSER_COLON;
+			break;
+		default:
+			TYRAN_ERROR("unknown binary token to convert:%d", token_id);
 	}
 
 	return operand;
@@ -439,26 +459,26 @@ tyran_parser_unary_operand_type tyran_mocha_parser_convert_unary_operand(tyran_m
 	tyran_parser_unary_operand_type operand;
 
 	switch (token_id) {
-	case TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT:
-		operand = TYRAN_PARSER_UNARY_PARENTHESES;
-		break;
-	case TYRAN_MOCHA_TOKEN_BLOCK_END:
-		operand = TYRAN_PARSER_UNARY_BLOCK;
-		break;
-	case TYRAN_MOCHA_TOKEN_OBJECT_END:
-		operand = TYRAN_PARSER_UNARY_OBJECT;
-		break;
-	case TYRAN_MOCHA_TOKEN_BRACKET_RIGHT:
-		operand = TYRAN_PARSER_UNARY_BRACKET;
-		break;
-	case TYRAN_MOCHA_TOKEN_IF:
-		operand = TYRAN_PARSER_UNARY_IF;
-		break;
-	case TYRAN_MOCHA_TOKEN_UNLESS:
-		operand = TYRAN_PARSER_UNARY_UNLESS;
-		break;
-	default:
-		TYRAN_ERROR("unknown unary token to convert:%d", token_id);
+		case TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT:
+			operand = TYRAN_PARSER_UNARY_PARENTHESES;
+			break;
+		case TYRAN_MOCHA_TOKEN_BLOCK_END:
+			operand = TYRAN_PARSER_UNARY_BLOCK;
+			break;
+		case TYRAN_MOCHA_TOKEN_OBJECT_END:
+			operand = TYRAN_PARSER_UNARY_OBJECT;
+			break;
+		case TYRAN_MOCHA_TOKEN_BRACKET_RIGHT:
+			operand = TYRAN_PARSER_UNARY_BRACKET;
+			break;
+		case TYRAN_MOCHA_TOKEN_IF:
+			operand = TYRAN_PARSER_UNARY_IF;
+			break;
+		case TYRAN_MOCHA_TOKEN_UNLESS:
+			operand = TYRAN_PARSER_UNARY_UNLESS;
+			break;
+		default:
+			TYRAN_ERROR("unknown unary token to convert:%d", token_id);
 	}
 
 	return operand;
@@ -467,27 +487,27 @@ tyran_parser_unary_operand_type tyran_mocha_parser_convert_unary_operand(tyran_m
 NODE tyran_mocha_parser_token_to_literal(tyran_memory* memory, tyran_mocha_token* first)
 {
 	switch (first->token_id) {
-	case TYRAN_MOCHA_TOKEN_IDENTIFIER:
-		return tyran_parser_literal_identifier(memory, (const char*)first->token_data);
-	case TYRAN_MOCHA_TOKEN_STRING:
-		return tyran_parser_literal_string(memory, (const char*)first->token_data);
-	case TYRAN_MOCHA_TOKEN_NUMBER:
-		return tyran_parser_literal_number(memory, (tyran_number*)first->token_data);
-	case TYRAN_MOCHA_TOKEN_TRUE:
-		return tyran_parser_bool(memory, 1);
-	case TYRAN_MOCHA_TOKEN_FALSE:
-		return tyran_parser_bool(memory, 0);
-	case TYRAN_MOCHA_TOKEN_UNDEFINED:
-		return tyran_parser_undefined(memory);
-	case TYRAN_MOCHA_TOKEN_SELF:
-		return tyran_parser_self(memory);
-	case TYRAN_MOCHA_TOKEN_BREAK:
-		return tyran_parser_break(memory);
-	case TYRAN_MOCHA_TOKEN_CONTINUE:
-		return tyran_parser_continue(memory);
-	default:
-		TYRAN_ERROR("Illegal literal token:%d", first->token_id);
-		return 0;
+		case TYRAN_MOCHA_TOKEN_IDENTIFIER:
+			return tyran_parser_literal_identifier(memory, (const char*)first->token_data);
+		case TYRAN_MOCHA_TOKEN_STRING:
+			return tyran_parser_literal_string(memory, (const char*)first->token_data);
+		case TYRAN_MOCHA_TOKEN_NUMBER:
+			return tyran_parser_literal_number(memory, (tyran_number*)first->token_data);
+		case TYRAN_MOCHA_TOKEN_TRUE:
+			return tyran_parser_bool(memory, 1);
+		case TYRAN_MOCHA_TOKEN_FALSE:
+			return tyran_parser_bool(memory, 0);
+		case TYRAN_MOCHA_TOKEN_UNDEFINED:
+			return tyran_parser_undefined(memory);
+		case TYRAN_MOCHA_TOKEN_SELF:
+			return tyran_parser_self(memory);
+		case TYRAN_MOCHA_TOKEN_BREAK:
+			return tyran_parser_break(memory);
+		case TYRAN_MOCHA_TOKEN_CONTINUE:
+			return tyran_parser_continue(memory);
+		default:
+			TYRAN_ERROR("Illegal literal token:%d", first->token_id);
+			return 0;
 	}
 }
 
@@ -623,41 +643,41 @@ NODE tyran_mocha_parser_add_terminal(tyran_memory* memory, tyran_mocha_parser* p
 {
 	NODE node;
 	switch (token_id) {
-	case TYRAN_MOCHA_TOKEN_UNLESS:
-		node = tyran_mocha_parser_if(memory, parser, TYRAN_TRUE);
-		break;
-	case TYRAN_MOCHA_TOKEN_IF:
-		node = tyran_mocha_parser_if(memory, parser, TYRAN_FALSE);
-		break;
-	case TYRAN_MOCHA_TOKEN_ELSE:
-		node = tyran_mocha_parser_else(memory, parser);
-		break;
-	case TYRAN_MOCHA_TOKEN_WHILE:
-	case TYRAN_MOCHA_TOKEN_UNTIL:
-		node = tyran_mocha_parser_while(memory, parser);
-		if (token_id == TYRAN_MOCHA_TOKEN_UNTIL) {
-			((tyran_parser_node_while*)node)->node.type = TYRAN_PARSER_NODE_TYPE_UNTIL;
-		}
-		break;
-	case TYRAN_MOCHA_TOKEN_FOR:
-		node = tyran_mocha_parser_for(memory, parser);
-		break;
-	case TYRAN_MOCHA_TOKEN_CASE:
-		node = tyran_mocha_parser_case(memory, parser);
-		break;
-	case TYRAN_MOCHA_TOKEN_WHEN:
-		node = tyran_mocha_parser_when(memory, parser);
-		break;
-	case TYRAN_MOCHA_TOKEN_RETURN:
-		node = tyran_mocha_parser_return(memory, parser);
-		break;
-	case TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH:
-	case TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND:
-		node = tyran_mocha_parser_function(memory, parser, (token_id == TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND));
-		break;
-	default:
-		return tyran_mocha_parser_add_default_operator(memory, parser, token_id, precedence);
-		break;
+		case TYRAN_MOCHA_TOKEN_UNLESS:
+			node = tyran_mocha_parser_if(memory, parser, TYRAN_TRUE);
+			break;
+		case TYRAN_MOCHA_TOKEN_IF:
+			node = tyran_mocha_parser_if(memory, parser, TYRAN_FALSE);
+			break;
+		case TYRAN_MOCHA_TOKEN_ELSE:
+			node = tyran_mocha_parser_else(memory, parser);
+			break;
+		case TYRAN_MOCHA_TOKEN_WHILE:
+		case TYRAN_MOCHA_TOKEN_UNTIL:
+			node = tyran_mocha_parser_while(memory, parser);
+			if (token_id == TYRAN_MOCHA_TOKEN_UNTIL) {
+				((tyran_parser_node_while*)node)->node.type = TYRAN_PARSER_NODE_TYPE_UNTIL;
+			}
+			break;
+		case TYRAN_MOCHA_TOKEN_FOR:
+			node = tyran_mocha_parser_for(memory, parser);
+			break;
+		case TYRAN_MOCHA_TOKEN_CASE:
+			node = tyran_mocha_parser_case(memory, parser);
+			break;
+		case TYRAN_MOCHA_TOKEN_WHEN:
+			node = tyran_mocha_parser_when(memory, parser);
+			break;
+		case TYRAN_MOCHA_TOKEN_RETURN:
+			node = tyran_mocha_parser_return(memory, parser);
+			break;
+		case TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH:
+		case TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND:
+			node = tyran_mocha_parser_function(memory, parser, (token_id == TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND));
+			break;
+		default:
+			return tyran_mocha_parser_add_default_operator(memory, parser, token_id, precedence);
+			break;
 	}
 	tyran_mocha_parser_add_to_empty(memory, parser, node, precedence);
 	parser->next_node_to_overwrite = 0;

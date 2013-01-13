@@ -107,25 +107,25 @@ int tyran_lexer_parse_string(tyran_lexer* lexer, char* buf, int* length)
 		if (c == '\\') {
 			char n = tyran_lexer_pop_character(lexer);
 			switch(n) {
-			case 'b':
-				buf[index++] = '\b';
-				break;
-			case 'f':
-				buf[index++] = '\f';
-				break;
-			case 'n':
-				buf[index++] = '\n';
-				break;
-			case 'r':
-				buf[index++] = '\r';
-				break;
-			case 't':
-				buf[index++] = '\t';
-				break;
-			case 0:
-				TYRAN_SOFT_ERROR("Unexpected EOF parsing string.");
-			default:
-				buf[index++] = n;
+				case 'b':
+					buf[index++] = '\b';
+					break;
+				case 'f':
+					buf[index++] = '\f';
+					break;
+				case 'n':
+					buf[index++] = '\n';
+					break;
+				case 'r':
+					buf[index++] = '\r';
+					break;
+				case 't':
+					buf[index++] = '\t';
+					break;
+				case 0:
+					TYRAN_SOFT_ERROR("Unexpected EOF parsing string.");
+				default:
+					buf[index++] = n;
 			}
 		} else {
 			if (c == '\n') {

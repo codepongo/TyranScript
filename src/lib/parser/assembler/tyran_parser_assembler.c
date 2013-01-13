@@ -199,28 +199,28 @@ tyran_reg_or_constant_index parse_constant(tyran_parser_state* parser_state, tyr
 {
 	int token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
 	switch (token) {
-	case TYRAN_TOKEN_ASSEMBLER_NUMBER:
-		return tyran_constants_add_number(parser_state->constants, parser_state->lexer->number);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_STRING:
-		return tyran_constants_add_string(parser_state->constants, parser_state->runtime, (tyran_string*) parser_state->lexer->string_buffer);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_TRUE:
-	case TYRAN_TOKEN_ASSEMBLER_FALSE:
-		return tyran_constants_add_boolean(parser_state->constants, 0);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_REGISTER:
-		if (!allow_register) {
+		case TYRAN_TOKEN_ASSEMBLER_NUMBER:
+			return tyran_constants_add_number(parser_state->constants, parser_state->lexer->number);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_STRING:
+			return tyran_constants_add_string(parser_state->constants, parser_state->runtime, (tyran_string*) parser_state->lexer->string_buffer);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_TRUE:
+		case TYRAN_TOKEN_ASSEMBLER_FALSE:
+			return tyran_constants_add_boolean(parser_state->constants, 0);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_REGISTER:
+			if (!allow_register) {
+				error();
+				return -1;
+			}
+			tyran_reg_index a;
+			parse_r_index(parser_state, &a);
+			return a;
+			break;
+		default:
 			error();
 			return -1;
-		}
-		tyran_reg_index a;
-		parse_r_index(parser_state, &a);
-		return a;
-		break;
-	default:
-		error();
-		return -1;
 	}
 
 }
@@ -373,111 +373,111 @@ int tyran_lexer_assembler_parse_one(tyran_memory* memory, tyran_memory_pool* fun
 	tyran_opcodes* opcodes = parser_state->opcodes;
 
 	switch (token) {
-	case TYRAN_TOKEN_ASSEMBLER_MEMBER:
-		token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
-		if (token == TYRAN_TOKEN_ASSEMBLER_FUNC) {
-			if (parser_state->inside_function) {
-				tyran_lexer_assembler_end_of_function(function_pool, function_object_pool, value_pool, object_pool, parser_state);
-			}
+		case TYRAN_TOKEN_ASSEMBLER_MEMBER:
 			token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
-			if (token != TYRAN_TOKEN_ASSEMBLER_IDENTIFIER) {
+			if (token == TYRAN_TOKEN_ASSEMBLER_FUNC) {
+				if (parser_state->inside_function) {
+					tyran_lexer_assembler_end_of_function(function_pool, function_object_pool, value_pool, object_pool, parser_state);
+				}
+				token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
+				if (token != TYRAN_TOKEN_ASSEMBLER_IDENTIFIER) {
+					error();
+					return -1;
+				}
+				{
+					tyran_strncpy(parser_state->function_name, 512, parser_state->lexer->string_buffer, parser_state->lexer->string_buffer_max_size);
+					TYRAN_LOG("function '%s'", parser_state->function_name);
+				}
+				parser_state->inside_function = 1;
+			}
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_IDENTIFIER:
+			token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
+			if (token == TYRAN_TOKEN_ASSEMBLER_COLON) {
+				tyran_code_add_label(memory, parser_state->code, parser_state->lexer->string_buffer);
+			} else {
+				TYRAN_LOG("error token:%d", token);
 				error();
-				return -1;
 			}
-			{
-				tyran_strncpy(parser_state->function_name, 512, parser_state->lexer->string_buffer, parser_state->lexer->string_buffer_max_size);
-				TYRAN_LOG("function '%s'", parser_state->function_name);
-			}
-			parser_state->inside_function = 1;
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_LD:
+			parse_r_rc(parser_state, &a, &x);
+			tyran_opcodes_op_ld(opcodes, a, x);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_LDC: {
+			parse_r(parser_state, &a);
+			int c = parse_constant(parser_state, lexer_position, 0);
+			tyran_opcodes_op_ldc(opcodes, a, c);
 		}
 		break;
-	case TYRAN_TOKEN_ASSEMBLER_IDENTIFIER:
-		token = tyran_lexer_assembler_next_token(lexer_position, parser_state->lexer);
-		if (token == TYRAN_TOKEN_ASSEMBLER_COLON) {
-			tyran_code_add_label(memory, parser_state->code, parser_state->lexer->string_buffer);
-		} else {
-			TYRAN_LOG("error token:%d", token);
-			error();
-		}
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_LD:
-		parse_r_rc(parser_state, &a, &x);
-		tyran_opcodes_op_ld(opcodes, a, x);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_LDC: {
-		parse_r(parser_state, &a);
-		int c = parse_constant(parser_state, lexer_position, 0);
-		tyran_opcodes_op_ldc(opcodes, a, c);
-	}
-	break;
-	case TYRAN_TOKEN_ASSEMBLER_ADD:
-		parse_r_rc_rc(parser_state, &a, &x, &y);
-		tyran_opcodes_op_add(opcodes, a, x, y);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_DIV:
-		parse_r_rc_rc(parser_state, &a, &x, &y);
-		tyran_opcodes_op_div(opcodes, a, x, y);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_MOD:
-		parse_r_rc_rc(parser_state, &a, &x, &y);
-		tyran_opcodes_op_mod(opcodes, a, x, y);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_MUL:
-		parse_r_rc_rc(parser_state, &a, &x, &y);
-		tyran_opcodes_op_mul(opcodes, a, x, y);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_NEG:
-		parse_r_rc(parser_state, &a, &x);
-		tyran_opcodes_op_neg(opcodes, a, x);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_NOT:
-		parse_r_rc(parser_state, &a, &x);
-		tyran_opcodes_op_not(opcodes, a, x);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_POW:
-		parse_r_rc_rc(parser_state, &a, &x, &y);
-		tyran_opcodes_op_pow(opcodes, a, x, y);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_SUB:
-		parse_r_rc_rc(parser_state, &a, &x, &y);
-		tyran_opcodes_op_sub(opcodes, a, x, y);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_JEQ:
-		parse_b_rc_rc(parser_state, &b, &x, &y);
-		tyran_opcodes_op_jeq(opcodes, x, y, b);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_JLT:
-		parse_b_rc_rc(parser_state, &b, &x, &y);
-		tyran_opcodes_op_jlt(opcodes, x, y, b);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_JLE:
-		parse_b_rc_rc(parser_state, &b, &x, &y);
-		tyran_opcodes_op_jle(opcodes, x, y, b);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_JMP:
-		parse_label(parser_state);
-		tyran_opcodes_op_jmp(opcodes, 0);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_NEW:
-		parse_r(parser_state, &a);
-		tyran_opcodes_op_new(opcodes, a, 0, 0);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_RET:
-		parse_r_s(parser_state, &a, &s);
-		tyran_opcodes_op_ret(opcodes, a, s);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_SET:
-		parse_r_rc_rc(parser_state, &a, &x, &y);
-		tyran_opcodes_op_set(opcodes, a, x, y);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_GET:
-		parse_r_r_rc(parser_state, &a, &r, &y);
-		tyran_opcodes_op_get(opcodes, a, r, y);
-		break;
-	case TYRAN_TOKEN_ASSEMBLER_CALL:
-		parse_r_s_s(parser_state, &r, &s, &s2);
-		tyran_opcodes_op_call(opcodes, r, s, s2);
-		break;
+		case TYRAN_TOKEN_ASSEMBLER_ADD:
+			parse_r_rc_rc(parser_state, &a, &x, &y);
+			tyran_opcodes_op_add(opcodes, a, x, y);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_DIV:
+			parse_r_rc_rc(parser_state, &a, &x, &y);
+			tyran_opcodes_op_div(opcodes, a, x, y);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_MOD:
+			parse_r_rc_rc(parser_state, &a, &x, &y);
+			tyran_opcodes_op_mod(opcodes, a, x, y);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_MUL:
+			parse_r_rc_rc(parser_state, &a, &x, &y);
+			tyran_opcodes_op_mul(opcodes, a, x, y);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_NEG:
+			parse_r_rc(parser_state, &a, &x);
+			tyran_opcodes_op_neg(opcodes, a, x);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_NOT:
+			parse_r_rc(parser_state, &a, &x);
+			tyran_opcodes_op_not(opcodes, a, x);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_POW:
+			parse_r_rc_rc(parser_state, &a, &x, &y);
+			tyran_opcodes_op_pow(opcodes, a, x, y);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_SUB:
+			parse_r_rc_rc(parser_state, &a, &x, &y);
+			tyran_opcodes_op_sub(opcodes, a, x, y);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_JEQ:
+			parse_b_rc_rc(parser_state, &b, &x, &y);
+			tyran_opcodes_op_jeq(opcodes, x, y, b);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_JLT:
+			parse_b_rc_rc(parser_state, &b, &x, &y);
+			tyran_opcodes_op_jlt(opcodes, x, y, b);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_JLE:
+			parse_b_rc_rc(parser_state, &b, &x, &y);
+			tyran_opcodes_op_jle(opcodes, x, y, b);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_JMP:
+			parse_label(parser_state);
+			tyran_opcodes_op_jmp(opcodes, 0);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_NEW:
+			parse_r(parser_state, &a);
+			tyran_opcodes_op_new(opcodes, a, 0, 0);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_RET:
+			parse_r_s(parser_state, &a, &s);
+			tyran_opcodes_op_ret(opcodes, a, s);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_SET:
+			parse_r_rc_rc(parser_state, &a, &x, &y);
+			tyran_opcodes_op_set(opcodes, a, x, y);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_GET:
+			parse_r_r_rc(parser_state, &a, &r, &y);
+			tyran_opcodes_op_get(opcodes, a, r, y);
+			break;
+		case TYRAN_TOKEN_ASSEMBLER_CALL:
+			parse_r_s_s(parser_state, &r, &s, &s2);
+			tyran_opcodes_op_call(opcodes, r, s, s2);
+			break;
 	}
 
 	return token;

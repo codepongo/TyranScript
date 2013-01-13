@@ -30,16 +30,11 @@ tyran_mocha_token_id tyran_mocha_lexer_operand(tyran_lexer* lexer, int c)
 	static tyran_operand_info operands[] = {
 		{ "++", 2, TYRAN_MOCHA_TOKEN_INCREMENT },
 		{ "--", 2, TYRAN_MOCHA_TOKEN_DECREMENT },
-		{ "+=", 2, TYRAN_MOCHA_TOKEN_END },
-		{ "-=", 2, TYRAN_MOCHA_TOKEN_END },
-		{ "*=", 2, TYRAN_MOCHA_TOKEN_END },
-		{ "/=", 2, TYRAN_MOCHA_TOKEN_END },
-		{ "%=", 2, TYRAN_MOCHA_TOKEN_END },
-		{ "&=", 2, TYRAN_MOCHA_TOKEN_END },
-		{ "|=", 2, TYRAN_MOCHA_TOKEN_END },
-		{ "^=", 2, TYRAN_MOCHA_TOKEN_END },
-		{ "<<", 2, TYRAN_MOCHA_TOKEN_END },
-		{ ">>", 2, TYRAN_MOCHA_TOKEN_END },
+		{ "+=", 2, TYRAN_MOCHA_TOKEN_ASSIGNMENT_ADD },
+		{ "-=", 2, TYRAN_MOCHA_TOKEN_ASSIGNMENT_SUBTRACT },
+		{ "*=", 2, TYRAN_MOCHA_TOKEN_ASSIGNMENT_MULTIPLY },
+		{ "/=", 2, TYRAN_MOCHA_TOKEN_ASSIGNMENT_DIVIDE },
+		{ "%=", 2, TYRAN_MOCHA_TOKEN_ASSIGNMENT_MODULUS },
 		{ "->", 2, TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH },
 		{ "=>", 2, TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND },
 		{ "<=", 2, TYRAN_MOCHA_TOKEN_LESS_EQUAL },
@@ -174,7 +169,9 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		if (token.token_id != TYRAN_MOCHA_TOKEN_LINE_START && token.token_id != TYRAN_MOCHA_TOKEN_BLOCK_END) {
 			c = tyran_lexer_next_character_skip_whitespace_except_newline(lexer, &last_was_whitespace);
 			tyran_lexer_push_character(c, lexer);
-			lexer->target_indentation = lexer->indentation;
+			if (c != '\n') {
+				lexer->target_indentation = lexer->indentation;
+			}
 			if (lexer->indentation != lexer->current_indentation) {
 				return tyran_mocha_lexer_next_token(lexer_position_info, lexer);
 			} else {

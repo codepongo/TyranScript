@@ -20,22 +20,22 @@ int tyran_array_key_compare(void* key_a, void* key_b)
 	}
 
 	switch (a->key_value.type) {
-	case TYRAN_VALUE_TYPE_NUMBER:
-		return (a->key_value.data.number - b->key_value.data.number);
-		break;
-	case TYRAN_VALUE_TYPE_OBJECT:
-		switch (a->key_value.data.object->type) {
-		case TYRAN_OBJECT_TYPE_STRING:
-			return tyran_string_strcmp(b->key_value.data.object->data.str, a->key_value.data.object->data.str);
+		case TYRAN_VALUE_TYPE_NUMBER:
+			return (a->key_value.data.number - b->key_value.data.number);
+			break;
+		case TYRAN_VALUE_TYPE_OBJECT:
+			switch (a->key_value.data.object->type) {
+				case TYRAN_OBJECT_TYPE_STRING:
+					return tyran_string_strcmp(b->key_value.data.object->data.str, a->key_value.data.object->data.str);
+					break;
+				default:
+					TYRAN_ERROR("UNKNOWN OBJECT");
+					break;
+			}
 			break;
 		default:
-			TYRAN_ERROR("UNKNOWN OBJECT");
+			TYRAN_ERROR("Unknown type");
 			break;
-		}
-		break;
-	default:
-		TYRAN_ERROR("Unknown type");
-		break;
 	}
 
 	return 0;

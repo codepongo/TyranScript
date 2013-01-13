@@ -37,17 +37,17 @@ void tyran_object_free(struct tyran_object* object)
 	runtime->delete_callback(runtime, object);
 
 	switch (object->type) {
-	case TYRAN_OBJECT_TYPE_ARRAY_ITERATOR:
-		// tyran_object_iterator_free(object->data.iterator);
-		break;
-	case TYRAN_OBJECT_TYPE_FUNCTION:
-		tyran_function_object_free(object->data.function);
-		break;
-	case TYRAN_OBJECT_TYPE_STRING:
-		tyran_string_free(object->data.str);
-		break;
-	default:
-		break;
+		case TYRAN_OBJECT_TYPE_ARRAY_ITERATOR:
+			// tyran_object_iterator_free(object->data.iterator);
+			break;
+		case TYRAN_OBJECT_TYPE_FUNCTION:
+			tyran_function_object_free(object->data.function);
+			break;
+		case TYRAN_OBJECT_TYPE_STRING:
+			tyran_string_free(object->data.str);
+			break;
+		default:
+			break;
 	}
 
 	tyran_memset_type(object, 0);
