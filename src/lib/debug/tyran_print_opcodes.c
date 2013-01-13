@@ -221,7 +221,7 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 			break;
 		case TYRAN_OPCODE_GET:
 		case TYRAN_OPCODE_INDEX:
-			print_r_r_rc(code, constants, buf, size);
+			print_r_rc_rc(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_DEBUG:
 			break;

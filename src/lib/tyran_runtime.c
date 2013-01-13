@@ -97,24 +97,28 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			case TYRAN_OPCODE_MUL:
 			case TYRAN_OPCODE_POW:
 			case TYRAN_OPCODE_SUB:
-			case TYRAN_OPCODE_INDEX:
-			case TYRAN_OPCODE_INDEX_SET:
+			case TYRAN_OPCODE_INDEX: {
 				TYRAN_REGISTER_A_RCX_RCY;
-				{
-					int operator_index = opcode - TYRAN_OPCODE_ADD;
-					if (tyran_value_is_number(&rcx)) {
-						tyran_number_operator_binary(&r[a], operator_index, rcx.data.number, rcy.data.number);
-					} else {
-						if (opcode == TYRAN_OPCODE_INDEX_SET) {
-							tyran_value_replace(r[a+1], rcx);
-							tyran_value_replace(r[a+2], rcy);
-							TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], r[a], &r[a+1], 2, operator_index);
-						} else {
-							TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], rcx, &rcy, 1, operator_index);
-						}
-					}
+				int operator_index = opcode - TYRAN_OPCODE_ADD;
+				if (tyran_value_is_number(&rcx)) {
+					tyran_number_operator_binary(&r[a], operator_index, rcx.data.number, rcy.data.number);
+				} else {
+					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], rcx, &rcy, 1, operator_index);
 				}
-				break;
+			}
+			break;
+			case TYRAN_OPCODE_INDEX_SET: {
+				TYRAN_REGISTER_A_RCX_RCY;
+				int operator_index = opcode - TYRAN_OPCODE_ADD;
+				if (tyran_value_is_number(&r[a])) {
+					tyran_number_operator_binary(&r[a], operator_index, rcx.data.number, rcy.data.number);
+				} else {
+					tyran_value_replace(r[a+1], rcx);
+					tyran_value_replace(r[a+2], rcy);
+					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], r[a], &r[a+1], 2, operator_index);
+				}
+			}
+			break;
 			case TYRAN_OPCODE_ITER: {
 				TYRAN_REGISTER_A_RCX;
 				TYRAN_RUNTIME_INVOKE_UNARY_OPERATOR(&r[a], rcx, 11);
