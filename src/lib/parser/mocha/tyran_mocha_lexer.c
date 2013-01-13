@@ -196,7 +196,6 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		tyran_lexer_parse_identifier(lexer, c, identifier, &len, &ended_with_whitespace);
 		tyran_mocha_token_id token_id = TYRAN_MOCHA_TOKEN_IDENTIFIER;
 
-		TYRAN_LOG("$$$ Started:%d ended:%d (%s)", lexer->last_was_whitespace, ended_with_whitespace, identifier);
 		if (lexer->last_was_whitespace && ended_with_whitespace) {
 			tyran_mocha_token_id found_id = tyran_mocha_lexer_keyword(identifier);
 			if (found_id != TYRAN_MOCHA_TOKEN_END) {

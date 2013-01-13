@@ -13,7 +13,7 @@ const tyran_string* tyran_string_new(tyran_memory_pool* string_pool, tyran_memor
 void tyran_string_free(const tyran_string* str)
 {
 	tyran_free(str->buf);
-	tyran_free((void*)str);
+	TYRAN_MALLOC_FREE((void*)str);
 }
 
 

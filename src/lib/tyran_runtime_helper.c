@@ -43,6 +43,7 @@ tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* 
 	rt->rb_node_pool = rb_node_pool;
 	rt->runtime_stack_pool = runtime_stack_pool;
 	rt->global = TYRAN_CALLOC_TYPE(value_pool, tyran_value);
+	rt->delete_callback = 0;
 
 	tyran_runtime_setup_binary_operators(rt);
 

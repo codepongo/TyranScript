@@ -24,11 +24,6 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_char_at)
 	return 0;
 }
 
-TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_from_char_code)
-{
-	return 0;
-}
-
 TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_add)
 {
 	tyran_print_value("ADD (this)", self, 1, runtime->symbol_table, 0, 0, 0);
@@ -89,11 +84,27 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_index)
 	const tyran_string* copy = tyran_string_substr(runtime->string_pool, runtime->memory, str, index, 1);
 
 	tyran_value* copy_value = tyran_string_object_new(runtime, copy);
-
 	tyran_value_replace(*return_value, *copy_value);
 
 	return 0;
 }
+
+TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_from_char_code)
+{
+	int char_code = (int) tyran_value_number(arguments);
+
+	TYRAN_LOG("CHAR CODE $$$$: %d", char_code);
+	char temp[2];
+	temp[0] = char_code;
+	temp[1] = 0;
+
+	const tyran_string* str = tyran_string_from_c_str(runtime->string_pool, runtime->memory, temp);
+	tyran_value* copy_value = tyran_string_object_new(runtime, str);
+	tyran_value_replace(*return_value, *copy_value);
+
+	return 0;
+}
+
 
 void tyran_string_prototype_init(const struct tyran_runtime* runtime, tyran_value* o)
 {
@@ -102,4 +113,5 @@ void tyran_string_prototype_init(const struct tyran_runtime* runtime, tyran_valu
 	TYRAN_MEMBER(o, "<=", tyran_string_prototype_lte);
 	TYRAN_MEMBER(o, "<", tyran_string_prototype_lt);
 	TYRAN_MEMBER(o, "[]", tyran_string_prototype_index);
+	TYRAN_MEMBER(o, "fromCharCode", tyran_string_prototype_from_char_code);
 }

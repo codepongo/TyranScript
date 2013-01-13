@@ -34,7 +34,9 @@ tyran_object* tyran_object_new(const struct tyran_runtime* runtime)
 void tyran_object_free(struct tyran_object* object)
 {
 	const tyran_runtime* runtime = object->created_in_runtime;
-	runtime->delete_callback(runtime, object);
+	if (runtime->delete_callback) {
+		runtime->delete_callback(runtime, object);
+	}
 
 	switch (object->type) {
 		case TYRAN_OBJECT_TYPE_ARRAY_ITERATOR:
@@ -53,7 +55,7 @@ void tyran_object_free(struct tyran_object* object)
 	tyran_memset_type(object, 0);
 	object->retain_count = -9999;
 
-	tyran_free(object);
+	TYRAN_MALLOC_FREE(object);
 }
 
 int tyran_object_find_property(const struct tyran_object* object, const tyran_symbol* symbol)
