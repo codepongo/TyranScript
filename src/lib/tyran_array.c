@@ -20,9 +20,15 @@ int tyran_array_key_compare(void* key_a, void* key_b)
 	}
 
 	switch (a->key_value.type) {
-		case TYRAN_VALUE_TYPE_NUMBER:
-			return (a->key_value.data.number - b->key_value.data.number);
-			break;
+		case TYRAN_VALUE_TYPE_NUMBER: {
+			int a_int = (int)a->key_value.data.number;
+			int b_int = (int)b->key_value.data.number;
+			int result = a_int - b_int;
+
+			TYRAN_LOG("Compare: A(%d) B(%d) = %d", a_int, b_int, result);
+			return result;
+		}
+		break;
 		case TYRAN_VALUE_TYPE_OBJECT:
 			switch (a->key_value.data.object->type) {
 				case TYRAN_OBJECT_TYPE_STRING:
@@ -45,11 +51,11 @@ tyran_array* tyran_array_new(struct tyran_memory* memory)
 {
 	tyran_array* array = TYRAN_MALLOC_NO_POOL_TYPE(memory, tyran_array);
 	array->tree = tyran_red_black_tree_new(tyran_array_key_get, tyran_array_key_compare);
-	array->max_index = 0;
+	array->max_index = -1;
 	return array;
 }
 
-void tyran_array_copy(tyran_memory_pool* rb_node_pool, tyran_array* target, tyran_red_black_tree* source, int offset)
+void tyran_array_copy(tyran_memory_pool* array_node_pool, tyran_array* target, tyran_red_black_tree* source, int offset)
 {
 	tyran_red_black_tree_iterator* iterator = tyran_red_black_tree_iterator_new(source);
 	tyran_array_node* node;
@@ -58,37 +64,48 @@ void tyran_array_copy(tyran_memory_pool* rb_node_pool, tyran_array* target, tyra
 		if (offset != 0) {
 			key.data.number += offset;
 		}
-		tyran_array_insert(target, rb_node_pool, &key, &node->value);
+		tyran_array_insert(target, array_node_pool, &key, &node->value);
 	}
 	tyran_red_black_tree_iterator_destroy(iterator);
 }
 
-tyran_array* tyran_array_dup(struct tyran_memory* memory, tyran_memory_pool* rb_node_pool, const tyran_array* a1)
+tyran_array* tyran_array_dup(struct tyran_memory* memory, tyran_memory_pool* array_node_pool, const tyran_array* a1)
 {
 	tyran_array* duplicated_array = tyran_array_new(memory);
 
-	tyran_array_copy(rb_node_pool, duplicated_array, a1->tree, 0);
+	tyran_array_copy(array_node_pool, duplicated_array, a1->tree, 0);
 
 	return duplicated_array;
 }
 
-tyran_array* tyran_array_add(struct tyran_memory* memory, tyran_memory_pool* rb_node_pool, const tyran_array* a1, const tyran_array* a2)
+tyran_array* tyran_array_add(struct tyran_memory* memory, tyran_memory_pool* array_node_pool, const tyran_array* a1, const tyran_array* a2)
 {
-	tyran_array* array = tyran_array_dup(memory, rb_node_pool, a1);
-	tyran_array_copy(rb_node_pool, array, a2->tree, a1->max_index + 1);
+	tyran_array* array = tyran_array_dup(memory, array_node_pool, a1);
+	tyran_array_copy(array_node_pool, array, a2->tree, a1->max_index + 1);
 
 	return array;
 }
 
-void tyran_array_insert_helper(tyran_array* array, tyran_memory_pool* rb_node_pool, const tyran_array_key* key, tyran_value* value)
+void tyran_array_free_node(tyran_array_node* node)
 {
-	tyran_array_node* node = TYRAN_MALLOC_TYPE(rb_node_pool, tyran_array_node);
-	node->key = *key;
-	node->value = *value;
-	tyran_red_black_tree_insert(array->tree, node);
+	tyran_value_release(node->key.key_value);
+	tyran_value_release(node->value);
+	TYRAN_MALLOC_FREE(node);
 }
 
-void tyran_array_insert(tyran_array* array, tyran_memory_pool* rb_node_pool, const tyran_value* key, tyran_value* value)
+void tyran_array_insert_helper(tyran_array* array, tyran_memory_pool* array_node_pool, const tyran_array_key* key, tyran_value* value)
+{
+	tyran_array_node* node = TYRAN_MALLOC_TYPE(array_node_pool, tyran_array_node);
+	tyran_value_copy(node->key.key_value, key->key_value);
+	tyran_value_copy(node->value, *value);
+	TYRAN_LOG("INSERT HELPER:%f", node->key.key_value.data.number);
+	tyran_array_node* node_to_delete = (tyran_array_node*) tyran_red_black_tree_insert(array->tree, node);
+	if (node_to_delete) {
+		tyran_array_free_node(node_to_delete);
+	}
+}
+
+void tyran_array_insert(tyran_array* array, tyran_memory_pool* array_node_pool, const tyran_value* key, tyran_value* value)
 {
 	tyran_array_key object_key;
 
@@ -100,27 +117,58 @@ void tyran_array_insert(tyran_array* array, tyran_memory_pool* rb_node_pool, con
 			array->max_index = index;
 		}
 	}
-	tyran_array_insert_helper(array, rb_node_pool, &object_key, value);
+	tyran_array_insert_helper(array, array_node_pool, &object_key, value);
 }
 
 
-tyran_value* tyran_array_lookup_helper(const tyran_array* array, const tyran_array_key* key, tyran_array_key_flag_type* flag)
+void tyran_array_lookup_helper(tyran_value* dest, const tyran_array* array, const tyran_array_key* key, tyran_array_key_flag_type* flag)
 {
 	tyran_array_node* node = (tyran_array_node*) tyran_red_black_tree_search(*array->tree, (void*)key);
 	if (!node) {
-		return 0;
+		tyran_value_set_undefined(*dest);
+		return;
 	}
 	*flag = 0;
-	return &node->value;
+	tyran_value_copy(*dest, node->value);
 }
 
-tyran_value* tyran_array_lookup(const tyran_array* array, const tyran_value* key)
+void tyran_array_lookup(tyran_value* dest, const tyran_array* array, const tyran_value* key)
 {
 	tyran_array_key object_key;
 	tyran_array_key_flag_type flag;
 
 	object_key.key_value = *key;
 	object_key.flag = 0;
-	return tyran_array_lookup_helper(array, &object_key, &flag);
+	tyran_array_lookup_helper(dest, array, &object_key, &flag);
 }
 
+void tyran_array_delete_helper(tyran_value* v, tyran_array* array, const tyran_array_key* key, tyran_array_key_flag_type* flag)
+{
+	tyran_array_node* node = (tyran_array_node*) tyran_red_black_tree_delete(array->tree, (void*)key);
+	TYRAN_ASSERT(node, "Something went wrong");
+
+	tyran_value_copy(*v, node->value);
+	// tyran_value_move(*v, node->value);
+	// TYRAN_MALLOC_FREE(node);
+	// *flag = 0;
+}
+
+void tyran_array_delete(tyran_value* v, tyran_array* array, const tyran_value* key)
+{
+	tyran_array_key object_key;
+	tyran_array_key_flag_type flag;
+
+	object_key.key_value = *key;
+	object_key.flag = 0;
+
+	if (tyran_value_is_number(key)) {
+		int index = (int) key->data.number;
+		TYRAN_LOG("DELET $$$ %d", index);
+		if (index == array->max_index) {
+			TYRAN_LOG("Must be pop delete");
+			array->max_index -= 1;
+		}
+	}
+
+	tyran_array_delete_helper(v, array, &object_key, &flag);
+}

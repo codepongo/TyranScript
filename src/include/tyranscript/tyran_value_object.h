@@ -6,6 +6,7 @@ struct tyran_value;
 struct tyran_runtime;
 struct tyran_object_key;
 struct tyran_memory_pool;
+struct tyran_array;
 
 /* Create and Destroy */
 struct tyran_value* tyran_value_object_new(const struct tyran_runtime* runtime);
@@ -23,5 +24,6 @@ const struct tyran_value* tyran_value_object_lookup_prototype(const struct tyran
 
 const struct tyran_string* tyran_value_object_string(struct tyran_value* v);
 
+struct tyran_array* tyran_value_object_array(struct tyran_value* v);
 
 #endif

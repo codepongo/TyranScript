@@ -66,3 +66,9 @@ const struct tyran_string* tyran_value_object_string(struct tyran_value* target)
 	return tyran_object_string(target->data.object);
 }
 
+struct tyran_array* tyran_value_object_array(struct tyran_value* target) {
+	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only set prototype on objects");
+	return tyran_object_array(target->data.object);
+}
+
+

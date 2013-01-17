@@ -154,17 +154,19 @@ char tyran_lexer_next_character_skip_whitespace(tyran_lexer* lexer)
 	return c;
 }
 
-char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexer, tyran_boolean* last_was_whitespace)
+char tyran_lexer_next_character_skip_whitespace_except_newline(tyran_lexer* lexer, tyran_boolean* first_was_whitespace)
 {
 	char c;
 
+	*first_was_whitespace = TYRAN_FALSE;
+
 	while ((c = tyran_lexer_pop_character(lexer)) == ' ' || c == '\t' || c == '\r') {
-
-
+		*first_was_whitespace = TYRAN_TRUE;
 	}
 
-	*last_was_whitespace = tyran_lexer_is_whitespace(c);
-
+	if ( c == '\n') {
+		*first_was_whitespace = TYRAN_TRUE;
+	}
 	return c;
 }
 

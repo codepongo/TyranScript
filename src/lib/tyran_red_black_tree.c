@@ -131,7 +131,6 @@ void* tyran_red_black_tree_insert(tyran_red_black_tree* root, void* node)
 
 		if (root->compare(root->key(z), root->key(x)) == 0) {
 			void* holder = x->node;
-			free(z);
 			x->node = node;
 			return holder;
 		}
@@ -221,7 +220,9 @@ void tyran_red_black_tree_transplant(tyran_red_black_tree* root, tyran_red_black
 		u->parent->right = v;
 	}
 
-	v->parent = u->parent;
+	if (v) {
+		v->parent = u->parent;
+	}
 }
 
 tyran_red_black_tree_node* tyran_red_black_tree_minimum(tyran_red_black_tree_node* z)
@@ -286,16 +287,21 @@ void tyran_red_black_tree_delete_fixup(tyran_red_black_tree* root, tyran_red_bla
 			}
 		}
 	}
-	x->color = tyran_red_black_tree_color_black;
+	if (x) {
+		x->color = tyran_red_black_tree_color_black;
+	}
 }
 
-void* rb_tree_delete(tyran_red_black_tree* root, void* key)
+void* tyran_red_black_tree_delete(tyran_red_black_tree* root, void* key)
 {
 	tyran_red_black_tree_node* y, *z, *x, *hold_node_to_delete;
 	tyran_red_black_tree_color y_original_color;
 	void* node_to_return;
 
 	hold_node_to_delete = y = z = tyran_red_black_tree_search_node(*root, key);
+	if (!hold_node_to_delete) {
+		return 0;
+	}
 
 	node_to_return = y->node;
 
@@ -311,7 +317,9 @@ void* rb_tree_delete(tyran_red_black_tree* root, void* key)
 		y_original_color = y->color;
 		x = y->right;
 		if (y->parent == z) {
-			x->parent = y;
+			if (x) {
+				x->parent = y;
+			}
 		} else {
 			tyran_red_black_tree_transplant(root, y, y->right);
 			y->right = z->right;

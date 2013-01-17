@@ -184,6 +184,7 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node**
 				tyran_snprintf(buf, buf_size, "when ");
 				tyran_parser_node_print_helper_output(buf, description, tab_count);
 				tyran_parser_node_print_helper("when expression", &operand->expression, current_root, next_to_overwrite, tab_count+1);
+				tyran_parser_node_print_helper("when block", &operand->block, current_root, next_to_overwrite, tab_count+1);
 			}
 			break;
 			case TYRAN_PARSER_NODE_TYPE_CALL: {
@@ -199,6 +200,10 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node**
 				tyran_snprintf(buf, buf_size, "case ");
 				tyran_parser_node_print_helper_output(buf, description, tab_count);
 				tyran_parser_node_print_helper("case expression", &operand->expression, current_root, next_to_overwrite, tab_count+1);
+				for (int i=0; i<operand->when_count; ++i) {
+					NODE when_node = (NODE) operand->whens[i];
+					tyran_parser_node_print_helper("when", &when_node, current_root, next_to_overwrite, tab_count+1);
+				}
 			}
 			break;
 			case TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY: {

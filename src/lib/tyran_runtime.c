@@ -113,9 +113,10 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				if (tyran_value_is_number(&r[a])) {
 					tyran_number_operator_binary(&r[a], operator_index, rcx.data.number, rcy.data.number);
 				} else {
-					tyran_value_replace(r[a+1], rcx);
-					tyran_value_replace(r[a+2], rcy);
-					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], r[a], &r[a+1], 2, operator_index);
+					tyran_value temp[2];
+					tyran_value_copy(temp[0], rcx);
+					tyran_value_copy(temp[1], rcy);
+					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(0, r[a], temp, 2, operator_index);
 				}
 			}
 			break;

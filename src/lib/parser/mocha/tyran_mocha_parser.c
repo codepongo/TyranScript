@@ -731,6 +731,9 @@ void tyran_mocha_parser_line(tyran_mocha_parser* parser)
 void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* parser, tyran_mocha_token* token)
 {
 	static tyran_boolean last_literal = 0;
+
+	tyran_mocha_lexer_debug_token(token);
+
 	if (token->token_id == TYRAN_MOCHA_TOKEN_LINE_START) {
 		tyran_mocha_parser_line(parser);
 		last_literal = TYRAN_FALSE;

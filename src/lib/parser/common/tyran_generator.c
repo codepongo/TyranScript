@@ -256,6 +256,8 @@ tyran_reg_or_constant_index tyran_generator_create_object_with_arguments(const c
 	tyran_boolean is_constructor = TYRAN_TRUE;
 
 	tyran_reg_or_constant_index result = tyran_generator_call_or_new(memory, code, target, self_index, is_constructor, argument_nodes, argument_count);
+	tyran_variable_scopes_undefine_variable(code->scope, target);
+	tyran_variable_scopes_undefine_variable(code->scope, self_index);
 
 	return result;
 }
@@ -570,19 +572,19 @@ tyran_reg_or_constant_index tyran_generator_traverse_if(tyran_memory* memory, ty
 	tyran_generator_define_label(code, if_true_label);
 
 
-	tyran_reg_index if_register = tyran_variable_scopes_define_temporary_variable(code->scope);
-	result = tyran_generator_traverse_force_register(memory, code, then_node, 0, 0, loop_start, loop_end, TYRAN_TRUE, if_register);
+	result = tyran_generator_traverse(memory, code, then_node, 0, 0, loop_start, loop_end, self_index, TYRAN_TRUE);
 	if (else_node) {
 		int end_of_if = tyran_generator_prepare_label(code);
 		tyran_generator_label_reference(code, end_of_if);
 		tyran_generator_define_label(code, if_false_label);
 
-		tyran_generator_traverse_force_register(memory, code, else_node, 0, 0, loop_start, loop_end, TYRAN_TRUE, if_register);
+		tyran_generator_traverse(memory, code, else_node, 0, 0, loop_start, loop_end, self_index, TYRAN_TRUE);
 
 		tyran_generator_define_label(code, end_of_if);
 	} else {
 		tyran_generator_define_label(code, if_false_label);
 	}
+
 	return result;
 }
 

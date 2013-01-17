@@ -25,7 +25,7 @@ void tyran_memory_pool_initialize_entries(tyran_memory_pool* pool)
 
 tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count, const char* type)
 {
-//	TYRAN_LOG("Allocating pool of type '%s' (%zu x %zu)", type, struct_size, count);
+	TYRAN_LOG("Allocating pool of type '%s' (%zu x %zu)", type, struct_size, count);
 	tyran_memory_pool* pool = TYRAN_MEMORY_ALLOC(memory, sizeof(tyran_memory_pool), "Memory pool");
 	pool->memory = TYRAN_MEMORY_ALLOC(memory, (sizeof(tyran_memory_pool_entry) + struct_size) * count + 1, "Memory pool entries");
 	pool->struct_size = struct_size;

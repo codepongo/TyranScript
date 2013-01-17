@@ -143,3 +143,8 @@ const struct tyran_string* tyran_object_string(struct tyran_object* o) {
 	TYRAN_ASSERT(o->type == TYRAN_OBJECT_TYPE_STRING, "must be array iterator");
 	return o->data.str;
 }
+
+struct tyran_array* tyran_object_array(struct tyran_object* o) {
+	TYRAN_ASSERT(o->type == TYRAN_OBJECT_TYPE_ARRAY, "must be array");
+	return o->data.array;
+}

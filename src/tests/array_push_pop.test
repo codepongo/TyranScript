@@ -1,0 +1,23 @@
+a = []
+
+a.push('hello')
+a.push('world')
+a.push('!')
+
+print(a[0])
+print(a[1])
+print(a[2])
+
+q = a.pop()
+print(q)
+q = a.pop()
+print(q)
+q = a.pop()
+print(q)
+---
+hello
+world
+!
+!
+world
+hello

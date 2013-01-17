@@ -25,7 +25,7 @@ void tyran_runtime_setup_binary_operators(tyran_runtime* rt)
 	}
 }
 
-tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* memory, tyran_memory_pool* string_pool, tyran_memory_pool* object_key_pool, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* runtime_stack_pool, tyran_memory_pool* object_pool, tyran_memory_pool* registers_value_pool, tyran_memory_pool* value_pool, tyran_memory_pool* rb_node_pool)
+tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* memory, tyran_memory_pool* string_pool, tyran_memory_pool* object_key_pool, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* function_pool, tyran_memory_pool* function_object_pool, tyran_memory_pool* runtime_stack_pool, tyran_memory_pool* object_pool, tyran_memory_pool* registers_value_pool, tyran_memory_pool* value_pool, tyran_memory_pool* array_node_pool)
 {
 	tyran_runtime* rt = TYRAN_CALLOC_TYPE(runtime_pool, tyran_runtime);
 
@@ -40,7 +40,7 @@ tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* 
 	rt->memory = memory;
 	rt->symbol_table = tyran_symbol_table_new(memory);
 	rt->value_pool = value_pool;
-	rt->rb_node_pool = rb_node_pool;
+	rt->array_node_pool = array_node_pool;
 	rt->runtime_stack_pool = runtime_stack_pool;
 	rt->global = TYRAN_CALLOC_TYPE(value_pool, tyran_value);
 	rt->delete_callback = 0;

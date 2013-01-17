@@ -19,7 +19,7 @@ void tyran_print_runtime_state(const tyran_opcode* pc, const struct tyran_runtim
 	result[0] = 0;
 	int reg_index;
 	TYRAN_LOG("---");
-	for (reg_index=0; reg_index <= 20; reg_index++) {
+	for (reg_index=0; reg_index <= 29; reg_index++) {
 		if (reg_index != 0) {
 			tyran_strncat(result, ", ", MAX_SIZE);
 		}
