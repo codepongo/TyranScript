@@ -695,8 +695,6 @@ tyran_reg_or_constant_index tyran_generator_traverse_for(tyran_memory* memory, t
 	tyran_label_id start_of_for_loop = tyran_generator_prepare_label(code);
 	tyran_generator_define_label(code, start_of_for_loop);
 
-	TYRAN_LOG("@@@ FOR LOOP START:%d", start_of_for_loop);
-
 	tyran_label_id end_of_for_loop = tyran_generator_prepare_label(code);
 	tyran_opcodes_op_next(code->opcodes, key, iterator_register);
 	tyran_generator_label_reference(code, end_of_for_loop);
@@ -773,8 +771,6 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran
 		break;
 		case TYRAN_PARSER_NODE_TYPE_CONTINUE: {
 			result = TYRAN_OPCODE_REGISTER_ILLEGAL;
-			TYRAN_LOG("@@@ CONTINUE LOOP:%d", loop_start);
-
 			tyran_generator_label_reference(code, loop_start);
 		}
 		break;

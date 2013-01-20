@@ -102,8 +102,6 @@ tyran_mocha_token_id tyran_mocha_lexer_keyword(const char* identifier)
 		tyran_mocha_token_id value;
 	} tyran_mocha_keyword_info;
 
-	TYRAN_LOG("Trying to find match for '%s'", identifier);
-
 	static tyran_mocha_keyword_info keywords[] = {
 		{ "if", TYRAN_MOCHA_TOKEN_IF },
 		{ "unless", TYRAN_MOCHA_TOKEN_UNLESS },

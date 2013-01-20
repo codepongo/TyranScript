@@ -25,7 +25,6 @@ int tyran_array_key_compare(void* key_a, void* key_b)
 			int b_int = (int)b->key_value.data.number;
 			int result = a_int - b_int;
 
-			TYRAN_LOG("Compare: A(%d) B(%d) = %d", a_int, b_int, result);
 			return result;
 		}
 		break;
@@ -98,7 +97,6 @@ void tyran_array_insert_helper(tyran_array* array, tyran_memory_pool* array_node
 	tyran_array_node* node = TYRAN_MALLOC_TYPE(array_node_pool, tyran_array_node);
 	tyran_value_copy(node->key.key_value, key->key_value);
 	tyran_value_copy(node->value, *value);
-	TYRAN_LOG("INSERT HELPER:%f", node->key.key_value.data.number);
 	tyran_array_node* node_to_delete = (tyran_array_node*) tyran_red_black_tree_insert(array->tree, node);
 	if (node_to_delete) {
 		tyran_array_free_node(node_to_delete);
@@ -163,7 +161,6 @@ void tyran_array_delete(tyran_value* v, tyran_array* array, const tyran_value* k
 
 	if (tyran_value_is_number(key)) {
 		int index = (int) key->data.number;
-		TYRAN_LOG("DELET $$$ %d", index);
 		if (index == array->max_index) {
 			TYRAN_LOG("Must be pop delete");
 			array->max_index -= 1;

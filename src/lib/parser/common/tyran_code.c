@@ -99,7 +99,6 @@ void tyran_code_fixup_label_references(tyran_code_state* state)
 		} else {
 			int absolute_position = (ref->opcode - state->opcodes->codes);
 			int delta = label->position - absolute_position - 2;
-			TYRAN_LOG("label pos:%d reference:DELTA:%d", absolute_position, delta);
 			tyran_code_change_opcode_branch(ref->opcode, delta);
 		}
 	}

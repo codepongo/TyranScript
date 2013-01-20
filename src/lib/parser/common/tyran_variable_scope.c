@@ -33,7 +33,6 @@ tyran_reg_index tyran_variable_scope_get_identifier(tyran_variable_scope* scope,
 
 	for (i=0; i<scope->variable_count; ++i) {
 		if (tyran_strcmp(scope->variables[i].name, variable_name) == 0) {
-			TYRAN_LOG("Found: '%s'", variable_name);
 			return scope->variables[i].register_index;
 		}
 	}
