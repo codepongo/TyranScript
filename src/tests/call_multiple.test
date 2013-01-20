@@ -1,0 +1,18 @@
+some_func = (ch) -> 
+	ch + 2
+
+a = {f: some_func}
+memory = [65]
+i = 3
+case memory[0]
+	when 2
+		if i is 3
+			print("hello")
+		else
+			print("groby")
+	when 65
+		print(String.fromCharCode(memory[0]))
+	when 3
+		print("hello")
+---
+A

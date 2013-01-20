@@ -154,10 +154,9 @@ tyran_reg_index tyran_generator_call_or_new(tyran_memory* memory, tyran_code_sta
 	int i;
 	int return_value_count = 1;
 
-	tyran_reg_index start_register = tyran_variable_scopes_top_free(code->scope, return_value_count);
+	tyran_reg_index start_register = tyran_variable_scopes_top_free(code->scope, argument_count + 1);
 	tyran_opcodes_op_ld(code->opcodes, start_register, function_register);
 	tyran_opcodes_op_ld(code->opcodes, start_register + 1, self_index);
-
 	for (i = 0; i < argument_count; ++i) {
 		tyran_reg_index target_index = start_register + i + 2;
 		NODE node = arguments[i];
