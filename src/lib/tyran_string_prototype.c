@@ -30,8 +30,9 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_add)
 	tyran_print_value("ADD (param)", arguments, 1, runtime->symbol_table, 0, 0, 0);
 
 	const tyran_string* s = tyran_string_strcat(runtime->string_pool, runtime->memory, self->data.object->data.str, arguments->data.object->data.str);
-	tyran_value* value = tyran_string_object_new(runtime, s);
-	tyran_value_replace(*return_value, *value);
+	tyran_value value;
+	tyran_string_object_new(&value, runtime, s);
+	tyran_value_replace(*return_value, value);
 
 	return 0;
 }
@@ -83,9 +84,10 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_index)
 
 	const tyran_string* copy = tyran_string_substr(runtime->string_pool, runtime->memory, str, index, 1);
 
-	tyran_value* copy_value = tyran_string_object_new(runtime, copy);
-	tyran_value_replace(*return_value, *copy_value);
-
+	tyran_value copy_value;
+	tyran_string_object_new(&copy_value, runtime, copy);
+	tyran_value_move(*return_value, copy_value);
+	
 	return 0;
 }
 
@@ -99,8 +101,9 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_from_char_code)
 	temp[1] = 0;
 
 	const tyran_string* str = tyran_string_from_c_str(runtime->string_pool, runtime->memory, temp);
-	tyran_value* copy_value = tyran_string_object_new(runtime, str);
-	tyran_value_replace(*return_value, *copy_value);
+	tyran_value copy_value;
+	tyran_string_object_new(&copy_value, runtime, str);
+	tyran_value_move(*return_value, copy_value);
 
 	return 0;
 }

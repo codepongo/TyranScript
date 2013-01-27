@@ -40,6 +40,7 @@ void tyran_generator_define_label(tyran_code_state* code, tyran_label_id label_i
 
 void tyran_generator_label_reference(tyran_code_state* code, tyran_label_id label_index)
 {
+	TYRAN_ASSERT(label_index >= 0, "Wrong label:%d", label_index);
 	tyran_code_add_label_index_reference(code, label_index);
 	tyran_opcodes_op_jmp(code->opcodes, 0);
 }
@@ -154,7 +155,7 @@ tyran_reg_index tyran_generator_call_or_new(tyran_memory* memory, tyran_code_sta
 	int i;
 	int return_value_count = 1;
 
-	tyran_reg_index start_register = tyran_variable_scopes_top_free(code->scope, argument_count + 1);
+	tyran_reg_index start_register = tyran_variable_scopes_top_reserve_variables(code->scope, argument_count + 1);
 	tyran_opcodes_op_ld(code->opcodes, start_register, function_register);
 	tyran_opcodes_op_ld(code->opcodes, start_register + 1, self_index);
 	for (i = 0; i < argument_count; ++i) {
@@ -173,7 +174,9 @@ tyran_reg_index tyran_generator_call_or_new(tyran_memory* memory, tyran_code_sta
 	} else {
 		tyran_opcodes_op_call(code->opcodes, start_register, argument_count, return_value_count);
 	}
-
+	TYRAN_LOG("After call undefine variables");
+	tyran_variable_scopes_top_undefine_variables(code->scope, start_register + 1, argument_count);
+	TYRAN_LOG("After call undefine variables - done");
 
 	return start_register;
 }
@@ -413,13 +416,18 @@ tyran_reg_index tyran_generator_traverse_default_binary(tyran_memory* memory, ty
 	tyran_reg_index target_index;
 	if (binary->operator_type != TYRAN_PARSER_CONCAT) {
 		target_index = tyran_generator_handle_operator(code, binary, left_index, right_index, true_label, false_label, invert_logic);
-
+/*
 		if (!tyran_opcodes_is_constant(right_index)) {
+			TYRAN_LOG("Concat free");
 			tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)right_index);
+			TYRAN_LOG("Concat free done");
 		}
 		if (!tyran_opcodes_is_constant(left_index)) {
+			TYRAN_LOG("Concat free L");
 			tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)left_index);
+			TYRAN_LOG("Concat free L DONE");
 		}
+*/
 	} else {
 		target_index = right_index;
 	}
@@ -654,10 +662,9 @@ void tyran_generator_traverse_function_parameters(tyran_memory* memory, tyran_co
 }
 
 
-tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* code, tyran_parser_node_function* func_node, tyran_memory_pool* opcodes_pool, tyran_memory_pool* function_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, tyran_memory* memory)
+tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* original_code, tyran_parser_node_function* func_node, tyran_memory_pool* opcodes_pool, tyran_memory_pool* function_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, tyran_memory* memory)
 {
-	tyran_opcodes* old_codes = code->opcodes;
-	code->opcodes = tyran_opcodes_new(opcodes_pool, memory, 1024);
+	tyran_code_state* code = tyran_code_clone(original_code);
 
 	tyran_variable_scopes_push_scope(code->scope, memory, variable_info_pool, register_pool);
 
@@ -666,16 +673,16 @@ tyran_reg_or_constant_index tyran_generator_traverse_function(tyran_code_state* 
 	tyran_reg_index temp_index = tyran_variable_scopes_define_temporary_variable(code->scope);
 
 	temp_index = tyran_generator_traverse_force_register(memory, code, func_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, -1, -1, 0, temp_index);
-	tyran_constant_index function_constant_index = tyran_constants_add_function(function_pool, code->constants, code->opcodes);
 	tyran_opcodes_op_ret(code->opcodes, temp_index, 1);
 
 	tyran_variable_scopes_pop_scope(code->scope);
 	tyran_generator_resolve_labels(code);
 	tyran_print_opcodes(code->opcodes, 0, code->constants);
 
-	code->opcodes = old_codes;
-	tyran_reg_index function_object_index = tyran_variable_scopes_define_temporary_variable(code->scope);
-	tyran_opcodes_op_func(code->opcodes, function_object_index, function_constant_index);
+	tyran_reg_index function_object_index = tyran_variable_scopes_define_temporary_variable(original_code->scope);
+	tyran_constant_index function_constant_index = tyran_constants_add_function(function_pool, original_code->constants, code->constants, code->opcodes);
+	tyran_opcodes_op_func(original_code->opcodes, function_object_index, function_constant_index);
+
 	return function_object_index;
 }
 
@@ -686,7 +693,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_for(tyran_memory* memory, t
 
 	const char* key_variable_name = for_node->value_variable->string;
 	tyran_reg_index key_register = tyran_variable_scopes_define_identifier(memory, code->scope, key_variable_name);
-	tyran_reg_or_constant_index key = tyran_variable_scopes_define_identifier(memory, code->scope, key_variable_name);
+	// tyran_reg_or_constant_index key = tyran_variable_scopes_define_identifier(memory, code->scope, key_variable_name);
 
 
 	tyran_reg_index iterator_register = tyran_variable_scopes_define_temporary_variable(code->scope);
@@ -696,7 +703,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_for(tyran_memory* memory, t
 	tyran_generator_define_label(code, start_of_for_loop);
 
 	tyran_label_id end_of_for_loop = tyran_generator_prepare_label(code);
-	tyran_opcodes_op_next(code->opcodes, key, iterator_register);
+	tyran_opcodes_op_next(code->opcodes, key_register, iterator_register);
 	tyran_generator_label_reference(code, end_of_for_loop);
 
 	tyran_generator_traverse(memory, code, for_node->block, start_of_for_loop, end_of_for_loop, start_of_for_loop, end_of_for_loop, self_index, TYRAN_FALSE);
@@ -704,7 +711,6 @@ tyran_reg_or_constant_index tyran_generator_traverse_for(tyran_memory* memory, t
 	tyran_generator_define_label(code, end_of_for_loop);
 
 	tyran_variable_scopes_undefine_variable(code->scope, iterator_register);
-	tyran_variable_scopes_undefine_variable(code->scope, key_register);
 
 	return key_register;
 }
@@ -766,7 +772,7 @@ tyran_reg_or_constant_index tyran_generator_traverse(tyran_memory* memory, tyran
 		break;
 		case TYRAN_PARSER_NODE_TYPE_BREAK: {
 			result = TYRAN_OPCODE_REGISTER_ILLEGAL;
-			tyran_generator_label_reference(code, false_label);
+			tyran_generator_label_reference(code, loop_end);
 		}
 		break;
 		case TYRAN_PARSER_NODE_TYPE_CONTINUE: {

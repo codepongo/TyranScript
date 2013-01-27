@@ -32,13 +32,17 @@ tyran_reg_index tyran_variable_scope_define_temporary_variable(tyran_variable_sc
 void tyran_variable_scope_undefine_variable(tyran_variable_scope* scope, tyran_reg_index index);
 
 
+void tyran_variable_scope_undefine_variables(tyran_variable_scope* scope, tyran_reg_index start_index, int count);
+void tyran_variable_scopes_top_undefine_variables(tyran_variable_scopes* scopes, tyran_reg_index start_index, int count);
+
+
 tyran_reg_index tyran_variable_scopes_get_identifier(tyran_variable_scopes* scope, const char* string);
 tyran_reg_index tyran_variable_scopes_define_identifier(tyran_memory* memory, tyran_variable_scopes* scope, const char* string);
 tyran_reg_index tyran_variable_scopes_define_temporary_variable(tyran_variable_scopes* scope);
 void tyran_variable_scopes_undefine_variable(tyran_variable_scopes* scope, tyran_reg_index index);
 
-tyran_reg_index tyran_variable_scope_top_free(tyran_variable_scope* scopes, int return_count);
-tyran_reg_index tyran_variable_scopes_top_free(tyran_variable_scopes* scopes, int return_count);
+tyran_reg_index tyran_variable_scopes_top_reserve_variables(tyran_variable_scopes* scopes, int return_count);
+tyran_reg_index tyran_variable_scope_top_reserve_variables(tyran_variable_scope* scope, int return_count);
 
 void tyran_variable_scopes_push_scope(tyran_variable_scopes* scopes, tyran_memory* memory, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool);
 void tyran_variable_scopes_pop_scope(tyran_variable_scopes* scopes);

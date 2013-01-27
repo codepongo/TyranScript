@@ -64,6 +64,9 @@ void tyran_opcodes_add_code_a_x_y(tyran_opcodes* codes, int code, tyran_reg_inde
 /* Load values */
 void tyran_opcodes_op_ld(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index x)
 {
+	if (a == x) {
+		return;
+	}
 	tyran_opcodes_add_code_a_x(codes, TYRAN_OPCODE_LD, a, x);
 }
 
@@ -156,6 +159,7 @@ void tyran_opcodes_op_jle(tyran_opcodes* codes, tyran_reg_or_constant_index x, t
 
 void tyran_opcodes_op_jmp(tyran_opcodes* codes, int pc)
 {
+	TYRAN_ASSERT(pc >= 0, "Wrong pc:%d", pc);
 	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_JMP, pc, 0, 0);
 }
 

@@ -44,9 +44,11 @@ tyran_constant_index tyran_constants_add_number(tyran_constants* constants, tyra
 
 tyran_constant_index tyran_constants_add_string(tyran_constants* constants, struct tyran_runtime* runtime, const struct tyran_string* v)
 {
-	tyran_value* value = tyran_string_object_new(runtime, v);
+	tyran_value value;
 
-	return tyran_constants_reserve_index(constants, value);
+	tyran_string_object_new(&value, runtime, v);
+
+	return tyran_constants_reserve_index(constants, &value);
 }
 
 tyran_constant_index tyran_constants_add_symbol_from_c_string(tyran_constants* constants, const char* v)
@@ -66,10 +68,10 @@ tyran_constant_index tyran_constants_add_boolean(tyran_constants* constants, tyr
 	return tyran_constants_reserve_index(constants, &value);
 }
 
-tyran_constant_index tyran_constants_add_function(tyran_memory_pool* function_pool, tyran_constants* constants, tyran_opcodes* opcodes)
+tyran_constant_index tyran_constants_add_function(tyran_memory_pool* function_pool, tyran_constants* constants, tyran_constants* function_constants, tyran_opcodes* opcodes)
 {
 	tyran_value value;
-	struct tyran_function* func = tyran_function_new(function_pool, opcodes, constants);
+	struct tyran_function* func = tyran_function_new(function_pool, opcodes, function_constants);
 	tyran_value_set_static_function(value, func);
 	return tyran_constants_reserve_index(constants, &value);
 }

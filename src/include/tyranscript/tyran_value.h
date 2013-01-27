@@ -31,8 +31,18 @@ typedef struct tyran_value {
 	} data;
 } tyran_value;
 
+#define tyran_value_clear(v, a) { \
+	for (i=0; i<a; ++i) { \
+		tyran_value_release_and_clear(v[i]); \
+	} \
+}
+
 #define tyran_value_release(v) { \
 	if ((v).type == TYRAN_VALUE_TYPE_OBJECT) { TYRAN_OBJECT_RELEASE((v).data.object) } \
+}
+
+#define tyran_value_release_and_clear(v) { \
+	tyran_value_release(v); \
 	(v).type = TYRAN_VALUE_TYPE_UNDEFINED; \
 	(v).data.object = 0; \
 }
@@ -102,6 +112,12 @@ typedef struct tyran_value {
 	tyran_value_release(v); \
 	tyran_value_copy(v, b); \
 }
+
+#define tyran_value_move(v, b) { \
+	tyran_value_replace(v, b); \
+	tyran_value_release(b); \
+}
+
 
 #define tyran_value_is_same_type(a, b) ((a)->type == (b)->type)
 #define tyran_value_is_same(a, b) (tyran_value_is_same_type(a, b) && ((a)->data.data == (b)->data.data))

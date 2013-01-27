@@ -61,10 +61,6 @@ tyran_reg_index tyran_variable_scopes_define_temporary_variable(tyran_variable_s
 	return tyran_variable_scope_define_temporary_variable(tyran_variable_scopes_top(scopes));
 }
 
-void tyran_variable_scopes_undefine_variable(tyran_variable_scopes* scopes, tyran_reg_index index)
-{
-	tyran_variable_scope_undefine_variable(tyran_variable_scopes_top(scopes), index);
-}
 
 void tyran_variable_scope_add_identifier(tyran_memory* memory, tyran_variable_scope* scope, const char* variable_name, tyran_reg_index register_index)
 {
@@ -84,7 +80,7 @@ void tyran_variable_scope_reserve_variable(tyran_variable_scope* scope, tyran_re
 }
 
 
-tyran_reg_index tyran_variable_scope_top_free(tyran_variable_scope* scope, int return_count)
+tyran_reg_index tyran_variable_scope_top_reserve_variables(tyran_variable_scope* scope, int return_count)
 {
 	int highest = scope->highest_register_used + 1;
 	int i;
@@ -95,11 +91,39 @@ tyran_reg_index tyran_variable_scope_top_free(tyran_variable_scope* scope, int r
 	return highest;
 }
 
-
-tyran_reg_index tyran_variable_scopes_top_free(tyran_variable_scopes* scopes, int return_count)
+void tyran_variable_scope_undefine_variable(tyran_variable_scope* scope, tyran_reg_index index)
 {
-	return tyran_variable_scope_top_free(tyran_variable_scopes_top(scopes), return_count);
+	if (scope->highest_register_used == index) {
+		scope->highest_register_used--;
+	}
+	TYRAN_LOG("Undefining register %d, highest is now %d", index, scope->highest_register_used);
+	scope->registers[index] = 0;
 }
+
+
+tyran_reg_index tyran_variable_scopes_top_reserve_variables(tyran_variable_scopes* scopes, int return_count)
+{
+	return tyran_variable_scope_top_reserve_variables(tyran_variable_scopes_top(scopes), return_count);
+}
+
+void tyran_variable_scopes_undefine_variable(tyran_variable_scopes* scopes, tyran_reg_index index)
+{
+	tyran_variable_scope_undefine_variable(tyran_variable_scopes_top(scopes), index);
+}
+
+void tyran_variable_scope_undefine_variables(tyran_variable_scope* scope, tyran_reg_index start_index, int count)
+{
+	for (tyran_reg_index i=start_index+count-1; i>=start_index; --i)
+	{
+		tyran_variable_scope_undefine_variable(scope, i);
+	}
+}
+
+void tyran_variable_scopes_top_undefine_variables(tyran_variable_scopes* scopes, tyran_reg_index start_index, int count)
+{
+	tyran_variable_scope_undefine_variables(tyran_variable_scopes_top(scopes), start_index, count);
+}
+
 
 tyran_reg_index tyran_variable_scope_find_and_reserve_variable(tyran_variable_scope* scope, int status)
 {
@@ -119,16 +143,6 @@ tyran_reg_index tyran_variable_scope_define_temporary_variable(tyran_variable_sc
 	return tyran_variable_scope_find_and_reserve_variable(scope, 1);
 }
 
-void tyran_variable_scope_undefine_variable(tyran_variable_scope* scope, tyran_reg_index index)
-{
-	if (scope->registers[index] == 2) {
-		return;
-	}
-	if (scope->highest_register_used == index) {
-		scope->highest_register_used--;
-	}
-	scope->registers[index] = 0;
-}
 
 tyran_reg_index tyran_variable_scope_define_identifier(tyran_memory* memory, tyran_variable_scope* top_scope, const char* variable_name)
 {

@@ -48,34 +48,13 @@
 	sp->r = r; \
 	sp->c = c; \
 	sp->pc = pc; \
+	sp->argument_count = x; \
 	sp++;
 
 #define TYRAN_STACK_POP \
 	sp--; \
 	r = sp->r; \
 	c = sp->c; \
+	argument_count = sp->argument_count; \
 	pc = sp->pc;
-
-#define TYRAN_SET_REGISTER(a, x) \
-	r[a] = r[x];
-
-
-#define TYRAN_ADD_REF(v) \
-	if ((v).type == TYRAN_VALUE_TYPE_OBJECT) { \
-		((v)).data.object->retain_count++; \
-	}
-
-#define TYRAN_DEC_REF(memory_pool, o) \
-	if (--o->retain_count == 0) { \
-		tyran_object_pool_free(memory_pool, o); \
-	}
-
-#define TYRAN_DEC_REF_RANGE(memory_pool, values, n) { \
-	int __i; \
-	tyran_value* v = (values); \
-	for (__i=0; __i < n; ++__i) { \
-		TYRAN_DEC_REF(memory_pool, v[i].data.object); \
-	}
-
-#define TYRAN_CALC_HASH(a)
 

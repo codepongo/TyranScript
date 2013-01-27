@@ -45,7 +45,6 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_push)
 	tyran_array* self_array = tyran_value_object_array(self);
 
 	tyran_value_set_number(length, self_array->max_index + 1);
-	TYRAN_LOG("Push:%d", self_array->max_index + 1);
 	tyran_array_insert(self_array, runtime->array_node_pool, &length, arguments);
 
 	tyran_value_set_number(length, self_array->max_index + 1);
@@ -61,7 +60,10 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_pop)
 
 	tyran_value_set_number(length, self_array->max_index);
 	TYRAN_LOG("pop:%d", self_array->max_index);
-	tyran_array_delete(return_value, self_array, &length);
+
+	tyran_value v;
+	tyran_array_delete(&v, self_array, &length);
+	tyran_value_move(*return_value, v);
 
 	tyran_value_set_number(length, self_array->max_index + 1);
 	tyran_value_object_insert_c_string_key(runtime, self, "length", &length);
@@ -72,7 +74,11 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_pop)
 TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_index)
 {
 	tyran_array* self_array = tyran_value_object_array(self);
-	tyran_array_lookup(return_value, self_array, arguments);
+	tyran_value v;
+
+	tyran_array_lookup(&v, self_array, arguments);
+
+	tyran_value_move(*return_value, v);
 	return 0;
 }
 

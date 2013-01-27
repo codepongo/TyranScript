@@ -73,7 +73,7 @@ void tyran_value_to_c_string(const tyran_symbol_table* symbol_table, const tyran
 					char temp_buffer[temp_buffer_size];
 					tyran_string_to_c_str(temp_buffer, temp_buffer_size, v->data.object->data.str);
 					if (quote) {
-						tyran_snprintf(buf, max_length, "'%s'", temp_buffer);
+						tyran_snprintf(buf, max_length, "'%s' (%d)", temp_buffer, v->data.object->retain_count);
 					} else {
 						tyran_strncpy(buf, max_length, temp_buffer, temp_buffer_size);
 					}

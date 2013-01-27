@@ -146,9 +146,7 @@ void tyran_array_delete_helper(tyran_value* v, tyran_array* array, const tyran_a
 	TYRAN_ASSERT(node, "Something went wrong");
 
 	tyran_value_copy(*v, node->value);
-	// tyran_value_move(*v, node->value);
-	// TYRAN_MALLOC_FREE(node);
-	// *flag = 0;
+	tyran_array_free_node(node);
 }
 
 void tyran_array_delete(tyran_value* v, tyran_array* array, const tyran_value* key)

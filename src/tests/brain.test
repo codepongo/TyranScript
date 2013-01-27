@@ -1,0 +1,68 @@
+execute = (opcodes) ->
+	opcode_length = opcodes.length
+	memory = []
+	loopstack = []
+	sp = 0
+	ip = 0
+
+	result = ''
+
+	for i in 0...1000
+		memory[i] = 0
+
+	while ip < opcode_length
+		case opcodes[ip]
+			when '+'
+				memory[sp] += 1
+			when '-'
+				memory[sp] -= 1
+			when '>'
+				sp += 1
+			when '<'
+				sp -= 1
+			when '.'
+				result += String.fromCharCode(memory[sp])
+			when '['
+				if memory[sp] isnt 0
+					loopstack.push(ip)
+				else
+					bracket_matching = 0
+					for index in ip..opcode_length
+						if opcodes[index] is '['
+							bracket_matching += 1
+						if opcodes[index] is ']'
+							bracket_matching -= 1
+						if bracket_matching is 0
+							break
+
+					if bracket_matching isnt 0
+						print("error: couldn't find match")
+						return result
+					else
+						ip = index
+			when ']'
+				ip = loopstack.pop() - 1
+		ip += 1
+	return result
+
+
+first = execute("++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.")
+print(first)
+
+# execute("+++++++>+++.<------.")
+
+# second = execute("+++++++++++
+# >+>>>>++++++++++++++++++++++++++++++++++++++++++++
+# >++++++++++++++++++++++++++++++++<<<<<<[>[>>>>>>+>
+# +<<<<<<<-]>>>>>>>[<<<<<<<+>>>>>>>-]<[>++++++++++[-
+# <-[>>+>+<<<-]>>>[<<<+>>>-]+<[>[-]<[-]]>[<<[>>>+<<<
+# -]>>[-]]<<]>>>[>>+>+<<<-]>>>[<<<+>>>-]+<[>[-]<[-]]
+# >[<<+>>[-]]<<<<<<<]>>>>>[+++++++++++++++++++++++++
+# +++++++++++++++++++++++.[-]]++++++++++<[->-<]>++++
+# ++++++++++++++++++++++++++++++++++++++++++++.[-]<<
+# <<<<<<<<<<[>>>+>+<<<<-]>>>>[<<<<+>>>>-]<-[>>.>.<<<
+# [-]]<<[>>+>+<<<-]>>>[<<<+>>>-]<<[<+>-]>[<+>-]<<<-]")
+
+#print(second)
+---
+Hello World!

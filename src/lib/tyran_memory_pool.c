@@ -46,7 +46,7 @@ void* tyran_memory_pool_alloc(tyran_memory_pool* pool)
 	pool->count++;
 	u8t* m = (u8t*) e;
 	u8t* p = m + sizeof(tyran_memory_pool_entry);
-	TYRAN_LOG("Allocating from memory pool '%s' (%zu) -> %p", pool->type_string, pool->struct_size, m);
+	TYRAN_LOG("Allocating from memory pool '%s' (%zu) -> %p (count:%zu)", pool->type_string, pool->struct_size, m, pool->count);
 	return p;
 }
 
@@ -80,8 +80,13 @@ void tyran_memory_pool_free(void* p)
 	u8t* m = p;
 	tyran_memory_pool_entry* e = (tyran_memory_pool_entry*)(m - sizeof(tyran_memory_pool_entry));
 
+	tyran_memory_pool* pool = e->pool;
+
+	pool->count--;
+
+	TYRAN_LOG("Freeing from memory pool '%s' (%zu) -> %p (count:%zu)", pool->type_string, pool->struct_size, m, pool->count);
 	e->next_free = e->pool->first_free;
-	e->pool->first_free = e;
+	pool->first_free = e;
 }
 
 char* tyran_str_dup(tyran_memory* memory, const char* str)

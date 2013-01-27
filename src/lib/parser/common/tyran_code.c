@@ -8,7 +8,7 @@
 #include <tyranscript/tyran_constants.h>
 #include <tyranscript/tyran_config.h>
 
-tyran_code_state* tyran_code_new(struct tyran_runtime* runtime, tyran_memory_pool* string_pool, tyran_memory_pool* function_pool, tyran_memory_pool* code_state_pool, tyran_memory_pool* opcodes_pool, tyran_memory_pool* constants_pool, tyran_memory_pool* constant_values_pool, tyran_memory_pool* label_pool, tyran_memory_pool* label_reference_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, tyran_variable_scopes* variable_scopes, tyran_memory* memory)
+tyran_code_state* tyran_code_new(struct tyran_runtime* runtime, tyran_memory_pool* string_pool, tyran_memory_pool* function_pool, tyran_memory_pool* code_state_pool, tyran_memory_pool* opcodes_pool, tyran_memory_pool* constants_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, tyran_variable_scopes* variable_scopes, tyran_memory* memory)
 {
 	tyran_code_state* state = TYRAN_CALLOC_TYPE(code_state_pool, tyran_code_state);
 
@@ -19,6 +19,8 @@ tyran_code_state* tyran_code_new(struct tyran_runtime* runtime, tyran_memory_poo
 	state->memory = memory;
 	state->variable_info_pool = variable_info_pool;
 	state->register_pool = register_pool;
+	state->code_state_pool = code_state_pool;
+	state->constants_pool = constants_pool;
 
 	state->runtime = runtime;
 
@@ -29,6 +31,12 @@ tyran_code_state* tyran_code_new(struct tyran_runtime* runtime, tyran_memory_poo
 	state->labels = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_label, 100);
 	state->label_references = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_label_reference, 100);
 	return state;
+}
+
+tyran_code_state* tyran_code_clone(tyran_code_state* state)
+{
+	tyran_code_state* cloned_state = tyran_code_new(state->runtime, state->string_pool, state->function_pool, state->code_state_pool, state->opcodes_pool, state->constants_pool, state->variable_info_pool, state->register_pool, state->scope, state->memory);
+	return cloned_state;
 }
 
 tyran_label_id tyran_code_label_new(tyran_code_state* state)
@@ -98,6 +106,7 @@ void tyran_code_fixup_label_references(tyran_code_state* state)
 			TYRAN_SOFT_ERROR("Label:%d is not defined", i);
 		} else {
 			int absolute_position = (ref->opcode - state->opcodes->codes);
+			TYRAN_ASSERT(absolute_position >= 0, "Wrong position for label");
 			int delta = label->position - absolute_position - 2;
 			tyran_code_change_opcode_branch(ref->opcode, delta);
 		}

@@ -19,6 +19,8 @@ typedef struct tyran_code_state {
 	tyran_memory_pool* string_pool;
 	tyran_memory_pool* variable_info_pool;
 	tyran_memory_pool* register_pool;
+	tyran_memory_pool* constants_pool;
+	tyran_memory_pool* code_state_pool;
 	tyran_memory* memory;
 
 	tyran_reg_index last_self_index;
@@ -29,7 +31,8 @@ typedef int tyran_label_id;
 
 
 
-tyran_code_state* tyran_code_new(struct tyran_runtime* runtime, tyran_memory_pool* string_pool, tyran_memory_pool* function_pool, tyran_memory_pool* code_state_pool, tyran_memory_pool* opcodes_pool, tyran_memory_pool* constants_pool, tyran_memory_pool* constant_values_pool, tyran_memory_pool* label_pool, tyran_memory_pool* label_reference_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, struct tyran_variable_scopes* variable_scopes, tyran_memory* memory);
+tyran_code_state* tyran_code_new(struct tyran_runtime* runtime, tyran_memory_pool* string_pool, tyran_memory_pool* function_pool, tyran_memory_pool* code_state_pool, tyran_memory_pool* opcodes_pool, tyran_memory_pool* constants_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, struct tyran_variable_scopes* variable_scopes, tyran_memory* memory);
+tyran_code_state* tyran_code_clone(tyran_code_state* state);
 
 tyran_label_id tyran_code_prepare_label(tyran_code_state* state);
 void tyran_code_define_label(tyran_code_state* state, tyran_label_id label_index);

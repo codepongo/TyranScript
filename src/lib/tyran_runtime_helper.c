@@ -77,6 +77,7 @@ void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opco
 	runtime_info->opcodes = opcodes;
 	runtime_info->pc = opcodes->codes;
 	runtime_info->r = rt->registers;
+	runtime_info->argument_count = 0;
 	rt->stack[rt->stack_pointer] = *runtime_info;
 	rt->stack_pointer++;
 }
