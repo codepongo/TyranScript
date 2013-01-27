@@ -398,6 +398,9 @@ tyran_reg_or_constant_index tyran_generator_handle_node(tyran_code_state* code, 
 			result = tyran_generator_self_member(code, identifier->string);
 			// TYRAN_SOFT_ERROR("illegal identifier: '%s'", identifier->string);
 		}
+	} else {
+		TYRAN_ERROR("Illegal node");
+		result = TYRAN_OPCODE_REGISTER_ILLEGAL;
 	}
 
 	return result;
