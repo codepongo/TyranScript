@@ -68,6 +68,21 @@ tyran_constant_index tyran_constants_add_boolean(tyran_constants* constants, tyr
 	return tyran_constants_reserve_index(constants, &value);
 }
 
+tyran_constant_index tyran_constants_add_nil(tyran_constants* constants)
+{
+	tyran_value value;
+	tyran_value_set_nil(value);
+	return tyran_constants_reserve_index(constants, &value);
+}
+
+tyran_constant_index tyran_constants_add_undefined(tyran_constants* constants)
+{
+	tyran_value value;
+	tyran_value_set_undefined(value);
+	return tyran_constants_reserve_index(constants, &value);
+}
+
+
 tyran_constant_index tyran_constants_add_function(tyran_memory_pool* function_pool, tyran_constants* constants, tyran_constants* function_constants, tyran_opcodes* opcodes)
 {
 	tyran_value value;

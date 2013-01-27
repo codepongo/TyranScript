@@ -73,6 +73,7 @@ tyran_constant_index tyran_generator_literal_to_constant_index(tyran_constants* 
 		}
 		break;
 		case TYRAN_PARSER_NODE_TYPE_NULL:
+			result = tyran_constants_add_nil(constants);
 			break;
 		case TYRAN_PARSER_NODE_TYPE_STRING: {
 			tyran_parser_node_string* string = (tyran_parser_node_string*) node;

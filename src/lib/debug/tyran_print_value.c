@@ -23,7 +23,7 @@ void tyran_value_to_c_string(const tyran_symbol_table* symbol_table, const tyran
 		case TYRAN_VALUE_TYPE_UNDEFINED:
 			tyran_snprintf(buf, max_length, "undefined");
 			break;
-		case TYRAN_VALUE_TYPE_NULL:
+		case TYRAN_VALUE_TYPE_NIL:
 			tyran_snprintf(buf, max_length, "null");
 			break;
 		case TYRAN_VALUE_TYPE_NUMBER:
