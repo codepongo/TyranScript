@@ -82,6 +82,7 @@ tyran_constant_index tyran_generator_literal_to_constant_index(tyran_constants* 
 		}
 		break;
 		case TYRAN_PARSER_NODE_TYPE_UNDEFINED:
+			result = tyran_constants_add_undefined(constants);
 			break;
 		case TYRAN_PARSER_NODE_TYPE_NUMBER: {
 			tyran_parser_node_number* number = (tyran_parser_node_number*) node;
@@ -90,6 +91,7 @@ tyran_constant_index tyran_generator_literal_to_constant_index(tyran_constants* 
 		break;
 		default:
 			TYRAN_ERROR("Unknown constant:%d", node->type);
+			return TYRAN_OPCODE_REGISTER_ILLEGAL;
 	}
 
 	return result;
