@@ -211,8 +211,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 					if (opcode == TYRAN_OPCODE_NEW) {
 						tyran_value_copy(r[a], r[a+1]);
 					}
-					if (function->type != tyran_function_type_normal)
-					{
+					if (function->type != tyran_function_type_normal) {
 						tyran_value_clear((&r[a+1]), x + 1);
 					}
 				}
