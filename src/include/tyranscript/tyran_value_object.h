@@ -18,8 +18,8 @@ void tyran_value_object_insert(const struct tyran_runtime* runtime, struct tyran
 void tyran_value_object_delete(struct tyran_value* object, struct tyran_value* key);
 
 /* Query */
-const struct tyran_value* tyran_value_object_lookup(const struct tyran_value* object, const struct tyran_value* key);
-const struct tyran_value* tyran_value_object_lookup_prototype(const struct tyran_value* object, const struct tyran_value* key);
+void tyran_value_object_lookup(struct tyran_value* v, const struct tyran_value* object, const struct tyran_value* key);
+void tyran_value_object_lookup_prototype(struct tyran_value* v, const struct tyran_value* object, const struct tyran_value* key);
 
 
 const struct tyran_string* tyran_value_object_string(struct tyran_value* v);

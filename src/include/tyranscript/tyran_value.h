@@ -3,6 +3,7 @@
 
 #include <tyranscript/tyran_config.h>
 #include <tyranscript/tyran_symbol.h>
+#include <tyranscript/tyran_object_macros.h>
 
 struct tyran_string;
 struct tyran_object;

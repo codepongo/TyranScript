@@ -422,18 +422,18 @@ tyran_reg_index tyran_generator_traverse_default_binary(tyran_memory* memory, ty
 	tyran_reg_index target_index;
 	if (binary->operator_type != TYRAN_PARSER_CONCAT) {
 		target_index = tyran_generator_handle_operator(code, binary, left_index, right_index, true_label, false_label, invert_logic);
-/*
-		if (!tyran_opcodes_is_constant(right_index)) {
-			TYRAN_LOG("Concat free");
-			tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)right_index);
-			TYRAN_LOG("Concat free done");
-		}
-		if (!tyran_opcodes_is_constant(left_index)) {
-			TYRAN_LOG("Concat free L");
-			tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)left_index);
-			TYRAN_LOG("Concat free L DONE");
-		}
-*/
+		/*
+				if (!tyran_opcodes_is_constant(right_index)) {
+					TYRAN_LOG("Concat free");
+					tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)right_index);
+					TYRAN_LOG("Concat free done");
+				}
+				if (!tyran_opcodes_is_constant(left_index)) {
+					TYRAN_LOG("Concat free L");
+					tyran_variable_scopes_undefine_variable(code->scope, (tyran_reg_index)left_index);
+					TYRAN_LOG("Concat free L DONE");
+				}
+		*/
 	} else {
 		target_index = right_index;
 	}

@@ -26,22 +26,19 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_char_at)
 
 TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_add)
 {
-	tyran_print_value("ADD (this)", self, 1, runtime->symbol_table, 0, 0, 0);
-	tyran_print_value("ADD (param)", arguments, 1, runtime->symbol_table, 0, 0, 0);
-
-	const tyran_string* s = tyran_string_strcat(runtime->string_pool, runtime->memory, self->data.object->data.str, arguments->data.object->data.str);
-	tyran_value value;
-	tyran_string_object_new(&value, runtime, s);
-	tyran_value_replace(*return_value, value);
+	const tyran_string* self_string = tyran_value_object_string(self);
+	const tyran_string* add_string = tyran_value_object_string(arguments);
+	TYRAN_LOG("String add!");
+	const tyran_string* s = tyran_string_strcat(runtime->string_pool, runtime->memory, self_string, add_string);
+	tyran_value copy_value;
+	tyran_string_object_new(&copy_value, runtime, s);
+	tyran_value_move(*return_value, copy_value);
 
 	return 0;
 }
 
 TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_equal)
 {
-	tyran_print_value("EQUAL (this)", self, 1, runtime->symbol_table, 0, 0, 0);
-	tyran_print_value("EQUAL (param)", arguments, 1, runtime->symbol_table, 0, 0, 0);
-
 	int diff = tyran_string_strcmp(self->data.object->data.str, arguments->data.object->data.str);
 	tyran_value_replace_boolean(*return_value, diff == 0);
 
@@ -50,9 +47,6 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_equal)
 
 TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_lte)
 {
-	tyran_print_value("LTE (this)", self, 1, runtime->symbol_table, 0, 0, 0);
-	tyran_print_value("LTE (param)", arguments, 1, runtime->symbol_table, 0, 0, 0);
-
 	int diff = tyran_string_strcmp(self->data.object->data.str, arguments->data.object->data.str);
 	tyran_value_replace_boolean(*return_value, diff <= 0);
 
@@ -61,9 +55,6 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_lte)
 
 TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_lt)
 {
-	tyran_print_value("LT (this)", self, 1, runtime->symbol_table, 0, 0, 0);
-	tyran_print_value("LT (param)", arguments, 1, runtime->symbol_table, 0, 0, 0);
-
 	int diff = tyran_string_strcmp(self->data.object->data.str, arguments->data.object->data.str);
 	tyran_value_replace_boolean(*return_value, diff < 0);
 
@@ -87,7 +78,7 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_index)
 	tyran_value copy_value;
 	tyran_string_object_new(&copy_value, runtime, copy);
 	tyran_value_move(*return_value, copy_value);
-	
+
 	return 0;
 }
 
@@ -95,7 +86,6 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_from_char_code)
 {
 	int char_code = (int) tyran_value_number(arguments);
 
-	TYRAN_LOG("CHAR CODE $$$$: %d", char_code);
 	char temp[2];
 	temp[0] = char_code;
 	temp[1] = 0;

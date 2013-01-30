@@ -1,3 +1,4 @@
+#include <tyranscript/tyran_configuration.h>
 #include <tyranscript/tyran_opcode_ids.h>
 #include <tyranscript/tyran_opcodes.h>
 #include <tyranscript/tyran_opcode.h>
@@ -230,6 +231,7 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 
 void tyran_print_opcode(const tyran_opcode* opcode, const tyran_constants* constants, int ip, int highlight)
 {
+#if defined TYRAN_CONFIGURATION_DEBUG
 	tyran_opcode code = *opcode;
 	int instruction = TYRAN_OPCODE_INSTRUCTION(code);
 
@@ -238,10 +240,12 @@ void tyran_print_opcode(const tyran_opcode* opcode, const tyran_constants* const
 	tyran_print_arguments(code, ip, constants, args, 512);
 
 	TYRAN_LOG("%d %s%s", ip, tyran_opcode_names[instruction], args);
+#endif
 }
 
 void tyran_print_opcodes(const struct tyran_opcodes* ops, const tyran_opcode* ip, const tyran_constants* constants)
 {
+#if defined TYRAN_CONFIGURATION_DEBUG
 	int i = 0;
 	const tyran_opcode* tyran_opcodes = ops->codes;
 	int octet_length = ops->code_len;
@@ -251,4 +255,5 @@ void tyran_print_opcodes(const struct tyran_opcodes* ops, const tyran_opcode* ip
 	for (i = 0; i < octet_length; ++i) {
 		tyran_print_opcode(&tyran_opcodes[i], constants, i, ip == &tyran_opcodes[i]);
 	}
+#endif
 }

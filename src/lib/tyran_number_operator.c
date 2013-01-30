@@ -1,5 +1,6 @@
 #include <tyranscript/tyran_number_operator.h>
 #include <tyranscript/tyran_value.h>
+#include <tyranscript/tyran_object.h>
 
 tyran_boolean tyran_number_operator_comparison(int comparison, tyran_number a, tyran_number b)
 {
@@ -49,5 +50,5 @@ void tyran_number_operator_binary(tyran_value* value, int operator_index, tyran_
 			TYRAN_ERROR("Unknown operator:%d", operator_index);
 	}
 
-	tyran_value_set_number(*value, result);
+	tyran_value_replace_number(*value, result);
 }

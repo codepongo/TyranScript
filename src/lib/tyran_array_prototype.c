@@ -95,7 +95,7 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_array_prototype_add)
 	tyran_object* obj = tyran_object_new(runtime);
 	tyran_object_set_prototype(obj, runtime->_array_class);
 	tyran_object_set_array(obj, added_array);
-	tyran_value_set_object(*return_value, obj);
+	tyran_value_replace_object(*return_value, obj);
 	return 0;
 }
 

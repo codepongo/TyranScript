@@ -1,9 +1,7 @@
+#include <tyranscript/tyran_configuration.h>
 #include <tyranscript/parser/common/tyran_errors.h>
 #include <tyranscript/parser/tyran_lexer.h>
 
-static const char* error_string[TYRAN_ERROR_CODE_MAX] = {
-	"String without end"
-};
 
 tyran_errors* tyran_errors_new(tyran_memory* memory)
 {
@@ -15,8 +13,16 @@ tyran_errors* tyran_errors_new(tyran_memory* memory)
 
 int tyran_errors_add(tyran_errors* errors, enum tyran_error_code error, struct tyran_lexer* lexer)
 {
+#if defined TYRAN_CONFIGURATION_DEBUG
+	static const char* error_string[TYRAN_ERROR_CODE_MAX] = {
+		"String without end"
+	};
+
 	errors->last_error = error;
 	TYRAN_LOG("error:%s", error_string[error]);
 
 	return (int) error;
+#else
+	return 0;
+#endif
 }

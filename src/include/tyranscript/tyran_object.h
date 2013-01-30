@@ -70,9 +70,8 @@ void tyran_object_insert(struct tyran_object* object, const tyran_symbol* symbol
 void tyran_object_delete(struct tyran_object* object, const struct tyran_symbol* symbol);
 
 /* Find */
-struct tyran_value* tyran_object_lookup(struct tyran_object* object, const struct tyran_symbol* key);
-struct tyran_value* tyran_object_lookup_prototype(struct tyran_object* o, const struct tyran_symbol* key);
-
+void tyran_object_lookup(struct tyran_value* x, struct tyran_object* object, const struct tyran_symbol* key);
+void tyran_object_lookup_prototype(struct tyran_value* x, struct tyran_object* o, const struct tyran_symbol* key);
 
 struct tyran_range_iterator* tyran_object_range_iterator(struct tyran_object* o);
 struct tyran_range* tyran_object_range(struct tyran_object* o);

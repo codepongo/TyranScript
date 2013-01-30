@@ -1,4 +1,6 @@
 #include "tyran_runtime_macros.h"
+#include <tyranscript/tyran_configuration.h>
+
 
 #include <tyranscript/tyran_value.h>
 #include <tyranscript/tyran_runtime.h>
@@ -16,19 +18,23 @@
 
 #include <tyranscript/debug/tyran_print_runtime_state.h>
 
+#if defined TYRAN_CONFIGURATION_DEBUG
 #define TYRAN_RUNTIME_DEBUG
+#endif
 
 #define TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(DESTINATION, OBJECT, PARAMS, PARAM_COUNT, OPERATOR) \
-	tyran_value* member = tyran_object_lookup_prototype((OBJECT).data.object, &runtime->binary_operator_symbols[OPERATOR]); \
-	TYRAN_ASSERT(member, "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
-	const tyran_function* function = member->data.object->data.function->static_function; \
-	function->data.callback(runtime, member, PARAMS, PARAM_COUNT, &OBJECT, DESTINATION, TYRAN_FALSE);
+	{ tyran_value member; \
+	tyran_object_lookup_prototype(&member, (OBJECT).data.object, &runtime->binary_operator_symbols[OPERATOR]); \
+	TYRAN_ASSERT(!tyran_value_is_undefined(&member), "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
+	const tyran_function* function = member.data.object->data.function->static_function; \
+	function->data.callback(runtime, &member, PARAMS, PARAM_COUNT, &OBJECT, DESTINATION, TYRAN_FALSE); }
 
 #define TYRAN_RUNTIME_INVOKE_UNARY_OPERATOR(DESTINATION, OBJECT, OPERATOR) \
-	tyran_value* member = tyran_object_lookup_prototype((OBJECT).data.object, &runtime->binary_operator_symbols[OPERATOR]); \
-	TYRAN_ASSERT(member, "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
-	const tyran_function* function = member->data.object->data.function->static_function; \
-	function->data.callback(runtime, member, 0, 0, &OBJECT, DESTINATION, TYRAN_FALSE);
+	{ tyran_value member; \
+	tyran_object_lookup_prototype(&member, (OBJECT).data.object, &runtime->binary_operator_symbols[OPERATOR]); \
+	TYRAN_ASSERT(!tyran_value_is_undefined(&member), "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
+	const tyran_function* function = member.data.object->data.function->static_function; \
+	function->data.callback(runtime, &member, 0, 0, &OBJECT, DESTINATION, TYRAN_FALSE); }
 
 void tyran_register_copy(tyran_value* target, tyran_value* source, int count)
 {
@@ -169,12 +175,12 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			case TYRAN_OPCODE_RET: {
 				TYRAN_REGISTER_A_X;
 				tyran_value* from = &r[a];
-				tyran_value_clear((&r[a+1]), argument_count);
 				if (sp == base_sp) {
 					tyran_value_copy(*return_value, *from);
 					return;
 				}
 				tyran_register_copy(sp->return_register, from, x);
+				tyran_value_clear((&r[1]), 100);
 				TYRAN_STACK_POP;
 			}
 			break;
@@ -184,6 +190,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				{
 					if (opcode == TYRAN_OPCODE_NEW) {
 						object = TYRAN_CALLOC_TYPE(runtime->object_pool, tyran_object);
+						object->created_in_runtime = runtime;
 						tyran_object_set_prototype(object, r[a+1].data.object);
 						tyran_value_replace_object(r[a+1], object);
 					}
@@ -202,18 +209,19 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 						function->data.callback(runtime, &r[a], &r[a+2], x, &r[a+1], &r[a], TYRAN_FALSE);
 					}
 					if (opcode == TYRAN_OPCODE_NEW) {
-						tyran_value_replace(r[a], r[a+1]);
+						tyran_value_copy(r[a], r[a+1]);
+					}
+					if (function->type != tyran_function_type_normal)
+					{
+						tyran_value_clear((&r[a+1]), x + 1);
 					}
 				}
 				break;
 			case TYRAN_OPCODE_GET: {
 				TYRAN_REGISTER_A_RCX_RCY;
-				const tyran_value* v = tyran_value_object_lookup_prototype(&rcx, &rcy);
-				if (!v) {
-					tyran_value_replace_undefined(r[a]);
-				} else {
-					tyran_value_replace(r[a], *v);
-				}
+				tyran_value v;
+				tyran_value_object_lookup_prototype(&v, &rcx, &rcy);
+				tyran_value_replace(r[a], v);
 			}
 			break;
 			case TYRAN_OPCODE_SET:

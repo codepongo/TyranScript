@@ -332,7 +332,7 @@ void* tyran_red_black_tree_delete(tyran_red_black_tree* root, void* key)
 		y->color = z->color;
 	}
 
-	if (y_original_color == tyran_red_black_tree_color_black) {
+	if (x && (y_original_color == tyran_red_black_tree_color_black)) {
 		tyran_red_black_tree_delete_fixup(root, x);
 	}
 

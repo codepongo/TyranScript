@@ -33,8 +33,8 @@ tyran_object* tyran_object_new(const struct tyran_runtime* runtime)
 
 void tyran_object_free(struct tyran_object* object)
 {
-	TYRAN_LOG("Object free:%p", object);
 	const tyran_runtime* runtime = object->created_in_runtime;
+	TYRAN_LOG("Object free:%p, runtime:%p", object, runtime);
 	if (runtime->delete_callback) {
 		runtime->delete_callback(runtime, object);
 	}
@@ -55,6 +55,7 @@ void tyran_object_free(struct tyran_object* object)
 
 	tyran_memset_type(object, 0);
 	object->retain_count = -9999;
+	object->created_in_runtime = 0;
 
 	TYRAN_MALLOC_FREE(object);
 }
@@ -87,13 +88,13 @@ void tyran_object_insert(struct tyran_object* object, const tyran_symbol* symbol
 
 }
 
-tyran_value* tyran_object_lookup(struct tyran_object* object, const struct tyran_symbol* symbol)
+void tyran_object_lookup(tyran_value* x, struct tyran_object* object, const struct tyran_symbol* symbol)
 {
 	int found = tyran_object_find_property(object, symbol);
 	if (found == -1) {
-		return 0;
+		tyran_value_set_undefined(*x);
 	} else {
-		return &object->properties[found].value;
+		tyran_value_copy(*x, object->properties[found].value);
 	}
 }
 
@@ -108,17 +109,12 @@ void tyran_object_set_prototype(struct tyran_object* target, struct tyran_object
 	target->prototype = proto;
 }
 
-tyran_value* tyran_object_lookup_prototype(struct tyran_object* o, const struct tyran_symbol* symbol)
+void tyran_object_lookup_prototype(tyran_value* x, struct tyran_object* o, const struct tyran_symbol* symbol)
 {
-	tyran_value* ret_value;
-	ret_value = tyran_object_lookup(o, symbol);
-	if (!ret_value) {
-		if (o->prototype) {
-			return tyran_object_lookup_prototype(o->prototype, symbol);
-		}
+	tyran_object_lookup(x, o, symbol);
+	if (tyran_value_is_undefined(x) && o->prototype) {
+		tyran_object_lookup_prototype(x, o->prototype, symbol);
 	}
-
-	return ret_value;
 }
 
 int tyran_object_length(const struct tyran_object* object)

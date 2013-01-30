@@ -1,3 +1,4 @@
+#include <tyranscript/tyran_configuration.h>
 #include <tyranscript/debug/mocha/tyran_mocha_lexer_debug.h>
 #include <tyranscript/parser/mocha/tyran_mocha_lexer.h>
 #include <tyranscript/tyran_config.h>
@@ -29,6 +30,7 @@ void tyran_mocha_lexer_debug_tokens(const char* description, tyran_mocha_token* 
 
 void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 {
+#if defined TYRAN_CONFIGURATION_DEBUG
 	const char* token_id_to_string[TYRAN_MOCHA_TOKEN_MAX] = {
 		"END",
 		"INCREMENT",
@@ -102,5 +104,7 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 	if (token->token_id == TYRAN_MOCHA_TOKEN_IDENTIFIER || token->token_id == TYRAN_MOCHA_TOKEN_STRING) {
 		TYRAN_LOG_NO_LF("(%s)", (const char*) token->token_data);
 	}
+
+#endif
 }
 

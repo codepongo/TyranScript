@@ -40,18 +40,18 @@ void tyran_value_object_delete(tyran_value* target, tyran_value* key)
 	tyran_object_delete(target->data.object, &key->data.symbol);
 }
 
-const tyran_value* tyran_value_object_lookup(const tyran_value* target, const struct tyran_value* key)
+void tyran_value_object_lookup(tyran_value* t, const tyran_value* target, const struct tyran_value* key)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
 	TYRAN_ASSERT(key->type == TYRAN_VALUE_TYPE_SYMBOL, "Can only lookup symbols");
-	return tyran_object_lookup(target->data.object, &key->data.symbol);
+	tyran_object_lookup(t, target->data.object, &key->data.symbol);
 }
 
-const tyran_value* tyran_value_object_lookup_prototype(const tyran_value* target, const struct tyran_value* key)
+void tyran_value_object_lookup_prototype(tyran_value* v, const tyran_value* target, const struct tyran_value* key)
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
 	TYRAN_ASSERT(key->type == TYRAN_VALUE_TYPE_SYMBOL, "Can only lookup symbols");
-	return tyran_object_lookup_prototype(target->data.object, &key->data.symbol);
+	tyran_object_lookup_prototype(v, target->data.object, &key->data.symbol);
 }
 
 void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_value* prototype)

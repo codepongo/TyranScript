@@ -113,8 +113,7 @@ void tyran_variable_scopes_undefine_variable(tyran_variable_scopes* scopes, tyra
 
 void tyran_variable_scope_undefine_variables(tyran_variable_scope* scope, tyran_reg_index start_index, int count)
 {
-	for (tyran_reg_index i=start_index+count-1; i>=start_index; --i)
-	{
+	for (tyran_reg_index i=start_index+count-1; i>=start_index; --i) {
 		tyran_variable_scope_undefine_variable(scope, i);
 	}
 }
