@@ -3,22 +3,26 @@
 
 void tyran_variable_scopes_push_scope(tyran_variable_scopes* scopes, tyran_memory* memory, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool)
 {
+	TYRAN_LOG("PUSH SCOPE ***");
 	TYRAN_ASSERT(scopes->scope_count < scopes->allocated_scope_count, "Out of memory adding a scope");
 	tyran_variable_scope* scope = &scopes->scopes[scopes->scope_count++];
 	scope->allocated_variable_count = 1024;
 	scope->variables = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_variable_info, scope->allocated_variable_count);
+	scope->variable_count = 0;
 	scope->register_count = 255;
 	scope->registers = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, int, scope->register_count);
 }
 
 void tyran_variable_scopes_pop_scope(tyran_variable_scopes* scopes)
 {
+	TYRAN_LOG("POP SCOPE ***");
 	TYRAN_ASSERT(scopes->scope_count > 0, "Popped too much");
 	scopes->scope_count --;
 }
 
 tyran_variable_scopes* tyran_variable_scopes_new(tyran_memory_pool* scopes_pool, tyran_memory* memory, tyran_memory_pool* scope_pool, tyran_memory_pool* variable_info_pool, tyran_memory_pool* register_pool, int max_count)
 {
+	TYRAN_LOG("NEW SCOPES....");
 	tyran_variable_scopes* scopes = TYRAN_CALLOC_TYPE(scopes_pool, tyran_variable_scopes);
 	scopes->allocated_scope_count = max_count;
 	scopes->scopes = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_variable_scope, scopes->allocated_scope_count);
@@ -32,6 +36,8 @@ tyran_reg_index tyran_variable_scope_get_identifier(tyran_variable_scope* scope,
 	int i;
 
 	for (i=0; i<scope->variable_count; ++i) {
+		TYRAN_LOG("scope:%d", i);
+		TYRAN_LOG("name:%s", scope->variables[i].name);
 		if (tyran_strcmp(scope->variables[i].name, variable_name) == 0) {
 			return scope->variables[i].register_index;
 		}
@@ -145,6 +151,7 @@ tyran_reg_index tyran_variable_scope_define_temporary_variable(tyran_variable_sc
 
 tyran_reg_index tyran_variable_scope_define_identifier(tyran_memory* memory, tyran_variable_scope* top_scope, const char* variable_name)
 {
+		TYRAN_LOG("Adding variable:%s", variable_name);
 	tyran_reg_index current_index = tyran_variable_scope_get_identifier(top_scope, variable_name);
 	if (current_index == TYRAN_OPCODE_REGISTER_ILLEGAL) {
 		TYRAN_LOG("Couldn't find variable '%s', adding it to scope", variable_name);
