@@ -17,6 +17,7 @@ tyran_boolean tyran_number_operator_comparison(int comparison, tyran_number a, t
 			result = (a<=b);
 			break;
 		default:
+			result = 0;
 			TYRAN_ERROR("Unknown comparison:%d", comparison);
 	}
 
