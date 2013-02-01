@@ -450,6 +450,7 @@ tyran_parser_binary_operand_type tyran_mocha_parser_convert_binary_operand(tyran
 			operand = TYRAN_PARSER_COLON;
 			break;
 		default:
+			operand = TYRAN_PARSER_BINARY_OPERAND_TYPE_MAX;
 			TYRAN_ERROR("unknown binary token to convert:%d", token_id);
 	}
 
