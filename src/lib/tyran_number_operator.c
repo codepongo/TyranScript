@@ -48,6 +48,7 @@ void tyran_number_operator_binary(tyran_value* value, int operator_index, tyran_
 			result = a - b;
 			break;
 		default:
+			result = 0;
 			TYRAN_ERROR("Unknown operator:%d", operator_index);
 	}
 
