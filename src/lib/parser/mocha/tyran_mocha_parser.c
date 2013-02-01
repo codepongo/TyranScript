@@ -482,6 +482,7 @@ tyran_parser_unary_operand_type tyran_mocha_parser_convert_unary_operand(tyran_m
 			operand = TYRAN_PARSER_UNARY_UNLESS;
 			break;
 		default:
+			operand = TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX;
 			TYRAN_ERROR("unknown unary token to convert:%d", token_id);
 	}
 
