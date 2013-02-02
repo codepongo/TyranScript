@@ -1,11 +1,11 @@
 if 'a' is 'a'
-	print('equal')
+	print 'equal'
 else
-	print('not equal')
+	print 'not equal'
 if 'b' isnt 'a'
-	print('good')
+	print 'good'
 else
-	print('problem')
+	print 'problem'
 ---
 equal
 good

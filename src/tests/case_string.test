@@ -1,9 +1,9 @@
-name = "mocha"
+name = 'mocha'
 
 case name
 	when 'wrong'
-		print("wrong")
+		print 'wrong'
 	when 'mocha'
-		print("good")
+		print 'good'
 ---
 good

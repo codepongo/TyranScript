@@ -1,6 +1,6 @@
 a = ["Hello", 24] + [12, 0, "World"]
-print(a[0])
-print(a[2])
+print a[0]
+print a[2]
 ---
 Hello
 12

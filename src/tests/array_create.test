@@ -1,4 +1,4 @@
 a = Array.new()
-print(a.length)
+print a.length
 ---
 0

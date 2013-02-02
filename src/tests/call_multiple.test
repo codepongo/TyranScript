@@ -7,12 +7,12 @@ i = 3
 case memory[0]
 	when 2
 		if i is 3
-			print("hello")
+			print 'hello'
 		else
-			print("groby")
+			print 'groby'
 	when 65
-		print(String.fromCharCode(memory[0]))
+		print String.fromCharCode memory[0]
 	when 3
-		print("hello")
+		print 'hello'
 ---
 A

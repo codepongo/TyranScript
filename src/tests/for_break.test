@@ -4,7 +4,7 @@ count = 0
 for i in array
 	if count is 2
 		break
-	print(i)
+	print i
 	count = count + 1
 ---
 2

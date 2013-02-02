@@ -1,5 +1,5 @@
 f = (kalle=4) -> 2 + kalle
 answer = f()
-print(answer)
+print answer
 ---
 6

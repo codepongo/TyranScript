@@ -1,12 +1,12 @@
 if 'a' < 'b'
-	print('good')
+	print 'good'
 else
-	print('bad')
+	print 'bad'
 
 if 'b' <= 'a'
-	print('bad')
+	print 'bad'
 else
-	print('worked')
+	print 'worked'
 ---
 good
 worked

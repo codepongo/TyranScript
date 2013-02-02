@@ -2,8 +2,8 @@ i = 3
 
 case i
 	when 5
-		print("bad")
+		print 'bad'
 	when 3
-		print("good")
+		print 'good'
 ---
 good

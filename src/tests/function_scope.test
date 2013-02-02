@@ -1,7 +1,7 @@
 f = (kalle) ->
 	janne = 4
 	2 + kalle
-answer = f(40)
-print(answer)
+answer = f 40
+print answer
 ---
 42

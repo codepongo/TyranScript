@@ -1,19 +1,19 @@
 a = []
 
-a.push('hello')
-a.push('world')
-a.push('!')
+a.push 'hello'
+a.push 'world'
+a.push '!'
 
-print(a[0])
-print(a[1])
-print(a[2])
+print a[0]
+print a[1]
+print a[2]
 
 q = a.pop()
-print(q)
+print q
 q = a.pop()
-print(q)
+print q
 q = a.pop()
-print(q)
+print q
 ---
 hello
 world

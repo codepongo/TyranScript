@@ -1,11 +1,11 @@
 a = Array.new()
-print(a.length)
-print(a[0])
-print(a[1])
-a.push("kalle")
-print(a.length)
-print(a[1])
-print(a[0])
+print a.length
+print a[0]
+print a[1]
+a.push "kalle"
+print a.length
+print a[1]
+print a[0]
 ---
 0
 undefined

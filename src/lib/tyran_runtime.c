@@ -141,11 +141,11 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 			case TYRAN_OPCODE_NEG:
 				TYRAN_REGISTER_A_RCX;
-				tyran_value_set_number(r[a], -rcx.data.number);
+				tyran_value_replace_number(r[a], -rcx.data.number);
 				break;
 			case TYRAN_OPCODE_NOT:
 				TYRAN_REGISTER_A_RCX;
-				tyran_value_set_boolean(r[a], !rcx.data.boolean);
+				tyran_value_replace_boolean(r[a], !rcx.data.boolean);
 				break;
 			case TYRAN_OPCODE_JEQ:
 			case TYRAN_OPCODE_JLT:

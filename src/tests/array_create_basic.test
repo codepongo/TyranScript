@@ -1,8 +1,8 @@
 b = 42.43
 a = [12, b, "World"]
-print(a[2])
-print(a[1])
-print(a[0])
+print a[2]
+print a[1]
+print a[0]
 ---
 World
 42.43

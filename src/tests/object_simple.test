@@ -1,9 +1,8 @@
 o = {hello:19+2.0, world:24+33}
 
-
-print(o.hello)
-print(hello)
-print(o.world)
+print o.hello
+print hello
+print o.world
 ---
 21
 undefined

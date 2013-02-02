@@ -1,7 +1,7 @@
 a = Array.new()
-print(a['hello'])
+print a['hello']
 a['hello'] = 'world'
-print(a['hello'])
+print a['hello']
 ---
 undefined
 world
