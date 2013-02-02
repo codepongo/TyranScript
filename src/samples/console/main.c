@@ -26,8 +26,6 @@ int main(int argc, char* argv[])
 		}
 
 		tyran_mocha_api_eval(&api, &global, buf, tyran_strlen(buf));
-
-//		tyran_parser_node_print("result", mocha_parser_tree, 0);
 	}
 
 	return 0;

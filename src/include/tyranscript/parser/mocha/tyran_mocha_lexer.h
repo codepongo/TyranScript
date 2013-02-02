@@ -4,6 +4,8 @@
 struct tyran_memory_pool;
 struct tyran_memory;
 
+
+
 typedef enum tyran_mocha_token_id {
 	TYRAN_MOCHA_TOKEN_END,
 	TYRAN_MOCHA_TOKEN_INCREMENT,
@@ -51,7 +53,6 @@ typedef enum tyran_mocha_token_id {
 	TYRAN_MOCHA_TOKEN_EXTENDS,
 	TYRAN_MOCHA_TOKEN_RETURN,
 	TYRAN_MOCHA_TOKEN_WHILE,
-	TYRAN_MOCHA_TOKEN_SWITCH,
 	TYRAN_MOCHA_TOKEN_CASE,
 	TYRAN_MOCHA_TOKEN_WHEN,
 	TYRAN_MOCHA_TOKEN_FOR,

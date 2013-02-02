@@ -99,6 +99,7 @@ typedef enum tyran_parser_unary_operand_type {
 	TYRAN_PARSER_UNARY_BRACKET,
 	TYRAN_PARSER_UNARY_ARRAY,
 	TYRAN_PARSER_UNARY_OBJECT,
+	TYRAN_PARSER_UNARY_NOT,
 	TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX
 } tyran_parser_unary_operand_type;
 
@@ -166,7 +167,7 @@ typedef struct tyran_parser_node_operand_binary {
 
 typedef struct tyran_parser_node_operand_unary {
 	tyran_parser_node node;
-	int operator_type;
+	tyran_parser_unary_operand_type operator_type;
 	tyran_parser_node* expression;
 	tyran_boolean post;
 } tyran_parser_node_operand_unary;

@@ -116,7 +116,6 @@ tyran_mocha_token_id tyran_mocha_lexer_keyword(const char* identifier)
 		{ "return", TYRAN_MOCHA_TOKEN_RETURN },
 		{ "while", TYRAN_MOCHA_TOKEN_WHILE },
 		{ "until", TYRAN_MOCHA_TOKEN_UNTIL },
-		{ "switch", TYRAN_MOCHA_TOKEN_SWITCH },
 		{ "case", TYRAN_MOCHA_TOKEN_CASE },
 		{ "when", TYRAN_MOCHA_TOKEN_WHEN },
 		{ "for", TYRAN_MOCHA_TOKEN_FOR },
@@ -316,7 +315,7 @@ tyran_mocha_token* tyran_mocha_lexer_last(tyran_mocha_lexer* lexer)
 
 int tyran_mocha_lexer_is_unary_operator(tyran_mocha_token_id token_id)
 {
-	return (token_id == TYRAN_MOCHA_TOKEN_RETURN || token_id == TYRAN_MOCHA_TOKEN_IF || token_id == TYRAN_MOCHA_TOKEN_UNLESS || token_id == TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT || token_id == TYRAN_MOCHA_TOKEN_BLOCK_END || token_id == TYRAN_MOCHA_TOKEN_BRACKET_RIGHT || token_id == TYRAN_MOCHA_TOKEN_OBJECT_END);
+	return (token_id == TYRAN_MOCHA_TOKEN_NOT || token_id == TYRAN_MOCHA_TOKEN_RETURN || token_id == TYRAN_MOCHA_TOKEN_IF || token_id == TYRAN_MOCHA_TOKEN_UNLESS || token_id == TYRAN_MOCHA_TOKEN_PARENTHESES_RIGHT || token_id == TYRAN_MOCHA_TOKEN_BLOCK_END || token_id == TYRAN_MOCHA_TOKEN_BRACKET_RIGHT || token_id == TYRAN_MOCHA_TOKEN_OBJECT_END);
 }
 
 tyran_mocha_token_id tyran_mocha_enclosing_start_token(tyran_mocha_token_id token_id)

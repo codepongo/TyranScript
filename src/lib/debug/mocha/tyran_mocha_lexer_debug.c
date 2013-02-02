@@ -78,7 +78,6 @@ void tyran_mocha_lexer_debug_token(tyran_mocha_token* token)
 		"EXTENDS",
 		"RETURN",
 		"WHILE",
-		"SWITCH",
 		"CASE",
 		"WHEN",
 		"FOR",

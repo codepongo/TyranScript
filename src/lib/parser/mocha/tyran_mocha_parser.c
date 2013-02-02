@@ -30,6 +30,7 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_LESS_EQUAL, 1, 0},
 		{TYRAN_MOCHA_TOKEN_GREATER, 1, 0},
 		{TYRAN_MOCHA_TOKEN_GREATER_EQUAL, 1, 0},
+		{TYRAN_MOCHA_TOKEN_NOT, 1, 0},
 		{TYRAN_MOCHA_TOKEN_IF, 1, 0},
 		{TYRAN_MOCHA_TOKEN_UNLESS, 1, 0},
 		{TYRAN_MOCHA_TOKEN_WHILE, 1, 0},
@@ -305,17 +306,33 @@ void tyran_mocha_parser_add_to_empty(tyran_memory* memory, tyran_mocha_parser* p
 		tyran_mocha_parser_push_root_right(parser, binary, TYRAN_MOCHA_TOKEN_INCREMENT, -1);
 		tyran_mocha_parser_add_to_empty(memory, parser, node, precedence);
 	} else {
-		tyran_parser_node_operand_unary* unary = 0;
+		*parser->next_node_to_overwrite = node;
+		parser->next_node_to_overwrite = 0;
+		if (node->type == TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY) {
+			tyran_parser_node_operand_unary* unary = (tyran_parser_node_operand_unary*) node;
+			switch (unary->operator_type) {
+				case TYRAN_PARSER_UNARY_OBJECT:
+				case TYRAN_PARSER_UNARY_BLOCK:
+				case TYRAN_PARSER_UNARY_BRACKET:
+				case TYRAN_PARSER_UNARY_PARENTHESES:
+				case TYRAN_PARSER_UNARY_ARRAY:
+					parser->next_node_to_overwrite = &unary->expression;
+					break;
+				default:
+					TYRAN_LOG("Unknown operator type:%d", unary->operator_type);
+			}
+		}
+		/*tyran_parser_node_operand_unary* unary = 0;
 		if (node->type == TYRAN_PARSER_NODE_TYPE_OPERAND_UNARY) {
 			unary = (tyran_parser_node_operand_unary*) node;
 		}
-
-		*parser->next_node_to_overwrite = node;
+		TYRAN_LOG("IS UNARY:%p", unary);
 		if (unary) {
 			parser->next_node_to_overwrite = &unary->expression;
 		} else {
-			parser->next_node_to_overwrite = 0;
 		}
+			*/
+		//	parser->next_node_to_overwrite = 0;
 	}
 
 }
@@ -481,6 +498,9 @@ tyran_parser_unary_operand_type tyran_mocha_parser_convert_unary_operand(tyran_m
 		case TYRAN_MOCHA_TOKEN_UNLESS:
 			operand = TYRAN_PARSER_UNARY_UNLESS;
 			break;
+		case TYRAN_MOCHA_TOKEN_NOT:
+			operand = TYRAN_PARSER_UNARY_NOT;
+			break;
 		default:
 			operand = TYRAN_PARSER_UNARY_OPERAND_TYPE_MAX;
 			TYRAN_ERROR("unknown unary token to convert:%d", token_id);
@@ -543,6 +563,15 @@ NODE tyran_mocha_parser_add_default_operator(tyran_memory* memory, tyran_mocha_p
 {
 	if (tyran_mocha_lexer_is_unary_operator(token_id)) {
 		tyran_parser_node_operand_unary* node = tyran_parser_operand_unary(memory, tyran_mocha_parser_convert_unary_operand(token_id), 0, 0);
+		switch (node->operator_type) {
+			case TYRAN_PARSER_UNARY_NOT: {
+				NODE last_node = tyran_mocha_parser_concat_pop(parser);
+				node->expression = last_node;
+			}
+			break;
+			default:
+				break;
+		}
 		tyran_mocha_parser_add_to_empty(memory, parser, (NODE)node, precedence);
 		return (NODE)node;
 	} else {
@@ -736,6 +765,7 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_memory* 
 			tyran_mocha_parser_define_function_parameters(memory, function, parentheses->expression);
 		}
 	}
+	parser->next_node_to_overwrite = 0;
 }
 
 
@@ -749,12 +779,12 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 {
 	static tyran_boolean last_literal = 0;
 
+	tyran_mocha_lexer_debug_token(token);
+
 	if (token->token_id == TYRAN_MOCHA_TOKEN_LINE_START) {
 		tyran_mocha_parser_line(parser);
 		last_literal = TYRAN_FALSE;
-		return;
-	}
-	if (parser->waiting_for_start_enclosure_id == token->token_id) {
+	} else if (parser->waiting_for_start_enclosure_id == token->token_id) {
 		tyran_mocha_parser_end_enclosure(parser, memory, token->token_id);
 		last_literal = TYRAN_FALSE;
 		if (token->token_id == TYRAN_MOCHA_TOKEN_PARENTHESES_LEFT) {
@@ -780,13 +810,11 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 				parser->last_bracket_node = 0;
 				tyran_mocha_token index_token;
 				index_token.token_id = TYRAN_MOCHA_TOKEN_INDEX;
-				TYRAN_LOG("Pushing in INDEX");
 				tyran_mocha_parser_add_token(memory, parser, &index_token);
 			}
 			if (last_literal) {
 				tyran_mocha_token* token = TYRAN_CALLOC_TYPE(parser->mocha_token_pool, tyran_mocha_token);
 				token->token_id = TYRAN_MOCHA_TOKEN_CALL;
-				TYRAN_LOG("Pushing in CALL");
 				tyran_mocha_parser_add_token(memory, parser, token);
 			}
 			NODE literal = tyran_mocha_parser_token_to_literal(memory, token);
@@ -795,6 +823,7 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 			last_literal = TYRAN_TRUE;
 		}
 	}
+	tyran_mocha_parser_node_print_tree(parser, "adder", 0);
 }
 
 

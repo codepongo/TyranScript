@@ -1,0 +1,7 @@
+a = true
+print(a)
+a = not a
+print(a)
+---
+true
+false
