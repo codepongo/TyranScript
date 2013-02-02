@@ -395,6 +395,7 @@ tyran_reg_or_constant_index tyran_generator_handle_node(tyran_code_state* code, 
 		tyran_parser_node_identifier* identifier = (tyran_parser_node_identifier*) node;
 		result = tyran_variable_scopes_get_identifier(code->scope, identifier->string);
 		if (result == TYRAN_OPCODE_REGISTER_ILLEGAL) {
+			code->last_self_index = 0;
 			result = tyran_generator_self_member(code, identifier->string);
 		}
 	} else {
