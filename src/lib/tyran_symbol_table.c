@@ -38,7 +38,6 @@ void tyran_symbol_table_add(tyran_symbol_table* table, tyran_symbol* symbol, con
 		TYRAN_ASSERT(table->entry_count < 100, "Out of memory");
 		table->entry_count++;
 		tyran_symbol_table_entry* entry = &table->entries[index];
-		TYRAN_LOG("Inserting symbol '%s' to %d", str, index);
 		entry->string = tyran_strdup(table->memory, str);
 	}
 

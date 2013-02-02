@@ -25,6 +25,7 @@ typedef struct tyran_lexer {
 	tyran_memory* memory;
 	struct tyran_errors* errors;
 	tyran_boolean last_was_whitespace;
+	int next_is_member;
 
 } tyran_lexer;
 

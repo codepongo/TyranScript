@@ -146,6 +146,12 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 {
 	tyran_mocha_token token;
 
+	if (lexer->next_is_member) {
+		lexer->next_is_member = TYRAN_FALSE;
+		token.token_id = TYRAN_MOCHA_TOKEN_MEMBER;
+		return token;
+	}
+
 	token.token_id = TYRAN_MOCHA_TOKEN_END;
 
 	tyran_lexer_set_begin(lexer_position_info, lexer);
@@ -186,6 +192,10 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 		} else {
 			token.token_id = TYRAN_MOCHA_TOKEN_END;
 		}
+	} else if (c=='@') {
+		token.token_id = TYRAN_MOCHA_TOKEN_SELF;
+		token.token_data = 0;
+		lexer->next_is_member = TYRAN_TRUE;
 	} else if (tyran_lexer_is_alpha(c) || c == '_' || c == '$') {
 		int len = 100;
 		char identifier[100];

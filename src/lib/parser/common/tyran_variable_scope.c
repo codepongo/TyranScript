@@ -36,14 +36,11 @@ tyran_reg_index tyran_variable_scope_get_identifier(tyran_variable_scope* scope,
 	int i;
 
 	for (i=0; i<scope->variable_count; ++i) {
-		TYRAN_LOG("scope:%d", i);
-		TYRAN_LOG("name:%s", scope->variables[i].name);
 		if (tyran_strcmp(scope->variables[i].name, variable_name) == 0) {
 			return scope->variables[i].register_index;
 		}
 	}
 
-	TYRAN_LOG("Couldn't find: '%s'", variable_name);
 	return TYRAN_OPCODE_REGISTER_ILLEGAL;
 }
 
@@ -151,10 +148,8 @@ tyran_reg_index tyran_variable_scope_define_temporary_variable(tyran_variable_sc
 
 tyran_reg_index tyran_variable_scope_define_identifier(tyran_memory* memory, tyran_variable_scope* top_scope, const char* variable_name)
 {
-		TYRAN_LOG("Adding variable:%s", variable_name);
 	tyran_reg_index current_index = tyran_variable_scope_get_identifier(top_scope, variable_name);
 	if (current_index == TYRAN_OPCODE_REGISTER_ILLEGAL) {
-		TYRAN_LOG("Couldn't find variable '%s', adding it to scope", variable_name);
 		current_index = tyran_variable_scope_find_and_reserve_variable(top_scope, 2);
 		tyran_variable_scope_add_identifier(memory, top_scope, variable_name, current_index);
 	}
