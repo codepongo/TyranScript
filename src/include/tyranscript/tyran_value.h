@@ -12,7 +12,6 @@ struct tyran_red_black_tree_iterator;
 
 typedef enum {
 	TYRAN_VALUE_TYPE_UNDEFINED,
-	TYRAN_VALUE_TYPE_NIL,
 	TYRAN_VALUE_TYPE_BOOLEAN,
 	TYRAN_VALUE_TYPE_NUMBER,
 	TYRAN_VALUE_TYPE_SYMBOL,
@@ -82,10 +81,6 @@ typedef struct tyran_value {
 
 #define tyran_value_set_undefined(v) { \
 	(v).type = TYRAN_VALUE_TYPE_UNDEFINED; \
-}
-
-#define tyran_value_set_nil(v) { \
-	(v).type = TYRAN_VALUE_TYPE_NIL; \
 }
 
 
