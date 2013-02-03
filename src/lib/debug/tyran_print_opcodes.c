@@ -41,19 +41,23 @@ const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
 
 
 #define TYRAN_OPCODE_INSTRUCTION(code) \
-	(code & 0x3f)
+	(code & 0x1f)
+
+
+#define TYRAN_OPCODE_ARG_B(code) \
+	((code >> 31) & 0x1)
 
 #define TYRAN_OPCODE_ARG_A(code) \
-	((code >> 6) & 0xff)
+	((code >> 5) & 0xff)
 
 #define TYRAN_OPCODE_ARG_X(code) \
-	((code >> 14) & 0x1ff)
+	((code >> 13) & 0x1ff)
 
 #define TYRAN_OPCODE_ARG_Y(code) \
-	((code >> 23) & 0x1ff)
+	((code >> 22) & 0x1ff)
 
 #define TYRAN_OPCODE_ARG_BR(code) \
-	((code >> 6) & 0xffff) - 0x8000;
+	((code >> 5) & 0xffff) - 0x8000;
 
 
 void print_s(int v, char* buf, int size)
@@ -94,11 +98,18 @@ void print_rc(tyran_reg_or_constant_index index, const tyran_constants* constant
 	}
 }
 
+
 void print_r_rc_rc(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
 {
 	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
 	print_rc(TYRAN_OPCODE_ARG_X(code), constants, buf, size);
 	print_rc(TYRAN_OPCODE_ARG_Y(code), constants, buf, size);
+}
+
+void print_r_rc_rc_b(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
+{
+	print_r_rc_rc(code, constants, buf, size);
+	print_b(TYRAN_OPCODE_ARG_B(code), buf, size);
 }
 
 void print_r_r_rc(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
@@ -199,7 +210,7 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 		case TYRAN_OPCODE_JEQ:
 		case TYRAN_OPCODE_JLT:
 		case TYRAN_OPCODE_JLE:
-			print_b_rc_rc(code, constants, buf, size);
+			print_r_rc_rc_b(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_JMP:
 			print_br(code, ip, buf, size);

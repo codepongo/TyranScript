@@ -444,15 +444,15 @@ int tyran_lexer_assembler_parse_one(tyran_memory* memory, tyran_memory_pool* fun
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_JEQ:
 			parse_b_rc_rc(parser_state, &b, &x, &y);
-			tyran_opcodes_op_jeq(opcodes, x, y, b);
+			//tyran_opcodes_op_jeq(opcodes, x, y, b);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_JLT:
 			parse_b_rc_rc(parser_state, &b, &x, &y);
-			tyran_opcodes_op_jlt(opcodes, x, y, b);
+			//tyran_opcodes_op_jlt(opcodes, x, y, b);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_JLE:
 			parse_b_rc_rc(parser_state, &b, &x, &y);
-			tyran_opcodes_op_jle(opcodes, x, y, b);
+			//tyran_opcodes_op_jle(opcodes, x, y, b);
 			break;
 		case TYRAN_TOKEN_ASSEMBLER_JMP:
 			parse_label(parser_state);

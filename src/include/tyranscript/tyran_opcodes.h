@@ -26,6 +26,8 @@ typedef struct tyran_opcodes {
 struct tyran_opcodes* tyran_opcodes_new(tyran_memory_pool* opcode_pool, tyran_memory* memory, int size);
 void tyran_opcodes_free(struct tyran_opcodes* codes);
 
+void tyran_opcodes_modify_branch(tyran_opcode* code, int position);
+
 /* Load values */
 void tyran_opcodes_op_ld(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_index x);
 void tyran_opcodes_op_ldc(tyran_opcodes* codes, tyran_reg_index a, tyran_constant_index c);
@@ -46,9 +48,9 @@ void tyran_opcodes_op_iter(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or
 void tyran_opcodes_op_next(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x);
 
 /* Branch */
-void tyran_opcodes_op_jeq(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean);
-void tyran_opcodes_op_jlt(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean);
-void tyran_opcodes_op_jle(tyran_opcodes* codes, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean);
+void tyran_opcodes_op_jeq(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean);
+void tyran_opcodes_op_jlt(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean);
+void tyran_opcodes_op_jle(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean);
 void tyran_opcodes_op_jmp(tyran_opcodes* codes, int pc);
 
 /* Call stack */

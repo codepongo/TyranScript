@@ -45,7 +45,7 @@ void tyran_register_copy(tyran_value* target, tyran_value* source, int count)
 
 #define TYRAN_RUNTIME_DO_JMP \
 	instruction = *pc++; \
-	instruction >>= 6; \
+	instruction >>= 5; \
 	TYRAN_REGISTER_BR; \
 	pc += br;
 
@@ -57,6 +57,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	u8t xc;
 	u8t yc;
 	int br;
+	int b;
 	tyran_value rcx;
 	tyran_value rcy;
 	u32t i;
@@ -79,8 +80,8 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 		tyran_print_runtime_state(pc, sp, r);
 #endif
 		u32t instruction = *pc++;
-		u32t opcode = instruction & 0x3f;
-		instruction >>= 6;
+		u32t opcode = instruction & 0x1f;
+		instruction >>= 5;
 
 		switch (opcode) {
 			case TYRAN_OPCODE_LD:
@@ -152,16 +153,20 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			case TYRAN_OPCODE_JLE: {
 				int comparison_index = (opcode - TYRAN_OPCODE_JEQ) + 8;
 
-				TYRAN_REGISTER_A_RCX_RCY;
+				TYRAN_REGISTER_A_B_RCX_RCY;
 				if (tyran_value_is_object(&rcx)) {
-					tyran_value dest;
-
-					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&dest, rcx, &rcy, 1, comparison_index);
-					test = dest.data.boolean;
+					TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(&r[a], rcx, &rcy, 1, comparison_index);
 				} else {
 					test = tyran_number_operator_comparison(comparison_index, rcx.data.number, rcy.data.number);
+					tyran_value_replace_boolean(r[a], test);
 				}
-				if (test != a) {
+				TYRAN_LOG("b:%d", b);
+				test = r[a].data.boolean;
+				if (b) {
+					test = !test;
+					r[a].data.boolean = test;
+				}
+				if (test) {
 					pc++;
 				} else {
 					TYRAN_RUNTIME_DO_JMP;
@@ -239,7 +244,10 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 			case TYRAN_OPCODE_DEBUG:
 				return;
-				break;
+			break;
+			default:
+				TYRAN_ERROR("Illegal instruction:%d",instruction);
+			break;
 		}
 	}
 }

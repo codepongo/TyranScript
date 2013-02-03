@@ -89,12 +89,6 @@ int tyran_code_get_label(struct tyran_label* labels, int count, const char* name
 	return -1;
 }
 
-void tyran_code_change_opcode_branch(tyran_opcode* code, int position)
-{
-	u16t br = (position + 0x8000);
-	*code = (*code & 0x3f) | (br << 6);
-}
-
 void tyran_code_fixup_label_references(tyran_code_state* state)
 {
 	int i;
@@ -108,7 +102,7 @@ void tyran_code_fixup_label_references(tyran_code_state* state)
 			int absolute_position = (ref->opcode - state->opcodes->codes);
 			TYRAN_ASSERT(absolute_position >= 0, "Wrong position for label");
 			int delta = label->position - absolute_position - 2;
-			tyran_code_change_opcode_branch(ref->opcode, delta);
+			tyran_opcodes_modify_branch(ref->opcode, delta);
 		}
 	}
 

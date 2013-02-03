@@ -41,6 +41,22 @@
 	rcx = xc ? c[x] : r[x]; \
 	rcy = yc ? c[y] : r[y];
 
+#define TYRAN_REGISTER_A_B_RCX_RCY \
+	i = instruction; \
+	a = i; \
+	i >>= 8; \
+	x = i; \
+	i >>= 8; \
+	xc = i & 0x01; \
+	i >>= 1; \
+	y = i; \
+	i >>= 8; \
+	yc = i & 0x01; \
+	rcx = xc ? c[x] : r[x]; \
+	rcy = yc ? c[y] : r[y]; \
+	i >>= 1; \
+	b = i & 0x01;
+
 #define TYRAN_REGISTER_BR \
 	br = (instruction & 0xffff) - 0x8000;
 
