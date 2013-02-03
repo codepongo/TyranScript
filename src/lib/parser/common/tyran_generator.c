@@ -79,9 +79,6 @@ tyran_constant_index tyran_generator_literal_to_constant_index(tyran_constants* 
 			result = tyran_constants_add_boolean(constants, boolean->boolean);
 		}
 		break;
-		case TYRAN_PARSER_NODE_TYPE_NULL:
-			result = tyran_constants_add_nil(constants);
-			break;
 		case TYRAN_PARSER_NODE_TYPE_STRING: {
 			tyran_parser_node_string* string = (tyran_parser_node_string*) node;
 			const struct tyran_string* str = tyran_string_from_c_str(string_pool, memory, string->string);

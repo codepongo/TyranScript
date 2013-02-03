@@ -55,11 +55,6 @@ void tyran_parser_node_print_helper(const char* description, tyran_parser_node**
 				tyran_parser_node_print_helper_output(buf, description, tab_count);
 			}
 			break;
-			case TYRAN_PARSER_NODE_TYPE_NULL: {
-				tyran_snprintf(buf, buf_size, "null");
-				tyran_parser_node_print_helper_output(buf, description, tab_count);
-			}
-			break;
 			case TYRAN_PARSER_NODE_TYPE_SELF: {
 				tyran_snprintf(buf, buf_size, "self");
 				tyran_parser_node_print_helper_output(buf, description, tab_count);
