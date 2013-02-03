@@ -92,7 +92,7 @@ void tyran_object_lookup(tyran_value* x, struct tyran_object* object, const stru
 {
 	int found = tyran_object_find_property(object, symbol);
 	if (found == -1) {
-		tyran_value_set_undefined(*x);
+		tyran_value_set_nil(*x);
 	} else {
 		tyran_value_copy(*x, object->properties[found].value);
 	}
@@ -112,7 +112,7 @@ void tyran_object_set_prototype(struct tyran_object* target, struct tyran_object
 void tyran_object_lookup_prototype(tyran_value* x, struct tyran_object* o, const struct tyran_symbol* symbol)
 {
 	tyran_object_lookup(x, o, symbol);
-	if (tyran_value_is_undefined(x) && o->prototype) {
+	if (tyran_value_is_nil(x) && o->prototype) {
 		tyran_object_lookup_prototype(x, o->prototype, symbol);
 	}
 }

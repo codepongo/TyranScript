@@ -31,7 +31,7 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_array_iterator_prototype_next)
 	if (node) {
 		tyran_value_replace(*return_value, node->value);
 	} else {
-		tyran_value_replace_undefined(*return_value);
+		tyran_value_replace_nil(*return_value);
 	}
 
 	return 0;

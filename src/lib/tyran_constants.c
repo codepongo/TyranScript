@@ -68,10 +68,10 @@ tyran_constant_index tyran_constants_add_boolean(tyran_constants* constants, tyr
 	return tyran_constants_reserve_index(constants, &value);
 }
 
-tyran_constant_index tyran_constants_add_undefined(tyran_constants* constants)
+tyran_constant_index tyran_constants_add_nil(tyran_constants* constants)
 {
 	tyran_value value;
-	tyran_value_set_undefined(value);
+	tyran_value_set_nil(value);
 	return tyran_constants_reserve_index(constants, &value);
 }
 

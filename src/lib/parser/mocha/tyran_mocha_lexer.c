@@ -109,7 +109,7 @@ tyran_mocha_token_id tyran_mocha_lexer_keyword(const char* identifier)
 		{ "else", TYRAN_MOCHA_TOKEN_ELSE },
 		{ "true", TYRAN_MOCHA_TOKEN_TRUE },
 		{ "false", TYRAN_MOCHA_TOKEN_FALSE },
-		{ "undefined", TYRAN_MOCHA_TOKEN_UNDEFINED },
+		{ "nil", TYRAN_MOCHA_TOKEN_NIL },
 		{ "self", TYRAN_MOCHA_TOKEN_SELF },
 		{ "class", TYRAN_MOCHA_TOKEN_CLASS },
 		{ "extends", TYRAN_MOCHA_TOKEN_EXTENDS },

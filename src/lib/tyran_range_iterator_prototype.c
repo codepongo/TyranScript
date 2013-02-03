@@ -28,7 +28,7 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_range_iterator_prototype_next)
 
 	int* next = tyran_range_iterator_next(iterator);
 	if (!next) {
-		tyran_value_replace_undefined(*return_value);
+		tyran_value_replace_nil(*return_value);
 	} else {
 		tyran_value_replace_number(*return_value, (tyran_number) *next);
 	}

@@ -20,8 +20,8 @@ void tyran_value_to_c_string(const tyran_symbol_table* symbol_table, const tyran
 		case TYRAN_VALUE_TYPE_BOOLEAN:
 			tyran_snprintf(buf, max_length, "%s", v->data.boolean ? "true" : "false");
 			break;
-		case TYRAN_VALUE_TYPE_UNDEFINED:
-			tyran_snprintf(buf, max_length, "undefined");
+		case TYRAN_VALUE_TYPE_NIL:
+			tyran_snprintf(buf, max_length, "nil");
 			break;
 		case TYRAN_VALUE_TYPE_NUMBER:
 			if (tyran_value_is_integer(v->data.number)) {

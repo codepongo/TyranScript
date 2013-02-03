@@ -85,8 +85,8 @@ tyran_constant_index tyran_generator_literal_to_constant_index(tyran_constants* 
 			result = tyran_constants_add_string(constants, runtime, str);
 		}
 		break;
-		case TYRAN_PARSER_NODE_TYPE_UNDEFINED:
-			result = tyran_constants_add_undefined(constants);
+		case TYRAN_PARSER_NODE_TYPE_NIL:
+			result = tyran_constants_add_nil(constants);
 			break;
 		case TYRAN_PARSER_NODE_TYPE_NUMBER: {
 			tyran_parser_node_number* number = (tyran_parser_node_number*) node;

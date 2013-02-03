@@ -11,7 +11,7 @@ struct tyran_runtime_stack;
 struct tyran_red_black_tree_iterator;
 
 typedef enum {
-	TYRAN_VALUE_TYPE_UNDEFINED,
+	TYRAN_VALUE_TYPE_NIL,
 	TYRAN_VALUE_TYPE_BOOLEAN,
 	TYRAN_VALUE_TYPE_NUMBER,
 	TYRAN_VALUE_TYPE_SYMBOL,
@@ -43,7 +43,7 @@ typedef struct tyran_value {
 
 #define tyran_value_release_and_clear(v) { \
 	tyran_value_release(v); \
-	(v).type = TYRAN_VALUE_TYPE_UNDEFINED; \
+	(v).type = TYRAN_VALUE_TYPE_NIL; \
 	(v).data.object = 0; \
 }
 
@@ -79,8 +79,8 @@ typedef struct tyran_value {
 }
 
 
-#define tyran_value_set_undefined(v) { \
-	(v).type = TYRAN_VALUE_TYPE_UNDEFINED; \
+#define tyran_value_set_nil(v) { \
+	(v).type = TYRAN_VALUE_TYPE_NIL; \
 }
 
 
@@ -99,9 +99,9 @@ typedef struct tyran_value {
 	tyran_value_set_boolean(v, b); \
 }
 
-#define tyran_value_replace_undefined(v) { \
+#define tyran_value_replace_nil(v) { \
 	tyran_value_release(v); \
-	tyran_value_set_undefined(v); \
+	tyran_value_set_nil(v); \
 }
 
 #define tyran_value_replace(v, b) { \
@@ -117,7 +117,7 @@ typedef struct tyran_value {
 
 #define tyran_value_is_same_type(a, b) ((a)->type == (b)->type)
 #define tyran_value_is_same(a, b) (tyran_value_is_same_type(a, b) && ((a)->data.data == (b)->data.data))
-#define tyran_value_is_undefined(pv) ((pv)->type == TYRAN_VALUE_TYPE_UNDEFINED)
+#define tyran_value_is_nil(pv) ((pv)->type == TYRAN_VALUE_TYPE_NIL)
 #define tyran_value_is_null(pv) ((pv)->type == TYRAN_VALUE_TYPE_NIL)
 #define tyran_value_is_integer(n) (tyran_number_is_normal(n) && (double)((int)(n)) == (n))
 #define tyran_value_is_number(pv) ((pv)->type == TYRAN_VALUE_TYPE_NUMBER)

@@ -522,8 +522,8 @@ NODE tyran_mocha_parser_token_to_literal(tyran_memory* memory, tyran_mocha_token
 			return tyran_parser_bool(memory, 1);
 		case TYRAN_MOCHA_TOKEN_FALSE:
 			return tyran_parser_bool(memory, 0);
-		case TYRAN_MOCHA_TOKEN_UNDEFINED:
-			return tyran_parser_undefined(memory);
+		case TYRAN_MOCHA_TOKEN_NIL:
+			return tyran_parser_nil(memory);
 		case TYRAN_MOCHA_TOKEN_SELF:
 			return tyran_parser_self(memory);
 		case TYRAN_MOCHA_TOKEN_BREAK:

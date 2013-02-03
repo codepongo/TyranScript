@@ -3,5 +3,5 @@ print a['hello']
 a['hello'] = 'world'
 print a['hello']
 ---
-undefined
+nil
 world

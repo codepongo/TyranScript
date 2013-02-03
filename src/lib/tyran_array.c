@@ -123,7 +123,7 @@ void tyran_array_lookup_helper(tyran_value* dest, const tyran_array* array, cons
 {
 	tyran_array_node* node = (tyran_array_node*) tyran_red_black_tree_search(*array->tree, (void*)key);
 	if (!node) {
-		tyran_value_set_undefined(*dest);
+		tyran_value_set_nil(*dest);
 		return;
 	}
 	*flag = 0;

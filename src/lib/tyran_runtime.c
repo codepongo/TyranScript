@@ -25,14 +25,14 @@
 #define TYRAN_RUNTIME_INVOKE_BINARY_OPERATOR(DESTINATION, OBJECT, PARAMS, PARAM_COUNT, OPERATOR) \
 	{ tyran_value member; \
 	tyran_object_lookup_prototype(&member, (OBJECT).data.object, &runtime->binary_operator_symbols[OPERATOR]); \
-	TYRAN_ASSERT(!tyran_value_is_undefined(&member), "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
+	TYRAN_ASSERT(!tyran_value_is_nil(&member), "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
 	const tyran_function* function = member.data.object->data.function->static_function; \
 	function->data.callback(runtime, &member, PARAMS, PARAM_COUNT, &OBJECT, DESTINATION, TYRAN_FALSE); }
 
 #define TYRAN_RUNTIME_INVOKE_UNARY_OPERATOR(DESTINATION, OBJECT, OPERATOR) \
 	{ tyran_value member; \
 	tyran_object_lookup_prototype(&member, (OBJECT).data.object, &runtime->binary_operator_symbols[OPERATOR]); \
-	TYRAN_ASSERT(!tyran_value_is_undefined(&member), "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
+	TYRAN_ASSERT(!tyran_value_is_nil(&member), "Couldn't find operator:%d %d", OPERATOR, runtime->binary_operator_symbols[OPERATOR].hash); \
 	const tyran_function* function = member.data.object->data.function->static_function; \
 	function->data.callback(runtime, &member, 0, 0, &OBJECT, DESTINATION, TYRAN_FALSE); }
 
@@ -72,7 +72,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 	TYRAN_STACK_POP
 	tyran_runtime_stack* base_sp = sp;
 
-	tyran_value_set_undefined(*return_value);
+	tyran_value_set_nil(*return_value);
 	tyran_value_copy(r[0], sp->_this);
 
 	while (1) {
@@ -94,7 +94,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				break;
 			case TYRAN_OPCODE_LDCU:
 				TYRAN_REGISTER_A_X;
-				if (tyran_value_is_undefined(&r[a])) {
+				if (tyran_value_is_nil(&r[a])) {
 					tyran_value_replace(r[a], c[x]);
 				}
 				break;
@@ -135,7 +135,7 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			case TYRAN_OPCODE_NEXT: {
 				TYRAN_REGISTER_A_RCX;
 				TYRAN_RUNTIME_INVOKE_UNARY_OPERATOR(&r[a], rcx, 12);
-				if (!tyran_value_is_undefined(&r[a])) {
+				if (!tyran_value_is_nil(&r[a])) {
 					pc++;
 				}
 			}

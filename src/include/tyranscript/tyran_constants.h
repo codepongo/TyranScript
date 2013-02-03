@@ -23,6 +23,6 @@ tyran_constant_index tyran_constants_add_string(tyran_constants* constants, stru
 tyran_constant_index tyran_constants_add_symbol_from_c_string(tyran_constants* constants, const char* v);
 tyran_constant_index tyran_constants_add_boolean(tyran_constants* constants, tyran_boolean v);
 tyran_constant_index tyran_constants_add_function(tyran_memory_pool* function_pool, tyran_constants* constants, tyran_constants* function_constants, tyran_opcodes* opcodes);
-tyran_constant_index tyran_constants_add_undefined(tyran_constants* constants);
+tyran_constant_index tyran_constants_add_nil(tyran_constants* constants);
 
 #endif

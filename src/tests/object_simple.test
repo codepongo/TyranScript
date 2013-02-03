@@ -5,5 +5,5 @@ print hello
 print o.world
 ---
 21
-undefined
+nil
 57
