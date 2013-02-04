@@ -1,0 +1,9 @@
+a = 2
+b = true
+x = not (a isnt 0 and b)
+print x
+y = not (a isnt 2 and not x)
+print y
+---
+false
+true

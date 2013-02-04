@@ -109,8 +109,11 @@ tyran_reg_or_constant_index tyran_generator_logical_operator(tyran_memory* memor
 		case TYRAN_PARSER_AND: {
 			tyran_label_id and_false = tyran_generator_prepare_label(code);
 			tyran_label_id and_true = -1;
-			tyran_generator_traverse(memory, code, binary->left, TYRAN_OPCODE_REGISTER_ILLEGAL, and_false, -1, -1, self_index, result, TYRAN_FALSE);
-			tyran_generator_traverse(memory, code, binary->right, and_true, and_false, -1, -1, 0, result, TYRAN_FALSE);
+			tyran_reg_or_constant_index left_index = tyran_generator_traverse(memory, code, binary->left, TYRAN_OPCODE_REGISTER_ILLEGAL, and_false, -1, -1, self_index, result, TYRAN_FALSE);
+			tyran_opcodes_op_jb(code->opcodes, result, left_index, TYRAN_FALSE);
+			tyran_generator_label_reference(code, and_false);
+			tyran_reg_or_constant_index right_index = tyran_generator_traverse(memory, code, binary->right, and_true, and_false, -1, -1, 0, result, TYRAN_FALSE);
+			tyran_generator_ld(code->opcodes, result, right_index);
 			tyran_generator_define_label(code, and_false);
 		}
 		break;
@@ -118,8 +121,11 @@ tyran_reg_or_constant_index tyran_generator_logical_operator(tyran_memory* memor
 			TYRAN_LOG("GENERATE OR!!!!!");
 			tyran_label_id or_true = tyran_generator_prepare_label(code);
 			tyran_label_id or_false = false_label;
-			tyran_generator_traverse(memory, code, binary->left, TYRAN_OPCODE_REGISTER_ILLEGAL, or_true, -1, -1, self_index, result, TYRAN_TRUE);
-			tyran_generator_traverse(memory, code, binary->right, TYRAN_OPCODE_REGISTER_ILLEGAL, or_false, -1, -1, self_index, result, TYRAN_FALSE);
+			tyran_reg_or_constant_index left_index = tyran_generator_traverse(memory, code, binary->left, TYRAN_OPCODE_REGISTER_ILLEGAL, or_true, -1, -1, self_index, result, TYRAN_TRUE);
+			tyran_opcodes_op_jb(code->opcodes, result, left_index, TYRAN_TRUE);
+			tyran_generator_label_reference(code, or_true);
+			tyran_reg_or_constant_index right_index = tyran_generator_traverse(memory, code, binary->right, TYRAN_OPCODE_REGISTER_ILLEGAL, or_false, -1, -1, self_index, result, TYRAN_FALSE);
+			tyran_generator_ld(code->opcodes, result, right_index);
 			tyran_generator_define_label(code, or_true);
 		}
 		break;
@@ -137,32 +143,26 @@ tyran_reg_index tyran_generator_comparison_operator(tyran_code_state* code, tyra
 
 	switch (operator_type) {
 		case TYRAN_PARSER_EQUAL:
-			tyran_opcodes_op_jeq(codes, result, left, right, invert_logic);
+			tyran_opcodes_op_eq(codes, result, left, right, TYRAN_FALSE);
 			break;
 		case TYRAN_PARSER_NOT_EQUAL:
 			TYRAN_LOG("Inserting NEQ $$$$");
-			tyran_opcodes_op_jeq(codes, result, left, right, !invert_logic);
+			tyran_opcodes_op_eq(codes, result, left, right, TYRAN_TRUE);
 			break;
 		case TYRAN_PARSER_LESS:
-			tyran_opcodes_op_jlt(codes, result, left, right, invert_logic);
+			tyran_opcodes_op_lt(codes, result, left, right, TYRAN_FALSE);
 			break;
 		case TYRAN_PARSER_LESS_EQUAL:
-			tyran_opcodes_op_jle(codes, result, left, right, invert_logic);
+			tyran_opcodes_op_le(codes, result, left, right, TYRAN_FALSE);
 			break;
 		case TYRAN_PARSER_GREATER_EQUAL:
-			tyran_opcodes_op_jlt(codes, result, left, right, !invert_logic);
+			tyran_opcodes_op_lt(codes, result, left, right, TYRAN_TRUE);
 			break;
 		case TYRAN_PARSER_GREATER:
-			tyran_opcodes_op_jle(codes, result, left, right, !invert_logic);
+			tyran_opcodes_op_le(codes, result, left, right, TYRAN_TRUE);
 			break;
 		default:
 			TYRAN_ERROR("Unhandled comparison operator");
-	}
-
-	if (false_label == -1) {
-		tyran_opcodes_op_jmp(codes, 0);
-	} else {
-		tyran_generator_label_reference(code, false_label);
 	}
 
 	return result;
@@ -404,10 +404,7 @@ tyran_reg_index tyran_generator_emit_binary_operator(tyran_code_state* code, tyr
 		case TYRAN_PARSER_LESS_EQUAL:
 		case TYRAN_PARSER_GREATER:
 		case TYRAN_PARSER_GREATER_EQUAL:
-			if (comparison_index == -1 || comparison_index == TYRAN_OPCODE_REGISTER_ILLEGAL) {
-				comparison_index = target;
-			}
-			tyran_generator_comparison_operator(code, operator_type, comparison_index, left, right, true_label, false_label, invert_logic);
+			tyran_generator_comparison_operator(code, operator_type, target, left, right, true_label, false_label, invert_logic);
 			break;
 		case TYRAN_PARSER_COMMA:
 			break;
@@ -608,7 +605,10 @@ tyran_reg_or_constant_index tyran_generator_traverse_if(tyran_memory* memory, ty
 	tyran_label_id if_true_label = tyran_generator_prepare_label(code);
 	tyran_label_id if_false_label = tyran_generator_prepare_label(code);
 
-	tyran_generator_traverse(memory, code, expression, if_true_label, if_false_label, loop_start, loop_end, self_index, -1, invert);
+	tyran_reg_or_constant_index expression_index = tyran_generator_traverse(memory, code, expression, if_true_label, if_false_label, loop_start, loop_end, self_index, -1, invert);
+
+	tyran_opcodes_op_jb(code->opcodes, 254, expression_index, TYRAN_FALSE);
+	tyran_generator_label_reference(code, if_false_label);
 
 	tyran_reg_or_constant_index result;
 
@@ -662,7 +662,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_return(tyran_memory* memory
 void tyran_generator_traverse_when(tyran_memory* memory, tyran_code_state* code, tyran_reg_or_constant_index compare_register, tyran_parser_node_when* when_node, tyran_label_id end_of_case_label, tyran_label_id loop_start, tyran_label_id loop_end, tyran_reg_index comparison_index, tyran_reg_index self_index)
 {
 	tyran_reg_or_constant_index value_register = tyran_generator_traverse(memory, code, when_node->expression, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, loop_start, loop_end, self_index, -1, TYRAN_FALSE);
-	tyran_opcodes_op_jeq(code->opcodes, comparison_index, compare_register, value_register, TYRAN_FALSE);
+	tyran_opcodes_op_eq(code->opcodes, comparison_index, compare_register, value_register, TYRAN_FALSE);
 	tyran_label_id end_of_when_label = tyran_generator_prepare_label(code);
 	tyran_generator_label_reference(code, end_of_when_label);
 	tyran_generator_traverse(memory, code, when_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, loop_start, loop_end, self_index, -1, TYRAN_FALSE);

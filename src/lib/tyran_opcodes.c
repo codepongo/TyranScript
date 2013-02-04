@@ -155,20 +155,25 @@ void tyran_opcodes_op_next(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or
 
 /* Branch */
 
-void tyran_opcodes_op_jeq(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int b)
+void tyran_opcodes_op_eq(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int b)
 {
 	TYRAN_LOG("jeq. b:%d", b);
-	tyran_opcodes_add_code(codes, TYRAN_OPCODE_JEQ, a, x, y, b);
+	tyran_opcodes_add_code(codes, TYRAN_OPCODE_EQ, a, x, y, b);
 }
 
-void tyran_opcodes_op_jlt(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int b)
+void tyran_opcodes_op_lt(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int b)
 {
-	tyran_opcodes_add_code(codes, TYRAN_OPCODE_JLT, a, x, y, b);
+	tyran_opcodes_add_code(codes, TYRAN_OPCODE_LT, a, x, y, b);
 }
 
-void tyran_opcodes_op_jle(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int b)
+void tyran_opcodes_op_le(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int b)
 {
-	tyran_opcodes_add_code(codes, TYRAN_OPCODE_JLE, a, x, y, b);
+	tyran_opcodes_add_code(codes, TYRAN_OPCODE_LE, a, x, y, b);
+}
+
+void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, int b)
+{
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_JB, a, x, b);
 }
 
 void tyran_opcodes_op_jmp(tyran_opcodes* codes, int pc)

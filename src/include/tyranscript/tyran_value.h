@@ -114,6 +114,7 @@ typedef struct tyran_value {
 	tyran_value_release(b); \
 }
 
+#define tyran_value_is_false(pv) (tyran_value_is_nil(pv) || (tyran_value_is_boolean(pv) && !(pv)->data.boolean))
 
 #define tyran_value_is_same_type(a, b) ((a)->type == (b)->type)
 #define tyran_value_is_same(a, b) (tyran_value_is_same_type(a, b) && ((a)->data.data == (b)->data.data))

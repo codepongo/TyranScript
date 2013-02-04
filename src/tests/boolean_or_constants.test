@@ -1,0 +1,4 @@
+a = "world" or false
+print a
+---
+world

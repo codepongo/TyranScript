@@ -26,9 +26,10 @@ const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
 	"NEXT",
 	"NEG",
 	"NOT",
-	"JEQ",
-	"JLT",
-	"JLE",
+	"EQ",
+	"LT",
+	"LE",
+	"JB",
 	"JMP",
 	"RET",
 	"CALL",
@@ -152,7 +153,7 @@ void print_rc_b(tyran_opcode code, const tyran_constants* constants, char* buf, 
 void print_r_rc_b(tyran_opcode code, const tyran_constants* constants, char* buf, int size)
 {
 	print_r(TYRAN_OPCODE_ARG_A(code), buf, size);
-	print_rc(TYRAN_OPCODE_ARG_Y(code), constants, buf, size);
+	print_rc(TYRAN_OPCODE_ARG_X(code), constants, buf, size);
 	print_b(TYRAN_OPCODE_ARG_Y(code), buf, size);
 }
 
@@ -167,6 +168,12 @@ void print_br(tyran_opcode code, int pc, char* buf, int size)
 {
 	int br = TYRAN_OPCODE_ARG_BR(code);
 	tyran_snprintf(buf, size, " %d (%d)", (pc + br + 1), br);
+}
+
+void print_br_b(tyran_opcode code, int pc, char* buf, int size)
+{
+	print_br(code, pc, buf, size);
+	print_b(TYRAN_OPCODE_ARG_A(code), buf, size);
 }
 
 void print_r_s(tyran_opcode code, char* buf, int size)
@@ -207,10 +214,13 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 		case TYRAN_OPCODE_ITER:
 			print_r_c(code, constants, buf, size);
 			break;
-		case TYRAN_OPCODE_JEQ:
-		case TYRAN_OPCODE_JLT:
-		case TYRAN_OPCODE_JLE:
+		case TYRAN_OPCODE_EQ:
+		case TYRAN_OPCODE_LT:
+		case TYRAN_OPCODE_LE:
 			print_r_rc_rc_b(code, constants, buf, size);
+			break;
+		case TYRAN_OPCODE_JB:
+			print_r_rc_b(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_JMP:
 			print_br(code, ip, buf, size);

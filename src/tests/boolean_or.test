@@ -1,0 +1,4 @@
+a = (2 is 3) or "kalle"
+print a
+---
+kalle

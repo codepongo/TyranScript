@@ -148,10 +148,10 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 				TYRAN_REGISTER_A_RCX;
 				tyran_value_replace_boolean(r[a], !rcx.data.boolean);
 				break;
-			case TYRAN_OPCODE_JEQ:
-			case TYRAN_OPCODE_JLT:
-			case TYRAN_OPCODE_JLE: {
-				int comparison_index = (opcode - TYRAN_OPCODE_JEQ) + 8;
+			case TYRAN_OPCODE_EQ:
+			case TYRAN_OPCODE_LT:
+			case TYRAN_OPCODE_LE: {
+				int comparison_index = (opcode - TYRAN_OPCODE_EQ) + 8;
 
 				TYRAN_REGISTER_A_B_RCX_RCY;
 				if (tyran_value_is_object(&rcx)) {
@@ -166,10 +166,19 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 					test = !test;
 					r[a].data.boolean = test;
 				}
+			}
+			break;
+			case TYRAN_OPCODE_JB: {
+				TYRAN_REGISTER_A_RCX_Y;
+				test = tyran_value_is_false(&rcx);
+				if (y) {
+					test = !test;
+				}
 				if (test) {
-					pc++;
-				} else {
+					tyran_value_replace(r[a], rcx);
 					TYRAN_RUNTIME_DO_JMP;
+				} else {
+					pc++;
 				}
 			}
 			break;
