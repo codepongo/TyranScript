@@ -607,7 +607,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_if(tyran_memory* memory, ty
 
 	tyran_reg_or_constant_index expression_index = tyran_generator_traverse(memory, code, expression, if_true_label, if_false_label, loop_start, loop_end, self_index, -1, invert);
 
-	tyran_opcodes_op_jb(code->opcodes, 254, expression_index, TYRAN_FALSE);
+	tyran_opcodes_op_jb(code->opcodes, 254, expression_index, invert);
 	tyran_generator_label_reference(code, if_false_label);
 
 	tyran_reg_or_constant_index result;
@@ -639,7 +639,10 @@ tyran_reg_or_constant_index tyran_generator_traverse_while(tyran_memory* memory,
 
 	tyran_generator_define_label(code, while_loop_label);
 
-	tyran_generator_traverse(memory, code, while_node->condition, while_true_label, while_false_label, while_loop_label, while_false_label, self_index, -1, invert_logic);
+	tyran_reg_or_constant_index expression_index = tyran_generator_traverse(memory, code, while_node->condition, while_true_label, while_false_label, while_loop_label, while_false_label, self_index, -1, invert_logic);
+	tyran_opcodes_op_jb(code->opcodes, 254, expression_index, invert_logic);
+	tyran_generator_label_reference(code, while_false_label);
+
 	tyran_generator_define_label(code, while_true_label);
 
 	tyran_reg_or_constant_index result;
@@ -661,10 +664,15 @@ tyran_reg_or_constant_index tyran_generator_traverse_return(tyran_memory* memory
 
 void tyran_generator_traverse_when(tyran_memory* memory, tyran_code_state* code, tyran_reg_or_constant_index compare_register, tyran_parser_node_when* when_node, tyran_label_id end_of_case_label, tyran_label_id loop_start, tyran_label_id loop_end, tyran_reg_index comparison_index, tyran_reg_index self_index)
 {
+	tyran_reg_index target = tyran_variable_scopes_define_temporary_variable(code->scope);
+
 	tyran_reg_or_constant_index value_register = tyran_generator_traverse(memory, code, when_node->expression, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, loop_start, loop_end, self_index, -1, TYRAN_FALSE);
-	tyran_opcodes_op_eq(code->opcodes, comparison_index, compare_register, value_register, TYRAN_FALSE);
+	tyran_opcodes_op_eq(code->opcodes, target, compare_register, value_register, TYRAN_FALSE);
 	tyran_label_id end_of_when_label = tyran_generator_prepare_label(code);
+
+	tyran_opcodes_op_jb(code->opcodes, 254, target, TYRAN_FALSE);
 	tyran_generator_label_reference(code, end_of_when_label);
+
 	tyran_generator_traverse(memory, code, when_node->block, TYRAN_OPCODE_REGISTER_ILLEGAL, TYRAN_OPCODE_REGISTER_ILLEGAL, loop_start, loop_end, self_index, -1, TYRAN_FALSE);
 	tyran_generator_label_reference(code, end_of_case_label);
 	tyran_generator_define_label(code, end_of_when_label);
