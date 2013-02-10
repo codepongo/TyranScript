@@ -30,6 +30,7 @@ const char* tyran_opcode_names[TYRAN_OPCODE_MAX_ID] = {
 	"LT",
 	"LE",
 	"JB",
+	"JBLD",
 	"JMP",
 	"RET",
 	"CALL",
@@ -219,8 +220,11 @@ void tyran_print_arguments(tyran_opcode code, int ip, const tyran_constants* con
 		case TYRAN_OPCODE_LE:
 			print_r_rc_rc_b(code, constants, buf, size);
 			break;
-		case TYRAN_OPCODE_JB:
+		case TYRAN_OPCODE_JBLD:
 			print_r_rc_b(code, constants, buf, size);
+			break;
+		case TYRAN_OPCODE_JB:
+			print_rc_b(code, constants, buf, size);
 			break;
 		case TYRAN_OPCODE_JMP:
 			print_br(code, ip, buf, size);

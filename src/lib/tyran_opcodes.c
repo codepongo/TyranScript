@@ -171,9 +171,14 @@ void tyran_opcodes_op_le(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_c
 	tyran_opcodes_add_code(codes, TYRAN_OPCODE_LE, a, x, y, b);
 }
 
-void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, int b)
+void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_or_constant_index x, int b)
 {
-	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_JB, a, x, b);
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_JB, b, x, 0);
+}
+
+void tyran_opcodes_op_jbld(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, int b)
+{
+	tyran_opcodes_add_code_a_x_y(codes, TYRAN_OPCODE_JBLD, a, x, b);
 }
 
 void tyran_opcodes_op_jmp(tyran_opcodes* codes, int pc)

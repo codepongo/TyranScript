@@ -1,0 +1,5 @@
+a = print() - 1
+print a
+---
+nil
+15

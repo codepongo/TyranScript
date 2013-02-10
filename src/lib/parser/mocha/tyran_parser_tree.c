@@ -197,18 +197,6 @@ NODE tyran_parser_return(tyran_memory* memory, NODE expression)
 	return (NODE)node;
 }
 
-
-NODE tyran_parser_call(tyran_memory* memory, NODE function, NODE* arguments, int argument_count)
-{
-	tyran_parser_node_call* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_call, 1);
-	node->node.type = TYRAN_PARSER_NODE_TYPE_CALL;
-	node->argument_count = argument_count;
-	node->arguments = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, NODE, node->argument_count);
-	node->function_node = function;
-	tyran_memcpy_type(NODE, node->arguments, arguments, node->argument_count);
-	return (tyran_parser_node*)node;
-}
-
 NODE tyran_parser_function(tyran_memory* memory, NODE block, tyran_boolean bound)
 {
 	tyran_parser_node_function* node = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_parser_node_function, 1);

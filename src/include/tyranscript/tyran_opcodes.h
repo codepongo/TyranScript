@@ -52,7 +52,8 @@ void tyran_opcodes_op_lt(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_c
 void tyran_opcodes_op_le(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int boolean);
 
 /* Branch */
-void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, int b);
+void tyran_opcodes_op_jbld(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, int b);
+void tyran_opcodes_op_jb(tyran_opcodes* codes, tyran_reg_or_constant_index x, int b);
 void tyran_opcodes_op_jmp(tyran_opcodes* codes, int pc);
 
 /* Call stack */

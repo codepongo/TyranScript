@@ -169,6 +169,19 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			}
 			break;
 			case TYRAN_OPCODE_JB: {
+				TYRAN_REGISTER_A_RCX;
+				test = tyran_value_is_false(&rcx);
+				if (a) {
+					test = !test;
+				}
+				if (test) {
+					TYRAN_RUNTIME_DO_JMP;
+				} else {
+					pc++;
+				}
+			}
+			break;
+			case TYRAN_OPCODE_JBLD: {
 				TYRAN_REGISTER_A_RCX_Y;
 				test = tyran_value_is_false(&rcx);
 				if (y) {

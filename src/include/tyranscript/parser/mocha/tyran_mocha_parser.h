@@ -9,7 +9,10 @@ struct tyran_mocha_lexer;
 
 typedef struct tyran_mocha_parser_enclosure_info {
 	tyran_mocha_token_id start_token_id;
-	int top_precedence;
+	// int top_precedence;
+	int root_precedence;
+	int last_precedence;
+
 	NODE* root;
 	tyran_parser_node_operand_unary* enclosure_node;
 } tyran_mocha_parser_enclosure_info;
@@ -33,6 +36,8 @@ typedef struct tyran_mocha_parser {
 	struct tyran_memory_pool* mocha_token_pool;
 	tyran_parser_node_operand_unary* last_bracket_node;
 	tyran_boolean last_was_colon;
+	tyran_boolean last_was_parentheses;
+	NODE last_operator_node;
 	int root_precedence;
 	tyran_mocha_token_id root_precedence_token;
 	int last_precedence;
