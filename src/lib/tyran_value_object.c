@@ -56,18 +56,18 @@ void tyran_value_object_lookup_prototype(tyran_value* v, const tyran_value* targ
 
 void tyran_value_object_set_prototype(struct tyran_value* target, struct tyran_value* prototype)
 {
-	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only set prototype on objects");
-	TYRAN_ASSERT(prototype->type == TYRAN_VALUE_TYPE_OBJECT, "Can only set prototype to objects");
+	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "value_object: Can only set prototype on objects");
+	TYRAN_ASSERT(prototype->type == TYRAN_VALUE_TYPE_OBJECT, "value_object: Can only set prototype to an object");
 	tyran_object_set_prototype(target->data.object, prototype->data.object);
 }
 
 const struct tyran_string* tyran_value_object_string(struct tyran_value* target) {
-	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only set prototype on objects");
+	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "value_object: Can only get string from objects");
 	return tyran_object_string(target->data.object);
 }
 
 struct tyran_array* tyran_value_object_array(struct tyran_value* target) {
-	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only set prototype on objects");
+	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "value_object: Can only get array from objects");
 	return tyran_object_array(target->data.object);
 }
 

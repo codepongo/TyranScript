@@ -148,7 +148,7 @@ NODE* tyran_mocha_parser_last_node_helper(NODE* parent, NODE* node, tyran_boolea
 
 	tyran_parser_node_operand_unary* unary = tyran_parser_unary_operator_cast(*node);
 	if (use_operator && unary) {
-		return tyran_mocha_parser_last_node_helper(node, &unary->expression, use_operator);
+		return node; // tyran_mocha_parser_last_node_helper(node, &unary->expression, use_operator);
 	}
 
 	if (use_operator) {
@@ -597,7 +597,7 @@ NODE tyran_mocha_parser_add_default_operator(tyran_memory* memory, tyran_mocha_p
 		tyran_parser_node_operand_binary* node = tyran_parser_operand_binary(memory, tyran_mocha_parser_convert_binary_operand(token_id), 0, 0);
 		return_node = (NODE) node;
 		if (token_id == TYRAN_MOCHA_TOKEN_CALL && parser->last_was_parentheses) {
-			TYRAN_LOG("It was parentheses, you know");
+			TYRAN_LOG("It was parentheses, push last operator right");
 			tyran_mocha_parser_push_last_operator_right(parser, node, token_id, precedence);
 		} else if (precedence <= parser->root_precedence) {
 			debug_precedence(precedence, token_id, parser->root_precedence, parser->root_precedence_token, "root");
@@ -811,7 +811,7 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 {
 	static tyran_boolean last_literal = 0;
 
-#if 1 // defined TYRAN_MOCHA_PARSER_DEBUG
+#if defined TYRAN_MOCHA_PARSER_DEBUG
 	TYRAN_LOG("ADD TOKEN:")
 	tyran_mocha_lexer_debug_token(token);
 	TYRAN_LOG(" rootp:%d lastp:%d", parser->root_precedence, parser->last_precedence);
@@ -868,7 +868,7 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 			parser->last_was_parentheses = TYRAN_FALSE;
 		}
 	}
-#if 1 // defined TYRAN_MOCHA_PARSER_DEBUG
+#if defined TYRAN_MOCHA_PARSER_DEBUG
 	tyran_mocha_parser_node_print_tree(parser, "adder", 0);
 #endif
 }

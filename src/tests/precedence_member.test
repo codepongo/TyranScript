@@ -1,0 +1,4 @@
+memory = [65]
+print String.fromCharCode(memory[0])
+---
+A

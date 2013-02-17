@@ -1,0 +1,5 @@
+x = {fromCharCode: -> 'A'}
+memory = [65]
+print x.fromCharCode(memory[0])
+---
+A
