@@ -1,11 +1,24 @@
 #include <tyranscript/tyran_mocha_api.h>
 
-int mocha_print(struct tyran_runtime* runtime, struct tyran_value* function, struct tyran_value* arguments, struct tyran_value* _this, struct tyran_value* return_value, int is_new_call)
+void print_value(tyran_runtime* runtime, tyran_value* v)
 {
-	TYRAN_OUTPUT("PRINT");
-	return 0;
+	const int buf_len = 100;
+	char buf[buf_len];
+
+	tyran_value_to_c_string(runtime->symbol_table, v, buf, buf_len, 0);
+
+	puts(buf);
+
 }
 
+
+TYRAN_RUNTIME_CALL_FUNC(mocha_print)
+{
+	struct tyran_value* v = &arguments[0];
+	print_value(runtime, v);
+	tyran_value_set_number(*return_value, 16.0f);
+	return 0;
+}
 
 int main(int argc, char* argv[])
 {
@@ -14,18 +27,22 @@ int main(int argc, char* argv[])
 	tyran_mocha_api api;
 	tyran_mocha_api_new(&api, 1024);
 
-	tyran_value global = tyran_mocha_api_create_object(&api);
-	tyran_mocha_api_add_function(&api, &global, "print", mocha_print);
+	tyran_value* global = tyran_runtime_context(api.default_runtime);
+	tyran_mocha_api_add_function(&api, global, "print", mocha_print);
 
 	char buf[512];
 	while (1) {
-		TYRAN_LOG_NO_LF("> ");
+		TYRAN_OUTPUT_NO_LF("> ");
 		char* p = fgets(buf, 512, stdin);
 		if (!p) {
 			break;
 		}
 
-		tyran_mocha_api_eval(&api, &global, buf, tyran_strlen(buf));
+		tyran_value return_value;
+		tyran_mocha_api_eval(&api, global, &return_value, buf, tyran_strlen(buf));
+		TYRAN_OUTPUT_NO_LF("   =>");
+		print_value(api.default_runtime, &return_value);
+
 	}
 
 	return 0;

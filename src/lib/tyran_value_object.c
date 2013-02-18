@@ -51,6 +51,7 @@ void tyran_value_object_lookup_prototype(tyran_value* v, const tyran_value* targ
 {
 	TYRAN_ASSERT(target->type == TYRAN_VALUE_TYPE_OBJECT, "Can only subscript on objects");
 	TYRAN_ASSERT(key->type == TYRAN_VALUE_TYPE_SYMBOL, "Can only lookup symbols");
+	TYRAN_ASSERT(target->data.object, "Object is 0");
 	tyran_object_lookup_prototype(v, target->data.object, &key->data.symbol);
 }
 
