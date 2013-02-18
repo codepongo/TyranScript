@@ -588,26 +588,29 @@ tyran_reg_or_constant_index tyran_generator_traverse_unary(tyran_memory* memory,
 
 tyran_reg_or_constant_index tyran_generator_traverse_if(tyran_memory* memory, tyran_code_state* code, tyran_parser_node* expression, tyran_parser_node* then_node, tyran_parser_node* else_node, tyran_label_id loop_start, tyran_label_id loop_end, tyran_reg_index self_index, tyran_boolean invert)
 {
-	tyran_label_id if_true_label = tyran_generator_prepare_label(code);
+	TYRAN_LOG("if()");
 	tyran_label_id if_false_label = tyran_generator_prepare_label(code);
 
-	tyran_reg_or_constant_index expression_index = tyran_generator_traverse(memory, code, expression, if_true_label, if_false_label, loop_start, loop_end, self_index, -1, invert);
+	tyran_reg_or_constant_index expression_index = tyran_generator_traverse(memory, code, expression, -1, -1, loop_start, loop_end, self_index, -1, invert);
 
 	tyran_opcodes_op_jb(code->opcodes, expression_index, invert);
 	tyran_generator_label_reference(code, if_false_label);
 
-	tyran_reg_or_constant_index result;
-
-	tyran_generator_define_label(code, if_true_label);
+	tyran_reg_or_constant_index result = tyran_variable_scopes_define_temporary_variable(code->scope);
 
 
-	result = tyran_generator_traverse(memory, code, then_node, 0, 0, loop_start, loop_end, self_index, -1, TYRAN_TRUE);
+	tyran_reg_or_constant_index then_index = tyran_generator_traverse(memory, code, then_node, -1, -1, loop_start, loop_end, self_index, -1, TYRAN_TRUE);
+	if (then_index != TYRAN_OPCODE_REGISTER_ILLEGAL) {
+		tyran_generator_ld(code->opcodes, result, then_index);
+	}
 	if (else_node) {
+		TYRAN_LOG("---> ELSE NODE");
 		int end_of_if = tyran_generator_prepare_label(code);
 		tyran_generator_label_reference(code, end_of_if);
 		tyran_generator_define_label(code, if_false_label);
 
-		tyran_generator_traverse(memory, code, else_node, 0, 0, loop_start, loop_end, self_index, -1, TYRAN_TRUE);
+		tyran_reg_or_constant_index else_index = tyran_generator_traverse(memory, code, else_node, -1, -1, loop_start, loop_end, self_index, -1, TYRAN_TRUE);
+		tyran_generator_ld(code->opcodes, result, else_index);
 
 		tyran_generator_define_label(code, end_of_if);
 	} else {
@@ -642,8 +645,15 @@ tyran_reg_or_constant_index tyran_generator_traverse_while(tyran_memory* memory,
 
 tyran_reg_or_constant_index tyran_generator_traverse_return(tyran_memory* memory, tyran_code_state* code, tyran_parser_node_return* return_node, tyran_label_id true_label, tyran_label_id false_label, tyran_reg_index self_index, tyran_boolean invert_logic)
 {
-	tyran_reg_or_constant_index return_index = tyran_generator_traverse(memory, code, return_node->expression, true_label, false_label, -1, -1, self_index, -1, invert_logic);
+	tyran_reg_or_constant_index return_index;
+	if (return_node->expression) {
+		return_index = tyran_generator_traverse(memory, code, return_node->expression, true_label, false_label, -1, -1, self_index, -1, invert_logic);
+	} else {
+		return_index = tyran_variable_scopes_define_temporary_variable(code->scope);
+	}
+
 	tyran_generator_ret(code, return_index);
+
 	return return_index;
 }
 

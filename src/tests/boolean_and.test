@@ -1,0 +1,7 @@
+a = true and "first"
+b = (2 < 0) and "second"
+print a
+print b
+---
+first
+false

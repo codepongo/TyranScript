@@ -7,7 +7,7 @@
 
 typedef struct tyran_mocha_operator_info {
 	tyran_mocha_token_id token_id;
-	int direction;
+	int right_associative;
 	int is_enclosing;
 	int precedence;
 } tyran_mocha_operator_info;
@@ -50,7 +50,7 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_COMMA, 1, 0},
 		{TYRAN_MOCHA_TOKEN_COLON, 1, 0},
 		{TYRAN_MOCHA_TOKEN_ADD, 1, 0},
-		{TYRAN_MOCHA_TOKEN_SUBTRACT, 1, 0},
+		{TYRAN_MOCHA_TOKEN_SUBTRACT, 0, 0},
 		{TYRAN_MOCHA_TOKEN_MULTIPLY, 1, 0},
 		{TYRAN_MOCHA_TOKEN_MODULUS, 1, 0},
 		{TYRAN_MOCHA_TOKEN_DIVIDE, 1, 0},
@@ -573,7 +573,7 @@ void debug_precedence(int precedence, tyran_mocha_token_id precedence_token_id, 
 	tyran_mocha_lexer_debug_token(&compare_precedence_token);
 }
 
-NODE tyran_mocha_parser_add_default_operator(tyran_memory* memory, tyran_mocha_parser* parser, tyran_mocha_token_id token_id, int precedence)
+NODE tyran_mocha_parser_add_default_operator(tyran_memory* memory, tyran_mocha_parser* parser, tyran_mocha_token_id token_id, int precedence, int right_associative)
 {
 	NODE return_node;
 
@@ -599,7 +599,7 @@ NODE tyran_mocha_parser_add_default_operator(tyran_memory* memory, tyran_mocha_p
 		if (token_id == TYRAN_MOCHA_TOKEN_CALL && parser->last_was_parentheses) {
 			TYRAN_LOG("It was parentheses, push last operator right");
 			tyran_mocha_parser_push_last_operator_right(parser, node, token_id, precedence);
-		} else if (precedence <= parser->root_precedence) {
+		} else if (right_associative && precedence <= parser->root_precedence) {
 			debug_precedence(precedence, token_id, parser->root_precedence, parser->root_precedence_token, "root");
 			tyran_mocha_parser_push_root_right(parser, node, token_id, precedence);
 		} else if (parser->next_node_to_overwrite == 0 && (precedence < parser->last_precedence)) {
@@ -626,7 +626,16 @@ NODE tyran_mocha_parser_add_default_operator(tyran_memory* memory, tyran_mocha_p
 NODE tyran_mocha_parser_if(tyran_memory* memory, tyran_mocha_parser* parser, tyran_boolean invert)
 {
 	NODE expression = tyran_mocha_parser_concat_pop(parser);
-	NODE block = tyran_mocha_parser_concat_pop(parser);
+
+	tyran_parser_node_operand_binary* then_binary = tyran_parser_binary_operator_type_cast(expression, TYRAN_PARSER_THEN);
+	NODE block;
+	if (then_binary) {
+		expression = then_binary->left;
+		block = then_binary->right;
+	} else {
+		block = tyran_mocha_parser_concat_pop(parser);
+	}
+
 	NODE else_block = tyran_mocha_parser_concat_peek(parser);
 	if (else_block && else_block->type == TYRAN_PARSER_NODE_TYPE_ELSE) {
 		else_block = tyran_mocha_parser_concat_pop(parser);
@@ -710,7 +719,7 @@ NODE tyran_mocha_parser_case(tyran_memory* memory, tyran_mocha_parser* parser)
 	return tyran_parser_case(memory, expression, when_nodes, when_node_count);
 }
 
-NODE tyran_mocha_parser_add_terminal(tyran_memory* memory, tyran_mocha_parser* parser, tyran_mocha_token_id token_id, int precedence)
+NODE tyran_mocha_parser_add_terminal(tyran_memory* memory, tyran_mocha_parser* parser, tyran_mocha_token_id token_id, int precedence, int right_associative)
 {
 	NODE node;
 	switch (token_id) {
@@ -747,7 +756,7 @@ NODE tyran_mocha_parser_add_terminal(tyran_memory* memory, tyran_mocha_parser* p
 			node = tyran_mocha_parser_function(memory, parser, (token_id == TYRAN_MOCHA_TOKEN_FUNCTION_GLYPH_BOUND));
 			break;
 		default:
-			return tyran_mocha_parser_add_default_operator(memory, parser, token_id, precedence);
+			return tyran_mocha_parser_add_default_operator(memory, parser, token_id, precedence, right_associative);
 			break;
 	}
 	tyran_mocha_parser_add_to_empty(memory, parser, node, precedence);
@@ -841,7 +850,7 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 			}
 
 
-			NODE terminal = tyran_mocha_parser_add_terminal(memory, parser, token->token_id, info.precedence);
+			NODE terminal = tyran_mocha_parser_add_terminal(memory, parser, token->token_id, info.precedence, info.right_associative);
 			parser->last_operator_node = terminal;
 			tyran_mocha_token_id end_closing_token_id = tyran_mocha_enclosing_start_token(token->token_id);
 			if (end_closing_token_id != TYRAN_MOCHA_TOKEN_END) {

@@ -266,10 +266,10 @@ void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_va
 			break;
 			case TYRAN_OPCODE_DEBUG:
 				return;
-			break;
+				break;
 			default:
 				TYRAN_ERROR("Illegal instruction:%d",instruction);
-			break;
+				break;
 		}
 	}
 }
