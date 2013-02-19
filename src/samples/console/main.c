@@ -5,7 +5,7 @@ void print_value(tyran_runtime* runtime, tyran_value* v)
 	const int buf_len = 100;
 	char buf[buf_len];
 
-	tyran_value_to_c_string(runtime->symbol_table, v, buf, buf_len, 0);
+	tyran_value_to_c_string(runtime->symbol_table, v, buf, buf_len, 1);
 
 	puts(buf);
 
@@ -34,13 +34,12 @@ int main(int argc, char* argv[])
 	while (1) {
 		TYRAN_OUTPUT_NO_LF("> ");
 		char* p = fgets(buf, 512, stdin);
-		if (!p) {
+		if (!p || strcmp(p, "quit\n") == 0) {
 			break;
 		}
-
 		tyran_value return_value;
 		tyran_mocha_api_eval(&api, global, &return_value, buf, tyran_strlen(buf));
-		TYRAN_OUTPUT_NO_LF("   =>");
+		TYRAN_OUTPUT_NO_LF(" => ");
 		print_value(api.default_runtime, &return_value);
 
 	}
