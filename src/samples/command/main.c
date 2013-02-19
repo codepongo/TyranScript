@@ -39,7 +39,8 @@ int main(int argc, char* argv[])
 
 	tyran_mocha_api_add_function(&api, global, "print", mocha_print);
 
-	tyran_mocha_api_eval(&api, global, buf, tyran_strlen(buf));
+	tyran_value return_value;
+	tyran_mocha_api_eval(&api, global, &return_value, buf, tyran_strlen(buf));
 
 	return 0;
 }

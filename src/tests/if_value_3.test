@@ -1,0 +1,5 @@
+b = 3
+a = if b is 3 then "You got it!" else "Bad"
+print a
+---
+You got it!

@@ -1,0 +1,5 @@
+b = 4
+a = if b + 1 > 4 then "yes" else "no"
+print a
+---
+yes
