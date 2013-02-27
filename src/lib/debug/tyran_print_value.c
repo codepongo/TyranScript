@@ -125,43 +125,14 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 
 	if (v->type == TYRAN_VALUE_TYPE_OBJECT) {
 		tyran_object* o = v->data.object;
-		if (o->prototype == 0) {
-			TYRAN_LOG("[]");
-			/*
-			int len = tyran_object_length(o);
-			int i;
-			tyran_value* nv;
 
-			const int max_size_description = 2048;
-			char desc[max_size_description];
-			for (i = 0; i < len; ++i) {
-				tyran_object_key_flag_type flag;
-				nv = tyran_value_object_lookup_array(v, i, &flag);
-				if (nv) {
-					tyran_snprintf(desc, max_size_description, "#%d: ", i);
-					// TYRAN_ASSERT(nv != 0, "Must be able to lookup all indexes");
-					tyran_print_value_helper(tabs, desc, nv, 1, object_iterator_pool, string_pool, memory);
-				}
-			}
-			*/
-		} /*else*/ {
-			/*
-			tabs++;
-			tyran_object_iterator* target_iterator = tyran_object_iterator_new(object_iterator_pool);
-			tyran_object_get_keys(string_pool, memory, 0, v->data.object, target_iterator);
-			tyran_object_key_flag_type flag;
-			int i;
-			for (i=0; i<target_iterator->count; ++i) {
-				const tyran_object_key* key = target_iterator->keys[i];
-				tyran_value* sub_value = tyran_value_object_lookup(v, key, &flag);
-				if (sub_value) {
-					tyran_string_to_c_str(temp_buffer, temp_buffer_size, key->str);
-					tyran_print_value_helper(tabs, temp_buffer, sub_value, quote, object_iterator_pool, string_pool, memory);
-				}
-			}
+		for (int i=0; i<o->property_count; ++i) {
+			tyran_object_property* property = &o->properties[i];
 
-			tabs--;
-			*/
+			const char* symbol_name;
+			symbol_name = tyran_symbol_table_lookup(symbol_table, &property->symbol);
+
+			tyran_print_value_helper(tabs + 1, symbol_name, &property->value, quote, symbol_table, object_iterator_pool, string_pool, memory);
 		}
 
 		if (tyran_object_get_prototype(o)) {
