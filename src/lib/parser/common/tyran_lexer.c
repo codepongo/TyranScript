@@ -198,7 +198,7 @@ int tyran_lexer_parse_identifier(tyran_lexer* lexer, char c, char* buf, int* max
 	}
 
 	buf[string_index] = 0;
-	*last_was_whitespace = tyran_lexer_is_whitespace(c);
+	*last_was_whitespace = tyran_lexer_is_whitespace(c) || c == ',' || c == ']';
 	*max_length = string_index;
 
 	return 0;
