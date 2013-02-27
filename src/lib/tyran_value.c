@@ -32,7 +32,7 @@ tyran_number tyran_value_number(tyran_value* v)
 
 tyran_boolean tyran_value_boolean(tyran_value* v)
 {
-	TYRAN_ASSERT(tyran_value_is_boolean(v), "Must be number");
+	TYRAN_ASSERT(tyran_value_is_boolean(v), "Must be boolean");
 	return v->data.boolean;
 }
 
@@ -40,4 +40,10 @@ tyran_object* tyran_value_object(tyran_value* v)
 {
 	TYRAN_ASSERT(tyran_value_is_object(v), "Must be object");
 	return v->data.object;
+}
+
+const tyran_string* tyran_value_string(tyran_value* v)
+{
+	TYRAN_ASSERT(tyran_value_is_object(v), "Must be object");
+	return tyran_object_string(v->data.object);
 }
