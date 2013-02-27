@@ -5,6 +5,8 @@
 #include <tyranscript/debug/parser/tyran_print_parser_tree.h>
 #include <tyranscript/parser/common/tyran_parser_tree.h>
 
+#define TYRAN_MOCHA_PARSER_DEBUG
+
 typedef struct tyran_mocha_operator_info {
 	tyran_mocha_token_id token_id;
 	int right_associative;
@@ -205,7 +207,6 @@ NODE* tyran_mocha_parser_actual_root(tyran_mocha_parser* parser)
 
 void tyran_mocha_parser_push_root_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node, tyran_mocha_token_id token_id, int precedence)
 {
-	TYRAN_LOG("push_root_right");
 	NODE* actual_root = tyran_mocha_parser_actual_root(parser);
 	parser->root_precedence = precedence;
 	parser->root_precedence_token = token_id;
@@ -216,7 +217,6 @@ void tyran_mocha_parser_push_root_right(tyran_mocha_parser* parser, tyran_parser
 
 void tyran_mocha_parser_push_last_inserted_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node, tyran_mocha_token_id token_id, int precedence)
 {
-	TYRAN_LOG("push_last_inserted_right");
 	NODE* last_node = tyran_mocha_parser_last_node(parser);
 	parser->last_precedence = precedence;
 	parser->last_precedence_token = token_id;
@@ -225,7 +225,6 @@ void tyran_mocha_parser_push_last_inserted_right(tyran_mocha_parser* parser, tyr
 
 void tyran_mocha_parser_push_last_operator_right(tyran_mocha_parser* parser, tyran_parser_node_operand_binary* node, tyran_mocha_token_id token_id, int precedence)
 {
-	TYRAN_LOG("push_last_operator_right");
 	NODE* last_node = tyran_mocha_parser_last_operator_node(parser);
 	tyran_mocha_parser_push_right(parser, node, last_node);
 	parser->last_precedence = precedence;
@@ -262,18 +261,24 @@ NODE tyran_mocha_parser_concat_pop(tyran_mocha_parser* parser)
 
 void tyran_mocha_parser_parameters(tyran_parser_node_parameter* parameter_nodes, int* index, NODE node)
 {
+
 	tyran_parser_node_operand_binary* binary = tyran_parser_binary_operator_cast(node);
 	if (binary && (binary->operator_type == TYRAN_PARSER_COMMA || binary->operator_type == TYRAN_PARSER_CONCAT)) {
+		TYRAN_LOG("Comma parameters!");
 		tyran_mocha_parser_parameters(parameter_nodes, index, binary->left);
 		tyran_mocha_parser_parameters(parameter_nodes, index, binary->right);
 	} else {
 		tyran_parser_node_parameter parameter_node;
 		if (binary && (binary->operator_type ==  TYRAN_PARSER_ASSIGNMENT)) {
+			TYRAN_LOG("*** Assignment");
 			parameter_node.default_value = binary->right;
 			node = binary->left;
+			TYRAN_LOG("Node:%d", node->type);
 		} else {
 			parameter_node.default_value = 0;
 		}
+
+		TYRAN_ASSERT(node->type == TYRAN_PARSER_NODE_TYPE_IDENTIFIER, "Must be an identifier!");
 		parameter_node.identifier = (tyran_parser_node_identifier*) node;
 		parameter_nodes[*index] = parameter_node;
 		*index = *index + 1;
@@ -561,8 +566,6 @@ NODE tyran_mocha_parser_reduce_while(tyran_memory* memory, tyran_mocha_parser* p
 
 void debug_precedence(int precedence, tyran_mocha_token_id precedence_token_id, int compare_precedence, tyran_mocha_token_id compare_precendence_token_id, const char* description)
 {
-	TYRAN_LOG("%s: %d compared to %d", description, precedence, compare_precedence);
-
 	tyran_mocha_token precedence_token;
 	precedence_token.token_id = precedence_token_id;
 
@@ -618,7 +621,6 @@ NODE tyran_mocha_parser_add_default_operator(tyran_memory* memory, tyran_mocha_p
 		parser->root_precedence = precedence;
 		parser->root_precedence_token = token_id;
 	}
-	TYRAN_LOG("Returning rootp:%d, lastp:%d", parser->root_precedence, parser->last_precedence);
 	return return_node;
 }
 
@@ -800,8 +802,12 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_memory* 
 	if (parentheses) {
 		NODE node = tyran_mocha_parser_concat_peek_position(parser, 1);
 		if (node && node->type == TYRAN_PARSER_NODE_TYPE_FUNCTION) {
+#if defined TYRAN_MOCHA_PARSER_DEBUG
+	tyran_mocha_parser_node_print_tree(parser, "function_parameters", 0);
+#endif
 			tyran_mocha_parser_concat_pop(parser);
 			tyran_parser_node_function* function = (tyran_parser_node_function*) node;
+
 			tyran_mocha_parser_define_function_parameters(memory, function, parentheses->expression);
 		}
 	}
@@ -820,7 +826,7 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 {
 	static tyran_boolean last_literal = 0;
 
-#if defined TYRAN_MOCHA_PARSER_DEBUG
+#if 0
 	TYRAN_LOG("ADD TOKEN:")
 	tyran_mocha_lexer_debug_token(token);
 	TYRAN_LOG(" rootp:%d lastp:%d", parser->root_precedence, parser->last_precedence);
@@ -877,9 +883,6 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 			parser->last_was_parentheses = TYRAN_FALSE;
 		}
 	}
-#if defined TYRAN_MOCHA_PARSER_DEBUG
-	tyran_mocha_parser_node_print_tree(parser, "adder", 0);
-#endif
 }
 
 
