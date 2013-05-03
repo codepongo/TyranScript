@@ -803,7 +803,7 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_memory* 
 		NODE node = tyran_mocha_parser_concat_peek_position(parser, 1);
 		if (node && node->type == TYRAN_PARSER_NODE_TYPE_FUNCTION) {
 #if defined TYRAN_MOCHA_PARSER_DEBUG
-	tyran_mocha_parser_node_print_tree(parser, "function_parameters", 0);
+			tyran_mocha_parser_node_print_tree(parser, "function_parameters", 0);
 #endif
 			tyran_mocha_parser_concat_pop(parser);
 			tyran_parser_node_function* function = (tyran_parser_node_function*) node;

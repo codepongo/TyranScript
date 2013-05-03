@@ -32,8 +32,6 @@ void tyran_memory_pool_free(void*);
 #define TYRAN_MALLOC_TYPE(pool, type) (type*) tyran_memory_pool_alloc_debug(pool, #type, sizeof(type));
 #define TYRAN_MALLOC_FREE(p) tyran_memory_pool_free(p);
 
-#define TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, type, count) (type*) TYRAN_MEMORY_CALLOC(memory, count * sizeof(type), #type);
-#define TYRAN_MALLOC_NO_POOL_TYPE(memory, type) (type*) TYRAN_MEMORY_CALLOC(memory, sizeof(type), #type);
 
 
 #endif

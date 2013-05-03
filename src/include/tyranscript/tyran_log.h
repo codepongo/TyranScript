@@ -1,6 +1,7 @@
 #ifndef tyran_log_h
 #define tyran_log_h
 
+#include <tyranscript/tyran_clib.h>
 #include <tyranscript/tyran_configuration.h>
 
 

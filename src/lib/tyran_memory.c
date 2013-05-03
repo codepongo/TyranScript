@@ -28,3 +28,7 @@ void* tyran_memory_calloc_debug(tyran_memory* memory, size_t size, const char* s
 	return tyran_memory_calloc(memory, size);
 }
 
+void tyran_memory_free(void* p)
+{
+	tyran_free(p);
+}

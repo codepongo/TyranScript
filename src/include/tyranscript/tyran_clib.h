@@ -1,6 +1,8 @@
 #ifndef TYRAN_CLIB_H
 #define TYRAN_CLIB_H
 
+#include <tyranscript/tyran_config.h>
+
 char* tyran_str_dup(tyran_memory* pool, const char* str);
 
 
