@@ -144,10 +144,13 @@ tyran_mocha_token_id tyran_mocha_lexer_keyword(const char* identifier)
 tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_position_info, tyran_lexer* lexer)
 {
 	tyran_mocha_token token;
+    token.token_data = 0;
 
 	if (lexer->next_is_member) {
 		lexer->next_is_member = TYRAN_FALSE;
 		token.token_id = TYRAN_MOCHA_TOKEN_MEMBER;
+        token.token_data = 0;
+        
 		return token;
 	}
 
@@ -256,6 +259,7 @@ tyran_mocha_lexer* tyran_mocha_lexer_lex(tyran_memory_pool* mocha_lexer_pool, ty
 
 	tyran_lexer* lexer = tyran_lexer_new(lexer_pool, memory, buf);
 	tyran_mocha_token start_token;
+    start_token.token_data = 0;
 	start_token.token_id = TYRAN_MOCHA_TOKEN_LINE_START;
 
 	temp_buffer[count++] = start_token;

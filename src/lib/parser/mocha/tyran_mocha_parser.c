@@ -77,6 +77,9 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 
 	tyran_mocha_operator_info empty;
 
+    empty.is_enclosing = TYRAN_FALSE;
+    empty.right_associative = TYRAN_FALSE;
+    empty.precedence = 0;
 	empty.token_id = TYRAN_MOCHA_TOKEN_END;
 
 	return empty;
@@ -269,6 +272,7 @@ void tyran_mocha_parser_parameters(tyran_parser_node_parameter* parameter_nodes,
 		tyran_mocha_parser_parameters(parameter_nodes, index, binary->right);
 	} else {
 		tyran_parser_node_parameter parameter_node;
+        parameter_node.node.type = 0;
 		if (binary && (binary->operator_type ==  TYRAN_PARSER_ASSIGNMENT)) {
 			TYRAN_LOG("*** Assignment");
 			parameter_node.default_value = binary->right;

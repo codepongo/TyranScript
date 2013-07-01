@@ -81,6 +81,7 @@ typedef struct tyran_value {
 
 #define tyran_value_set_nil(v) { \
 	(v).type = TYRAN_VALUE_TYPE_NIL; \
+    (v).data.data = 0;  \
 }
 
 
