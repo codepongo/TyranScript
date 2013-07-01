@@ -30,7 +30,7 @@ class Builder
 		end
 
 		p "o:#{o_files.inspect}"
-		@c_compiler = 'clang'
+		@c_compiler = 'gcc' #'clang'
 
 		CLEAN.include o_files
 	end
@@ -52,7 +52,7 @@ class Builder
 
 	def compile source, target
 		p "compile #{source.inspect}"
-		# c_flags = '-g -O0'
+		# c_flags = '-g -O0 -D DEBUG -D TYRAN_CONFIGURATION_DEBUG'
 		c_flags = '-O3'
 
 		sh "#{@c_compiler} -c #{source} #{c_flags} -Wall -pedantic -Werror #{parameter_string('I', @includes)} -std=c99 -o #{target}"

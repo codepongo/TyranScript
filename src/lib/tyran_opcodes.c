@@ -23,8 +23,6 @@ void tyran_opcodes_add_code(tyran_opcodes* codes, int code, int a, tyran_reg_or_
 {
 	u32t raw = 0;
 
-	TYRAN_LOG("B is %d", b);
-
 	raw |= (b ? 0x01 : 0);
 
 	raw <<= 9;

@@ -99,7 +99,6 @@ void tyran_variable_scope_undefine_variable(tyran_variable_scope* scope, tyran_r
 	if (scope->highest_register_used == index) {
 		scope->highest_register_used--;
 	}
-	TYRAN_LOG("Undefining register %d, highest is now %d", index, scope->highest_register_used);
 	scope->registers[index] = 0;
 }
 

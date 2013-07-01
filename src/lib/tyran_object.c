@@ -34,7 +34,7 @@ tyran_object* tyran_object_new(const struct tyran_runtime* runtime)
 void tyran_object_free(struct tyran_object* object)
 {
 	const tyran_runtime* runtime = object->created_in_runtime;
-	TYRAN_LOG("Object free:%p, runtime:%p", object, runtime);
+	TYRAN_LOG("Object free:%p, runtime:%p", (void*)object, (void*)runtime);
 	if (runtime->delete_callback) {
 		runtime->delete_callback(runtime, object);
 	}

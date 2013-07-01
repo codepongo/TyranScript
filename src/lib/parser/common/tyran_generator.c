@@ -193,9 +193,7 @@ tyran_reg_index tyran_generator_call_or_new(tyran_memory* memory, tyran_code_sta
 	} else {
 		tyran_opcodes_op_call(code->opcodes, start_register, argument_count, return_value_count);
 	}
-	TYRAN_LOG("After call undefine variables");
 	tyran_variable_scopes_top_undefine_variables(code->scope, start_register + 1, argument_count);
-	TYRAN_LOG("After call undefine variables - done");
 
 	return start_register;
 }
