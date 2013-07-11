@@ -56,7 +56,7 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 		{TYRAN_MOCHA_TOKEN_MULTIPLY, 1, 0},
 		{TYRAN_MOCHA_TOKEN_MODULUS, 1, 0},
 		{TYRAN_MOCHA_TOKEN_DIVIDE, 1, 0},
-    	{TYRAN_MOCHA_TOKEN_INDEX, 0, 0},
+		{TYRAN_MOCHA_TOKEN_INDEX, 0, 0},
 		{TYRAN_MOCHA_TOKEN_MEMBER, 1, 0},
 		{TYRAN_MOCHA_TOKEN_RANGE_EXCLUSIVE, 1, 0},
 		{TYRAN_MOCHA_TOKEN_RANGE_INCLUSIVE, 1, 0},
@@ -77,9 +77,9 @@ tyran_mocha_operator_info tyran_mocha_parser_get_operator_info(tyran_mocha_token
 
 	tyran_mocha_operator_info empty;
 
-    empty.is_enclosing = TYRAN_FALSE;
-    empty.right_associative = TYRAN_FALSE;
-    empty.precedence = 0;
+	empty.is_enclosing = TYRAN_FALSE;
+	empty.right_associative = TYRAN_FALSE;
+	empty.precedence = 0;
 	empty.token_id = TYRAN_MOCHA_TOKEN_END;
 
 	return empty;
@@ -272,7 +272,7 @@ void tyran_mocha_parser_parameters(tyran_parser_node_parameter* parameter_nodes,
 		tyran_mocha_parser_parameters(parameter_nodes, index, binary->right);
 	} else {
 		tyran_parser_node_parameter parameter_node;
-        parameter_node.node.type = 0;
+		parameter_node.node.type = 0;
 		if (binary && (binary->operator_type ==  TYRAN_PARSER_ASSIGNMENT)) {
 			TYRAN_LOG("*** Assignment");
 			parameter_node.default_value = binary->right;
@@ -797,7 +797,7 @@ void tyran_mocha_parser_end_enclosure(tyran_mocha_parser* parser, tyran_memory* 
 	tyran_parser_node_operand_unary* bracket = tyran_parser_unary_operator_type_cast(&(info.enclosure_node->node), TYRAN_PARSER_UNARY_BRACKET);
 
 	//if (bracket) {
-		parser->last_bracket_node = bracket;
+	parser->last_bracket_node = bracket;
 	//}
 
 
@@ -829,9 +829,9 @@ void tyran_mocha_parser_line(tyran_mocha_parser* parser)
 void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* parser, tyran_mocha_token* token)
 {
 	static tyran_boolean last_literal = 0;
-    
-    tyran_parser_node_operand_unary* last_was_bracket = parser->last_bracket_node;
-    parser->last_bracket_node = 0;
+
+	tyran_parser_node_operand_unary* last_was_bracket = parser->last_bracket_node;
+	parser->last_bracket_node = 0;
 
 #if 0
 	TYRAN_LOG("ADD TOKEN:")

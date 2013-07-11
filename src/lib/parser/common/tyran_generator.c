@@ -579,7 +579,7 @@ tyran_reg_or_constant_index tyran_generator_traverse_unary(tyran_memory* memory,
 		case TYRAN_PARSER_UNARY_BLOCK:
 			if (!unary->expression) {
 				tyran_reg_or_constant_index result = tyran_variable_scopes_define_temporary_variable(code->scope);
-				
+
 				return result;
 			}
 		case TYRAN_PARSER_UNARY_IF:
