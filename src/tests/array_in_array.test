@@ -1,0 +1,10 @@
+a = [
+['Hello', 24]
+['World', 33]
+]
+
+print a[0][0]
+print a[1][1]
+---
+Hello
+33
