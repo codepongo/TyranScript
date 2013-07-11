@@ -874,7 +874,6 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 				last_was_bracket = 0;
 			}
 			if (last_literal) {
-				TYRAN_LOG("CALL!!!!!!!!");
 				tyran_mocha_token* t = TYRAN_CALLOC_TYPE(parser->mocha_token_pool, tyran_mocha_token);
 				t->token_id = TYRAN_MOCHA_TOKEN_CALL;
 				tyran_mocha_parser_add_token(memory, parser, t);
