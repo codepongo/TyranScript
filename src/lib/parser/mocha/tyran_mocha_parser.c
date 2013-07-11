@@ -856,33 +856,30 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 	} else {
 		tyran_mocha_operator_info info = tyran_mocha_parser_get_operator_info(token->token_id);
 		if (info.token_id != TYRAN_MOCHA_TOKEN_END) {
-    		tyran_mocha_token_id end_closing_token_id = tyran_mocha_enclosing_start_token(token->token_id);
+			tyran_mocha_token_id end_closing_token_id = tyran_mocha_enclosing_start_token(token->token_id);
 
-    		if (end_closing_token_id != TYRAN_MOCHA_TOKEN_END) {
-
-            if (last_was_bracket) {
-				tyran_mocha_token index_token;
-				index_token.token_id = TYRAN_MOCHA_TOKEN_INDEX;
-				tyran_mocha_parser_add_token(memory, parser, &index_token);
+			if (end_closing_token_id != TYRAN_MOCHA_TOKEN_END) {
+				if (last_was_bracket) {
+					tyran_mocha_token index_token;
+					index_token.token_id = TYRAN_MOCHA_TOKEN_INDEX;
+					tyran_mocha_parser_add_token(memory, parser, &index_token);
+					last_was_bracket = 0;
+				}
 			}
-    		}
-            
+
 			NODE terminal = tyran_mocha_parser_add_terminal(memory, parser, token->token_id, info.precedence, info.right_associative);
 			parser->last_operator_node = terminal;
 			if (end_closing_token_id != TYRAN_MOCHA_TOKEN_END) {
 				tyran_mocha_parser_add_enclosure(parser, (tyran_parser_node_operand_unary*)terminal, token->token_id, end_closing_token_id);
-			} else {
-			    if (last_was_bracket) {
-    				last_was_bracket->operator_type = TYRAN_PARSER_UNARY_ARRAY;
-	    		}
 			}
 			last_literal = TYRAN_FALSE;
 		} else {
 			if (last_was_bracket) {
-                //tyran_parser_node_operand_unary* old_bracket = parser->last_bracket_node;
+				//tyran_parser_node_operand_unary* old_bracket = parser->last_bracket_node;
 				tyran_mocha_token index_token;
 				index_token.token_id = TYRAN_MOCHA_TOKEN_INDEX;
 				tyran_mocha_parser_add_token(memory, parser, &index_token);
+				last_was_bracket = 0;
 			}
 			if (last_literal) {
 				TYRAN_LOG("CALL!!!!!!!!");
@@ -898,6 +895,9 @@ void tyran_mocha_parser_add_token(tyran_memory* memory, tyran_mocha_parser* pars
 		}
 	}
 
+	if (last_was_bracket) {
+		last_was_bracket->operator_type = TYRAN_PARSER_UNARY_ARRAY;
+	}
 }
 
 
