@@ -1,0 +1,14 @@
+a =
+	hello: 2
+	world: 'hello'
+	planet:
+		size: 42
+		name: 'Jupiter'	
+
+print a.hello
+print a.world
+print a.planet.name
+---
+2
+hello
+Jupiter

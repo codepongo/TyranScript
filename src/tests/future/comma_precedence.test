@@ -1,0 +1,6 @@
+"hello", a=2, b=2+8
+print a
+print b
+---
+2
+10
