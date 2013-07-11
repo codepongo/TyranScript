@@ -201,6 +201,9 @@ tyran_reg_index tyran_generator_call_or_new(tyran_memory* memory, tyran_code_sta
 void tyran_generator_argument_nodes(NODE* argument_nodes, int* index, NODE node)
 {
 	tyran_parser_node_operand_binary* comma = tyran_parser_binary_operator_type_cast(node, TYRAN_PARSER_COMMA);
+	if (!comma) {
+		comma = tyran_parser_binary_operator_type_cast(node, TYRAN_PARSER_CONCAT);
+	}
 	if (comma) {
 		tyran_generator_argument_nodes(argument_nodes, index, comma->left);
 		tyran_generator_argument_nodes(argument_nodes, index, comma->right);
