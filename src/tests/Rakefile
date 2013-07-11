@@ -1,6 +1,6 @@
 require 'colored'
 
-test_files = FileList['./**/*.test']
+test_files = FileList['./*.test']
 
 o_files = []
 success = true
