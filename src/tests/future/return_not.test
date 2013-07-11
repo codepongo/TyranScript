@@ -1,0 +1,4 @@
+return if not true
+print "worked"
+---
+worked
