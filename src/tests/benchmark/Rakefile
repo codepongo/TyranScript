@@ -1,0 +1,9 @@
+
+def benchmark name, command_line
+	sh "time #{command_line.join(' ')}"
+end
+
+benchmark 'mocha', ['../../samples/command/command', 'brain.mocha']
+benchmark 'Lua', ['lua', 'brain.lua']
+benchmark 'Ruby', ['ruby', 'brain.rb']
+benchmark 'Python', ['python', 'brain.py']
