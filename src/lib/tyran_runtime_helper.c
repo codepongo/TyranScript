@@ -14,13 +14,14 @@
 #include <tyranscript/tyran_string.h>
 #include <tyranscript/tyran_object_macros.h>
 #include <tyranscript/tyran_symbol_table.h>
+#include <tyranscript/tyran_function.h>
 
 
 void tyran_runtime_setup_binary_operators(tyran_runtime* rt)
 {
 	const char* binary_strings[] = {"+", "-", "%", "*", "^", "-", "[]", "[]=", "==", "<", "<=", "iter", "++"};
 
-	for (int i=0; i<sizeof(binary_strings) / sizeof(char*); ++i) {
+	for (size_t i=0; i<sizeof(binary_strings) / sizeof(char*); ++i) {
 		tyran_symbol_table_add(rt->symbol_table, &rt->binary_operator_symbols[i], binary_strings[i]);
 	}
 }
@@ -30,7 +31,7 @@ tyran_runtime* tyran_runtime_new(tyran_memory_pool* runtime_pool, tyran_memory* 
 	tyran_runtime* rt = TYRAN_CALLOC_TYPE(runtime_pool, tyran_runtime);
 
 	rt->stack = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_runtime_stack, 128);
-	rt->registers = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_value, 128);
+	rt->registers = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_value, 1024);
 	rt->object_key_pool = object_key_pool;
 	rt->function_pool = function_pool;
 	rt->function_object_pool = function_object_pool;
@@ -81,3 +82,9 @@ void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opco
 	rt->stack[rt->stack_pointer] = *runtime_info;
 	rt->stack_pointer++;
 }
+
+void tyran_runtime_push_call_ex(tyran_runtime* rt, const tyran_function* func, const struct tyran_value* _this)
+{
+	tyran_runtime_push_call(rt, func->data.opcodes, func->constants, _this);
+}
+

@@ -27,7 +27,7 @@ typedef struct tyran_mocha_api {
 
 
 void tyran_mocha_api_new(tyran_mocha_api* api, int hunk_size);
-void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, tyran_value* return_value, const char* s, size_t length);
+void tyran_mocha_api_eval(tyran_mocha_api* api, tyran_value* context, tyran_value* return_value, const char* s);
 tyran_value tyran_mocha_api_create_object(tyran_mocha_api* api);
 void tyran_mocha_api_add_function(tyran_mocha_api* api, tyran_value* target, const char* name, tyran_function_callback callback);
 

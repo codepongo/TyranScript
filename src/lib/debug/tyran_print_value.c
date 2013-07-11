@@ -88,7 +88,7 @@ void tyran_value_to_c_string(const tyran_symbol_table* symbol_table, const tyran
 
 }
 
-void tyran_print_value_helper(int tabs, const char* property, const tyran_value* v, int quote, const tyran_symbol_table* symbol_table, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* string_pool, tyran_memory* memory)
+void tyran_print_value_helper(int tabs, const char* property, const tyran_value* v, int quote, const tyran_symbol_table* symbol_table)
 {
 	int t;
 
@@ -132,18 +132,18 @@ void tyran_print_value_helper(int tabs, const char* property, const tyran_value*
 			const char* symbol_name;
 			symbol_name = tyran_symbol_table_lookup(symbol_table, &property->symbol);
 
-			tyran_print_value_helper(tabs + 1, symbol_name, &property->value, quote, symbol_table, object_iterator_pool, string_pool, memory);
+			tyran_print_value_helper(tabs + 1, symbol_name, &property->value, quote, symbol_table);
 		}
 
 		if (tyran_object_get_prototype(o)) {
 			tyran_value prototype_value;
 			tyran_value_set_object(prototype_value, tyran_object_get_prototype(o));
-			tyran_print_value_helper(tabs + 1, "__proto__", &prototype_value, quote, symbol_table, object_iterator_pool, string_pool, memory);
+			tyran_print_value_helper(tabs + 1, "__proto__", &prototype_value, quote, symbol_table);
 		}
 	}
 }
 
-void tyran_print_value(const char* property, const tyran_value* v, int quote, const tyran_symbol_table* symbol_table, tyran_memory_pool* object_iterator_pool, tyran_memory_pool* string_pool, tyran_memory* memory)
+void tyran_print_value(const char* property, const tyran_value* v, int quote, const tyran_symbol_table* symbol_table)
 {
-	tyran_print_value_helper(0, property, v, quote, symbol_table, object_iterator_pool, string_pool, memory);
+	tyran_print_value_helper(0, property, v, quote, symbol_table);
 }

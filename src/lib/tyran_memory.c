@@ -1,3 +1,4 @@
+#include <tyranscript/tyran_memory.h>
 #include <tyranscript/tyran_config.h>
 
 void tyran_memory_construct(tyran_memory* memory, u8t* start, size_t size)
@@ -24,6 +25,7 @@ void* tyran_memory_alloc_debug(tyran_memory* memory, size_t size, const char* so
 
 void* tyran_memory_calloc_debug(tyran_memory* memory, size_t size, const char* source_file, int line, const char* description)
 {
+
 	// TYRAN_LOG("Allocating zeroed memory from '%s':%d", source_file, line);
 	return tyran_memory_calloc(memory, size);
 }

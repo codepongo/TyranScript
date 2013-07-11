@@ -11,6 +11,7 @@
 
 #include <tyranscript/debug/tyran_print_value.h>
 
+/*
 TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_constructor)
 {
 	if (!is_constructor) {
@@ -23,6 +24,7 @@ TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_char_at)
 {
 	return 0;
 }
+*/
 
 TYRAN_RUNTIME_CALL_FUNC(tyran_string_prototype_add)
 {

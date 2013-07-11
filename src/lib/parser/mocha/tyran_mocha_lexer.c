@@ -251,7 +251,7 @@ tyran_mocha_token tyran_mocha_lexer_next_token(tyran_lexer_position_info* lexer_
 	return token;
 }
 
-tyran_mocha_lexer* tyran_mocha_lexer_lex(tyran_memory_pool* mocha_lexer_pool, tyran_memory_pool* mocha_token_pool, tyran_memory_pool* lexer_pool, tyran_memory* memory, const char* buf, int length)
+tyran_mocha_lexer* tyran_mocha_lexer_lex(tyran_memory_pool* mocha_lexer_pool, tyran_memory_pool* mocha_token_pool, tyran_memory_pool* lexer_pool, tyran_memory* memory, const char* buf)
 {
 	tyran_lexer_position_info position_info;
 	tyran_mocha_token* temp_buffer = TYRAN_MALLOC_NO_POOL_TYPE_COUNT(memory, tyran_mocha_token, 8192);

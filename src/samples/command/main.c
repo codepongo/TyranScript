@@ -10,7 +10,7 @@ void print_value(tyran_runtime* runtime, tyran_value* v)
 
 void inspect_value(tyran_runtime* runtime, tyran_value* v)
 {
-	tyran_print_value("", v, 1, runtime->symbol_table, runtime->iterator_pool, runtime->string_pool, runtime->memory);
+	tyran_print_value("", v, 1, runtime->symbol_table);
 }
 
 
@@ -37,7 +37,7 @@ tyran_value* load(tyran_mocha_api* api, tyran_value* global, const char* input_f
 	tyran_value_object_set_prototype(new_object, global);
 
 	tyran_value return_value;
-	tyran_mocha_api_eval(api, new_object, &return_value, buf, tyran_strlen(buf));
+	tyran_mocha_api_eval(api, new_object, &return_value, buf);
 
 	return new_object;
 }

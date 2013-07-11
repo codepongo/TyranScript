@@ -71,6 +71,6 @@
 	sp--; \
 	r = sp->r; \
 	c = sp->c; \
-	argument_count = sp->argument_count; \
+	/* argument_count = sp->argument_count; */ \
 	pc = sp->pc;
 

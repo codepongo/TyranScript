@@ -75,7 +75,7 @@ void tyran_code_add_label_index_reference(tyran_code_state* state, tyran_label_i
 	struct tyran_label_reference* label_reference = &state->label_references[state->label_reference_count++];
 	label_reference->label_index = label_index;
 	label_reference->opcode = &state->opcodes->codes[state->opcodes->code_len];
-	TYRAN_LOG("Adding label reference:%d code_position:%d", label_index, state->opcodes->code_len);
+	// TYRAN_LOG("Adding label reference:%d code_position:%d", label_index, state->opcodes->code_len);
 }
 
 

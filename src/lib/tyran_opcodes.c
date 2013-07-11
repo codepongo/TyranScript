@@ -155,7 +155,6 @@ void tyran_opcodes_op_next(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or
 
 void tyran_opcodes_op_eq(tyran_opcodes* codes, tyran_reg_index a, tyran_reg_or_constant_index x, tyran_reg_or_constant_index y, int b)
 {
-	TYRAN_LOG("jeq. b:%d", b);
 	tyran_opcodes_add_code(codes, TYRAN_OPCODE_EQ, a, x, y, b);
 }
 

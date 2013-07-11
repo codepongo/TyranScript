@@ -47,3 +47,8 @@ const tyran_string* tyran_value_string(tyran_value* v)
 	TYRAN_ASSERT(tyran_value_is_object(v), "Must be object");
 	return tyran_object_string(v->data.object);
 }
+
+const struct tyran_function* tyran_value_function(tyran_value* v) {
+	TYRAN_ASSERT(tyran_value_is_object(v), "Must be object");
+	return tyran_object_function(v->data.object);
+}

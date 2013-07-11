@@ -133,6 +133,7 @@ typedef struct tyran_value {
 tyran_number tyran_value_number(tyran_value* v);
 tyran_boolean tyran_value_boolean(tyran_value* v);
 const struct tyran_string* tyran_value_string(tyran_value* v);
+const struct tyran_function* tyran_value_function(tyran_value* v);
 
 struct tyran_object* tyran_value_object(tyran_value* v);
 
@@ -144,5 +145,6 @@ int tyran_value_is_true(const tyran_value* v);
 int tyran_value_length(const tyran_value* v);
 
 void tyran_value_set_program_specific(struct tyran_value* value, void* program_specific_context);
+#define tyran_value_program_specific(v) v->data.object->program_specific
 
 #endif

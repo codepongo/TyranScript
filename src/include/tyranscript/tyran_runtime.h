@@ -12,8 +12,9 @@ struct tyran_value;
 struct tyran_object;
 struct tyran_memory_pool;
 struct tyran_symbol_table;
+struct tyran_function;
 
-#define TYRAN_RUNTIME_CALL_FUNC(NAME) int NAME(struct tyran_runtime* runtime, tyran_value* func, tyran_value* arguments, int argument_count, tyran_value* self, tyran_value* return_value, int is_constructor)
+#define TYRAN_RUNTIME_CALL_FUNC(NAME) static int NAME(struct tyran_runtime* runtime, tyran_value* func, tyran_value* arguments, int argument_count, tyran_value* self, tyran_value* return_value, int is_constructor)
 
 typedef void (*tyran_value_delete_callback)(const struct tyran_runtime* program_specific_context, struct tyran_object* program_specific);
 
@@ -61,6 +62,8 @@ tyran_runtime* tyran_runtime_new(struct tyran_memory_pool* runtime_pool, struct 
 void tyran_runtime_free(tyran_runtime* rt);
 void tyran_runtime_execute(tyran_runtime* runtime, struct tyran_value* return_value, const struct tyran_runtime_callbacks* callbacks);
 void tyran_runtime_push_call(tyran_runtime* rt, const struct tyran_opcodes* opcodes, const struct tyran_constants* constants, const struct tyran_value* _this);
+void tyran_runtime_push_call_ex(tyran_runtime* rt, const struct tyran_function* func, const struct tyran_value* _this);
+
 #define tyran_runtime_context(RUNTIME) (RUNTIME->global)
 
 #endif

@@ -78,5 +78,6 @@ struct tyran_range* tyran_object_range(struct tyran_object* o);
 struct tyran_red_black_tree_iterator* tyran_object_array_iterator(struct tyran_object* o);
 const struct tyran_string* tyran_object_string(struct tyran_object* o);
 struct tyran_array* tyran_object_array(struct tyran_object* o);
+const struct tyran_function* tyran_object_function(struct tyran_object* o);
 
 #endif

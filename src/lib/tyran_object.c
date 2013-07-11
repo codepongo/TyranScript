@@ -104,7 +104,11 @@ void tyran_object_delete(struct tyran_object* object, const struct tyran_symbol*
 
 void tyran_object_set_prototype(struct tyran_object* target, struct tyran_object* proto)
 {
-	TYRAN_ASSERT(target->prototype == 0, "Prototype already set, this is a problem");
+	if (target->prototype) {
+		TYRAN_OBJECT_RELEASE(target->prototype);
+	}
+	TYRAN_ASSERT(proto != target, "Can not set prototype to self");
+
 	TYRAN_OBJECT_RETAIN(proto);
 	target->prototype = proto;
 }
@@ -145,3 +149,9 @@ struct tyran_array* tyran_object_array(struct tyran_object* o) {
 	TYRAN_ASSERT(o->type == TYRAN_OBJECT_TYPE_ARRAY, "must be array");
 	return o->data.array;
 }
+
+const struct tyran_function* tyran_object_function(struct tyran_object* o) {
+	TYRAN_ASSERT(o->type == TYRAN_OBJECT_TYPE_FUNCTION, "must be array");
+	return o->data.function->static_function;
+}
+

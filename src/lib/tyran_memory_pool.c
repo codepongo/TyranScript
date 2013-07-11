@@ -5,7 +5,7 @@ void tyran_memory_pool_initialize_entries(tyran_memory_pool* pool)
 	u8t* m = pool->memory + 1;
 	int total_size = pool->struct_size + sizeof(tyran_memory_pool_entry);
 	tyran_memory_pool_entry* previous = 0;
-	for (int i=0; i<pool->max_count; ++i) {
+	for (size_t i=0; i<pool->max_count; ++i) {
 		tyran_memory_pool_entry* e = (tyran_memory_pool_entry*) m;
 		if (i==0) {
 			pool->first_free = e;
@@ -25,7 +25,7 @@ void tyran_memory_pool_initialize_entries(tyran_memory_pool* pool)
 
 tyran_memory_pool* tyran_memory_pool_construct(tyran_memory* memory, size_t struct_size, size_t count, const char* type)
 {
-	TYRAN_LOG("Allocating pool of type '%s' (%zu x %zu)", type, struct_size, count);
+	// TYRAN_LOG("Allocating pool of type '%s' (%zu x %zu)", type, struct_size, count);
 	tyran_memory_pool* pool = TYRAN_MEMORY_ALLOC(memory, sizeof(tyran_memory_pool), "Memory pool");
 	pool->memory = TYRAN_MEMORY_ALLOC(memory, (sizeof(tyran_memory_pool_entry) + struct_size) * count + 1, "Memory pool entries");
 	pool->struct_size = struct_size;
@@ -46,7 +46,7 @@ void* tyran_memory_pool_alloc(tyran_memory_pool* pool)
 	pool->count++;
 	u8t* m = (u8t*) e;
 	u8t* p = m + sizeof(tyran_memory_pool_entry);
-	TYRAN_LOG("Allocating from memory pool '%s' (%zu) -> %p (count:%zu)", pool->type_string, pool->struct_size, m, pool->count);
+	// TYRAN_LOG("Allocating from memory pool '%s' (%zu) -> %p (count:%zu)", pool->type_string, pool->struct_size, m, pool->count);
 	return p;
 }
 
@@ -84,7 +84,7 @@ void tyran_memory_pool_free(void* p)
 
 	pool->count--;
 
-	TYRAN_LOG("Freeing from memory pool '%s' (%zu) -> %p (count:%zu)", pool->type_string, pool->struct_size, m, pool->count);
+	// TYRAN_LOG("Freeing from memory pool '%s' (%zu) -> %p (count:%zu)", pool->type_string, pool->struct_size, m, pool->count);
 	e->next_free = e->pool->first_free;
 	pool->first_free = e;
 }
