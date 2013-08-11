@@ -1,0 +1,4 @@
+b = 99
+print "Answer: #{b + 1}"
+---
+Answer: 100

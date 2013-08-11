@@ -1,0 +1,4 @@
+b = 'world!'
+print "Hello, #{b}"
+---
+Hello, world!

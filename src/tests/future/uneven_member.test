@@ -1,0 +1,8 @@
+a = 
+	world:
+		hello: 2
+
+
+print a.world.hello
+---
+2

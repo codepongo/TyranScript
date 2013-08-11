@@ -1,0 +1,7 @@
+a = nil
+if a is nil
+	print "told you it's nil!"
+else
+	print "fail"
+---
+told you it's nil!

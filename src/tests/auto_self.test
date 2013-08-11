@@ -1,0 +1,8 @@
+o =
+	member: 42
+	somefunc: ->
+		member
+
+print o.somefunc()
+---
+42
