@@ -6,7 +6,6 @@ class Builder
 
 	def initialize application
 		@includes = ['../../include']
-
 		build_directory = 'build/'
 		p "directory"
 		directory build_directory
@@ -52,8 +51,8 @@ class Builder
 
 	def compile source, target
 		p "compile #{source.inspect}"
-		# c_flags = '-g -O0 -D DEBUG -D TYRAN_CONFIGURATION_DEBUG'
-		c_flags = '-O3'
+		c_flags = '-g -O0 -D DEBUG -D TYRAN_CONFIGURATION_DEBUG'
+		# c_flags = '-O3'
 
 		sh "#{@c_compiler} -c #{source} #{c_flags} -Wall -pedantic -Werror #{parameter_string('I', @includes)} -std=c99 -o #{target}"
 	end
